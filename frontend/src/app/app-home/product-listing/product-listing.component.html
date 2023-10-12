@@ -1,0 +1,26 @@
+<app-header></app-header>
+
+   <!-- This is where the content passed between <app-product-listing> tags will be rendered -->
+
+<div class="productlist--container">
+  <ng-content></ng-content>
+  <div class="page-container">
+    <mat-paginator class="page"
+      [length]="products.length"
+      [pageSize]="21"
+      [pageSizeOptions]="[7, 14, 21]"
+      aria-label="Select page"
+      #paginator>
+    </mat-paginator>
+  </div>
+  
+  <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
+    <app-product  
+      [product]="product" 
+      (click)="openProductDetail(product)"
+    >
+    </app-product>
+  </ng-container>
+</div>
+<app-footer></app-footer>
+  

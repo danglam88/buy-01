@@ -1,0 +1,92 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<app-header></app-header>
+<mat-card>
+  <!--HEADER-->
+  <div class="header">
+    <span class="role">{{ userInfo.role }}</span>
+    <h1 mat-dialog-title class="title">My Profile</h1>
+  </div>
+  <!--Image-->
+  <!-- Cannot choose another pic after cancel -->
+  <div class="profile-image">
+    <div >
+      <img [src]="previewUrl ? previewUrl : userInfo.avatar">
+    </div>
+    <div>
+      <input type="file" (change)="uploadImage($event)" accept="image/*" style="display: none" #fileInput>
+      <button mat-button color="primary" (click)="fileInput.click()" *ngIf="!previewUrl">Upload Image</button>
+      <button mat-button color="primary" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
+      <button mat-button color="primary" *ngIf="previewUrl">Save</button>
+    </div>
+  </div>
+  <mat-dialog-content>
+    <div>
+      <form [formGroup]="userProfileForm">
+        <!--Name-->
+        <div class="profile-field">
+          <div class="profile-label">
+            <strong>Name:</strong>
+          </div>
+          <div class="profile-value" *ngIf="editingField !== 'name'">
+            {{ userInfo.name }}
+          </div>
+          <div class="profile-value" *ngIf="editingField == 'name'">
+            <mat-form-field *ngIf="editingField === 'name'">
+              <input matInput formControlName="name" [placeholder]="userInfo.name" #nameInput>
+            </mat-form-field>
+          </div>
+          <div class="profile-button">
+            <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+            <button mat-button color="primary" *ngIf="editingField === 'name'" (click)="updateName()">Save</button>
+            <button mat-button color="primary" *ngIf="editingField === 'name'" (click)="cancelFieldEdit()">Cancel</button>
+          </div>
+        </div>
+        <!--Email-->
+        <div class="profile-field">
+          <div class="profile-label">
+            <strong>Email:</strong>
+          </div>
+          <div class="profile-value" *ngIf="editingField !== 'email'">
+            {{ userInfo.email }}
+          </div>
+          <div class="profile-value" *ngIf="editingField == 'email'">
+            <mat-form-field *ngIf="editingField === 'email'">
+              <input matInput formControlName="email" [placeholder]="userInfo.email" #emailInput>
+            </mat-form-field>
+          </div>
+          <div class="profile-button">
+            <button class="edit-button" (click)="editProfileField('email')" *ngIf="editingField !== 'email'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+            <button mat-button color="primary" *ngIf="editingField === 'email'" (click)="updateEmail()">Save</button>
+            <button mat-button color="primary" *ngIf="editingField === 'email'" (click)="cancelFieldEdit()">Cancel</button>
+          </div>
+        </div>
+        <!--Password-->
+        <div class="profile-field">
+          <div class="profile-label">
+            <strong>Password:</strong>
+          </div>
+          <div class="profile-value" *ngIf="editingField !== 'password'">
+            ********
+          </div>
+          <div class="profile-value" *ngIf="editingField == 'password'">
+            <mat-form-field *ngIf="editingField === 'password'">
+              <input matInput formControlName="password" type="password" #passwordInput>
+            </mat-form-field>
+          </div>
+          <div class="profile-button">
+            <button class="edit-button" (click)="editProfileField('password')" *ngIf="editingField !== 'password'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+            <button mat-button color="primary" *ngIf="editingField === 'password'" (click)="updatePassword()">Save</button>
+            <button mat-button color="primary" *ngIf="editingField === 'password'" (click)="cancelFieldEdit()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+  <button class="delete-button" (click)="deleteUser()">
+    <span class="text">
+        Delete My Account
+    </span>
+  </button>
+</mat-card>
+<app-footer></app-footer>
+

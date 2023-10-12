@@ -1,0 +1,15 @@
+<header class="site-header">
+  <div class="site-identity">
+    <h1><a routerLink="../home">Buy-01!</a></h1>
+  </div>  
+  <nav class="site-navigation">
+    <ul class="nav">
+      <li><a routerLink="../home" [ngClass]="{ 'selected': currentRoute === '/home' }">Home</a></li>
+      <li *ngIf="role === 'SELLER'"><a routerLink="../product-dashboard" [ngClass]="{ 'selected': currentRoute === '/product-dashboard' }">My Products</a></li>
+      <li><a routerLink="../user-dashboard" [ngClass]="{ 'selected': currentRoute === '/user-dashboard' }">Profile</a></li>
+      <li><a (click)="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+ 

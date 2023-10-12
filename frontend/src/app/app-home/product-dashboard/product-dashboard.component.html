@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<app-header></app-header>
+
+<div class="productlist--container">
+  <div class="page-container">
+    <mat-paginator class="page"
+      [length]="sellerProducts.length"
+      [pageSize]="21"
+      [pageSizeOptions]="[7, 14, 21]"
+      aria-label="Select page"
+      #paginator>
+    </mat-paginator>
+  </div>
+  <button class="button-79" role="button" (click)="openCreateProduct()">Create New Product</button>
+  <p *ngIf="sellerProducts.length == 0">You have no products!</p>
+  <ng-container *ngFor="let product of sellerProducts.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
+    <app-product  
+      [product]="product" 
+      (click)="openProductDetail(product)"
+    >
+    </app-product>
+  </ng-container>
+</div>
+<app-footer></app-footer>
+

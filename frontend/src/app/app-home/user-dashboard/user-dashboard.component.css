@@ -1,0 +1,160 @@
+mat-card {
+  max-width: 600px; /* Adjust the width as needed */
+  margin: 0 auto;
+  margin-top: 5%;
+  padding: 20px;
+  box-shadow: 0 4px 6px #778da9;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 35px;
+  border: 1px solid #778da9;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(15px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.role {
+  color: #231E39;
+	background-color: #FEBB0B;
+	border-radius: 5px;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 6px 10px;
+	position: absolute;
+	top: 30px;
+	left: 30px;
+}
+
+.title {
+  margin: 0;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.edit-profile-close{
+  cursor: pointer; 
+  color: #28282B;
+  font-size: 20px;
+  margin: 22px;
+}
+
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+mat-dialog-content {
+  display: flex;
+  margin-top: 0;
+  margin-left: 15%;
+}
+
+
+img {
+  max-width: 100%;
+  max-height: 200px; 
+  display: block;
+  margin-top: 10px;
+}
+
+
+button {
+  margin-top: 20px;
+}
+
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.profile-field {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 10px; 
+}
+
+.profile-label {
+  flex-grow: 1; 
+  margin-right: 5px; 
+}
+
+.profile-button {
+  flex-shrink: 0; 
+}
+
+.profile-value {
+  flex-grow: 3;
+}
+
+.profile-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.profile-image img {
+  width: 150px; 
+  height: 150px; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  margin-bottom: 10px; 
+  border: 3px solid darkgrey;
+}
+.profile-image input[type="file"] {
+  display: none;
+}
+
+.profile-image button {
+  margin-top: 10px; 
+}
+
+.delete-button {
+  margin-top: 30px;
+  background-color: #d13535;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 23%;
+  height: 100vh;
+  width: 150px;
+  height: 50px;
+  cursor: pointer;
+
+  background: red;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #e62222;
+}
+
+.delete-button .text {
+  color: white;
+  font-size: 14px;
+}
+
+.delete-button:hover {
+  background: #ff3636;
+}
+
+.edit-button {
+  background-color: transparent;
+  border: none;
+  margin-left: 20px;
+  cursor: pointer;
+}

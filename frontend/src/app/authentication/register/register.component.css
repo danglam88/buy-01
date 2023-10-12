@@ -1,0 +1,64 @@
+
+
+  .roles {
+    height: 100%;
+    width: 100%;
+    border: none;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 6px;
+    outline: none;
+    padding: 0 15px;
+    padding-top: 12px;
+    border: 1px solid#CACACA;
+
+  }
+
+  header{
+    font-size: 25px;
+    font-weight: 600;
+    color: #232836;
+    text-align: center;
+}
+
+/* Center the .round div */
+.round {
+  margin-left: 37%;
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100px;
+  width: 100px;
+  border: 2px solid lightgrey;
+  border-radius: 50%;
+  padding: .35rem;
+  margin-bottom: 15px;
+  object-fit: cover; 
+}
+
+.upload-button {
+  /* justify-items: center !important;
+  align-items: center !important; 
+  justify-content: space-between; */
+  justify-content: space-between !important;
+  margin-left: 34%;
+  color: #fff;
+  background-color: #0171d3;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none; 
+  border-radius: 5px; 
+  
+}
+
+.upload-button:hover {
+  background-color: #016dcb;
+}
+
+/* .buttons {
+  display: flex;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 10px;
+} */

@@ -1,0 +1,53 @@
+<section class="container forms">
+    <div class="form login">
+      <div class="form-content">
+        <header>Register</header>
+        <!--Form-->
+        <form class="register-form" [formGroup]="registerform" (ngSubmit)="register()">
+          <!--Avatar Preview Container-->
+          <div class="profile-picture">
+            <div id="preview" *ngIf="previewUrl" class="avatar-container">
+              <img [src]="previewUrl" alt="Image Preview" class="round">
+            </div>
+            <div *ngIf="!previewUrl">
+              <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Default Avatar" class="round">
+            </div>
+          </div>
+          <!--Upload Avatar Button-->
+          <div class="buttons">
+            <label for="image"class="upload-button" *ngIf="!previewUrl" >Upload Avatar</label>
+            <input type="file" id="image" name="image" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+            <button class="upload-button" *ngIf="previewUrl">Save</button>
+            <button class="upload-button" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
+          </div>
+          <!--Name Field-->
+          <div class="field input-field">
+            <input placeholder="Name" class="input" formControlName="name" #nameInput>
+          </div>
+          <!--Email Field-->
+          <div class="field input-field">
+              <input type="email" placeholder="Email" class="input" formControlName="email">
+          </div>
+          <!--Password Field-->
+          <div class="field input-field">
+              <input type="password" placeholder="Create password" class="password" formControlName="password">
+          </div>
+          <!--Role Option-->
+          <div class="field input-field">
+            <mat-select placeholder="Choose a role" class="roles" formControlName="role">
+              <mat-option class="options" value="Client">Client</mat-option>
+              <mat-option class="options" value="Seller">Seller</mat-option>
+            </mat-select>
+          </div>
+          <!--Register Button-->
+          <div class="field button-field">
+              <button>Register</button>
+          </div>
+        </form>
+        <!--Form End-->
+        <div class="form-link">
+            <span>Already have an account? <a routerLink='/login' class="link login-link">Login</a></span>
+        </div>
+      </div>
+    </div>
+</section>

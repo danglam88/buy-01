@@ -1,0 +1,42 @@
+.product--item{
+    width: 290px;
+    background-color: #FDFEFE;
+    margin: 10px 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: #efefef 2px solid;
+    border-radius: 6px;
+    height: 90%;
+    cursor: pointer;
+}
+
+.product--price{
+    padding:2px 6px;
+    position:absolute;
+    margin-top: -25px;
+    background-color:#28282B;
+    color:white;
+}
+
+.product--image{
+    width: 265px;
+    height: 250px;
+}
+
+.product--name{
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    font-weight: 200;
+    color: #28282B;
+    margin-top: 7px;
+}
+
+.highlight-product{
+    -webkit-box-shadow: 0 0 1px 3px #000 inset;
+    -moz-box-shadow: 0 0 1px 3px #000 inset;
+    box-shadow: 10px 100 18px #cccccc;
+    border: #efefef 2px solid;
+    transform: scale(1.05);
+}

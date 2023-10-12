@@ -1,0 +1,48 @@
+import { Component, OnInit  } from '@angular/core';
+import { Product } from '../../Models/Product';
+import { MatDialog } from '@angular/material/dialog';
+import { ProductDetailComponent } from '../product-detail/product-detail.component';
+import { AllproductsInfoService } from 'src/app/services/allproducts-info.service';
+
+@Component({
+  selector: 'app-product-listing',
+  templateUrl: './product-listing.component.html',
+  styleUrls: ['./product-listing.component.css'],
+})
+export class ProductListingComponent implements OnInit {
+  selectedProduct: Product;
+  products: any = [];
+
+  constructor(
+    private dialog: MatDialog, 
+    private allProductsInfoService: AllproductsInfoService
+    ) {}
+  
+
+  ngOnInit(): void {
+    this.allProductsInfoService.getAllProductsInfo().subscribe({
+      next: (result) => {
+        console.log(result);
+        this.products = result;
+      },
+      error: (error) => {
+        console.log(error);
+        if (error.status == 404) {
+          console.log("Products not found");
+        }
+      },
+      complete: () => {
+        console.log("All products retrieved");
+      }
+    });
+  }
+
+  openProductDetail(productData: Product): void {
+    console.log(productData)
+     this.dialog.open(ProductDetailComponent, {
+      data: {
+        product: productData, 
+      },
+    });
+  }
+}
