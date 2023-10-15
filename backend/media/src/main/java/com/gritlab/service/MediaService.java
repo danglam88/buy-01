@@ -87,7 +87,7 @@ public class MediaService {
         }
     }
 
-    @KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
+    /*@KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
     public void consumeMessage(String message) {
         mediaRepository.deleteAllByProductId(message);
     }
@@ -108,7 +108,7 @@ public class MediaService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public MediaType getImageType(String fileName) {
 

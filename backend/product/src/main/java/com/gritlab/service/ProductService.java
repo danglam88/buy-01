@@ -32,8 +32,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    /*@Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;*/
 
     @Autowired
     private MediaService mediaService;
@@ -87,7 +87,7 @@ public class ProductService {
 
     public void deleteProduct(String id, String userId)  {
         if (productRepository.existsByUserIdAndId(userId, id)) {
-            kafkaTemplate.send("DELETE_PRODUCT", id);
+            //kafkaTemplate.send("DELETE_PRODUCT", id);
             productRepository.deleteById(id);
         }
     }
@@ -125,7 +125,7 @@ public class ProductService {
         return productsWithImages;
     }
 
-    @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
+    /*@KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
     public void consumeMessage(String message) {
         List<Product> products = productRepository.findAllByUserId(message);
         for (Product product : products) {
@@ -155,5 +155,5 @@ public class ProductService {
                 .build();
         productRepository.save(product2);
         kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
-    }
+    }*/
 }
