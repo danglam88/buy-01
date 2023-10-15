@@ -156,4 +156,21 @@ public class ProductService {
         productRepository.save(product2);
         kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
     }
+
+    @KafkaListener(topics = "DELETE_MEDIA", groupId = "my-consumer-group")
+    public void consumeMessageDeleteMedia(String message) {
+
+        String[] params = message.split(",");
+        if (params.length == 3) {
+            String productId = params[0];
+            String userId = params[1];
+            String mediaId = params[2];
+
+            Optional<Product> product = productRepository.findByUserIdAndId(userId, productId);
+
+            if (product.isPresent()) {
+                kafkaTemplate.send("DELETE_MEDIA_FEEDBACK", mediaId);
+            }
+        }
+    }
 }

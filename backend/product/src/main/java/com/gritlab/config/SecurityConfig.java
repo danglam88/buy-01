@@ -106,6 +106,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic topicDeleteMedia() {
+        return TopicBuilder.name("DELETE_MEDIA")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
