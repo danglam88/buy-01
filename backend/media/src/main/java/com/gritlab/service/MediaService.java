@@ -6,6 +6,7 @@ import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,9 @@ public class MediaService {
 
     @Autowired
     private MediaRepository mediaRepository;
+
+    /*@Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;*/
 
     public Optional<Media> getMedia(String id) {
 
@@ -70,24 +74,26 @@ public class MediaService {
         return newMedia;
     }
 
-    public void deleteMedia(String id)  {
+    public void deleteMedia(String id, String userId)  {
 
         if (mediaRepository.existsById(id)) {
 
             Media media = mediaRepository.findById(id).orElseThrow();
 
-            File fileToDelete = new File(media.getImagePath());
+            String data = media.getProductId() + "," + userId + "," + id;
 
-            if (fileToDelete.delete()) {
-                System.out.println("File deleted successfully.");
-            } else {
-                System.err.println("Failed to delete the file.");
-            }
-            mediaRepository.deleteById(id);
+            System.out.println("Media deleting, Sending data : " + data);
+            //kafkaTemplate.send("DELETE_MEDIA", data);
         }
     }
 
-    /*@KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
+    /*@KafkaListener(topics = "DELETE_MEDIA_FEEDBACK", groupId = "my-consumer-group")
+    public void consumeMessageDeleteMedia(String message) {
+        System.out.println("Media deleting, Receiving data : " + message);
+        mediaRepository.deleteById(message);
+    }
+
+    @KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
     public void consumeMessage(String message) {
         mediaRepository.deleteAllByProductId(message);
     }
@@ -96,7 +102,7 @@ public class MediaService {
     public void consumeMessage2(String message) throws IOException {
         String productId = message.split(" ")[0];
         String fileName = message.split(" ")[1];
-        Path filePath = Paths.get("backend/media/upload/" + fileName);
+        Path filePath = Paths.get("media/upload/" + fileName);
         try {
             byte[] fileContent = Files.readAllBytes(filePath);
             Media media = Media.builder()

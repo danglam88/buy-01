@@ -1,6 +1,7 @@
 package com.gritlab.controller;
 
 import com.gritlab.model.Media;
+import com.gritlab.model.UserDetails;
 import com.gritlab.service.MediaService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -69,10 +71,12 @@ public class MediaController {
 
     @DeleteMapping("/{id}")
     private ResponseEntity<Void> deleteProduct(
-            @PathVariable String id) {
+            @PathVariable String id,
+            Authentication authentication) {
 
-        //todo send request to product mc
-        mediaService.deleteMedia(id);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        mediaService.deleteMedia(id, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 }
