@@ -1,4 +1,5 @@
 Here are Julia's and Dang's suggested APIs and Kafka Topics for our project:
+test
 
 APIs (user type):
 -  GET: /users/userInfo => own client, own seller
