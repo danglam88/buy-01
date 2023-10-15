@@ -20,10 +20,10 @@ public class ProductResponse extends Product {
         super(product.getId(), product.getName(), product.getDescription(), product.getPrice(), product.getQuantity(), product.getUserId());
     }
 
-    public void setImages(List<Media> media, String service) {
+    public void setImages(List<String> media, String service) {
         this.images = new ArrayList<>();
-        for (Media item : media) {
-            this.images.add(service + item.getId());
+        for (String item : media) {
+            this.images.add(service + item);
         }
     }
 }

@@ -5,8 +5,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app-home.component.css']
 })
 export class AppHomeComponent {
-
-  //@ViewChild(ProductListingComponent) productListingComponent: ProductListingComponent;
-  
   
 }

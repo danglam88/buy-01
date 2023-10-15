@@ -7,8 +7,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   styleUrls: ['./confirmation-dialog.component.css']
 })
 export class ConfirmationDialogComponent {
-  constructor(public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { isDeleteProduct: boolean }) {}
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmationDialogComponent>, 
+    @Inject(MAT_DIALOG_DATA) public data: { confirmationText: string }) {}
 
   closeDialog(confirm: boolean): void {
     this.dialogRef.close(confirm);

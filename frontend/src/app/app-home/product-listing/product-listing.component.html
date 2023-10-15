@@ -6,7 +6,7 @@
   <ng-content></ng-content>
   <div class="page-container">
     <mat-paginator class="page"
-      [length]="products.length"
+      [length]="products?.length"
       [pageSize]="21"
       [pageSizeOptions]="[7, 14, 21]"
       aria-label="Select page"
@@ -14,7 +14,7 @@
     </mat-paginator>
   </div>
   
-  <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
+  <ng-container *ngFor="let product of products?.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
     <app-product  
       [product]="product" 
       (click)="openProductDetail(product)"
@@ -23,4 +23,3 @@
   </ng-container>
 </div>
 <app-footer></app-footer>
-  

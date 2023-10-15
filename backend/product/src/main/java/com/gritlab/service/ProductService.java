@@ -1,11 +1,12 @@
 package com.gritlab.service;
 
-import com.gritlab.model.Media;
 import com.gritlab.model.Product;
 import com.gritlab.model.ProductResponse;
 import com.gritlab.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -43,22 +44,21 @@ public class ProductService {
     @Value("${media.service.media.url}")
     private String mediaServiceMediaUrl;
 
-    public List<ProductResponse> findAll() {
+    public List<ProductResponse> findAll(String token) {
         List<Product> products = productRepository.findAll();
-        return this.setImages(products);
+        return this.setImages(products, token);
     }
 
-    public List<ProductResponse> findBySellerId(String sellerId) {
+    public List<ProductResponse> findBySellerId(String sellerId, String token) {
         List<Product> products = productRepository.findAllByUserId(sellerId);
-        return this.setImages(products);
+        return this.setImages(products, token);
     }
 
     public Optional<Product> getProduct(String id) {
         return productRepository.findById(id);
     }
 
-    public Product addProduct(String name, String description, Double price, Integer quantity,
-                              MultipartFile file, String userId) {
+    public Product addProduct(String name, String description, Double price, Integer quantity, String userId) {
         var product = Product.builder()
                 .name(name)
                 .description(description)
@@ -67,15 +67,7 @@ public class ProductService {
                 .userId(userId)
                 .build();
 
-        Product newProduct = productRepository.save(product);
-
-        try {
-            mediaService.uploadFile(file, product.getId());
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-
-        return newProduct;
+        return  productRepository.save(product);
     }
 
     public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
@@ -100,18 +92,26 @@ public class ProductService {
         }
     }
 
-    private List<ProductResponse> setImages(List<Product> products) {
+    private List<ProductResponse> setImages(List<Product> products, String token) {
 
         List<ProductResponse> productsWithImages = new ArrayList<>();
-        ParameterizedTypeReference<List<Media>> responseType = new ParameterizedTypeReference<List<Media>>() {};
+        ParameterizedTypeReference<List<String>> responseType = new ParameterizedTypeReference<List<String>>() {};
 
         for (Product product : products) {
-            ResponseEntity<List<Media>> responseEntity = restTemplate.exchange(mediaServiceProductUrl + product.getId(),  HttpMethod.GET,
-                    null, // Pass null as the request entity
+
+            // Create HttpHeaders and add the authorization header
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + token);
+
+            // Create an HttpEntity with the headers
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<List<String>> responseEntity = restTemplate.exchange(mediaServiceProductUrl + product.getId(),  HttpMethod.GET,
+                    entity, // Pass null as the request entity
                     responseType);
 
             // Retrieve the list of Media from the ResponseEntity
-            List<Media> media = responseEntity.getBody();
+            List<String> media = responseEntity.getBody();
 
             System.out.println(media);
 
@@ -144,7 +144,7 @@ public class ProductService {
                 .userId(message)
                 .build();
         productRepository.save(product1);
-        kafkaTemplate.send("DEFAULT_PRODUCT", product1.getId() + " upload/iPhone15.jpg");
+        kafkaTemplate.send("DEFAULT_PRODUCT", product1.getId() + " iPhone15.jpg");
 
         Product product2 = Product.builder()
                 .name("MAC Studio")
@@ -154,6 +154,6 @@ public class ProductService {
                 .userId(message)
                 .build();
         productRepository.save(product2);
-        kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " upload/MacStudio.jpg");
+        kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
     }
 }

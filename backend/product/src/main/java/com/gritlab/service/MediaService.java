@@ -1,5 +1,7 @@
 package com.gritlab.service;
 
+import com.gritlab.model.User;
+import com.gritlab.model.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;

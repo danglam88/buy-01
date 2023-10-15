@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             User user = responseEntity.getBody();
-            return new UserDetails(user);
+            return new UserDetails(user, token);
         } else {
             throw new NoSuchElementException();
         }

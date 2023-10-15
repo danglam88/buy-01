@@ -18,6 +18,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <version>1.27</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>media</finalName>
     </build>

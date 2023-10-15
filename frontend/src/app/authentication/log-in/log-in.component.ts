@@ -38,6 +38,7 @@ export class LogInComponent {
         console.log(result);
         sessionStorage.setItem('token', result['token']);
         sessionStorage.setItem('role', result['role']);
+        sessionStorage.setItem('id', result['id']);
       },
       error: (error) => {
         console.log(error);

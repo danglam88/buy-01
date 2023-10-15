@@ -4,9 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { UserInfoService } from 'src/app/services/user-info.service';
-import { UpdateUserService } from 'src/app/services/update-user.service';
-import { DeleteUserService } from 'src/app/services/delete-user.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -24,9 +22,7 @@ export class UserDashboardComponent implements OnInit {
   @ViewChild('passwordInput') passwordInput: ElementRef;
 
   constructor(
-    private userInfoService: UserInfoService,
-    private updateUserService: UpdateUserService,
-    private deleteUserService: DeleteUserService,
+    private userService: UserService,
     private toastr: ToastrService,
     private builder: FormBuilder,
     private router: Router,
@@ -66,7 +62,7 @@ export class UserDashboardComponent implements OnInit {
       ],
     });
 
-    this.userInfoService.getUserInfo().subscribe({
+    this.userService.getUserInfo().subscribe({
       next: (result) => {
         console.log(result);
         this.userInfo = result;
@@ -87,7 +83,7 @@ export class UserDashboardComponent implements OnInit {
   updateUserInformation(updateField: string): void {
     if (this.userProfileForm.controls[updateField].valid) {
       this.userInfo[updateField] = this.userProfileForm.value[updateField];
-      this.updateUserService.updateUser(this.userInfo).subscribe({
+      this.userService.updateUser(this.userInfo).subscribe({
         next: (result) => {
           console.log(result);
         },
@@ -176,12 +172,14 @@ export class UserDashboardComponent implements OnInit {
   // Delete user
   deleteUser(): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: { isDeleteProduct: false } 
+      data: {
+        confirmationText: 'Delete this account?' 
+      }
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
         console.log('User deleted');
-        this.deleteUserService.deleteUser(this.userInfo).subscribe({
+        this.userService.deleteUser(this.userInfo).subscribe({
           next: (result) => {
             console.log(result);
           },

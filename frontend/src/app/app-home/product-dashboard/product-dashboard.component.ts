@@ -3,7 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Product } from '../../Models/Product';
 import { CreateProductComponent } from '../create-product/create-product.component';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
-import { SellerProductsInfoService } from 'src/app/services/seller-products-info.service';
+import { ProductService } from 'src/app/services/product.service';
+
 
 @Component({
   selector: 'app-product-dashboard',
@@ -16,13 +17,13 @@ export class ProductDashboardComponent implements OnInit {
   
   constructor(
     private dialog: MatDialog,
-    private sellerProductsInfoService: SellerProductsInfoService
+    private productService: ProductService
     ) {}
   
   ngOnInit(): void {
-    this.sellerProductsInfoService.getSellerProductsInfo().subscribe({
+    this.productService.getSellerProductsInfo().subscribe({
       next: (result) => {
-        console.log(result);
+        console.log("sellerProducts" + JSON.stringify(result));
         this.sellerProducts = result;
       },
       error: (error) => {
@@ -32,7 +33,7 @@ export class ProductDashboardComponent implements OnInit {
         }
       },
       complete: () => {
-        console.log("All products retrieved");
+       // console.log("All products retrieved");
       }
     });
   }

@@ -2,8 +2,8 @@ import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { CreateProductService } from 'src/app/services/create-product.service';
 import { ProductService } from 'src/app/services/product.service';
+import { MediaService } from 'src/app/services/media.service';
 
 @Component({
   selector: 'app-create-product',
@@ -12,26 +12,24 @@ import { ProductService } from 'src/app/services/product.service';
 })
 export class CreateProductComponent implements OnInit {
   productInfo: any = {};
+  mediaInfo: any = {};
   previewUrl: string | ArrayBuffer | null = null;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
+  selectedFiles: Array<{ file: File, url: string }> = [];
   @ViewChild('nameInput') nameInput: ElementRef;
 
   constructor(
     private builder: FormBuilder,
     private toastr: ToastrService,
-    private createProductService: CreateProductService,
     private productService: ProductService,
+    private mediaService: MediaService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>
   ) {
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
-  ngOnInit() {
-    setTimeout(() => {
-      this.nameInput.nativeElement.focus();
-    });
-  }
+  ngOnInit() {}
 
   createProductForm = this.builder.group({
     name: [
@@ -65,18 +63,44 @@ export class CreateProductComponent implements OnInit {
   }
 
   createProduct() {
-    if (this.createProductForm.valid) {
+    if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       this.productInfo = this.prepareProductInfo();
-      this.createProductService.createProduct(this.productInfo).subscribe({
+      // createProduct
+      this.productService.createProduct(this.productInfo).subscribe({
         next: (result) => {
-          this.handleProductCreationSuccess(result);
+          const productId = result.toString();
+          this.saveEachSelectedFile(productId, 0);
+        },
+        error: (error) => {
+          this.handleProductCreationError(error);
+        },
+      });
+      
+
+    } else {
+      this.handleValidationErrors();
+    }
+  }
+
+  saveEachSelectedFile(productId: string, index: number) {
+    if (index < this.selectedFiles.length) {
+      const file = this.selectedFiles[index].file;
+      const formData = new FormData();
+      formData.append('productId', productId);
+      formData.append('file', file);
+  
+      this.mediaService.uploadMedia(formData).subscribe({
+        next: (result) => {
+          console.log("uploadMedia result: " + JSON.stringify(result));
+          // Process next file
+          this.saveEachSelectedFile(productId, index + 1);
         },
         error: (error) => {
           this.handleProductCreationError(error);
         },
       });
     } else {
-      this.handleValidationErrors();
+      this.handleProductCreationSuccess('All files uploaded');
     }
   }
 
@@ -85,19 +109,17 @@ export class CreateProductComponent implements OnInit {
       name: this.createProductForm.controls.name.value.replace(/\s+/g, ' ').trim(),
       price: this.createProductForm.controls.price.value,
       quantity: this.createProductForm.controls.quantity.value,
-      description: this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim(),
-      image: this.imgPlaceholder,
+      description: this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim()
     };
   }
 
   handleProductCreationSuccess(result: any) {
     this.toastr.success('Product created successfully.');
-    //this.productService.addProduct(this.productInfo);
     this.closeModal();
   }
 
   handleProductCreationError(error: any) {
-    console.error(error);
+    console.error("product creation error: " + JSON.stringify(error));
     this.toastr.error('Product creation failed.');
   }
 
@@ -110,14 +132,21 @@ export class CreateProductComponent implements OnInit {
       this.toastr.error('Please enter a valid quantity.');
     } else if (this.createProductForm.controls.description.invalid) {
       this.toastr.error('Description must be between 1 and 1000 characters.');
+    } else if (this.selectedFiles.length === 0) {
+      this.toastr.error('Please upload at least one image.');
     }
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.displaySelectedImage(file);
+    const files: FileList = event.target.files;
+    if (files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.displaySelectedImage(file);
+        this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
+      }
     }
+    console.log("selectedFiles 1: " + this.selectedFiles);
   }
 
   displaySelectedImage(file: File) {
@@ -131,15 +160,22 @@ export class CreateProductComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  cancelUploadImage() {
-    this.resetImageInput();
-  }
-
   resetImageInput() {
-    this.previewUrl = null;
+    this.selectedFiles = [];
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
     if (fileInput) {
       fileInput.value = '';
+    }
+    this.previewUrl = null;
+  }
+  onImageRemoved(index: number) {
+    this.selectedFiles.splice(index, 1);
+    console.log("selectedFiles 2: " + this.selectedFiles)
+    console.log("selectedFiles length: " + this.selectedFiles.length)
+
+    if (this.selectedFiles.length === 0) {
+      console.log("true")
+      this.resetImageInput();
     }
   }
 }

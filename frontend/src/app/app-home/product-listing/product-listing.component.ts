@@ -2,8 +2,7 @@ import { Component, OnInit  } from '@angular/core';
 import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
-import { AllproductsInfoService } from 'src/app/services/allproducts-info.service';
-
+import { ProductService } from 'src/app/services/product.service';
 @Component({
   selector: 'app-product-listing',
   templateUrl: './product-listing.component.html',
@@ -15,14 +14,14 @@ export class ProductListingComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog, 
-    private allProductsInfoService: AllproductsInfoService
+    private productService: ProductService
     ) {}
   
 
   ngOnInit(): void {
-    this.allProductsInfoService.getAllProductsInfo().subscribe({
+    this.productService?.getAllProductsInfo().subscribe({
       next: (result) => {
-        console.log(result);
+        console.log("product listing" + JSON.stringify(result));
         this.products = result;
       },
       error: (error) => {

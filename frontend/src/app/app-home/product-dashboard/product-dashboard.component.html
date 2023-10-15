@@ -4,7 +4,7 @@
 <div class="productlist--container">
   <div class="page-container">
     <mat-paginator class="page"
-      [length]="sellerProducts.length"
+      [length]="sellerProducts?.length"
       [pageSize]="21"
       [pageSizeOptions]="[7, 14, 21]"
       aria-label="Select page"
@@ -12,8 +12,8 @@
     </mat-paginator>
   </div>
   <button class="button-79" role="button" (click)="openCreateProduct()">Create New Product</button>
-  <p *ngIf="sellerProducts.length == 0">You have no products!</p>
-  <ng-container *ngFor="let product of sellerProducts.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
+  <p *ngIf="sellerProducts?.length == 0">You have no products!</p>
+  <ng-container *ngFor="let product of sellerProducts?.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
     <app-product  
       [product]="product" 
       (click)="openProductDetail(product)"

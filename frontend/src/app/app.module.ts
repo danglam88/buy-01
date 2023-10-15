@@ -2,17 +2,23 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthenticateGuard } from '../app/guard/authenticate.guard';
-import { AuthenticationService } from '../app/services/authentication.service';
-import { UserInfoService } from '../app/services/user-info.service';
+import { ToastrModule } from 'ngx-toastr';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
-import { LogInComponent } from './authentication/log-in/log-in.component';
-import { RegisterComponent } from './authentication/register/register.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+
+import { HighlightDirective } from './CustomDirectives/highlight.directive';
+
+
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { LogInComponent } from './authentication/log-in/log-in.component';
+import { RegisterComponent } from './authentication/register/register.component';
 import { HeaderComponent } from './app-home/header/header.component';
 import { FooterComponent } from './app-home/footer/footer.component';
 import { UserDashboardComponent } from './app-home/user-dashboard/user-dashboard.component';
@@ -20,14 +26,19 @@ import { ProductDashboardComponent } from './app-home/product-dashboard/product-
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 import { AppHomeComponent } from './app-home/app-home.component';
 import { AuthenticationComponent } from './authentication/authentication.component'
-import { ToastrModule } from 'ngx-toastr';
 import { ErrorsComponent } from './errors/errors.component';
 import { CreateProductComponent } from './app-home/create-product/create-product.component';
 import { ProductComponent } from './app-home/product-listing/product/product.component';
 import { ProductDetailComponent } from './app-home/product-detail/product-detail.component';
-import { MatDialogModule } from '@angular/material/dialog';
-import { HighlightDirective } from './CustomDirectives/highlight.directive';
 import { ConfirmationDialogComponent } from './app-home/confirmation-dialog/confirmation-dialog.component';
+import { ImageSliderComponent } from './app-home/image-slider/image-slider.component';
+import { MediaListingComponent } from './app-home/media-listing/media-listing.component';
+import { MediaComponent } from './app-home/media-listing/media/media.component';
+
+import { UserService } from './services/user.service';
+import { MediaService } from './services/media.service';
+import { ProductService } from './services/product.service';
+import { AuthenticationService } from '../app/services/authentication.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,7 +56,10 @@ import { ConfirmationDialogComponent } from './app-home/confirmation-dialog/conf
     ProductComponent,
     ProductDetailComponent,
     HighlightDirective,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    ImageSliderComponent,
+    MediaListingComponent,
+    MediaComponent
   ],
   imports: [
     BrowserModule,
@@ -59,7 +73,7 @@ import { ConfirmationDialogComponent } from './app-home/confirmation-dialog/conf
     ToastrModule.forRoot(),
     MatDialogModule
   ],
-  providers: [AuthenticateGuard, AuthenticationService, UserInfoService],
+  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

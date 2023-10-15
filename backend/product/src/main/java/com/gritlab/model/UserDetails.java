@@ -16,15 +16,18 @@ public class UserDetails implements org.springframework.security.core.userdetail
 
     private String id;
 
+    private String token;
+
     private List<GrantedAuthority> authorities;
 
-    public UserDetails(User user) {
+    public UserDetails(User user, String token) {
         this.username = user.getEmail();
         this.password = user.getPassword();
         this.id = user.getId();
         this.authorities = Arrays.stream(user.getRole().toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        this.token = token;
     }
 
     @Override
@@ -43,6 +46,8 @@ public class UserDetails implements org.springframework.security.core.userdetail
     }
 
     public String getId() {return this.id; }
+
+    public String getToken() {return this.token; }
 
     @Override
     public boolean isAccountNonExpired() {

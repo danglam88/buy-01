@@ -1,0 +1,14 @@
+<div class="image-slider">
+  <button mat-icon-button (click)="previousSlide()" [disabled]="currentIndex === 0">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  <div class="image-container">
+    <img [src]="currentImage" class="slider-image">
+    <button mat-icon-button class="remove-button" (click)="removeImage(currentIndex)">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </div>
+  <button mat-icon-button (click)="nextSlide()" [disabled]="currentIndex === images.length - 1">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

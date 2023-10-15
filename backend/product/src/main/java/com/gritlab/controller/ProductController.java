@@ -4,6 +4,7 @@ import com.gritlab.model.Product;
 import com.gritlab.model.ProductResponse;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,15 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
-    public ResponseEntity<List<ProductResponse>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<List<ProductResponse>> findAll(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(productService.findAll(userDetails.getToken()));
     }
 
     @GetMapping("/seller")
     public ResponseEntity<List<ProductResponse>> findBySellerId(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(productService.findBySellerId(userDetails.getId()));
+        return ResponseEntity.ok(productService.findBySellerId(userDetails.getId(), userDetails.getToken()));
     }
 
     @GetMapping("/{id}")
@@ -42,24 +44,20 @@ public class ProductController {
     }
 
     @PostMapping
-    private ResponseEntity<Void> createProduct(@RequestParam("name") String name,
-                                               @RequestParam("description") String description,
-                                               @RequestParam("quantity") Integer quantity,
-                                               @RequestParam("price") Double price,
-                                               @RequestPart("file") MultipartFile file,
+    private ResponseEntity<String> createProduct(@Valid @RequestBody Product request,
                                                 Authentication authentication,
                                                 UriComponentsBuilder ucb) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Product newProduct = productService.addProduct(name,
-                description,price,quantity, file, userDetails.getId());
+        Product newProduct = productService.addProduct(request.getName(),
+                request.getDescription(),request.getPrice(),request.getQuantity(), userDetails.getId());
 
         URI locationOfNewProduct = ucb
                 .path("/products/{id}")
                 .buildAndExpand(newProduct.getId())
                 .toUri();
 
-        return ResponseEntity.created(locationOfNewProduct).build();
+        return ResponseEntity.created(locationOfNewProduct).body(newProduct.getId());
     }
 
     @PutMapping("/{id}")

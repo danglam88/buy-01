@@ -45,7 +45,7 @@ public class AuthController {
                                 authRequest.getPassword() + user.get().getId()));
                 if (authentication.isAuthenticated()) {
                     AuthResponse okResponse = new AuthResponse(jwtService.generateToken(authRequest.getUsername()),
-                            user.get().getRole().toString());
+                            user.get().getId(), user.get().getRole().toString());
                     return ResponseEntity.status(HttpStatus.OK).body(okResponse);
                 }
             }

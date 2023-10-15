@@ -1,6 +1,6 @@
 <div class="product--item" appHighlight>
       <div class="product--image">
-          <img [src]="product.images" class="product--image">
+        <app-media-listing [productId]="product.id"></app-media-listing>
       </div>
       <div class="product--price">
           €{{product.price}}

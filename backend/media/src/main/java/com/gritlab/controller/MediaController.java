@@ -6,16 +6,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/media")
@@ -26,55 +25,45 @@ public class MediaController {
     private MediaService mediaService;
 
     @GetMapping("product/{id}")
-    public List<Media> findByProductId(@PathVariable String id) {
-        return mediaService.getByProductId(id);
+    public ResponseEntity<?> findByProductId(@PathVariable String id) {
+        return ResponseEntity.ok().body(mediaService.getByProductId(id));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ByteArrayResource> findById(@PathVariable String id) {
-        //todo send request to product mc
+
         Media media = mediaService.getMedia(id).orElseThrow();
-        try {
-            // Load the file as a byte array
-            byte[] fileContent = Files.readAllBytes(Paths.get(media.getImagePath()));
 
-            // Create a ByteArrayResource from the file content
-            ByteArrayResource resource = new ByteArrayResource(fileContent);
+        // Create a ByteArrayResource from the file content
+        ByteArrayResource resource = new ByteArrayResource(media.getImageData());
 
-            // Set up the HTTP headers for the response
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + media.getFileName());
-            headers.setContentType(mediaService.getImageType(media.getImagePath()));
+        // Set up the HTTP headers for the response
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + media.getFileName());
+        headers.setContentType(mediaService.getImageType(media.getImagePath()));
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(resource);
-        } catch (IOException ex) {
-            //todo add advice
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
 
     @PostMapping()
-    public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
                              @RequestParam("productId") String  productId,
-                                           UriComponentsBuilder ucb) throws IOException {
+                                           UriComponentsBuilder ucb) {
 
-        //todo file validation
-        //todo send request to product mc
-        if (!file.isEmpty()) {
-            String path = mediaService.saveFile(file);
-            Media newProduct = mediaService.addMedia(path, productId);
 
+        Optional<Media> newProductOptional = mediaService.addMedia(file, productId);
+
+        if (newProductOptional.isPresent()) {
             URI locationOfMedia = ucb
                     .path("/media/{id}")
-                    .buildAndExpand(newProduct.getId())
+                    .buildAndExpand(newProductOptional.get().getId())
                     .toUri();
 
             return ResponseEntity.created(locationOfMedia).build();
         } else {
-            //todo refactor
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>("Failed to upload image", HttpStatus.BAD_REQUEST);
         }
     }
 
