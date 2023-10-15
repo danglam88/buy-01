@@ -96,7 +96,7 @@ public class MediaService {
     public void consumeMessage2(String message) throws IOException {
         String productId = message.split(" ")[0];
         String fileName = message.split(" ")[1];
-        Path filePath = Paths.get("media/upload/" + fileName);
+        Path filePath = Paths.get("backend/media/upload/" + fileName);
         try {
             byte[] fileContent = Files.readAllBytes(filePath);
             Media media = Media.builder()
