@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -48,8 +49,13 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(
             HttpServletRequest request, @PathVariable String userId,
-            @RequestBody @Valid UserRequest userRequest, UriComponentsBuilder ucb) {
+            @RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("role") String role,
+            @RequestParam(value = "file", required = false) MultipartFile file, UriComponentsBuilder ucb) {
         userService.authenticateRequest(request, userId);
+        UserRequest userRequest = new UserRequest(name, email, password, role, file);
         User updatedUser = userService.updateUser(userId, userRequest);
         URI locationOfUpdatedUser = ucb
                 .path("/users/{userId}")

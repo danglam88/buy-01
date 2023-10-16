@@ -1,7 +1,7 @@
 package com.gritlab.component;
 
 import com.google.common.util.concurrent.RateLimiter;
-import com.gritlab.model.RateLimitException;
+import com.gritlab.exception.RateLimitException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -44,9 +44,9 @@ public class AuthController {
                         .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
                                 authRequest.getPassword() + user.get().getId()));
                 if (authentication.isAuthenticated()) {
-                    AuthResponse okResponse = new AuthResponse(jwtService.generateToken(authRequest.getUsername()),
+                    AuthResponse authResponse = new AuthResponse(jwtService.generateToken(authRequest.getUsername()),
                             user.get().getId(), user.get().getRole().toString());
-                    return ResponseEntity.status(HttpStatus.OK).body(okResponse);
+                    return ResponseEntity.status(HttpStatus.OK).body(authResponse);
                 }
             }
             throw new BadCredentialsException("User cannot be authenticated");

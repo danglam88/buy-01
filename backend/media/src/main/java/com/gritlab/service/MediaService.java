@@ -1,5 +1,6 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.InvalidFileException;
 import com.gritlab.model.Media;
 import com.gritlab.repository.MediaRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
@@ -51,27 +52,24 @@ public class MediaService {
         return productImages;
     }
 
-    public Optional<Media> addMedia(MultipartFile file, String productId) {
+    public Media addMedia(MultipartFile file, String productId) {
 
-        Optional<Media> newMedia = Optional.empty();
-        if (isFileValid(file)) {
-            try {
-                byte[] imageData = file.getBytes();
+        checkFile(file);
 
-                Media media = Media.builder()
-                        .imageData(imageData)
-                        .imagePath(file.getOriginalFilename())
-                        .productId(productId)
-                        .build();
+        try {
+            byte[] imageData = file.getBytes();
 
-                newMedia = Optional.of(mediaRepository.save(media));
-            } catch (IOException ex) {
-                //to log file
-                System.out.println(ex.getMessage());
-            }
+            Media media = Media.builder()
+                    .imageData(imageData)
+                    .imagePath(file.getOriginalFilename())
+                    .productId(productId)
+                    .build();
+
+            return mediaRepository.save(media);
+
+        } catch (IOException ex) {
+            throw new InvalidFileException("Failed to upload file");
         }
-
-        return newMedia;
     }
 
     public void deleteMedia(String id, String userId)  {
@@ -112,7 +110,7 @@ public class MediaService {
                     .build();
             mediaRepository.save(media);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }*/
 
@@ -128,26 +126,24 @@ public class MediaService {
         };
     }
 
-    public boolean isFileValid(MultipartFile file) {
+    public void checkFile(MultipartFile file) throws InvalidFileException {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                return false;
+                throw new InvalidFileException("File must be image");
             }
         } catch (IOException ex) {
-            //to the log
-            System.out.println(ex.getMessage());
+            throw new InvalidFileException("Failed to upload file");
         }
 
         if (file.isEmpty()) {
-            return false;
+            throw new InvalidFileException("File must not be empty");
         }
 
         String extension = getExtension(file.getOriginalFilename());
         if (!isValidExtension(extension)) {
-            return false;
+            throw new InvalidFileException("Allowed extensions: " + String.join(",", allowedExtensions));
         }
-        return true;
     }
 
     public String getExtension(String fileName) {

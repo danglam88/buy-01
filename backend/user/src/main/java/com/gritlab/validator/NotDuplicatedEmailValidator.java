@@ -33,9 +33,9 @@ public class NotDuplicatedEmailValidator implements ConstraintValidator<NotDupli
             if (email.equals(username)) {
                 return true;
             }
-            return !userService.emailExists(email);
+            return !userService.emailExists(email.toLowerCase());
         } catch (Exception e) {
-            return !userService.emailExists(email);
+            return !userService.emailExists(email.toLowerCase());
         }
     }
 }

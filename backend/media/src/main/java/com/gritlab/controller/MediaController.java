@@ -55,18 +55,14 @@ public class MediaController {
                                            UriComponentsBuilder ucb) {
 
 
-        Optional<Media> newProductOptional = mediaService.addMedia(file, productId);
+        Media newProduct = mediaService.addMedia(file, productId);
 
-        if (newProductOptional.isPresent()) {
-            URI locationOfMedia = ucb
-                    .path("/media/{id}")
-                    .buildAndExpand(newProductOptional.get().getId())
-                    .toUri();
+        URI locationOfMedia = ucb
+                .path("/media/{id}")
+                .buildAndExpand(newProduct.getId())
+                .toUri();
 
-            return ResponseEntity.created(locationOfMedia).build();
-        } else {
-            return new ResponseEntity<>("Failed to upload image", HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.created(locationOfMedia).build();
     }
 
     @DeleteMapping("/{id}")

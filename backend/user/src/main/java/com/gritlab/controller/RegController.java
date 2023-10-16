@@ -1,14 +1,14 @@
 package com.gritlab.controller;
 
-import com.gritlab.model.RegRequest;
+import com.gritlab.model.UserRequest;
 import com.gritlab.model.User;
 import com.gritlab.service.UserService;
 import jakarta.annotation.security.PermitAll;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -23,9 +23,14 @@ public class RegController {
 
     @PermitAll
     @PostMapping
-    public ResponseEntity<?> registerNewAccount(@RequestBody @Valid RegRequest regRequest,
+    public ResponseEntity<?> registerNewAccount(@RequestParam("name") String name,
+                                                @RequestParam("email") String email,
+                                                @RequestParam("password") String password,
+                                                @RequestParam("role") String role,
+                                                @RequestParam(value = "file", required = false) MultipartFile file,
                                                 UriComponentsBuilder ucb) {
-        User createdAccount = userService.createAccount(regRequest);
+        UserRequest userRequest = new UserRequest(name, email, password, role, file);
+        User createdAccount = userService.createAccount(userRequest);
         URI locationOfNewUser = ucb
                 .path("/users/{userId}")
                 .buildAndExpand(createdAccount.getId())

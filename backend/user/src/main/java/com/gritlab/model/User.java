@@ -51,4 +51,7 @@ public class User {
     @Pattern(regexp = "^(?!\\s*$).+", message = "Avatar cannot be empty or contain only spaces")
     @Size(max = 50, message = "Avatar cannot exceed 50 characters")
     private String avatar;
+
+    @Field("avatarData")
+    private byte[] avatarData;
 }
