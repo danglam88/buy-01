@@ -110,7 +110,7 @@ public class MediaService {
                     .build();
             mediaRepository.save(media);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

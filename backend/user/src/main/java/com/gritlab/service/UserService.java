@@ -1,22 +1,25 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.InvalidFileException;
 import com.gritlab.model.*;
 import com.gritlab.repository.UserRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Validated
 public class UserService {
 
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
@@ -61,8 +64,8 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User createAccount(UserRequest userRequest) {
-        UserDTO userDTO = this.validateInput(null, userRequest);
+    public User createAccount(@Valid UserRequest userRequest) {
+        UserDTO userDTO = this.validateFile(userRequest);
         String userId;
         do {
             userId = UUID.randomUUID().toString().split("-")[0];
@@ -80,58 +83,15 @@ public class UserService {
         return userRepository.save(convertFromDto(userDTO));
     }
 
-    public UserDTO validateInput(String userId, UserRequest userRequest) {
-        List<String> errors = new ArrayList<>();
+    public UserDTO validateFile(UserRequest userRequest) {
 
-        if (userRequest.getName() == null) {
-            errors.add("Name is required");
-        } else if (userRequest.getName().trim().isEmpty()) {
-            errors.add("Name cannot be empty or contain only spaces");
-        } else if (userRequest.getName().replaceAll("\\s+", " ").trim().length() > 50) {
-            errors.add("Name length must be between 1 and 50 characters");
+        if (userRequest.getFile() == null) {
+            return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
+                    userRequest.getEmail().trim(), userRequest.getPassword(),
+                    userRequest.getRole().trim(), null, null);
         }
 
-        if (userRequest.getEmail() == null) {
-            errors.add("Email is required");
-        } else if (userRequest.getEmail().trim().isEmpty()) {
-            errors.add("Email cannot be empty or contain only spaces");
-        } else if (userRequest.getEmail().trim().length() > 50) {
-            errors.add("Email cannot exceed 50 characters");
-        } else if (this.validEmail(userRequest.getEmail().trim())) {
-            errors.add("Email must be in valid format");
-        } else if (userRepository.findByEmail(userRequest.getEmail().trim()).isPresent() &&
-            (userId == null ||
-            !userRepository.findByEmail(userRequest.getEmail().trim()).get().getId().equals(userId))) {
-            errors.add("Email already taken, please use another one");
-        }
-
-        if (userRequest.getPassword() == null) {
-            errors.add("Password is required");
-        } else if (userRequest.getPassword().trim().isEmpty()) {
-            errors.add("Password cannot be empty or contain only spaces");
-        } else if (userRequest.getPassword().length() < 6 || userRequest.getPassword().length() > 50) {
-            errors.add("Password length must be between 6 and 50 characters");
-        } else if (this.validPassword(userRequest.getPassword())) {
-            errors.add("Password must contain at least one uppercase letter, one lowercase letter, "
-                    + "one digit and one special character (@$!%*?&)");
-        }
-
-        if (userRequest.getRole() == null) {
-            errors.add("Role is required");
-        } else if (userRequest.getRole().trim().isEmpty()) {
-            errors.add("Role cannot be empty or contain only spaces");
-        } else if (!userRequest.getRole().trim().toUpperCase().equals("SELLER")
-                && !userRequest.getRole().trim().toUpperCase().equals("CLIENT")) {
-            errors.add("Role must be either 'SELLER' or 'CLIENT' (case-insensitive)");
-        }
-
-        if (userRequest.getFile() != null && !this.isFileValid(userRequest.getFile())) {
-            errors.add("Avatar is invalid");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new InvalidInputException(errors);
-        }
+        this.checkFile(userRequest.getFile());
 
         try {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
@@ -140,30 +100,28 @@ public class UserService {
                     userRequest.getFile().getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            errors.add("Avatar is invalid");
-            throw new InvalidInputException(errors);
+            throw new InvalidFileException("Failed to upload file");
         }
     }
 
-    public boolean isFileValid(MultipartFile file) {
+    public void checkFile(MultipartFile file) throws InvalidFileException {
+
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                return false;
+                throw new InvalidFileException("File must be image");
             }
         } catch (IOException ex) {
-            //to the log
-            System.out.println(ex.getMessage());
+            throw new InvalidFileException("Failed to upload file");
         }
 
         if (file.isEmpty()) {
-            return false;
+            throw new InvalidFileException("File must not be empty");
         }
 
         String extension = getExtension(file.getOriginalFilename());
         if (!isValidExtension(extension)) {
-            return false;
+            throw new InvalidFileException("Allowed extensions: " + String.join(",", allowedExtensions));
         }
-        return true;
     }
 
     public String getExtension(String fileName) {
@@ -209,8 +167,8 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public User updateUser(String userId, UserRequest userRequest) {
-        UserDTO userDTO = this.validateInput(userId, userRequest);
+    public User updateUser(String userId, @Valid UserRequest userRequest) {
+        UserDTO userDTO = this.validateFile(userRequest);
         Optional<User> user = userRepository.findById(userId);
         String hashedPassword = null;
         if (userDTO.getPassword() != null) {

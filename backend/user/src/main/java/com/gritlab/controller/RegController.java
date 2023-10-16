@@ -27,7 +27,7 @@ public class RegController {
                                                 @RequestParam("email") String email,
                                                 @RequestParam("password") String password,
                                                 @RequestParam("role") String role,
-                                                @RequestParam("file") MultipartFile file,
+                                                @RequestParam(value = "file", required = false) MultipartFile file,
                                                 UriComponentsBuilder ucb) {
         UserRequest userRequest = new UserRequest(name, email, password, role, file);
         User createdAccount = userService.createAccount(userRequest);

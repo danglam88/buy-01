@@ -1,7 +1,7 @@
 package com.gritlab.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gritlab.model.ForbiddenException;
+import com.gritlab.exception.ForbiddenException;
 import com.gritlab.model.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

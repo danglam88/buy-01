@@ -1,4 +1,4 @@
-package com.gritlab.model;
+package com.gritlab.exception;
 
 public class ForbiddenException extends RuntimeException{
 

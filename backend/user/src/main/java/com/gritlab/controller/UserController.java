@@ -53,7 +53,7 @@ public class UserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             @RequestParam("role") String role,
-            @RequestParam("file") MultipartFile file, UriComponentsBuilder ucb) {
+            @RequestParam(value = "file", required = false) MultipartFile file, UriComponentsBuilder ucb) {
         userService.authenticateRequest(request, userId);
         UserRequest userRequest = new UserRequest(name, email, password, role, file);
         User updatedUser = userService.updateUser(userId, userRequest);

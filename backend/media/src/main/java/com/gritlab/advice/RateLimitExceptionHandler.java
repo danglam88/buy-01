@@ -1,6 +1,6 @@
 package com.gritlab.advice;
 
-import com.gritlab.model.RateLimitException;
+import com.gritlab.exception.RateLimitException;
 import com.gritlab.model.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
