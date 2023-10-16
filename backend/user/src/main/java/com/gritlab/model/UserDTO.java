@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
 @Data
@@ -44,4 +45,7 @@ public class UserDTO {
     @Pattern(regexp = "^(?!\\s*$).+", message = "Avatar cannot be empty or contain only spaces")
     @Size(max = 50, message = "Avatar cannot exceed 50 characters")
     private String avatar;
+
+    @Field("avatarData")
+    private byte[] avatarData;
 }

@@ -55,7 +55,8 @@ public class DBInitService {
             do {
                 sellerId = UUID.randomUUID().toString().split("-")[0];
             } while (userRepository.existsById(sellerId));
-            User seller = new User(sellerId, "Default Seller", "", "", Role.SELLER, null);
+            User seller = new User(sellerId,
+                    "Default Seller", "", "", Role.SELLER, null, null);
             do {
                 seller.setEmail(this.generateRandomEmail());
             } while (!this.validEmail(seller.getEmail()) || userRepository.findByEmail(seller.getEmail()).isPresent());

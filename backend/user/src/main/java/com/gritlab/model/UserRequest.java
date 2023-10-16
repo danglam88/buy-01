@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +25,7 @@ public class UserRequest {
     @NotDuplicatedEmail(message = "Email already taken, please use another one")
     private String email;
 
+    @NotNull(message = "Password is required")
     @Pattern(regexp = "^(?!\\s*$).+", message = "Password cannot be empty or contain only spaces")
     @Size(min = 6, max = 50, message = "Password length must be between 6 and 50 characters")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
@@ -33,10 +35,9 @@ public class UserRequest {
 
     @NotNull(message = "Role is required")
     @Pattern(regexp = "^(?!\\s*$).+", message = "Role cannot be empty or contain only spaces")
-    @Pattern(regexp = "^(?i)(seller|client)$", message = "Role must be either 'SELLER' or 'CLIENT' (case-insensitive)")
+    @Pattern(regexp = "^(?i)(seller|client)$",
+            message = "Role must be either 'SELLER' or 'CLIENT' (case-insensitive)")
     private String role;
 
-    @Pattern(regexp = "^(?!\\s*$).+", message = "Avatar cannot be empty or contain only spaces")
-    @Size(max = 50, message = "Avatar cannot exceed 50 characters")
-    private String avatar;
+    private MultipartFile file;
 }
