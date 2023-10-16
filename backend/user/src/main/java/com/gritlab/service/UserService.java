@@ -87,16 +87,16 @@ public class UserService {
 
         if (userRequest.getFile() == null) {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
-                    userRequest.getEmail().trim(), userRequest.getPassword(),
-                    userRequest.getRole().trim(), null, null);
+                    userRequest.getEmail().trim().toLowerCase(), userRequest.getPassword(),
+                    userRequest.getRole().trim().toUpperCase(), null, null);
         }
 
         this.checkFile(userRequest.getFile());
 
         try {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
-                    userRequest.getEmail().trim(), userRequest.getPassword(),
-                    userRequest.getRole().trim(), userRequest.getFile().getOriginalFilename(),
+                    userRequest.getEmail().trim().toLowerCase(), userRequest.getPassword(),
+                    userRequest.getRole().trim().toUpperCase(), userRequest.getFile().getOriginalFilename(),
                     userRequest.getFile().getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
