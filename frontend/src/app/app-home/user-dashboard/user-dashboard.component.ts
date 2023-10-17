@@ -70,20 +70,17 @@ export class UserDashboardComponent implements OnInit {
       next: (result) => {
         console.log(JSON.stringify(result));
         this.userInfo = result;
-        console.log('result avatar data ' + result["avatarData"])
+        console.log('result avatar data ' + typeof result["avatarData"]);
+        
         if (result["avatarData"] === null) {
           this.avatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
         } else {
-       
-            const reader = new FileReader();
-            reader.onload = () => {
-              this.userInfo.avatarData = reader.result
-            };
-            reader.readAsDataURL(this.userInfo.avatarData); 
-          }
-      this.avatar = this.userInfo.avatarData;
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.avatar =  reader.result;
+          };
+        }
       },
-
       error: (error) => {
         console.log(error);
         if (error.status == 404) {
