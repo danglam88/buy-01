@@ -62,6 +62,7 @@ export class CreateProductComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  // PRODUCTS ARE STILL CREATED IF THERE IS PROBLEMS WITH MEDIA?
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       this.productInfo = this.prepareProductInfo();
@@ -120,7 +121,7 @@ export class CreateProductComponent implements OnInit {
 
   handleProductCreationError(error: any) {
     console.error("product creation error: " + JSON.stringify(error));
-    this.toastr.error('Product creation failed.');
+    this.toastr.error(JSON.stringify(error));
   }
 
   handleValidationErrors() {

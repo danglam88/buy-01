@@ -67,7 +67,7 @@
                         </div>
                         
                         <button class="cancel-button" *ngIf="isEditingImages" (click)="cancelFieldEdit()">Cancel</button>
-                        <button class="save-button" *ngIf="editingField === 'addImages' && selectedFiles.length > 0" (click)="cancelFieldEdit()" >Save</button>
+                        <button class="save-button" *ngIf="editingField === 'addImages' && selectedFiles.length > 0 && isAddingImages && isEditingImages" (click)="saveEditedImages()">Save</button>
                         
                     </div>
                 </div>                  

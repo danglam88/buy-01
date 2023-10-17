@@ -324,5 +324,38 @@ export class ProductDetailComponent implements OnInit {
     } else {
       console.log("currentImage is null or undefined");
     }
-  } 
+  }
+
+  saveEachSelectedFile(productId: string, index: number) {
+    if (index < this.selectedFiles.length) {
+      const file = this.selectedFiles[index].file;
+      const formData = new FormData();
+      formData.append('productId', productId);
+      formData.append('file', file);
+  
+      this.mediaService.uploadMedia(formData).subscribe({
+        next: (result) => {
+          console.log("uploadMedia result: " + JSON.stringify(result));
+          // Process next file
+          this.saveEachSelectedFile(productId, index + 1);
+        },
+        error: (error) => {
+          this.toastr.error(error)
+        },
+      });
+    } else {
+      this.toastr.success('Images uploaded successful');
+      this.isAddingImages = false;
+      this.isEditingImages = false;
+      this.editingField = '';
+    }
+  }
+  
+  //WE NEED TO AUTO RELOAD IMAGES AFTER NEW IMAGES ADDED
+  saveEditedImages() {
+    console.log("this selected file" + JSON.stringify(this.selectedFiles));
+    console.log("product id" + this.product.id);
+    console.log("editing field" + this.editingField)
+    this.saveEachSelectedFile(this.product.id, 0)
+  }
 }
