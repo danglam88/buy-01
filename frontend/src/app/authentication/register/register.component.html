@@ -17,7 +17,6 @@
           <div class="buttons">
             <label for="image"class="upload-button" *ngIf="!previewUrl" >Upload Avatar</label>
             <input type="file" id="image" name="image" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
-            <button class="upload-button" *ngIf="previewUrl">Save</button>
             <button class="upload-button" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
           </div>
           <!--Name Field-->
