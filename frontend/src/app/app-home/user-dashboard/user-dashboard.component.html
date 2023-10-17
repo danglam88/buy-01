@@ -10,7 +10,7 @@
   <!-- Cannot choose another pic after cancel -->
   <div class="profile-image">
     <div >
-      <img [src]="previewUrl ? previewUrl : userInfo.avatar">
+      <img [src]="previewUrl ? previewUrl : avatar">
     </div>
     <div>
       <input type="file" (change)="uploadImage($event)" accept="image/*" style="display: none" #fileInput>

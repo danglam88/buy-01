@@ -17,6 +17,7 @@ export class UserDashboardComponent implements OnInit {
   previewUrl: string | ArrayBuffer | null = null;
   isEditingProfile: boolean = false;
   editingField: string | null = null;
+  avatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' || this.userInfo.avatar;
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -62,9 +63,10 @@ export class UserDashboardComponent implements OnInit {
       ],
     });
 
+  
     this.userService.getUserInfo().subscribe({
       next: (result) => {
-        console.log(result);
+        console.log(JSON.stringify(result));
         this.userInfo = result;
       },
       error: (error) => {
@@ -83,6 +85,13 @@ export class UserDashboardComponent implements OnInit {
   updateUserInformation(updateField: string): void {
     if (this.userProfileForm.controls[updateField].valid) {
       this.userInfo[updateField] = this.userProfileForm.value[updateField];
+      const file = this.avatar.file;
+      const formData = new FormData();
+      formData.append('name', this.userProfileForm.value[updateField]);
+      formData.append('email', this.userInfo.email);
+      formData.append('password', this.userInfo.password);
+      formData.append('role', this.userInfo.role);
+      formData.append('file', file);
       this.userService.updateUser(this.userInfo).subscribe({
         next: (result) => {
           console.log(result);
@@ -115,6 +124,7 @@ export class UserDashboardComponent implements OnInit {
   // Update user name
   updateName(): void {
     this.updateUserInformation('name');
+
   }
 
   // Update user email
