@@ -3,10 +3,10 @@ import { Product } from '../../Models/Product';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaService } from 'src/app/services/media.service';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'product-detail',
@@ -15,13 +15,14 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
-  isEditingProfile = false;
+  isEditingProfile: boolean = false;
   editingField: string | null = null;
-  userRole: string | null = sessionStorage.getItem('role');
-  productImages: Record<string, any> = {};
+  userRole = sessionStorage.getItem('role');
+  productImages: any = {};
+  mediaID: any = {};
   productDetailForm: FormGroup;
   noOfImages: number;
-  userID: string | null = sessionStorage.getItem('id');
+  userID = sessionStorage.getItem('id');
   selectedFiles: Array<{ file: File, url: string }> = [];
   previewUrl: string | ArrayBuffer | null = null;
   isAddingImages = false;
@@ -40,64 +41,71 @@ export class ProductDetailComponent implements OnInit {
     public dialogRef: MatDialogRef<ProductDetailComponent>,
     private builder: FormBuilder,
     private toastr: ToastrService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
   ) {
     this.product = data.product;
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
   ngOnInit(): void {
-    console.log("userId of product: " + this.product.userId);
-    console.log("userId of user: " + this.userID);
-    this.productDetailForm = this.configureFormGroup();
-    this.loadProductImages();
-  }
-
-  private configureFormGroup(): FormGroup {
-    return this.builder.group({
+    console.log("userId of product: " + this.product.userId)
+    console.log("userId of user: " + this.userID)
+    this.productDetailForm = this.builder.group({
       name: [
         this.product.name,
-        [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
+        [
+          Validators.required,
+          Validators.minLength(1),
+          Validators.maxLength(50),
+        ],
       ],
       price: [
         this.product.price,
-        [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)],
+        [
+          Validators.required,
+          Validators.pattern(/^\d+(\.\d+)?$/),
+        ],
       ],
       quantity: [
         this.product.quantity,
-        [Validators.required, Validators.pattern(/^[0-9]+$/)],
+        [
+          Validators.required,
+          Validators.pattern(/^[0-9]+$/),
+        ],
       ],
       description: [
         this.product.description,
-        [Validators.required, Validators.minLength(1), Validators.maxLength(1000)],
+        [
+          Validators.required,
+          Validators.minLength(1),
+          Validators.maxLength(1000),
+        ],
       ],
     });
-  }
 
-  private loadProductImages(): void {
+    // Get product images from media service
     this.mediaService.getImageByProductId(this.product.id).subscribe({
       next: (result) => {
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
-            this.loadProductImageByKey(key, result[key]);
+            this.mediaService.getImageByMediaId(result[key]).subscribe({
+              next: (image) => {
+                console.log((image));
+                const reader = new FileReader();
+                reader.onload = () => {
+                  this.productImages[key] = { data: reader.result, mediaId: result[key] };
+                };
+                reader.readAsDataURL(image); 
+              },
+              error: (error) => {
+                console.log(error);
+              }
+            });
           }
         }
-        this.noOfImages = Object.keys(result).length;
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });
-  }
+        const objectLength = Object.keys(result).length;
+        this.noOfImages = objectLength;
 
-  private loadProductImageByKey(key: string, mediaId: string): void {
-    this.mediaService.getImageByMediaId(mediaId).subscribe({
-      next: (image) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.productImages[key] = { data: reader.result, mediaId };
-        };
-        reader.readAsDataURL(image);
       },
       error: (error) => {
         console.log(error);
@@ -135,11 +143,11 @@ export class ProductDetailComponent implements OnInit {
     if (field === 'addImages') {
       this.isAddingImages = true;
       this.isDeletingImages = false;
-      this.isEditingImages = true;
+      this.isEditingImages = true; 
     } else if (field === 'deleteImages') {
       this.isAddingImages = false;
       this.isDeletingImages = true;
-      this.isEditingImages = true;
+      this.isEditingImages = true; 
     }
     console.log("editing field: " + this.editingField);
     setTimeout(() => {
@@ -164,7 +172,11 @@ export class ProductDetailComponent implements OnInit {
 
   // Delete product
   deleteProduct(): void {
-    const dialogRef = this.openConfirmationDialog('Delete this product?');
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        confirmationText: 'Delete this product?'
+      }
+    });
 
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
@@ -190,7 +202,6 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-
   currentIndex = 0;
 
   get currentImage(): { url: string, mediaId: string } | null {
@@ -235,7 +246,6 @@ export class ProductDetailComponent implements OnInit {
     };
     reader.readAsDataURL(file);
   }
-
   resetImageInput() {
     this.selectedFiles = [];
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
@@ -244,7 +254,6 @@ export class ProductDetailComponent implements OnInit {
     }
     this.previewUrl = null;
   }
-
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
     console.log("selectedFiles 2: " + this.selectedFiles)
@@ -260,15 +269,43 @@ export class ProductDetailComponent implements OnInit {
     if (currentImage) {
       console.log("currentImage: " + currentImage);
       console.log("currentImageMediaId: " + currentImage.mediaId);
-      const dialogRef = this.openConfirmationDialog('Delete this image?');
-
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        data: {
+          confirmationText: 'Delete this image?' 
+        }
+      });
       dialogRef.afterClosed().subscribe((confirm: boolean) => {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
               console.log(result);
               this.toastr.success('Image deleted');
-              this.reloadProductImages();
+              this.mediaService.getImageByProductId(this.product.id).subscribe({
+                next: (result) => {
+                  for (const key in result) {
+                    if (result.hasOwnProperty(key)) {
+                      this.mediaService.getImageByMediaId(result[key])?.subscribe({
+                        next: (image) => {
+                          console.log((image));
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            this.productImages[key] = { data: reader.result, mediaId: result[key] };
+                          };
+                          reader.readAsDataURL(image); 
+                        },
+                        error: (error) => {
+                          console.log(error);
+                        }
+                      });
+                    }
+                  }
+                  const objectLength = Object.keys(result).length;
+                  this.noOfImages = objectLength;
+                },
+                error: (error) => {
+                  console.log(error);
+                }
+              });
             },
             error: (error) => {
               console.log(error);
@@ -287,27 +324,5 @@ export class ProductDetailComponent implements OnInit {
     } else {
       console.log("currentImage is null or undefined");
     }
-  }
-
-  private openConfirmationDialog(confirmationText: string) {
-    return this.dialog.open(ConfirmationDialogComponent, {
-      data: { confirmationText }
-    });
-  }
-
-  private reloadProductImages() {
-    this.mediaService.getImageByProductId(this.product.id).subscribe({
-      next: (result) => {
-        for (const key in result) {
-          if (result.hasOwnProperty(key)) {
-            this.loadProductImageByKey(key, result[key]);
-          }
-        }
-        this.noOfImages = Object.keys(result).length;
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });
-  }
+  } 
 }
