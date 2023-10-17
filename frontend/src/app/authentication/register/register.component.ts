@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 
 export class RegisterComponent implements OnInit {
   previewUrl: string | ArrayBuffer | null = null;
+  selectedFile: File;
   userInfo: any = {};
   @ViewChild('nameInput') nameInput: ElementRef;
 
@@ -70,6 +71,7 @@ export class RegisterComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
+        this.selectedFile = file;
       };
       reader.onerror = (error) => {
         console.error('Error reading the selected image:', error);
@@ -91,14 +93,21 @@ export class RegisterComponent implements OnInit {
   // Register user
   register() {
     if (this.registerform.valid) {
-      this.userInfo = {
-        name: this.registerform.value.name.replace(/\s+/g, ' ').trim(),
-        email: this.registerform.value.email,
-        password: this.registerform.value.password,
-        role: this.registerform.value.role,
-      }
+      // this.userInfo = {
+      //   name: this.registerform.value.name.replace(/\s+/g, ' ').trim(),
+      //   email: this.registerform.value.email,
+      //   password: this.registerform.value.password,
+      //   role: this.registerform.value.role,
+      // }
       
-      this.regService.register(this.userInfo).subscribe({
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      formData.append('name', this.registerform.value.name.replace(/\s+/g, ' ').trim());
+      formData.append('email', this.registerform.value.email);
+      formData.append('password', this.registerform.value.password);
+      formData.append('role', this.registerform.value.role);
+      
+      this.regService.register(formData).subscribe({
         next: (result) => {
           console.log(result);
         },
