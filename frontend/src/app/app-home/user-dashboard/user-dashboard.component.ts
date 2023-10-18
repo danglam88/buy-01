@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
@@ -62,6 +62,14 @@ export class UserDashboardComponent implements OnInit {
           ),
         ],
       ],
+
+      // avatar is a FIle object
+      avatar: [
+        null,
+        [
+         this.validateAvatar
+        ],
+      ],
     });
 
 
@@ -111,8 +119,9 @@ export class UserDashboardComponent implements OnInit {
       formData.append('name', this.userProfileForm.value[updateField]);
       formData.append('email', this.userInfo.email);
       formData.append('role', this.userInfo.role);
-      
-      formData.append('file', this.selectedFile);
+      if (updateField === 'avatar'){
+        formData.append('file', this.selectedFile);
+      }
       if (updateField === 'password') {
         formData.append('password', this.userProfileForm.value[updateField]);
       }
@@ -257,5 +266,23 @@ export class UserDashboardComponent implements OnInit {
     });
   }
 
+   // Custom validator function for the 'avatar' form control
+   validateAvatar(control: AbstractControl): { [key: string]: any } | null {
+    const file = control.value as File;
+
+    if (!file) {
+      return { 'avatarRequired': true };
+    }
+
+    // You can add additional validation logic for the avatar file here, e.g., checking file size, file type, etc.
+    
+    // For example, checking if the file is an image (you can add more checks):
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (allowedTypes.indexOf(file.type) === -1) {
+      return { 'invalidAvatarType': true };
+    }
+
+    return null; // Return null if the validation is successful
+  }
 
 }
