@@ -17,8 +17,8 @@ export class UserDashboardComponent implements OnInit {
   previewUrl: string | ArrayBuffer | null = null;
   isEditingProfile: boolean = false;
   editingField: string | null = null;
+  selectedFile: File;
   avatar : any;
-  
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -70,16 +70,25 @@ export class UserDashboardComponent implements OnInit {
       next: (result) => {
         console.log(JSON.stringify(result));
         this.userInfo = result;
-        console.log('result avatar data ' + typeof result["avatarData"]);
-        
-        if (result["avatarData"] === null) {
-          this.avatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
-        } else {
-          const reader = new FileReader();
-          reader.onload = () => {
-            this.avatar =  reader.result;
-          };
-        }
+        console.log("user info: " + JSON.stringify(this.userInfo.id));
+
+        this.userService.getUserAvatar(this.userInfo.id).subscribe({
+          next: (result) => {
+            console.log(result);
+            this.avatar = result;
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+              this.avatar  = e.target.result;
+            };
+            reader.readAsDataURL(this.avatar);
+          },
+          error: (error) => {
+            console.log(error);
+          },
+          complete: () => {
+            console.log("Avatar retrieved");
+          }
+        });
       },
       error: (error) => {
         console.log(error);
@@ -91,21 +100,23 @@ export class UserDashboardComponent implements OnInit {
         console.log("User info retrieved");
       }
     });
+
   }
 
   // Common method to update user information
   updateUserInformation(updateField: string): void {
     if (this.userProfileForm.controls[updateField].valid) {
       this.userInfo[updateField] = this.userProfileForm.value[updateField];
-      const file = this.avatar.file;
       const formData = new FormData();
       formData.append('name', this.userProfileForm.value[updateField]);
       formData.append('email', this.userInfo.email);
+      formData.append('role', this.userInfo.role);
+      
+      formData.append('file', this.selectedFile);
       if (updateField === 'password') {
         formData.append('password', this.userProfileForm.value[updateField]);
       }
-      formData.append('role', this.userInfo.role);
-      formData.append('file', file);
+     
       this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
           console.log(result);
@@ -151,12 +162,18 @@ export class UserDashboardComponent implements OnInit {
     this.updateUserInformation('password');
   }
 
+  updateAvatar(): void {
+    this.updateUserInformation('avatar');
+  }
+
   uploadImage(event: any): void {
+    this.editProfileField('avatar');
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.previewUrl = e.target.result;
+        this.selectedFile = file;
       };
       reader.readAsDataURL(file);
     }
@@ -167,6 +184,21 @@ export class UserDashboardComponent implements OnInit {
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
     if (fileInput) {
       fileInput.value = '';
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewUrl = e.target.result;
+        this.selectedFile = file;
+      };
+      reader.onerror = (error) => {
+        console.error('Error reading the selected image:', error);
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -224,4 +256,6 @@ export class UserDashboardComponent implements OnInit {
       }
     });
   }
+
+
 }

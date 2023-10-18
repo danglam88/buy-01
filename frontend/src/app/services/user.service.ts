@@ -9,6 +9,7 @@ export class UserService {
   private userInfoUrl="http://localhost:8080/users/userInfo";
   private updateUserUrl="http://localhost:8080/users/";
   private deleteUserUrl="http://localhost:8080/users/";
+  private avaterUserUrl="http://localhost:8080/users/avatar/";
   private token = sessionStorage.getItem('token');
 
   constructor(private httpClient: HttpClient) { }
@@ -39,5 +40,15 @@ export class UserService {
 
     return this.httpClient.delete(`${this.deleteUserUrl}` + user.id, { headers });
   }
+
+  getUserAvatar(userId: string): Observable<Blob> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set('Authorization', `Bearer ${this.token}`);
+    }
+
+    return this.httpClient.get(`${this.avaterUserUrl}` + userId , { headers, responseType: 'blob' });
+  }
+
 }
 
