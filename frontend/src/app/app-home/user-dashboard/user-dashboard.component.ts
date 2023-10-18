@@ -104,7 +104,7 @@ export class UserDashboardComponent implements OnInit {
       formData.append('password', this.userInfo.password);
       formData.append('role', this.userInfo.role);
       formData.append('file', file);
-      this.userService.updateUser(this.userInfo).subscribe({
+      this.userService.updateUser(formData).subscribe({
         next: (result) => {
           console.log(result);
         },
