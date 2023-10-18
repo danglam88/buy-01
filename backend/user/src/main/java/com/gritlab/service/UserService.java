@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -193,18 +195,13 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public User authenticateRequest(HttpServletRequest request, String userId)
+    public User authorizeUser(Authentication authentication, String userId)
             throws BadCredentialsException, NoSuchElementException {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new BadCredentialsException("User cannot be authenticated");
-        }
-        if (userId != null && !findUserById(userId)) {
+        if (userId != null && !this.findUserById(userId)) {
             throw new NoSuchElementException();
         }
-        String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
-        Optional<User> user = getUserByEmail(username);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> user = getUserByEmail(userDetails.getUsername());
         if (user.isEmpty() || (userId != null && !user.get().getId().equals(userId))) {
             throw new BadCredentialsException("Operation is not allowed");
         }

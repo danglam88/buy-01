@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,8 +30,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/userInfo")
-    public ResponseEntity<?> getUserInfo(HttpServletRequest request) throws JsonProcessingException {
-        User user = userService.authenticateRequest(request, null);
+    public ResponseEntity<?> getUserInfo(HttpServletRequest request,
+                                         Authentication authentication) throws JsonProcessingException {
+        User user = userService.authorizeUser(authentication, null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.readTree(userNoPass));
@@ -37,9 +40,10 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(HttpServletRequest request, @PathVariable String userId)
+    public ResponseEntity<?> getUserById(HttpServletRequest request,
+                                         @PathVariable String userId, Authentication authentication)
             throws JsonProcessingException {
-        User user = userService.authenticateRequest(request, userId);
+        User user = userService.authorizeUser(authentication, userId);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.readTree(userNoPass));
@@ -53,8 +57,9 @@ public class UserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             @RequestParam("role") String role,
-            @RequestParam(value = "file", required = false) MultipartFile file, UriComponentsBuilder ucb) {
-        userService.authenticateRequest(request, userId);
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            UriComponentsBuilder ucb, Authentication authentication) {
+        userService.authorizeUser(authentication, userId);
         UserRequest userRequest = new UserRequest(name, email, password, role, file);
         User updatedUser = userService.updateUser(userId, userRequest);
         URI locationOfUpdatedUser = ucb
@@ -66,8 +71,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(HttpServletRequest request, @PathVariable String userId) {
-        userService.authenticateRequest(request, userId);
+    public ResponseEntity<?> deleteUser(HttpServletRequest request,
+                                        @PathVariable String userId, Authentication authentication) {
+        userService.authorizeUser(authentication, userId);
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
