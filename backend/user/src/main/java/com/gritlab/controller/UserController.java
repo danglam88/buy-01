@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +38,22 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.readTree(userNoPass));
+    }
+
+    @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
+    @GetMapping("/avatar/{userId}")
+    public ResponseEntity<?> getAvatarById(@PathVariable String userId, Authentication authentication) {
+        User user = userService.authorizeUser(authentication, userId);
+
+        // Create a ByteArrayResource from the file content
+        ByteArrayResource resource = new ByteArrayResource(user.getAvatarData());
+
+        // Set up the HTTP headers for the response
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + user.getAvatar());
+        headers.setContentType(userService.getImageType(user.getAvatar()));
+
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")

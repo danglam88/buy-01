@@ -7,6 +7,7 @@ import com.gritlab.utility.ImageFileTypeChecker;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -124,6 +125,18 @@ public class UserService {
         if (!isValidExtension(extension)) {
             throw new InvalidFileException("Allowed extensions: " + String.join(",", allowedExtensions));
         }
+    }
+
+    public MediaType getImageType(String fileName) {
+
+        String extension = getExtension(fileName);
+
+        // Map the file extension to image types
+        return switch (extension) {
+            case "png" -> MediaType.IMAGE_PNG;
+            case "gif" -> MediaType.IMAGE_GIF;
+            default -> MediaType.IMAGE_JPEG;
+        };
     }
 
     public String getExtension(String fileName) {
