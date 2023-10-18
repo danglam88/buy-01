@@ -17,7 +17,7 @@ public class UserService implements UserDetailsService {
     private RestTemplate restTemplate;
 
     @Value("${user.service.url}")
-    private String userServiceUser;
+    private String userServiceUrl;
 
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String token) throws NoSuchElementException {
 
@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
 
         // Make a request with RestTemplate
         //todo HttpClientErrorException$Forbidden exception with invalid token, token validation required
-        ResponseEntity<User> responseEntity = restTemplate.exchange(userServiceUser + "/users/userInfo",
+        ResponseEntity<User> responseEntity = restTemplate.exchange(userServiceUrl + "/users/userInfo",
                 HttpMethod.GET, entity, User.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {

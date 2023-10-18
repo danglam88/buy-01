@@ -35,23 +35,13 @@ public class ProductService {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Autowired
-    private MediaService mediaService;
 
-    @Value("${media.service.product.url}")
-    private String mediaServiceProductUrl;
-
-    @Value("${media.service.media.url}")
-    private String mediaServiceMediaUrl;
-
-    public List<ProductResponse> findAll(String token) {
-        List<Product> products = productRepository.findAll();
-        return this.setImages(products, token);
+    public List<Product> findAll() {
+        return productRepository.findAll();
     }
 
-    public List<ProductResponse> findBySellerId(String sellerId, String token) {
-        List<Product> products = productRepository.findAllByUserId(sellerId);
-        return this.setImages(products, token);
+    public List<Product> findBySellerId(String sellerId) {
+        return productRepository.findAllByUserId(sellerId);
     }
 
     public Optional<Product> getProduct(String id) {
@@ -90,39 +80,6 @@ public class ProductService {
             kafkaTemplate.send("DELETE_PRODUCT", id);
             productRepository.deleteById(id);
         }
-    }
-
-    private List<ProductResponse> setImages(List<Product> products, String token) {
-
-        List<ProductResponse> productsWithImages = new ArrayList<>();
-        ParameterizedTypeReference<List<String>> responseType = new ParameterizedTypeReference<List<String>>() {};
-
-        for (Product product : products) {
-
-            // Create HttpHeaders and add the authorization header
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-
-            // Create an HttpEntity with the headers
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<List<String>> responseEntity = restTemplate.exchange(mediaServiceProductUrl + product.getId(),  HttpMethod.GET,
-                    entity, // Pass null as the request entity
-                    responseType);
-
-            // Retrieve the list of Media from the ResponseEntity
-            List<String> media = responseEntity.getBody();
-
-            System.out.println(media);
-
-            // Create a ProductWithImages object that includes product data and image data
-            ProductResponse productWithImages = new ProductResponse(product);
-            productWithImages.setImages(media, mediaServiceMediaUrl);
-
-            productsWithImages.add(productWithImages);
-        }
-
-        return productsWithImages;
     }
 
     @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
