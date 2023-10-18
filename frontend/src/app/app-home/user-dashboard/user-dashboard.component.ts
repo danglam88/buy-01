@@ -78,25 +78,32 @@ export class UserDashboardComponent implements OnInit {
       next: (result) => {
         console.log(JSON.stringify(result));
         this.userInfo = result;
-        console.log("user info: " + JSON.stringify(this.userInfo.id));
+        console.log("user info: " + JSON.stringify(this.userInfo));
 
-        this.userService.getUserAvatar(this.userInfo.id).subscribe({
-          next: (result) => {
-            console.log(result);
-            this.avatar = result;
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-              this.avatar  = e.target.result;
-            };
-            reader.readAsDataURL(this.avatar);
-          },
-          error: (error) => {
-            console.log(error);
-          },
-          complete: () => {
-            console.log("Avatar retrieved");
-          }
-        });
+        if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
+          this.userService.getUserAvatar(this.userInfo.id)?.subscribe({
+            next: (result) => {
+              console.log("result" + JSON.stringify(result));
+              this.avatar = result;
+              const reader = new FileReader();
+              reader.onload = (e: any) => {
+                this.avatar  = e.target.result;
+              };
+              reader.readAsDataURL(this.avatar);
+            },
+            error: (error) => {
+              console.log(error);
+            },
+            complete: () => {
+              console.log("Avatar retrieved");
+            }
+          });
+        }
+        this.avatar = null;
+        console.log("previewUrl: " + this.previewUrl);
+        console.log("avatar: " + this.avatar);
+
+        
       },
       error: (error) => {
         console.log(error);
@@ -119,9 +126,7 @@ export class UserDashboardComponent implements OnInit {
       formData.append('name', this.userProfileForm.value[updateField]);
       formData.append('email', this.userInfo.email);
       formData.append('role', this.userInfo.role);
-      if (updateField === 'avatar'){
         formData.append('file', this.selectedFile);
-      }
       if (updateField === 'password') {
         formData.append('password', this.userProfileForm.value[updateField]);
       }
@@ -175,19 +180,6 @@ export class UserDashboardComponent implements OnInit {
     this.updateUserInformation('avatar');
   }
 
-  uploadImage(event: any): void {
-    this.editProfileField('avatar');
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.previewUrl = e.target.result;
-        this.selectedFile = file;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
   cancelUploadImage(): void {
     this.previewUrl = null;
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
@@ -197,6 +189,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
+    this.editProfileField('avatar');
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
