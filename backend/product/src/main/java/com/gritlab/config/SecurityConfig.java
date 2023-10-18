@@ -33,14 +33,14 @@ import java.util.Map;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    /*@Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;
 
     @Value("${spring.kafka.producer.value-serializer}")
-    private String valueSerializer;*/
+    private String valueSerializer;
 
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
@@ -73,7 +73,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    /*@Bean
+    @Bean
     public NewTopic topic() {
         return TopicBuilder.name("DELETE_USER")
                 .partitions(10)
@@ -125,5 +125,5 @@ public class SecurityConfig {
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
-    }*/
+    }
 }

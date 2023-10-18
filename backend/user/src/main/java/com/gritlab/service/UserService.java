@@ -33,8 +33,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /*@Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;*/
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public User convertFromDto(UserDTO userDTO) {
         User user = new User(userDTO.getId(), userDTO.getName(), userDTO.getEmail(),
@@ -189,7 +189,7 @@ public class UserService {
     }
 
     public void deleteUser(String userId) {
-        //kafkaTemplate.send("DELETE_USER", userId);
+        kafkaTemplate.send("DELETE_USER", userId);
         userRepository.deleteById(userId);
     }
 

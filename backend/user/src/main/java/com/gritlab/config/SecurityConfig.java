@@ -43,14 +43,14 @@ public class SecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    /*@Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;
 
     @Value("${spring.kafka.producer.value-serializer}")
-    private String valueSerializer;*/
+    private String valueSerializer;
 
     @Autowired
     private CorsFilter corsFilter;
@@ -102,7 +102,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*@Bean
+    @Bean
     public NewTopic topic() {
         return TopicBuilder.name("DELETE_USER")
                 .partitions(10)
@@ -130,7 +130,7 @@ public class SecurityConfig {
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
-    }*/
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

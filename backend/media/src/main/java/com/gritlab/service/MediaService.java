@@ -29,8 +29,8 @@ public class MediaService {
     @Autowired
     private MediaRepository mediaRepository;
 
-    /*@Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;*/
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public Optional<Media> getMedia(String id) {
 
@@ -81,11 +81,11 @@ public class MediaService {
             String data = media.getProductId() + "," + userId + "," + id;
 
             System.out.println("Media deleting, Sending data : " + data);
-            //kafkaTemplate.send("DELETE_MEDIA", data);
+            kafkaTemplate.send("DELETE_MEDIA", data);
         }
     }
 
-    /*@KafkaListener(topics = "DELETE_MEDIA_FEEDBACK", groupId = "my-consumer-group")
+    @KafkaListener(topics = "DELETE_MEDIA_FEEDBACK", groupId = "my-consumer-group")
     public void consumeMessageDeleteMedia(String message) {
         System.out.println("Media deleting, Receiving data : " + message);
         mediaRepository.deleteById(message);
@@ -112,7 +112,7 @@ public class MediaService {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-    }*/
+    }
 
     public MediaType getImageType(String fileName) {
 

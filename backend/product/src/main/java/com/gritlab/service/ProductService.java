@@ -32,8 +32,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    /*@Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;*/
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
 
     public List<Product> findAll() {
@@ -77,16 +77,16 @@ public class ProductService {
 
     public void deleteProduct(String id, String userId)  {
         if (productRepository.existsByUserIdAndId(userId, id)) {
-            //kafkaTemplate.send("DELETE_PRODUCT", id);
+            kafkaTemplate.send("DELETE_PRODUCT", id);
             productRepository.deleteById(id);
         }
     }
 
-    /*@KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
+    @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
     public void consumeMessage(String message) {
         List<Product> products = productRepository.findAllByUserId(message);
         for (Product product : products) {
-            //kafkaTemplate.send("DELETE_PRODUCT", product.getId());
+            kafkaTemplate.send("DELETE_PRODUCT", product.getId());
         }
         productRepository.deleteAllByUserId(message);
     }
@@ -101,7 +101,7 @@ public class ProductService {
                 .userId(message)
                 .build();
         productRepository.save(product1);
-        //kafkaTemplate.send("DEFAULT_PRODUCT", product1.getId() + " iPhone15.jpg");
+        kafkaTemplate.send("DEFAULT_PRODUCT", product1.getId() + " iPhone15.jpg");
 
         Product product2 = Product.builder()
                 .name("MAC Studio")
@@ -111,7 +111,7 @@ public class ProductService {
                 .userId(message)
                 .build();
         productRepository.save(product2);
-        //kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
+        kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
     }
 
     @KafkaListener(topics = "DELETE_MEDIA", groupId = "my-consumer-group")
@@ -129,5 +129,5 @@ public class ProductService {
                 kafkaTemplate.send("DELETE_MEDIA_FEEDBACK", mediaId);
             }
         }
-    }*/
+    }
 }
