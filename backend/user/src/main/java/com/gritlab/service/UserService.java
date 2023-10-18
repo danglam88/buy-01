@@ -7,8 +7,11 @@ import com.gritlab.utility.ImageFileTypeChecker;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,8 +36,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /*@Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;*/
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public User convertFromDto(UserDTO userDTO) {
         User user = new User(userDTO.getId(), userDTO.getName(), userDTO.getEmail(),
@@ -124,6 +127,18 @@ public class UserService {
         }
     }
 
+    public MediaType getImageType(String fileName) {
+
+        String extension = getExtension(fileName);
+
+        // Map the file extension to image types
+        return switch (extension) {
+            case "png" -> MediaType.IMAGE_PNG;
+            case "gif" -> MediaType.IMAGE_GIF;
+            default -> MediaType.IMAGE_JPEG;
+        };
+    }
+
     public String getExtension(String fileName) {
 
         String extension = "";
@@ -189,22 +204,17 @@ public class UserService {
     }
 
     public void deleteUser(String userId) {
-        //kafkaTemplate.send("DELETE_USER", userId);
+        kafkaTemplate.send("DELETE_USER", userId);
         userRepository.deleteById(userId);
     }
 
-    public User authenticateRequest(HttpServletRequest request, String userId)
+    public User authorizeUser(Authentication authentication, String userId)
             throws BadCredentialsException, NoSuchElementException {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new BadCredentialsException("User cannot be authenticated");
-        }
-        if (userId != null && !findUserById(userId)) {
+        if (userId != null && !this.findUserById(userId)) {
             throw new NoSuchElementException();
         }
-        String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
-        Optional<User> user = getUserByEmail(username);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> user = getUserByEmail(userDetails.getUsername());
         if (user.isEmpty() || (userId != null && !user.get().getId().equals(userId))) {
             throw new BadCredentialsException("Operation is not allowed");
         }

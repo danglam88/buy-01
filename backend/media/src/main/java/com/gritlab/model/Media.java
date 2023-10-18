@@ -28,9 +28,4 @@ public class Media {
     private String productId;
 
     private byte[] imageData;
-
-    public String getFileName() {
-        Path path = Paths.get(imagePath);
-        return path.getFileName().toString();
-    }
 }

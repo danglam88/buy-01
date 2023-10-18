@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class RateLimitExceptionHandler {
 
     @ExceptionHandler(RateLimitException.class)
-    public ResponseEntity<?> handleRateLimitException(Exception ex) {
+    public ResponseEntity<Response> handleRateLimitException(Exception ex) {
         Response errorResponse = new Response(ex.getMessage());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse);
     }
