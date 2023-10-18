@@ -40,3 +40,6 @@ typings
 # System files
 .DS_Store
 Thumbs.db
+
+# npm packages
+package-lock.json

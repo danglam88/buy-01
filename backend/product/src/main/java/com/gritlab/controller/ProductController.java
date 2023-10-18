@@ -26,15 +26,14 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
-    public ResponseEntity<List<ProductResponse>> findAll(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(productService.findAll(userDetails.getToken()));
+    public ResponseEntity<List<Product>> findAll() {
+        return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<List<ProductResponse>> findBySellerId(Authentication authentication) {
+    public ResponseEntity<List<Product>> findBySellerId(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(productService.findBySellerId(userDetails.getId(), userDetails.getToken()));
+        return ResponseEntity.ok(productService.findBySellerId(userDetails.getId()));
     }
 
     @GetMapping("/{id}")

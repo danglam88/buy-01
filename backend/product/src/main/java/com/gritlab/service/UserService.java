@@ -3,6 +3,7 @@ package com.gritlab.service;
 import com.gritlab.model.User;
 import com.gritlab.model.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Value("${user.service.url}")
+    private String userServiceUrl;
+
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String token) throws NoSuchElementException {
 
         // Create HttpHeaders and add the authorization header
@@ -26,12 +30,12 @@ public class UserService implements UserDetailsService {
 
         // Make a request with RestTemplate
         //todo HttpClientErrorException$Forbidden exception with invalid token, token validation required
-        ResponseEntity<User> responseEntity = restTemplate.exchange("http://localhost:8080/users/userInfo",
+        ResponseEntity<User> responseEntity = restTemplate.exchange( userServiceUrl + "users/userInfo",
                 HttpMethod.GET, entity, User.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             User user = responseEntity.getBody();
-            return new UserDetails(user, token);
+            return new UserDetails(user);
         } else {
             throw new NoSuchElementException();
         }
