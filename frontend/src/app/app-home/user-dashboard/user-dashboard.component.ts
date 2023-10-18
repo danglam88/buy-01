@@ -17,12 +17,8 @@ export class UserDashboardComponent implements OnInit {
   previewUrl: string | ArrayBuffer | null = null;
   isEditingProfile: boolean = false;
   editingField: string | null = null;
-<<<<<<< HEAD
   avatar : any;
   
-=======
-  avatar = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' || this.userInfo.avatar;
->>>>>>> main
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -68,10 +64,7 @@ export class UserDashboardComponent implements OnInit {
       ],
     });
 
-<<<<<<< HEAD
 
-=======
->>>>>>> main
   
     this.userService.getUserInfo().subscribe({
       next: (result) => {
@@ -111,11 +104,7 @@ export class UserDashboardComponent implements OnInit {
       formData.append('password', this.userInfo.password);
       formData.append('role', this.userInfo.role);
       formData.append('file', file);
-<<<<<<< HEAD
       this.userService.updateUser(formData).subscribe({
-=======
-      this.userService.updateUser(this.userInfo).subscribe({
->>>>>>> main
         next: (result) => {
           console.log(result);
         },
