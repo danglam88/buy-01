@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
-public class UserRequest {
+public class RegRequest {
 
     @NotNull(message = "Name is required")
     @Pattern(regexp = "^(?!\\s*$).+", message = "Name cannot be empty or contain only spaces")
@@ -25,6 +25,7 @@ public class UserRequest {
     @NotDuplicatedEmail(message = "Email already taken, please use another one")
     private String email;
 
+    @NotNull(message = "Password is required")
     @Pattern(regexp = "^(?!\\s*$).+", message = "Password cannot be empty or contain only spaces")
     @Size(min = 6, max = 50, message = "Password length must be between 6 and 50 characters")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",

@@ -73,7 +73,7 @@ public class UserController {
             HttpServletRequest request, @PathVariable String userId,
             @RequestParam("name") String name,
             @RequestParam("email") String email,
-            @RequestParam("password") String password,
+            @RequestParam(value = "password", required = false) String password,
             @RequestParam("role") String role,
             @RequestParam(value = "file", required = false) MultipartFile file,
             UriComponentsBuilder ucb, Authentication authentication) {

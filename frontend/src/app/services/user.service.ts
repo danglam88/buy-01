@@ -22,13 +22,13 @@ export class UserService {
     return this.httpClient.get(`${this.userInfoUrl}`, { headers });
   }
 
-  updateUser(user: any): Observable<object> {
+  updateUser(user: any, id: string): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.put(`${this.updateUserUrl}` + user.id, user, { headers });
+    return this.httpClient.put(`${this.updateUserUrl}` + id, user, { headers });
   }
 
   deleteUser(user: any): Observable<object> {

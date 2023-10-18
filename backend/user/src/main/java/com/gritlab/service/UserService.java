@@ -67,8 +67,8 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User createAccount(@Valid UserRequest userRequest) {
-        UserDTO userDTO = this.validateFile(userRequest);
+    public User createAccount(@Valid RegRequest regRequest) {
+        UserDTO userDTO = this.validateRegFile(regRequest);
         String userId;
         do {
             userId = UUID.randomUUID().toString().split("-")[0];
@@ -86,7 +86,28 @@ public class UserService {
         return userRepository.save(convertFromDto(userDTO));
     }
 
-    public UserDTO validateFile(UserRequest userRequest) {
+    public UserDTO validateRegFile(RegRequest regRequest) {
+
+        if (regRequest.getFile() == null) {
+            return new UserDTO(null, regRequest.getName().replaceAll("\\s+", " ").trim(),
+                    regRequest.getEmail().trim().toLowerCase(), regRequest.getPassword(),
+                    regRequest.getRole().trim().toUpperCase(), null, null);
+        }
+
+        this.checkFile(regRequest.getFile());
+
+        try {
+            return new UserDTO(null, regRequest.getName().replaceAll("\\s+", " ").trim(),
+                    regRequest.getEmail().trim().toLowerCase(), regRequest.getPassword(),
+                    regRequest.getRole().trim().toUpperCase(), regRequest.getFile().getOriginalFilename(),
+                    regRequest.getFile().getBytes());
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            throw new InvalidFileException("Failed to upload file");
+        }
+    }
+
+    public UserDTO validateUserFile(UserRequest userRequest) {
 
         if (userRequest.getFile() == null) {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
@@ -183,7 +204,7 @@ public class UserService {
     }
 
     public User updateUser(String userId, @Valid UserRequest userRequest) {
-        UserDTO userDTO = this.validateFile(userRequest);
+        UserDTO userDTO = this.validateUserFile(userRequest);
         Optional<User> user = userRepository.findById(userId);
         String hashedPassword = null;
         if (userDTO.getPassword() != null) {

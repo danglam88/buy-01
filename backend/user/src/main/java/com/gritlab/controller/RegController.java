@@ -1,6 +1,6 @@
 package com.gritlab.controller;
 
-import com.gritlab.model.UserRequest;
+import com.gritlab.model.RegRequest;
 import com.gritlab.model.User;
 import com.gritlab.service.UserService;
 import jakarta.annotation.security.PermitAll;
@@ -29,8 +29,8 @@ public class RegController {
                                                 @RequestParam("role") String role,
                                                 @RequestParam(value = "file", required = false) MultipartFile file,
                                                 UriComponentsBuilder ucb) {
-        UserRequest userRequest = new UserRequest(name, email, password, role, file);
-        User createdAccount = userService.createAccount(userRequest);
+        RegRequest regRequest = new RegRequest(name, email, password, role, file);
+        User createdAccount = userService.createAccount(regRequest);
         URI locationOfNewUser = ucb
                 .path("/users/{userId}")
                 .buildAndExpand(createdAccount.getId())
