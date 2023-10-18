@@ -38,13 +38,14 @@ public class AuthController {
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody @Valid AuthRequest authRequest)
             throws BadCredentialsException {
 
-            Optional<User> user = userRepository.findByEmail(authRequest.getUsername());
+            Optional<User> user = userRepository.findByEmail(authRequest.getUsername().toLowerCase());
             if (user.isPresent()) {
                 Authentication authentication = authenticationManager
-                        .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+                        .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername().toLowerCase(),
                                 authRequest.getPassword() + user.get().getId()));
                 if (authentication.isAuthenticated()) {
-                    AuthResponse authResponse = new AuthResponse(jwtService.generateToken(authRequest.getUsername()),
+                    AuthResponse authResponse =
+                            new AuthResponse(jwtService.generateToken(authRequest.getUsername().toLowerCase()),
                             user.get().getId(), user.get().getRole().toString());
                     return ResponseEntity.status(HttpStatus.OK).body(authResponse);
                 }
