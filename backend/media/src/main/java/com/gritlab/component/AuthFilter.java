@@ -30,19 +30,19 @@ public class AuthFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws IOException, ServletException, NoSuchElementException {
 
         String authHeader = request.getHeader("Authorization");
-        String token = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+            String token = authHeader.substring(7);
 
-            //todo is it throws error?
-            UserDetails userDetails = userDetailsService.loadUserByUsername(token);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(token);
 
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(userDetails,
-                            null, userDetails.getAuthorities());
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails,
+                                null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            } catch (Exception ex) {}
         }
 
         filterChain.doFilter(request, response);

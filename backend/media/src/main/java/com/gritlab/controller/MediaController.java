@@ -41,7 +41,7 @@ public class MediaController {
 
         // Set up the HTTP headers for the response
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + media.getFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + media.getImagePath());
         headers.setContentType(mediaService.getImageType(media.getImagePath()));
 
         return ResponseEntity.ok()
