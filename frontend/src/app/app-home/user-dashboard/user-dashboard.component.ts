@@ -19,6 +19,8 @@ export class UserDashboardComponent implements OnInit {
   editingField: string | null = null;
   selectedFile: File;
   avatar : any;
+  userAvatar: any;
+  defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -64,16 +66,13 @@ export class UserDashboardComponent implements OnInit {
       ],
     });
 
-
-  
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
-        console.log("user info", this.userInfo);
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
           this.getUserAvatar(this.userInfo.id);
         }
-        this.avatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+        this.avatar = this.defaultAvatar;
       },
       error: (error) => {
         console.log(error);
@@ -85,7 +84,6 @@ export class UserDashboardComponent implements OnInit {
         console.log("User info retrieved");
       }
     });
-
   }
 
   getUserAvatar(userId: string): void {
@@ -94,7 +92,8 @@ export class UserDashboardComponent implements OnInit {
         this.avatar = result;
         const reader = new FileReader();
         reader.onload = (e: any) => {
-          this.avatar  = e.target.result;
+          this.userAvatar  = e.target.result;
+          this.avatar = this.userAvatar;
         };
         reader.readAsDataURL(this.avatar);
       },
@@ -122,14 +121,14 @@ export class UserDashboardComponent implements OnInit {
         formData.append('file', this.selectedFile);
       } else if (updateField === 'removeAvatar') {
         formData.append('name', this.userInfo.name);
-        formData.append('file', null);
+       // formData.append('file', );
       } else {
         // If not 'avatar', add the field from the form
         formData.append(updateField, this.userProfileForm.value[updateField]);
       }
   
       // Check if this.avatar is not null and add it to formData
-      if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
+      if (this.userInfo.avatar != null && this.userInfo.avatarData != null && updateField !== 'removeAvatar') {
         const avatarBlob = this.dataURItoBlob(this.avatar);
         const avatarFile = new File([avatarBlob], this.userInfo.avatar);
         formData.append('file', avatarFile);
@@ -140,11 +139,6 @@ export class UserDashboardComponent implements OnInit {
         formData.append('password', this.userProfileForm.value[updateField]);
       }
 
-      this.userInfo[updateField] = this.userProfileForm.value[updateField];
-      console.log(formData.forEach((value, key) => {
-        console.log(key + ' ' + value);
-      }));
-  
      this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
           console.log(result);
@@ -196,7 +190,9 @@ export class UserDashboardComponent implements OnInit {
   }
 
   removeAvatar(): void {
-   // this.updateUserInformation('removeAvatar');
+   this.updateUserInformation('removeAvatar');
+   this.avatar = this.defaultAvatar;
+   this.cancelUploadImage();
   }
 
   cancelUploadImage(): void {
@@ -214,6 +210,7 @@ export class UserDashboardComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
+        this.avatar = this.previewUrl
         this.selectedFile = file;
       };
       reader.onerror = (error) => {
@@ -226,7 +223,6 @@ export class UserDashboardComponent implements OnInit {
   editProfileField(field: string): void {
     this.isEditingProfile = true;
     this.editingField = field;
-    console.log("editing field: " + this.editingField);
     if (field === 'name') {
       setTimeout(() => {
         this.nameInput.nativeElement.focus();
