@@ -109,7 +109,7 @@ export class UserDashboardComponent implements OnInit {
 
   // Common method to update user information
   updateUserInformation(updateField: string): void { 
-    if (updateField === 'avatar' || (this.userProfileForm.controls[updateField].valid)) {
+    if (updateField === 'avatar'  || updateField === 'removeAvatar' || (this.userProfileForm.controls[updateField].valid)) {
       const formData = new FormData();
   
       // Add common fields to formData
@@ -120,6 +120,9 @@ export class UserDashboardComponent implements OnInit {
       if (updateField === 'avatar') {
         formData.append('name', this.userInfo.name);
         formData.append('file', this.selectedFile);
+      } else if (updateField === 'removeAvatar') {
+        formData.append('name', this.userInfo.name);
+        formData.append('file', null);
       } else {
         // If not 'avatar', add the field from the form
         formData.append(updateField, this.userProfileForm.value[updateField]);
@@ -193,9 +196,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   removeAvatar(): void {
-    this.avatar = null;
-    this.selectedFile = null;
-    this.updateUserInformation('avatar');
+   // this.updateUserInformation('removeAvatar');
   }
 
   cancelUploadImage(): void {
