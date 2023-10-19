@@ -14,6 +14,7 @@ public class ForbiddenExceptionHandler {
     @ExceptionHandler({ForbiddenException.class, JsonProcessingException.class})
     public ResponseEntity<?> handleForbiddenException(Exception ex) throws Exception {
         if (ex instanceof ForbiddenException || ex instanceof JsonProcessingException) {
+            ex.printStackTrace();
             Response errorResponse = new Response(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
         } else {

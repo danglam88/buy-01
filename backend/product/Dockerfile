@@ -10,6 +10,11 @@ COPY pom.xml pom.xml
 # Copy the current microservice folder
 COPY product ./product
 
+# Copy the certificate into the docker image
+COPY product/src/main/resources/*.crt /usr/local/share/ca-certificates/
+COPY product/src/main/resources/*.jks /usr/local/share/ca-certificates/
+COPY product/src/main/resources/*.p12 /usr/local/share/ca-certificates/
+
 # Download all required dependencies into one layer
 RUN mvn -B -f ./product/pom.xml dependency:resolve-plugins dependency:resolve
 

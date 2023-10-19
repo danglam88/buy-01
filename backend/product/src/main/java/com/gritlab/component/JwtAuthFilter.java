@@ -33,7 +33,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
-                try {
                     String token = authHeader.substring(7);
 
                     //todo is it throws error?
@@ -44,7 +43,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                } catch (Exception ex) {}
             }
 
             filterChain.doFilter(request, response);

@@ -76,11 +76,11 @@ RUN rm -rf /usr/share/nginx/html/assets/cert
 RUN chmod -R 755 /usr/share/nginx/html && chown -R nginx:nginx /usr/share/nginx/html
 
 # Copy the SSL certificate and key
-COPY src/assets/cert/cert.pem /etc/nginx
-COPY src/assets/cert/key.pem /etc/nginx
-RUN chmod 600 /etc/nginx/key.pem
-RUN chmod 644 /etc/nginx/cert.pem
-RUN chown -R nginx:nginx /etc/nginx/cert.pem /etc/nginx/key.pem
+COPY src/assets/cert/localhost+2.pem /etc/nginx
+COPY src/assets/cert/localhost+2-key.pem /etc/nginx
+RUN chmod 600 /etc/nginx/localhost+2-key.pem
+RUN chmod 644 /etc/nginx/localhost+2.pem
+RUN chown -R nginx:nginx /etc/nginx/localhost+2.pem /etc/nginx/localhost+2-key.pem
 
 # Remove the default Nginx configuration file
 RUN rm /etc/nginx/conf.d/default.conf

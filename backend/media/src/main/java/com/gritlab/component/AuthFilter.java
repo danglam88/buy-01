@@ -34,7 +34,6 @@ public class AuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(token);
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -42,7 +41,6 @@ public class AuthFilter extends OncePerRequestFilter {
                                 null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } catch (Exception ex) {}
         }
 
         filterChain.doFilter(request, response);

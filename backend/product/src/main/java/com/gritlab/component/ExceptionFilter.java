@@ -26,6 +26,7 @@ public class ExceptionFilter extends OncePerRequestFilter {
             if (e instanceof BadCredentialsException) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             } else {
+                e.printStackTrace();
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
