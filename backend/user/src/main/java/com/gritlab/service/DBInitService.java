@@ -25,8 +25,8 @@ public class DBInitService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /*@Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;*/
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -63,7 +63,7 @@ public class DBInitService {
             String hashedPassword = passwordEncoder.encode("Seller1@" + sellerId);
             seller.setPassword(hashedPassword);
             userRepository.save(seller);
-            //kafkaTemplate.send("DEFAULT_SELLER", sellerId);
+            kafkaTemplate.send("DEFAULT_SELLER", sellerId);
         }
     }
 
