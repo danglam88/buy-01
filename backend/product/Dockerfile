@@ -11,9 +11,13 @@ COPY pom.xml pom.xml
 COPY product ./product
 
 # Copy the certificate into the docker image
+COPY product/src/main/resources/*.pem /usr/local/share/ca-certificates/
+COPY product/src/main/resources/*.p12 /usr/local/share/ca-certificates/
 COPY product/src/main/resources/*.crt /usr/local/share/ca-certificates/
 COPY product/src/main/resources/*.jks /usr/local/share/ca-certificates/
-COPY product/src/main/resources/*.p12 /usr/local/share/ca-certificates/
+
+# Import the certificate into the java truststore
+RUN keytool -import -trustcacerts -noprompt -storepass changeit -alias mycert -file /usr/local/share/ca-certificates/product.crt -keystore ${JAVA_HOME}/lib/security/cacerts
 
 # Download all required dependencies into one layer
 RUN mvn -B -f ./product/pom.xml dependency:resolve-plugins dependency:resolve
