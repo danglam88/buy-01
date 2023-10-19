@@ -7,11 +7,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class ProductService {
   private productList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-  private allProductsInfoUrl="http://localhost:8081/products";
-  private sellerProductsInfoUrl="http://localhost:8081/products/seller";
-  private createProductUrl="http://localhost:8081/products";
-  private updateUserUrl="http://localhost:8081/products/";
-  private deleteProductUrl="http://localhost:8081/products/";
+  private allProductsInfoUrl="https://localhost:8444/products";
+  private sellerProductsInfoUrl="https://localhost:8444/products/seller";
+  private createProductUrl="https://localhost:8444/products";
+  private updateUserUrl="https://localhost:8444/products/";
+  private deleteProductUrl="https://localhost:8444/products/";
   private token = sessionStorage.getItem('token');
 
   constructor(private httpClient: HttpClient) {

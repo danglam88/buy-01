@@ -6,10 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
-  private userInfoUrl="http://localhost:8080/users/userInfo";
-  private updateUserUrl="http://localhost:8080/users/";
-  private deleteUserUrl="http://localhost:8080/users/";
-  private avaterUserUrl="http://localhost:8080/users/avatar/";
+  private userInfoUrl="https://localhost:8443/users/userInfo";
+  private updateUserUrl="https://localhost:8443/users/";
+  private deleteUserUrl="https://localhost:8443/users/";
+  private avaterUserUrl="https://localhost:8443/users/avatar/";
   private token = sessionStorage.getItem('token');
 
   constructor(private httpClient: HttpClient) { }
