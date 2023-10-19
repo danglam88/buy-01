@@ -68,6 +68,9 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(HttpMethod.OPTIONS)
                                         .permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/products").hasAnyAuthority("SELLER")
+                                        .requestMatchers(HttpMethod.PUT, "/products").hasAnyAuthority("SELLER")
+                                        .requestMatchers(HttpMethod.DELETE, "/products").hasAnyAuthority("SELLER")
                                         .anyRequest()
                                         .authenticated())
                 .build();

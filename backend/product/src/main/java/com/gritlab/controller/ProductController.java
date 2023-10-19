@@ -1,16 +1,13 @@
 package com.gritlab.controller;
 
 import com.gritlab.model.Product;
-import com.gritlab.model.ProductResponse;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.security.core.Authentication;
 
