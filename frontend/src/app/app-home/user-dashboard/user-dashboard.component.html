@@ -15,6 +15,7 @@
     <div>
       <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>
       <button mat-button color="primary" (click)="fileInput.click()" *ngIf="!previewUrl">Edit Image</button>
+      <button mat-button color="primary" *ngIf="!previewUrl" (click) = "removeAvatar()">Remove Avatar</button>
       <button mat-button color="primary" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
       <button mat-button color="primary" *ngIf="previewUrl" (click)="updateAvatar()">Save</button>
     </div>
