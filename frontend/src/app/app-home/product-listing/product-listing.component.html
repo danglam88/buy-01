@@ -13,7 +13,7 @@
       #paginator>
     </mat-paginator>
   </div>
-  
+  <p *ngIf="products?.length == 0">There are no products!</p>
   <ng-container *ngFor="let product of products?.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
     <app-product  
       [product]="product" 
