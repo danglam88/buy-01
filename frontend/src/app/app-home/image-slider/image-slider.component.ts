@@ -36,8 +36,12 @@ export class ImageSliderComponent  {
   
   removeImage(index: number) {
     if (this.images.length > 0) {
-      // Emit an event to notify the parent component to remove the image at the currentIndex
       this.imageRemoved.emit(index);
+    }
+    if (this.currentIndex === index) {
+      this.currentIndex = 0;
+    } else if (this.currentIndex > index) {
+      this.currentIndex--;
     }
   }
 }
