@@ -28,6 +28,7 @@ export class ProductDetailComponent implements OnInit {
   isAddingImages = false;
   isDeletingImages = false;
   isEditingImages = false;
+  currentIndexOfImageSlider = 0;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('priceInput') priceInput: ElementRef;
@@ -83,8 +84,12 @@ export class ProductDetailComponent implements OnInit {
       ],
     });
 
+    this.getImage(this.product.id);
+  }
+
+  getImage(productId: string){
     // Get product images from media service
-    this.mediaService.getImageByProductId(this.product.id).subscribe({
+    this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
@@ -112,7 +117,6 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-
   // Capture which field is being updated
   updateField(field: string): void {
     if (this.productDetailForm.controls[field].invalid) {
@@ -202,10 +206,10 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-  currentIndex = 0;
+
 
   get currentImage(): { url: string, mediaId: string } | null {
-    const currentImageData = this.productImages[this.currentIndex];
+    const currentImageData = this.productImages[this.currentIndexOfImageSlider];
     if (currentImageData) {
       return {
         url: currentImageData.data,
@@ -217,11 +221,11 @@ export class ProductDetailComponent implements OnInit {
   }
 
   previousSlide() {
-    this.currentIndex = (this.currentIndex - 1 + this.noOfImages) % this.noOfImages;
+    this.currentIndexOfImageSlider = (this.currentIndexOfImageSlider - 1 + this.noOfImages) % this.noOfImages;
   }
 
   nextSlide() {
-    this.currentIndex = (this.currentIndex + 1) % this.noOfImages;
+    this.currentIndexOfImageSlider = (this.currentIndexOfImageSlider + 1) % this.noOfImages;
   }
 
   onFileSelected(event: any) {
@@ -267,8 +271,6 @@ export class ProductDetailComponent implements OnInit {
 
   deleteImage(currentImage: any) {
     if (currentImage) {
-      console.log("currentImage: " + currentImage);
-      console.log("currentImageMediaId: " + currentImage.mediaId);
       const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
         data: {
           confirmationText: 'Delete this image?' 
@@ -279,33 +281,8 @@ export class ProductDetailComponent implements OnInit {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
               console.log(result);
+              this.getImage(this.product.id);
               this.toastr.success('Image deleted');
-              this.mediaService.getImageByProductId(this.product.id).subscribe({
-                next: (result) => {
-                  for (const key in result) {
-                    if (result.hasOwnProperty(key)) {
-                      this.mediaService.getImageByMediaId(result[key])?.subscribe({
-                        next: (image) => {
-                          console.log((image));
-                          const reader = new FileReader();
-                          reader.onload = () => {
-                            this.productImages[key] = { data: reader.result, mediaId: result[key] };
-                          };
-                          reader.readAsDataURL(image); 
-                        },
-                        error: (error) => {
-                          console.log(error);
-                        }
-                      });
-                    }
-                  }
-                  const objectLength = Object.keys(result).length;
-                  this.noOfImages = objectLength;
-                },
-                error: (error) => {
-                  console.log(error);
-                }
-              });
             },
             error: (error) => {
               console.log(error);
@@ -334,9 +311,12 @@ export class ProductDetailComponent implements OnInit {
       formData.append('file', file);
   
       this.mediaService.uploadMedia(formData).subscribe({
-        next: (result) => {
-          console.log("uploadMedia result: " + JSON.stringify(result));
+        next: (result) => {;
           // Process next file
+          // empty productImages 
+          this.productImages = {};
+          this.getImage(productId);
+            // Set currentIndex to the index of the new image
           this.saveEachSelectedFile(productId, index + 1);
         },
         error: (error) => {
@@ -357,5 +337,7 @@ export class ProductDetailComponent implements OnInit {
     console.log("product id" + this.product.id);
     console.log("editing field" + this.editingField)
     this.saveEachSelectedFile(this.product.id, 0)
+    console.log("this.noOfImages: " + this.noOfImages)
+    this.currentIndexOfImageSlider = this.noOfImages - 1;
   }
 }
