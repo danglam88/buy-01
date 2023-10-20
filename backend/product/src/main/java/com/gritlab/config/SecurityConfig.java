@@ -109,8 +109,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topicDeleteMedia() {
-        return TopicBuilder.name("DELETE_MEDIA")
+    public NewTopic topic11() {
+        return TopicBuilder.name("CHECK_PRODUCT_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic topic12() {
+        return TopicBuilder.name("CHECK_PRODUCT_RESPONSE")
                 .partitions(1)
                 .replicas(1)
                 .build();

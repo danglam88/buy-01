@@ -42,7 +42,9 @@ public class AuthFilter extends OncePerRequestFilter {
                                 null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+                throw new RuntimeException("Failed to get user data");
+            }
         }
 
         filterChain.doFilter(request, response);
