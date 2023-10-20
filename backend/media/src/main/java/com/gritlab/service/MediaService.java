@@ -1,6 +1,6 @@
 package com.gritlab.service;
 
-import com.gritlab.exception.InvalidFileException;
+import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Media;
 import com.gritlab.repository.MediaRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
@@ -11,7 +11,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.Optional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 
 @Service
@@ -31,6 +31,14 @@ public class MediaService {
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Autowired
+    private final ProductCheckService productCheckService;
+
+    @Autowired
+    public MediaService(ProductCheckService kafkaService) {
+        this.productCheckService = kafkaService;
+    }
 
     public Optional<Media> getMedia(String id) {
 
@@ -52,7 +60,11 @@ public class MediaService {
         return productImages;
     }
 
-    public Media addMedia(MultipartFile file, String productId) {
+    public Media addMedia(MultipartFile file, String productId, String userId) {
+
+        if (!checkProduct(productId, userId)) {
+            throw new InvalidParamException("Product with this id does not belong to the current user");
+        }
 
         checkFile(file);
 
@@ -68,7 +80,7 @@ public class MediaService {
             return mediaRepository.save(media);
 
         } catch (IOException ex) {
-            throw new InvalidFileException("Failed to upload file");
+            throw new InvalidParamException("Failed to upload file");
         }
     }
 
@@ -78,17 +90,35 @@ public class MediaService {
 
             Media media = mediaRepository.findById(id).orElseThrow();
 
-            String data = media.getProductId() + "," + userId + "," + id;
-
-            System.out.println("Media deleting, Sending data : " + data);
-            kafkaTemplate.send("DELETE_MEDIA", data);
+            if (!checkProduct(media.getProductId(), userId)) {
+                throw new InvalidParamException("Media with this id does not belong to the current user");
+            } else {
+                mediaRepository.deleteById(id);
+            }
         }
     }
 
-    @KafkaListener(topics = "DELETE_MEDIA_FEEDBACK", groupId = "my-consumer-group")
-    public void consumeMessageDeleteMedia(String message) {
-        System.out.println("Media deleting, Receiving data : " + message);
-        mediaRepository.deleteById(message);
+    public boolean checkProduct(String productId, String userId) {
+
+        String requestPayload = productId + "," + userId;
+
+        productCheckService.sendRequest(requestPayload, requestPayload);
+
+        try {
+            String response = productCheckService.waitForResponse(requestPayload, 10000);
+            if (response != null) {
+                // Handle the response
+                System.out.println("Received response: " + response);
+                return response.equals("valid");
+            } else {
+                // Handle the timeout
+                System.out.println("Timeout: No response received within the specified time.");
+            }
+        } catch (InterruptedException e) {
+            // Handle exceptions
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
@@ -126,23 +156,23 @@ public class MediaService {
         };
     }
 
-    public void checkFile(MultipartFile file) throws InvalidFileException {
+    public void checkFile(MultipartFile file) throws InvalidParamException {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                throw new InvalidFileException("File must be image");
+                throw new InvalidParamException("File must be image");
             }
         } catch (IOException ex) {
-            throw new InvalidFileException("Failed to upload file");
+            throw new InvalidParamException("Failed to upload file");
         }
 
         if (file.isEmpty()) {
-            throw new InvalidFileException("File must not be empty");
+            throw new InvalidParamException("File must not be empty");
         }
 
         String extension = getExtension(file.getOriginalFilename());
         if (!isValidExtension(extension)) {
-            throw new InvalidFileException("Allowed extensions: " + String.join(",", allowedExtensions));
+            throw new InvalidParamException("Allowed extensions: " + String.join(",", allowedExtensions));
         }
     }
 

@@ -28,6 +28,7 @@ public class MediaController {
 
     @GetMapping("product/{id}")
     public ResponseEntity<?> findByProductId(@PathVariable String id) {
+
         return ResponseEntity.ok().body(mediaService.getByProductId(id));
     }
 
@@ -51,11 +52,12 @@ public class MediaController {
 
     @PostMapping()
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
-                             @RequestParam("productId") String  productId,
-                                           UriComponentsBuilder ucb) {
+                                             @RequestParam("productId") String  productId,
+                                             Authentication authentication,
+                                             UriComponentsBuilder ucb) {
 
-
-        Media newProduct = mediaService.addMedia(file, productId);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Media newProduct = mediaService.addMedia(file, productId, userDetails.getId());
 
         URI locationOfMedia = ucb
                 .path("/media/{id}")
@@ -66,9 +68,8 @@ public class MediaController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteProduct(
-            @PathVariable String id,
-            Authentication authentication) {
+    private ResponseEntity<Void> deleteProduct(@PathVariable String id,
+                                               Authentication authentication) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 

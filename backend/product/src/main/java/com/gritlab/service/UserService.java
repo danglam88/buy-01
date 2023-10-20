@@ -29,7 +29,6 @@ public class UserService implements UserDetailsService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Make a request with RestTemplate
-        //todo HttpClientErrorException$Forbidden exception with invalid token, token validation required
         ResponseEntity<User> responseEntity = restTemplate.exchange( userServiceUrl + "users/userInfo",
                 HttpMethod.GET, entity, User.class);
         System.out.println("responseEntity.getStatusCode(): " + responseEntity.getStatusCode());

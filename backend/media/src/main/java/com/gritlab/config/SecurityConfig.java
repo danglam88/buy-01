@@ -84,16 +84,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic10() {
-        return TopicBuilder.name("DELETE_MEDIA")
+    public NewTopic topic4() {
+        return TopicBuilder.name("DEFAULT_PRODUCT")
                 .partitions(1)
                 .replicas(1)
                 .build();
     }
 
     @Bean
-    public NewTopic topic4() {
-        return TopicBuilder.name("DEFAULT_PRODUCT")
+    public NewTopic topic11() {
+        return TopicBuilder.name("CHECK_PRODUCT_REQUEST")
                 .partitions(1)
                 .replicas(1)
                 .build();
