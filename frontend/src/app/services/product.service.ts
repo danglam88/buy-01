@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -13,6 +13,8 @@ export class ProductService {
   private updateUserUrl="http://localhost:8081/products/";
   private deleteProductUrl="http://localhost:8081/products/";
   private token = sessionStorage.getItem('token');
+  productCreated = new EventEmitter<any>();
+
 
   constructor(private httpClient: HttpClient) {
     // Load product data from local storage when the service is initialized
