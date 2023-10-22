@@ -48,12 +48,14 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public Product addProduct(String name, String description, Double price, Integer quantity, String userId) {
+    public Product addProduct(Product request, List<MultipartFile> files, String userId) {
+
+        //todo add files to media
         var product = Product.builder()
-                .name(name)
-                .description(description)
-                .price(price)
-                .quantity(quantity)
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
                 .userId(userId)
                 .build();
 

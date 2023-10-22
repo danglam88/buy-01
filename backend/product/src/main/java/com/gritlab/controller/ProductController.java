@@ -6,8 +6,12 @@ import com.gritlab.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.security.core.Authentication;
 
@@ -40,13 +44,18 @@ public class ProductController {
     }
 
     @PostMapping
-    private ResponseEntity<String> createProduct(@Valid @RequestBody Product request,
-                                                Authentication authentication,
-                                                UriComponentsBuilder ucb) {
+    private ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
+                                                 BindingResult result,
+                                                 @RequestPart("files") List<MultipartFile> files,
+                                                 Authentication authentication,
+                                                 UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
+
+        if (result.hasErrors()) {
+            throw new MethodArgumentNotValidException((MethodParameter) null, result);
+        }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Product newProduct = productService.addProduct(request.getName(),
-                request.getDescription(),request.getPrice(),request.getQuantity(), userDetails.getId());
+        Product newProduct = productService.addProduct(request, files, userDetails.getId());
 
         URI locationOfNewProduct = ucb
                 .path("/products/{id}")
