@@ -19,7 +19,7 @@ export class UserDashboardComponent implements OnInit {
   editingField: string | null = null;
   selectedFile: File;
   avatar : any;
-  userAvatar: any;
+  userAvatar: "";
   defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
@@ -65,7 +65,11 @@ export class UserDashboardComponent implements OnInit {
         ],
       ],
     });
+    this.getUserInfo();
+  }
 
+  // Get user information
+  getUserInfo(): void {
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
@@ -87,7 +91,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   getUserAvatar(userId: string): void {
-    this.userService.getUserAvatar(userId).subscribe({
+    this.userService.getUserAvatar(userId)?.subscribe({
       next: (result) => {
         this.avatar = result;
         const reader = new FileReader();
@@ -110,38 +114,54 @@ export class UserDashboardComponent implements OnInit {
   updateUserInformation(updateField: string): void { 
     if (updateField === 'avatar'  || updateField === 'removeAvatar' || (this.userProfileForm.controls[updateField].valid)) {
       const formData = new FormData();
+          // Check if this.avatar is not null and add it to formData
+          if (this.userInfo.avatar != null && this.userInfo.avatarData != null && updateField !== 'removeAvatar') {
+            const avatarBlob = this.dataURItoBlob(this.avatar);
+            const avatarFile = new File([avatarBlob], this.userInfo.avatar);
+            formData.append('file', avatarFile);
+          }
+      
+        if (updateField === 'name') {
+          formData.append('email', this.userInfo.email);
+          formData.append('role', this.userInfo.role);
+          formData.append('name', this.userProfileForm.value[updateField]);
+        } 
+
+        if (updateField === 'email') {
+          formData.append('email', this.userProfileForm.value[updateField]);
+          formData.append('role', this.userInfo.role);
+          formData.append('name', this.userInfo.name);
+        } 
+
+        // Check if the updateField is 'password' and add it to formData
+      if (updateField === 'password') {
+          formData.append('email', this.userInfo.email);
+          formData.append('role', this.userInfo.role);
+          formData.append('name', this.userInfo.name);
+          formData.append('password', this.userProfileForm.value[updateField]);
+      }
   
-      // Add common fields to formData
-      formData.append('email', this.userInfo.email);
-      formData.append('role', this.userInfo.role);
+
+      
   
       // Check if the updateField is 'avatar' and add the file to formData
       if (updateField === 'avatar') {
         formData.append('name', this.userInfo.name);
+        formData.append('email', this.userInfo.email);
+        formData.append('role', this.userInfo.role);
         formData.append('file', this.selectedFile);
-      } else if (updateField === 'removeAvatar') {
+      } 
+      if (updateField === 'removeAvatar') {
         formData.append('name', this.userInfo.name);
+        formData.append('email', this.userInfo.email);
+        formData.append('role', this.userInfo.role);
        // formData.append('file', );
-      } else {
-        // If not 'avatar', add the field from the form
-        formData.append(updateField, this.userProfileForm.value[updateField]);
-      }
-  
-      // Check if this.avatar is not null and add it to formData
-      if (this.userInfo.avatar != null && this.userInfo.avatarData != null && updateField !== 'removeAvatar') {
-        const avatarBlob = this.dataURItoBlob(this.avatar);
-        const avatarFile = new File([avatarBlob], this.userInfo.avatar);
-        formData.append('file', avatarFile);
-      }
-  
-      // Check if the updateField is 'password' and add it to formData
-      if (updateField === 'password') {
-        formData.append('password', this.userProfileForm.value[updateField]);
-      }
-
+      } 
+      
      this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
           console.log(result);
+          this.getUserInfo();
         },
         error: (error) => {
           console.log(error);
@@ -157,10 +177,10 @@ export class UserDashboardComponent implements OnInit {
           this.toastr.success(`${updateField} updated`);
           this.cancelFieldEdit();
           this.cancelUploadImage();
-          this.getUserAvatar(this.userInfo.id);
           if (updateField === 'email' || updateField === 'password') {
             this.router.navigate(['../login']);
           }
+        
         },
       });
     } else {
@@ -196,7 +216,13 @@ export class UserDashboardComponent implements OnInit {
   }
 
   cancelUploadImage(): void {
-    this.previewUrl = null;
+    this.previewUrl = ""
+    if (this.userAvatar != null) {
+      this.avatar = this.userAvatar;
+    } else {
+      this.avatar = this.defaultAvatar;
+    }
+
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
     if (fileInput) {
       fileInput.value = '';
