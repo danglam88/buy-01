@@ -46,7 +46,7 @@ public class ProductCheckService {
         if (response == null) {
             Thread.sleep(timeoutMillis);
         }
-        return response;
+        return responseMap.get(correlationId);
     }
 }
 

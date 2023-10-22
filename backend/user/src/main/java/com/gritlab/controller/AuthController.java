@@ -44,9 +44,12 @@ public class AuthController {
                         .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername().toLowerCase(),
                                 authRequest.getPassword() + user.get().getId()));
                 if (authentication.isAuthenticated()) {
-                    AuthResponse authResponse =
-                            new AuthResponse(jwtService.generateToken(authRequest.getUsername().toLowerCase()),
+
+                    String token = jwtService.generateToken(authRequest.getUsername().toLowerCase(),
                             user.get().getId(), user.get().getRole().toString());
+
+                    AuthResponse authResponse =
+                            new AuthResponse(token, user.get().getId(), user.get().getRole().toString());
                     return ResponseEntity.status(HttpStatus.OK).body(authResponse);
                 }
             }

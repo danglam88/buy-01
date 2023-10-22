@@ -1,6 +1,6 @@
 package com.gritlab.config;
 
-import com.gritlab.component.AuthFilter;
+import com.gritlab.component.JwtAuthFilter;
 import com.gritlab.component.CorsFilter;
 import com.gritlab.component.ExceptionFilter;
 import com.gritlab.component.RateLimitFilter;
@@ -46,7 +46,7 @@ public class SecurityConfig {
     private CorsFilter corsFilter;
 
     @Autowired
-    private AuthFilter authFilter;
+    private JwtAuthFilter authFilter;
 
     @Autowired
     private ExceptionFilter exceptionFilter;
