@@ -87,6 +87,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   getUserAvatar(userId: string): void {
+    console.log("userId: " + userId)
     this.userService.getUserAvatar(userId).subscribe({
       next: (result) => {
         this.avatar = result;

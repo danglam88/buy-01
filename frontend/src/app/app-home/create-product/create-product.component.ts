@@ -65,13 +65,26 @@ export class CreateProductComponent implements OnInit {
   // PRODUCTS ARE STILL CREATED IF THERE IS PROBLEMS WITH MEDIA?
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
-      this.productInfo = this.prepareProductInfo();
+      //this.productInfo = this.prepareProductInfo();
       // createProduct
-      this.productService.createProduct(this.productInfo).subscribe({
+      const formData = new FormData();
+      let index = 0;
+      if (index < this.selectedFiles.length) {
+        const file = this.selectedFiles[index].file;
+        const formData = new FormData();
+        formData.append('files', file);
+      }
+      formData.append('name', this.createProductForm.controls.name.value.replace(/\s+/g, ' ').trim());
+      formData.append('price', this.createProductForm.controls.price.value);
+      formData.append('quantity', this.createProductForm.controls.quantity.value);
+      formData.append('description', this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim());
+
+      this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          const productId = result.toString();
-          this.saveEachSelectedFile(productId, 0);
-          this.productService.productCreated.emit(true);
+          console.log("createProduct result: " + JSON.stringify(result));
+          // const productId = result.toString();
+          // this.saveEachSelectedFile(productId, 0);
+          // this.productService.productCreated.emit(true);
         },
         error: (error) => {
           this.handleProductCreationError(error);
