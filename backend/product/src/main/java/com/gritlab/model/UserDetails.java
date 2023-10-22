@@ -18,11 +18,10 @@ public class UserDetails implements org.springframework.security.core.userdetail
 
     private List<GrantedAuthority> authorities;
 
-    public UserDetails(User user) {
-        this.username = user.getEmail();
-        this.password = user.getPassword();
-        this.id = user.getId();
-        this.authorities = Arrays.stream(user.getRole().toString().split(","))
+    public UserDetails(String username, String id, String role) {
+        this.username = username;
+        this.id = id;
+        this.authorities = Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
@@ -34,7 +33,7 @@ public class UserDetails implements org.springframework.security.core.userdetail
 
     @Override
     public String getPassword() {
-        return this.password;
+        return "";
     }
 
     @Override
