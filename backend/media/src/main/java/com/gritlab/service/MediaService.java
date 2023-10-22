@@ -14,12 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 
 @Service
@@ -148,17 +148,12 @@ public class MediaService {
     @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group")
     public void consumeBinaryData(BinaryData binaryData) {
         System.out.println("Received binary data: " + binaryData);
-        try {
-            byte[] imageData = binaryData.getFile().getBytes();
-            Media media = Media.builder()
-                    .imageData(imageData)
-                    .imagePath(binaryData.getPath())
-                    .productId(binaryData.getOwnerId())
-                    .build();
-            mediaRepository.save(media);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        Media media = Media.builder()
+                .imageData(Base64.getDecoder().decode(binaryData.getFileContentBase64()))
+                .imagePath(binaryData.getPath())
+                .productId(binaryData.getOwnerId())
+                .build();
+        mediaRepository.save(media);
     }
 
     public MediaType getImageType(String fileName) {

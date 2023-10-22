@@ -49,7 +49,6 @@ public class ProductController {
                                                  @RequestPart("files") List<MultipartFile> files,
                                                  Authentication authentication,
                                                  UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
-        System.out.println("request: " + request);
         if (result.hasErrors()) {
             throw new MethodArgumentNotValidException((MethodParameter) null, result);
         }
