@@ -19,11 +19,12 @@ export class UserDashboardComponent implements OnInit {
   editingField: string | null = null;
   selectedFile: File;
   avatar : any;
-  userAvatar: "";
+  userAvatar: any;
   defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
+  @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor(
     private userService: UserService,
@@ -216,17 +217,13 @@ export class UserDashboardComponent implements OnInit {
   }
 
   cancelUploadImage(): void {
-    this.previewUrl = ""
+    this.previewUrl = null
     if (this.userAvatar != null) {
       this.avatar = this.userAvatar;
     } else {
       this.avatar = this.defaultAvatar;
     }
-
-    const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
-    if (fileInput) {
-      fileInput.value = '';
-    }
+    this.fileInput.nativeElement.value = '';
   }
 
   onFileSelected(event: any) {
