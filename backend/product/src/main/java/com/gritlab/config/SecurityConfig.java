@@ -4,6 +4,8 @@ import com.gritlab.component.CorsFilter;
 import com.gritlab.component.ExceptionFilter;
 import com.gritlab.component.JwtAuthFilter;
 import com.gritlab.component.RateLimitFilter;
+import com.gritlab.model.BinaryData;
+import com.gritlab.serializer.BinaryDataSerializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -125,6 +127,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic topic13() {
+        return TopicBuilder.name("BINARY_DATA")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -134,7 +144,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public ProducerFactory<String, BinaryData> binaryDataProducerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BinaryDataSerializer.class.getName());
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, BinaryData> binaryDataKafkaTemplate() {
+        return new KafkaTemplate<>(binaryDataProducerFactory());
     }
 }

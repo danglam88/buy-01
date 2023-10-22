@@ -4,18 +4,20 @@ import com.gritlab.component.JwtAuthFilter;
 import com.gritlab.component.CorsFilter;
 import com.gritlab.component.ExceptionFilter;
 import com.gritlab.component.RateLimitFilter;
+import com.gritlab.deserializer.BinaryDataDeserializer;
+import com.gritlab.model.BinaryData;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.*;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,6 +43,15 @@ public class SecurityConfig {
 
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
+
+    @Value("${spring.kafka.consumer.key-deserializer}")
+    private String keyDeserializer;
+
+    @Value("${spring.kafka.consumer.value-deserializer}")
+    private String valueDeserializer;
+
+    @Value("${spring.kafka.consumer.group-id}")
+    private String groupId;
 
     @Autowired
     private CorsFilter corsFilter;
@@ -100,6 +111,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic topic13() {
+        return TopicBuilder.name("BINARY_DATA")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -108,8 +127,41 @@ public class SecurityConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    @Bean ConsumerFactory<String, String> consumerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
+        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        return new DefaultKafkaConsumerFactory<>(configProps);
+    }
+
+    @Bean
+    public ConsumerFactory<String, BinaryData> binaryDataConsumerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
+        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BinaryDataDeserializer.class.getName());
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "binary-consumer-group");
+        return new DefaultKafkaConsumerFactory<>(configProps);
+    }
+
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, BinaryData> binaryDataKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, BinaryData> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(binaryDataConsumerFactory());
+        return factory;
     }
 }

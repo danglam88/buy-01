@@ -1,5 +1,6 @@
 package com.gritlab.service;
 
+import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
 import com.gritlab.model.ProductResponse;
 import com.gritlab.repository.ProductRepository;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,6 +37,8 @@ public class ProductService {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Autowired
+    private KafkaTemplate<String, BinaryData> binaryDataKafkaTemplate;
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -50,7 +54,6 @@ public class ProductService {
 
     public Product addProduct(Product request, List<MultipartFile> files, String userId) {
 
-        //todo add files to media
         var product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -59,7 +62,13 @@ public class ProductService {
                 .userId(userId)
                 .build();
 
-        return  productRepository.save(product);
+        Product newProduct = productRepository.save(product);
+
+        for (MultipartFile file : files) {
+            binaryDataKafkaTemplate.send("BINARY_DATA", new BinaryData(newProduct.getId(), file.getOriginalFilename(), file));
+        }
+
+        return newProduct;
     }
 
     public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
