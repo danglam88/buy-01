@@ -105,7 +105,7 @@ public class MediaService {
         productCheckService.sendRequest(requestPayload, requestPayload);
 
         try {
-            String response = productCheckService.waitForResponse(requestPayload, 10000);
+            String response = productCheckService.waitForResponse(requestPayload, 3000);
             if (response != null) {
                 // Handle the response
                 System.out.println("Received response: " + response);
