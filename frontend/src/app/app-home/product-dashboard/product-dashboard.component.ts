@@ -18,9 +18,19 @@ export class ProductDashboardComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private productService: ProductService
-    ) {}
+    ) {
+      this.productService.productCreated.subscribe((productCreated) => {
+        if (productCreated) {
+          this.getSellerProducts();
+        }
+      });
+    }
   
   ngOnInit(): void {
+    this.getSellerProducts();
+  }
+
+  getSellerProducts(){
     this.productService.getSellerProductsInfo().subscribe({
       next: (result) => {
         console.log("sellerProducts" + JSON.stringify(result));

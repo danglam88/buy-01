@@ -71,13 +71,12 @@ export class CreateProductComponent implements OnInit {
         next: (result) => {
           const productId = result.toString();
           this.saveEachSelectedFile(productId, 0);
+          this.productService.productCreated.emit(true);
         },
         error: (error) => {
           this.handleProductCreationError(error);
         },
       });
-      
-
     } else {
       this.handleValidationErrors();
     }

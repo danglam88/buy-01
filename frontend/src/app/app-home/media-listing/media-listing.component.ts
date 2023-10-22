@@ -13,25 +13,13 @@ export class MediaListingComponent implements OnInit {
   constructor(private mediaService: MediaService) { }
 
   ngOnInit(): void {
-
-    // this.productService.getAllProductsInfo().subscribe({
-    //   next: (result) => {
-    //     console.log(result);
-    //     this.mediaImageData = result;
-    //   },
-    //   error: (error) => {
-    //     console.error(error);
-    //   },
-    //   complete: () => {
-    //     console.log('All products retrieved');
-    //   }
-    // });
-
     this.mediaService.getImageByProductId(this.productId).subscribe({
       next: (result) => {
+        console.log("result" + result)
         console.log("Hello")
           this.mediaService.getImageByMediaId(result["0"]).subscribe({
             next: (mediaResult) => {
+              console.log("mediaResult" + mediaResult)
             const reader = new FileReader();
             reader.onload = () => {
               this.mediaImageData = reader.result; 
