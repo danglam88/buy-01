@@ -19,6 +19,8 @@ export class UserDashboardComponent implements OnInit {
   editingField: string | null = null;
   selectedFile: File;
   avatar : any;
+  userAvatar: any;
+  defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('emailInput') emailInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -62,48 +64,15 @@ export class UserDashboardComponent implements OnInit {
           ),
         ],
       ],
-
-      // avatar is a FIle object
-      avatar: [
-        null,
-        [
-         this.validateAvatar
-        ],
-      ],
     });
 
-
-  
     this.userService.getUserInfo().subscribe({
       next: (result) => {
-        console.log(JSON.stringify(result));
         this.userInfo = result;
-        console.log("user info: " + JSON.stringify(this.userInfo));
-
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
-          this.userService.getUserAvatar(this.userInfo.id)?.subscribe({
-            next: (result) => {
-              console.log("result" + JSON.stringify(result));
-              this.avatar = result;
-              const reader = new FileReader();
-              reader.onload = (e: any) => {
-                this.avatar  = e.target.result;
-              };
-              reader.readAsDataURL(this.avatar);
-            },
-            error: (error) => {
-              console.log(error);
-            },
-            complete: () => {
-              console.log("Avatar retrieved");
-            }
-          });
+          this.getUserAvatar(this.userInfo.id);
         }
-        this.avatar = null;
-        console.log("previewUrl: " + this.previewUrl);
-        console.log("avatar: " + this.avatar);
-
-        
+        this.avatar = this.defaultAvatar;
       },
       error: (error) => {
         console.log(error);
@@ -115,32 +84,69 @@ export class UserDashboardComponent implements OnInit {
         console.log("User info retrieved");
       }
     });
+  }
 
+  getUserAvatar(userId: string): void {
+    this.userService.getUserAvatar(userId).subscribe({
+      next: (result) => {
+        this.avatar = result;
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.userAvatar  = e.target.result;
+          this.avatar = this.userAvatar;
+        };
+        reader.readAsDataURL(this.avatar);
+      },
+      error: (error) => {
+        console.log(error);
+      },
+      complete: () => {
+        console.log("Avatar retrieved");
+      }
+    });
   }
 
   // Common method to update user information
-  updateUserInformation(updateField: string): void {
-    if (this.userProfileForm.controls[updateField].valid) {
-      this.userInfo[updateField] = this.userProfileForm.value[updateField];
+  updateUserInformation(updateField: string): void { 
+    if (updateField === 'avatar'  || updateField === 'removeAvatar' || (this.userProfileForm.controls[updateField].valid)) {
       const formData = new FormData();
-      formData.append('name', this.userProfileForm.value[updateField]);
+  
+      // Add common fields to formData
       formData.append('email', this.userInfo.email);
       formData.append('role', this.userInfo.role);
+  
+      // Check if the updateField is 'avatar' and add the file to formData
+      if (updateField === 'avatar') {
+        formData.append('name', this.userInfo.name);
         formData.append('file', this.selectedFile);
+      } else if (updateField === 'removeAvatar') {
+        formData.append('name', this.userInfo.name);
+       // formData.append('file', );
+      } else {
+        // If not 'avatar', add the field from the form
+        formData.append(updateField, this.userProfileForm.value[updateField]);
+      }
+  
+      // Check if this.avatar is not null and add it to formData
+      if (this.userInfo.avatar != null && this.userInfo.avatarData != null && updateField !== 'removeAvatar') {
+        const avatarBlob = this.dataURItoBlob(this.avatar);
+        const avatarFile = new File([avatarBlob], this.userInfo.avatar);
+        formData.append('file', avatarFile);
+      }
+  
+      // Check if the updateField is 'password' and add it to formData
       if (updateField === 'password') {
         formData.append('password', this.userProfileForm.value[updateField]);
       }
-     
-      this.userService.updateUser(formData, this.userInfo.id).subscribe({
+
+     this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
           console.log(result);
         },
         error: (error) => {
           console.log(error);
           if (error.status == 400) {
-            for (let i = 0; i < error.error.length; i++) {
-              this.toastr.error(error.error[i]);
-            }
+            this.toastr.error('Image must be maximum 2MB');
           } else if (error.status == 401) {
             this.toastr.error('Operation not allowed');
           } else if (error.status == 404) {
@@ -150,6 +156,8 @@ export class UserDashboardComponent implements OnInit {
         complete: () => {
           this.toastr.success(`${updateField} updated`);
           this.cancelFieldEdit();
+          this.cancelUploadImage();
+          this.getUserAvatar(this.userInfo.id);
           if (updateField === 'email' || updateField === 'password') {
             this.router.navigate(['../login']);
           }
@@ -159,6 +167,7 @@ export class UserDashboardComponent implements OnInit {
       this.toastr.error(`Invalid ${updateField}`);
     }
   }
+  
 
   // Update user name
   updateName(): void {
@@ -180,6 +189,12 @@ export class UserDashboardComponent implements OnInit {
     this.updateUserInformation('avatar');
   }
 
+  removeAvatar(): void {
+   this.updateUserInformation('removeAvatar');
+   this.avatar = this.defaultAvatar;
+   this.cancelUploadImage();
+  }
+
   cancelUploadImage(): void {
     this.previewUrl = null;
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
@@ -195,6 +210,7 @@ export class UserDashboardComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
+        this.avatar = this.previewUrl
         this.selectedFile = file;
       };
       reader.onerror = (error) => {
@@ -207,7 +223,6 @@ export class UserDashboardComponent implements OnInit {
   editProfileField(field: string): void {
     this.isEditingProfile = true;
     this.editingField = field;
-    console.log("editing field: " + this.editingField);
     if (field === 'name') {
       setTimeout(() => {
         this.nameInput.nativeElement.focus();
@@ -259,23 +274,15 @@ export class UserDashboardComponent implements OnInit {
     });
   }
 
-   // Custom validator function for the 'avatar' form control
-   validateAvatar(control: AbstractControl): { [key: string]: any } | null {
-    const file = control.value as File;
-
-    if (!file) {
-      return { 'avatarRequired': true };
-    }
-
-    // You can add additional validation logic for the avatar file here, e.g., checking file size, file type, etc.
-    
-    // For example, checking if the file is an image (you can add more checks):
-    const allowedTypes = ['image/jpeg', 'image/png'];
-    if (allowedTypes.indexOf(file.type) === -1) {
-      return { 'invalidAvatarType': true };
-    }
-
-    return null; // Return null if the validation is successful
+   // Function to convert a Base64-encoded data URI to a Blob
+dataURItoBlob(dataURI: string): Blob {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
   }
-
+  return new Blob([ab], { type: mimeString });
+}
 }

@@ -24,6 +24,7 @@ export class UserService {
   }
 
   updateUser(user: any, id: string): Observable<object> {
+    console.log("user", user)
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
