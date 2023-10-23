@@ -38,6 +38,4 @@ public class RegRequest {
     @Pattern(regexp = "^(?i)(seller|client)$",
             message = "Role must be either 'SELLER' or 'CLIENT' (case-insensitive)")
     private String role;
-
-    private MultipartFile file;
 }

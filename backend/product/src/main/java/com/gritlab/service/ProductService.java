@@ -1,8 +1,10 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
 import com.gritlab.repository.ProductRepository;
+import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class ProductService {
+
+    private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
 
     @Autowired
     private RestTemplate restTemplate;
@@ -45,7 +49,54 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    public void checkFile(MultipartFile file) throws InvalidParamException {
+
+        try {
+            if (!ImageFileTypeChecker.isImage(file)) {
+                throw new InvalidParamException("File must be image");
+            }
+        } catch (IOException ex) {
+            throw new InvalidParamException("Failed to upload file");
+        }
+
+        if (file.isEmpty()) {
+            throw new InvalidParamException("File must not be empty");
+        }
+
+        String extension = getExtension(file.getOriginalFilename());
+        if (!isValidExtension(extension)) {
+            throw new InvalidParamException("Allowed extensions: " + String.join(",", allowedExtensions));
+        }
+    }
+
+    public String getExtension(String fileName) {
+
+        String extension = "";
+
+        if (fileName != null && !fileName.isEmpty()) {
+            int lastDotIndex = fileName.lastIndexOf(".");
+
+            if (lastDotIndex > 0) {
+                extension = fileName.substring(lastDotIndex + 1).toLowerCase();
+            }
+        }
+        return extension;
+    }
+
+    private boolean isValidExtension(String extension) {
+        for (String allowedExtension : allowedExtensions) {
+            if (allowedExtension.equals(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Product addProduct(Product request, List<MultipartFile> files, String userId) {
+
+        for (MultipartFile file : files) {
+            checkFile(file);
+        }
 
         var product = Product.builder()
                 .name(request.getName())
@@ -63,6 +114,7 @@ public class ProductService {
                 BinaryData binaryData = new BinaryData(newProduct.getId(), file.getOriginalFilename(), base64String);
                 binaryDataKafkaTemplate.send("BINARY_DATA", binaryData);
             } catch (IOException e) {
+                productRepository.deleteById(newProduct.getId());
                 throw new RuntimeException("Error reading file content", e);
             }
         }
