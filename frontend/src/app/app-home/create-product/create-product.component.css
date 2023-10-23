@@ -82,8 +82,8 @@
 }
 
 .preview-image {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   object-fit: cover;
   border-radius: 6px;
 }
@@ -101,7 +101,7 @@
   padding: 5px 10px;
   border: none; 
   border-radius: 5px; 
-  margin-top: 20px;
+  margin-top: 10px;
   width: 150px;
   
 }
@@ -130,4 +130,22 @@
   width: 100%;
   margin-left: -3px;
   border-radius: 6px;
+}
+
+.requirement-info {
+  margin-top: 5px;
+  font-style: italic;
+  font-size: 11px;
+  font-weight: 200;
+  color: #5F6368;
+  text-align: center;
+}
+
+.field-requirement-info {
+  margin-top: -10px;
+  font-style: italic;
+  font-size: 11px;
+  font-weight: 200;
+  color: #5F6368;
+  text-align: left;
 }

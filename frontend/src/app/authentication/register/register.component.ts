@@ -15,6 +15,7 @@ export class RegisterComponent implements OnInit {
   selectedFile: File;
   userInfo: any = {};
   @ViewChild('nameInput') nameInput: ElementRef;
+  @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor(
     private builder: FormBuilder, 
@@ -83,23 +84,17 @@ export class RegisterComponent implements OnInit {
   // Cancel file upload
   cancelUploadImage() {
     this.previewUrl = null;
+    this.fileInput.nativeElement.value = '';
     // Optionally reset the file input if needed
-    const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
-    if (fileInput) {
-      fileInput.value = '';
-    }
+   //const fileInput = document.querySelector<HTMLInputElement>('#image');
+    // if (fileInput) {
+    //   fileInput.value = '';
+    // }
   }
 
   // Register user
   register() {
     if (this.registerform.valid) {
-      // this.userInfo = {
-      //   name: this.registerform.value.name.replace(/\s+/g, ' ').trim(),
-      //   email: this.registerform.value.email,
-      //   password: this.registerform.value.password,
-      //   role: this.registerform.value.role,
-      // }
-      
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('name', this.registerform.value.name.replace(/\s+/g, ' ').trim());

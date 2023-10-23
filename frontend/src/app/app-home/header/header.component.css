@@ -1,8 +1,8 @@
 
 a {
   font-family: Poppins, sans-serif;
-  font-weight: 200; /* Changed from 50 to 500 for better readability */
-  font-size: 20px !important;
+  font-weight: 200; 
+  font-size: 20px;
   text-decoration: none;
   color: #e0e1dd;
   cursor: pointer;
@@ -34,11 +34,12 @@ a:hover {
   top: 0;
 }
 
-.site-identity h1 {
-  font-size: 2em;
+.buy01 {
+  font-size: 26px;
   margin: 0.6em 0;
   margin-left: 120px !important;
   display: inline-block;
+  font-weight: 500;
 }
 
 .site-navigation ul{

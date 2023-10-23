@@ -65,62 +65,33 @@ export class CreateProductComponent implements OnInit {
   // PRODUCTS ARE STILL CREATED IF THERE IS PROBLEMS WITH MEDIA?
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
-      this.productInfo = this.prepareProductInfo();
-      // createProduct
-      this.productService.createProduct(this.productInfo).subscribe({
+      const formData = new FormData();
+      let index = 0;
+      if (index < this.selectedFiles.length) {
+        const file = this.selectedFiles[index].file;
+        formData.append('files', file);
+      }
+      formData.append('name', this.createProductForm.controls.name.value.replace(/\s+/g, ' ').trim());
+      formData.append('price', this.createProductForm.controls.price.value);
+      formData.append('quantity', this.createProductForm.controls.quantity.value);
+      formData.append('description', this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim());
+
+      this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          const productId = result.toString();
-          this.saveEachSelectedFile(productId, 0);
-          this.productService.productCreated.emit(true);
+          console.log("createProduct result: " + JSON.stringify(result));
         },
         error: (error) => {
-          this.handleProductCreationError(error);
+          console.error("product creation error: " + JSON.stringify(error));
+          this.toastr.error(JSON.stringify(error));
         },
+        complete: () => {
+          this.toastr.success('Product created successfully.');
+          this.closeModal();
+        }
       });
     } else {
       this.handleValidationErrors();
     }
-  }
-
-  saveEachSelectedFile(productId: string, index: number) {
-    if (index < this.selectedFiles.length) {
-      const file = this.selectedFiles[index].file;
-      const formData = new FormData();
-      formData.append('productId', productId);
-      formData.append('file', file);
-  
-      this.mediaService.uploadMedia(formData).subscribe({
-        next: (result) => {
-          console.log("uploadMedia result: " + JSON.stringify(result));
-          // Process next file
-          this.saveEachSelectedFile(productId, index + 1);
-        },
-        error: (error) => {
-          this.handleProductCreationError(error);
-        },
-      });
-    } else {
-      this.handleProductCreationSuccess('All files uploaded');
-    }
-  }
-
-  prepareProductInfo() {
-    return {
-      name: this.createProductForm.controls.name.value.replace(/\s+/g, ' ').trim(),
-      price: this.createProductForm.controls.price.value,
-      quantity: this.createProductForm.controls.quantity.value,
-      description: this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim()
-    };
-  }
-
-  handleProductCreationSuccess(result: any) {
-    this.toastr.success('Product created successfully.');
-    this.closeModal();
-  }
-
-  handleProductCreationError(error: any) {
-    console.error("product creation error: " + JSON.stringify(error));
-    this.toastr.error(JSON.stringify(error));
   }
 
   handleValidationErrors() {
@@ -139,14 +110,19 @@ export class CreateProductComponent implements OnInit {
 
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
-    if (files.length > 0) {
+
+    // Check if adding these files would exceed the limit
+    if (this.selectedFiles.length + files.length > 5) {
+      // Display a Toastr error message
+      this.toastr.error('You can only add a maximum of 5 images.');
+    } else if (files.length > 0) {
+      // Add the selected files that do not exceed the limit
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         this.displaySelectedImage(file);
         this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
       }
     }
-    console.log("selectedFiles 1: " + this.selectedFiles);
   }
 
   displaySelectedImage(file: File) {

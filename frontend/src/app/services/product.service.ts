@@ -37,12 +37,12 @@ export class ProductService {
      return this.httpClient.get(`${this.sellerProductsInfoUrl}`, { headers });
   }
 
-  createProduct(product: any): Observable<String> {
+  createProduct(product: any): Observable<Object> {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-    return this.httpClient.post(`${this.createProductUrl}`, product, { headers, responseType: 'text' });
+    return this.httpClient.post(`${this.createProductUrl}`, product, { headers });
   }
 
   updateProduct(product: any): Observable<object> {

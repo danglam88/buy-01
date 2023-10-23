@@ -2,6 +2,9 @@
 <app-header></app-header>
 
 <div class="productlist--container">
+
+  <button class="button-79" role="button" (click)="openCreateProduct()">Create New Product</button>
+  
   <div class="page-container">
     <mat-paginator class="page"
       [length]="sellerProducts?.length"
@@ -11,7 +14,7 @@
       #paginator>
     </mat-paginator>
   </div>
-  <button class="button-79" role="button" (click)="openCreateProduct()">Create New Product</button>
+
   <p *ngIf="sellerProducts?.length == 0">You have no products!</p>
   <ng-container *ngFor="let product of sellerProducts?.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
     <app-product  
