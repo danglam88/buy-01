@@ -14,6 +14,7 @@ export class ProductService {
   private deleteProductUrl="http://localhost:8081/products/";
   private token = sessionStorage.getItem('token');
   productCreated = new EventEmitter<any>();
+  productDeleted = new EventEmitter<any>();
 
 
   constructor(private httpClient: HttpClient) {

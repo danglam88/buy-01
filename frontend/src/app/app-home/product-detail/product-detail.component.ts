@@ -48,6 +48,7 @@ export class ProductDetailComponent implements OnInit {
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
+
   ngOnInit(): void {
     console.log("userId of product: " + this.product.userId)
     console.log("userId of user: " + this.userID)
@@ -188,6 +189,7 @@ export class ProductDetailComponent implements OnInit {
         this.productService.deleteProduct(this.product).subscribe({
           next: (result) => {
             console.log(result);
+            this.productService.productDeleted.emit(true);
           },
           error: (error) => {
             console.log(error);
@@ -312,12 +314,12 @@ export class ProductDetailComponent implements OnInit {
   
       this.mediaService.uploadMedia(formData).subscribe({
         next: (result) => {;
-          // Process next file
-          // empty productImages 
           this.productImages = {};
           this.getImage(productId);
             // Set currentIndex to the index of the new image
           this.saveEachSelectedFile(productId, index + 1);
+          this.selectedFiles = [];
+          this.previewUrl = null;
         },
         error: (error) => {
           this.toastr.error(error)
@@ -330,7 +332,7 @@ export class ProductDetailComponent implements OnInit {
       this.editingField = '';
     }
   }
-  
+
   //WE NEED TO AUTO RELOAD IMAGES AFTER NEW IMAGES ADDED
   saveEditedImages() {
     if (this.selectedFiles.length > 5) {
@@ -344,4 +346,6 @@ export class ProductDetailComponent implements OnInit {
     this.currentIndexOfImageSlider = this.noOfImages - 1;
     }
   }
+
+
 }
