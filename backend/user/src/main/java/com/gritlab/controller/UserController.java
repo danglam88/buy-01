@@ -2,18 +2,23 @@ package com.gritlab.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gritlab.model.RegRequest;
 import com.gritlab.model.UserRequest;
 import com.gritlab.service.UserService;
 import com.gritlab.model.User;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -30,8 +35,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/userInfo")
-    public ResponseEntity<?> getUserInfo(HttpServletRequest request,
-                                         Authentication authentication) throws JsonProcessingException {
+    public ResponseEntity<?> getUserInfo(Authentication authentication) throws JsonProcessingException {
         User user = userService.authorizeUser(authentication, null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
@@ -56,8 +60,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(HttpServletRequest request,
-                                         @PathVariable String userId, Authentication authentication)
+    public ResponseEntity<?> getUserById(@PathVariable String userId, Authentication authentication)
             throws JsonProcessingException {
         User user = userService.authorizeUser(authentication, userId);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -67,17 +70,18 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @PutMapping("/{userId}")
-    public ResponseEntity<?> updateUser(
-            HttpServletRequest request, @PathVariable String userId,
-            @RequestParam("name") String name,
-            @RequestParam("email") String email,
-            @RequestParam(value = "password", required = false) String password,
-            @RequestParam("role") String role,
-            @RequestParam(value = "file", required = false) MultipartFile file,
-            UriComponentsBuilder ucb, Authentication authentication) {
+    public ResponseEntity<?> updateUser(@PathVariable String userId,
+            @Valid @ModelAttribute("request") UserRequest request,
+            BindingResult result,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            UriComponentsBuilder ucb, Authentication authentication) throws MethodArgumentNotValidException {
+
+        if (result.hasErrors()) {
+            throw new MethodArgumentNotValidException((MethodParameter) null, result);
+        }
+
         userService.authorizeUser(authentication, userId);
-        UserRequest userRequest = new UserRequest(name, email, password, role, file);
-        User updatedUser = userService.updateUser(userId, userRequest);
+        User updatedUser = userService.updateUser(userId, request, file);
         URI locationOfUpdatedUser = ucb
                 .path("/users/{userId}")
                 .buildAndExpand(updatedUser.getId())
@@ -87,8 +91,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(HttpServletRequest request,
-                                        @PathVariable String userId, Authentication authentication) {
+    public ResponseEntity<?> deleteUser(@PathVariable String userId, Authentication authentication) {
         userService.authorizeUser(authentication, userId);
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
