@@ -145,7 +145,7 @@ public class MediaService {
         }
     }
 
-    @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group")
+    @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")
     public void consumeBinaryData(BinaryData binaryData) {
         System.out.println("Received binary data: " + binaryData);
         Media media = Media.builder()
