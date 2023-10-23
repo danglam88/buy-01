@@ -25,10 +25,7 @@ export class ProductListingComponent implements OnInit {
         this.products = result;
       },
       error: (error) => {
-        console.log(error);
-        if (error.status == 404) {
-          console.log("Products not found");
-        }
+        console.log("Ops: " + error);
       },
       complete: () => {
         console.log("All products retrieved");

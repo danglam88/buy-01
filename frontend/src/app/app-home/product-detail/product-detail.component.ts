@@ -7,6 +7,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaService } from 'src/app/services/media.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'product-detail',
@@ -43,6 +44,7 @@ export class ProductDetailComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
+    private router:Router
   ) {
     this.product = data.product;
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
@@ -132,19 +134,18 @@ export class ProductDetailComponent implements OnInit {
     this.product[field] = this.productDetailForm.controls[field].value;
     this.productService.updateProduct(this.product).subscribe({
       next: (result) => {
-        console.log(result);
-        this.toastr.success(`Product ${field} updated`, 'Success');
+        this.toastr.success(`Product ${field} updated`);
         this.editingField = null;
       },
       error: (error) => {
-        this.displayError(`Product ${field} update failed`);
+        this.toastr.error(`Product ${field} update failed`);
         console.log(error);
       }
     });
   }
 
   displayError(message: string): void {
-    this.toastr.error(message, 'Error');
+    
   }
 
   editProfileField(field: string): void {
@@ -203,7 +204,7 @@ export class ProductDetailComponent implements OnInit {
             if (error.status == 401) {
               this.toastr.error('Operation not allowed');
             } else if (error.status == 404) {
-              this.toastr.error('Product not found');
+              this.router.navigate(['../home']);
             }
           },
           complete: () => {

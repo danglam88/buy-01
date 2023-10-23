@@ -83,6 +83,6 @@ public class ProductController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         productService.deleteProduct(id, userDetails.getId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();  
     }
 }

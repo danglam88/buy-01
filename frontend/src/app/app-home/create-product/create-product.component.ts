@@ -81,8 +81,11 @@ export class CreateProductComponent implements OnInit {
           this.productService.productCreated.emit(true);
         },
         error: (error) => {
-          console.error("product creation error: " + JSON.stringify(error));
-          this.toastr.error(JSON.stringify(error));
+          if (error.status === 400) {
+            this.toastr.error(error.error);
+          } else if (error.status === 401) {
+            this.toastr.error(error.error);
+          } 
         },
         complete: () => {
           this.toastr.success('Product created successfully.');

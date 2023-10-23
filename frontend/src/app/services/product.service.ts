@@ -10,7 +10,7 @@ export class ProductService {
   private allProductsInfoUrl="http://localhost:8081/products";
   private sellerProductsInfoUrl="http://localhost:8081/products/seller";
   private createProductUrl="http://localhost:8081/products";
-  private updateUserUrl="http://localhost:8081/products/";
+  private updateProductUrl="http://localhost:8081/products/";
   private deleteProductUrl="http://localhost:8081/products/";
   private token = sessionStorage.getItem('token');
   productCreated = new EventEmitter<any>();
@@ -51,7 +51,7 @@ export class ProductService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.put(`${this.updateUserUrl}` + product.id, product, { headers });
+    return this.httpClient.put(`${this.updateProductUrl}` + product.id, product, { headers });
   }
 
   deleteProduct(user: any): Observable<object> {
