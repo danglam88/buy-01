@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -11,6 +11,8 @@ export class MediaService {
   private deleteMediaUrl="http://localhost:8082/media/";
   private mediaByMediaIdUrl="http://localhost:8082/media/";
   private token = sessionStorage.getItem('token');
+  productMediaUpdated = new EventEmitter<any>();
+
   constructor(private httpClient: HttpClient) { }
  
   getImageByProductId(productId: any): Observable<object> {

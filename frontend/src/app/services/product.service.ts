@@ -16,7 +16,6 @@ export class ProductService {
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
-
   constructor(private httpClient: HttpClient) {
     // Load product data from local storage when the service is initialized
     this.loadProductData();

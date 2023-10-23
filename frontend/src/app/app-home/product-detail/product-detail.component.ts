@@ -46,12 +46,17 @@ export class ProductDetailComponent implements OnInit {
   ) {
     this.product = data.product;
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+
+    this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
+      if (productMediaUpdated) {
+        this.productImages = {};
+        this.getImage(this.product.id);
+      }
+    });
   }
 
 
   ngOnInit(): void {
-    console.log("userId of product: " + this.product.userId)
-    console.log("userId of user: " + this.userID)
     this.productDetailForm = this.builder.group({
       name: [
         this.product.name,
@@ -96,7 +101,6 @@ export class ProductDetailComponent implements OnInit {
           if (result.hasOwnProperty(key)) {
             this.mediaService.getImageByMediaId(result[key]).subscribe({
               next: (image) => {
-                console.log((image));
                 const reader = new FileReader();
                 reader.onload = () => {
                   this.productImages[key] = { data: reader.result, mediaId: result[key] };
@@ -111,7 +115,8 @@ export class ProductDetailComponent implements OnInit {
         }
         const objectLength = Object.keys(result).length;
         this.noOfImages = objectLength;
-
+        console.log("ln 120 noOfImages: " + this.noOfImages);
+        this.currentIndexOfImageSlider = this.noOfImages - 1;
       },
       error: (error) => {
         console.log(error);
@@ -165,6 +170,8 @@ export class ProductDetailComponent implements OnInit {
     this.isAddingImages = false;
     this.isDeletingImages = false;
     this.isEditingImages = false;
+    this.selectedFiles = [];
+    this.previewUrl = null;
   }
 
   cancelEdit(): void {
@@ -305,6 +312,15 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  saveEditedImages() {
+    if (this.selectedFiles.length > 5) {
+      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
+    } else {
+      this.saveEachSelectedFile(this.product.id, 0)
+      this.mediaService.productMediaUpdated.emit(true);
+    }
+  }
+
   saveEachSelectedFile(productId: string, index: number) {
     if (index < this.selectedFiles.length) {
       const file = this.selectedFiles[index].file;
@@ -314,12 +330,12 @@ export class ProductDetailComponent implements OnInit {
   
       this.mediaService.uploadMedia(formData).subscribe({
         next: (result) => {;
-          this.productImages = {};
-          this.getImage(productId);
             // Set currentIndex to the index of the new image
+          this.getImage(this.product.id);
           this.saveEachSelectedFile(productId, index + 1);
           this.selectedFiles = [];
           this.previewUrl = null;
+
         },
         error: (error) => {
           this.toastr.error(error)
@@ -332,20 +348,5 @@ export class ProductDetailComponent implements OnInit {
       this.editingField = '';
     }
   }
-
-  //WE NEED TO AUTO RELOAD IMAGES AFTER NEW IMAGES ADDED
-  saveEditedImages() {
-    if (this.selectedFiles.length > 5) {
-      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
-    } else {
-    console.log("this selected file" + JSON.stringify(this.selectedFiles));
-    console.log("product id" + this.product.id);
-    console.log("editing field" + this.editingField)
-    this.saveEachSelectedFile(this.product.id, 0)
-    console.log("this.noOfImages: " + this.noOfImages)
-    this.currentIndexOfImageSlider = this.noOfImages - 1;
-    }
-  }
-
 
 }
