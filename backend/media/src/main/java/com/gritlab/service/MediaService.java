@@ -1,6 +1,7 @@
 package com.gritlab.service;
 
 import com.gritlab.exception.InvalidParamException;
+import com.gritlab.model.BinaryData;
 import com.gritlab.model.Media;
 import com.gritlab.repository.MediaRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
@@ -13,12 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 
 @Service
@@ -142,6 +143,17 @@ public class MediaService {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")
+    public void consumeBinaryData(BinaryData binaryData) {
+        System.out.println("Received binary data: " + binaryData);
+        Media media = Media.builder()
+                .imageData(Base64.getDecoder().decode(binaryData.getFileContentBase64()))
+                .imagePath(binaryData.getPath())
+                .productId(binaryData.getOwnerId())
+                .build();
+        mediaRepository.save(media);
     }
 
     public MediaType getImageType(String fileName) {

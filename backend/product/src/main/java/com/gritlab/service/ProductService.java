@@ -1,22 +1,17 @@
 package com.gritlab.service;
 
+import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
-import com.gritlab.model.ProductResponse;
 import com.gritlab.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -35,6 +30,8 @@ public class ProductService {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Autowired
+    private KafkaTemplate<String, BinaryData> binaryDataKafkaTemplate;
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -50,7 +47,6 @@ public class ProductService {
 
     public Product addProduct(Product request, List<MultipartFile> files, String userId) {
 
-        //todo add files to media
         var product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -59,7 +55,19 @@ public class ProductService {
                 .userId(userId)
                 .build();
 
-        return  productRepository.save(product);
+        Product newProduct = productRepository.save(product);
+
+        for (MultipartFile file : files) {
+            try {
+                String base64String = Base64.getEncoder().encodeToString(file.getBytes());
+                BinaryData binaryData = new BinaryData(newProduct.getId(), file.getOriginalFilename(), base64String);
+                binaryDataKafkaTemplate.send("BINARY_DATA", binaryData);
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading file content", e);
+            }
+        }
+
+        return newProduct;
     }
 
     public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
