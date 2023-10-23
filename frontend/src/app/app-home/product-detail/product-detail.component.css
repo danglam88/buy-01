@@ -210,8 +210,16 @@ body {
     margin-left: 10px;
     border: none;
     background-color: transparent;
+    cursor: pointer;
   }
 
+  .confirm-button:not(:disabled):hover {
+    transform: scale(1.3);
+  }
+  
+  .confirm-button:not(:disabled):hover:active {
+    transform: scale(1.05) translateY(.125rem);
+  }
 .scroll {
     overflow-y: scroll;
 }
