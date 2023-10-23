@@ -66,8 +66,8 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User createAccount(@Valid RegRequest regRequest) {
-        UserDTO userDTO = this.validateRegFile(regRequest);
+    public User createAccount(RegRequest regRequest, MultipartFile file) {
+        UserDTO userDTO = this.validateRegFile(regRequest, file);
         String userId;
         do {
             userId = UUID.randomUUID().toString().split("-")[0];
@@ -85,42 +85,40 @@ public class UserService {
         return userRepository.save(convertFromDto(userDTO));
     }
 
-    public UserDTO validateRegFile(RegRequest regRequest) {
+    public UserDTO validateRegFile(RegRequest regRequest, MultipartFile file) {
 
-        if (regRequest.getFile() == null) {
+        if (file == null) {
             return new UserDTO(null, regRequest.getName().replaceAll("\\s+", " ").trim(),
                     regRequest.getEmail().trim().toLowerCase(), regRequest.getPassword(),
                     regRequest.getRole().trim().toUpperCase(), null, null);
         }
 
-        this.checkFile(regRequest.getFile());
+        checkFile(file);
 
         try {
             return new UserDTO(null, regRequest.getName().replaceAll("\\s+", " ").trim(),
                     regRequest.getEmail().trim().toLowerCase(), regRequest.getPassword(),
-                    regRequest.getRole().trim().toUpperCase(), regRequest.getFile().getOriginalFilename(),
-                    regRequest.getFile().getBytes());
+                    regRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             throw new InvalidFileException("Failed to upload file");
         }
     }
 
-    public UserDTO validateUserFile(UserRequest userRequest) {
+    public UserDTO validateUserFile(UserRequest userRequest, MultipartFile file) {
 
-        if (userRequest.getFile() == null) {
+        if (file == null) {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
                     userRequest.getEmail().trim().toLowerCase(), userRequest.getPassword(),
                     userRequest.getRole().trim().toUpperCase(), null, null);
         }
 
-        this.checkFile(userRequest.getFile());
+        checkFile(file);
 
         try {
             return new UserDTO(null, userRequest.getName().replaceAll("\\s+", " ").trim(),
                     userRequest.getEmail().trim().toLowerCase(), userRequest.getPassword(),
-                    userRequest.getRole().trim().toUpperCase(), userRequest.getFile().getOriginalFilename(),
-                    userRequest.getFile().getBytes());
+                    userRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             throw new InvalidFileException("Failed to upload file");
@@ -202,8 +200,8 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public User updateUser(String userId, @Valid UserRequest userRequest) {
-        UserDTO userDTO = this.validateUserFile(userRequest);
+    public User updateUser(String userId, UserRequest userRequest, MultipartFile file) {
+        UserDTO userDTO = this.validateUserFile(userRequest, file);
         Optional<User> user = userRepository.findById(userId);
         String hashedPassword = null;
         if (userDTO.getPassword() != null) {
