@@ -117,7 +117,6 @@ export class ProductDetailComponent implements OnInit {
         }
         const objectLength = Object.keys(result).length;
         this.noOfImages = objectLength;
-        console.log("ln 120 noOfImages: " + this.noOfImages);
         this.currentIndexOfImageSlider = this.noOfImages - 1;
       },
       error: (error) => {
@@ -160,7 +159,6 @@ export class ProductDetailComponent implements OnInit {
       this.isDeletingImages = true;
       this.isEditingImages = true; 
     }
-    console.log("editing field: " + this.editingField);
     setTimeout(() => {
       this[field + 'Input']?.nativeElement.focus();
     });
@@ -196,16 +194,10 @@ export class ProductDetailComponent implements OnInit {
         console.log('Product deleted');
         this.productService.deleteProduct(this.product).subscribe({
           next: (result) => {
-            console.log(result);
             this.productService.productDeleted.emit(true);
           },
           error: (error) => {
             console.log(error);
-            if (error.status == 401) {
-              this.toastr.error('Operation not allowed');
-            } else if (error.status == 404) {
-              this.router.navigate(['../home']);
-            }
           },
           complete: () => {
             console.log('Product deleted');
@@ -247,7 +239,6 @@ export class ProductDetailComponent implements OnInit {
         this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
       }
     }
-    console.log("selectedFiles 1: " + this.selectedFiles);
   }
 
   displaySelectedImage(file: File) {
@@ -268,13 +259,10 @@ export class ProductDetailComponent implements OnInit {
     }
     this.previewUrl = null;
   }
+
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
-    console.log("selectedFiles 2: " + this.selectedFiles)
-    console.log("selectedFiles length: " + this.selectedFiles.length)
-
     if (this.selectedFiles.length === 0) {
-      console.log("true")
       this.resetImageInput();
     }
   }
@@ -290,17 +278,11 @@ export class ProductDetailComponent implements OnInit {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
-              console.log(result);
               this.getImage(this.product.id);
               this.toastr.success('Image deleted');
             },
             error: (error) => {
               console.log(error);
-              if (error.status == 401) {
-                this.toastr.error('Operation not allowed');
-              } else if (error.status == 404) {
-                this.toastr.error('Image not found');
-              }
             },
             complete: () => {
               console.log('Image deleted');
@@ -331,7 +313,6 @@ export class ProductDetailComponent implements OnInit {
   
       this.mediaService.uploadMedia(formData).subscribe({
         next: (result) => {;
-            // Set currentIndex to the index of the new image
           this.getImage(this.product.id);
           this.saveEachSelectedFile(productId, index + 1);
           this.selectedFiles = [];
@@ -339,7 +320,7 @@ export class ProductDetailComponent implements OnInit {
 
         },
         error: (error) => {
-          this.toastr.error(error)
+          console.log(error);
         },
       });
     } else {
