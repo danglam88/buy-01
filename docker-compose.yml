@@ -50,8 +50,8 @@ services:
       - "27017:27017"
     networks:
       - buy01-network
-    volumes:
-      - mongodb-data:/data/db
+    #volumes:
+      #- mongodb-data:/data/db
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -80,6 +80,6 @@ networks:
   buy01-network:
     driver: bridge
 
-volumes:
-  mongodb-data:
-    driver: local
+#volumes:
+  #mongodb-data:
+    #driver: local
