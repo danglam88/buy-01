@@ -57,7 +57,6 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-
   ngOnInit(): void {
     this.productDetailForm = this.builder.group({
       name: [
@@ -127,7 +126,7 @@ export class ProductDetailComponent implements OnInit {
   // Capture which field is being updated
   updateField(field: string): void {
     if (this.productDetailForm.controls[field].invalid) {
-      this.displayError(field);
+      this.toastr.error(`Product ${field} is invalid`);
       return;
     }
     this.product[field] = this.productDetailForm.controls[field].value;
@@ -141,10 +140,6 @@ export class ProductDetailComponent implements OnInit {
         console.log(error);
       }
     });
-  }
-
-  displayError(message: string): void {
-    
   }
 
   editProfileField(field: string): void {
@@ -181,7 +176,6 @@ export class ProductDetailComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  // Delete product
   deleteProduct(): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
@@ -208,7 +202,6 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-
 
   get currentImage(): { url: string, mediaId: string } | null {
     const currentImageData = this.productImages[this.currentIndexOfImageSlider];
@@ -330,5 +323,4 @@ export class ProductDetailComponent implements OnInit {
       this.editingField = '';
     }
   }
-
 }

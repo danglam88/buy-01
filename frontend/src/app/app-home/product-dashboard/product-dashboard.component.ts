@@ -49,9 +49,6 @@ export class ProductDashboardComponent implements OnInit {
           console.log("Products not found");
         }
       },
-      complete: () => {
-       // console.log("All products retrieved");
-      }
     });
   }
 
