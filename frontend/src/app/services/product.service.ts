@@ -10,11 +10,11 @@ export class ProductService {
   private allProductsInfoUrl="https://localhost:8444/products";
   private sellerProductsInfoUrl="https://localhost:8444/products/seller";
   private createProductUrl="https://localhost:8444/products";
-  private updateUserUrl="https://localhost:8444/products/";
+  private updateProductUrl="https://localhost:8444/products/";
   private deleteProductUrl="https://localhost:8444/products/";
   private token = sessionStorage.getItem('token');
   productCreated = new EventEmitter<any>();
-
+  productDeleted = new EventEmitter<any>();
 
   constructor(private httpClient: HttpClient) {
     // Load product data from local storage when the service is initialized
@@ -51,7 +51,7 @@ export class ProductService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.put(`${this.updateUserUrl}` + product.id, product, { headers });
+    return this.httpClient.put(`${this.updateProductUrl}` + product.id, product, { headers });
   }
 
   deleteProduct(user: any): Observable<object> {

@@ -74,10 +74,15 @@ export class UserDashboardComponent implements OnInit {
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
+        // if user has avatar, get it and
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
           this.getUserAvatar(this.userInfo.id);
+        } else {
+          this.avatar = this.defaultAvatar;
+          this.userAvatar = null;
+          console.log("This.avatar:", this.avatar);
+          console.log("User avatar:", this.userAvatar);
         }
-        this.avatar = this.defaultAvatar;
       },
       error: (error) => {
         console.log(error);
@@ -92,24 +97,27 @@ export class UserDashboardComponent implements OnInit {
   }
 
   getUserAvatar(userId: string): void {
-    this.userService.getUserAvatar(userId)?.subscribe({
+    this.userService.getUserAvatar(userId).subscribe({
       next: (result) => {
-        this.avatar = result;
+        console.log("Avatar result:", result);
         const reader = new FileReader();
         reader.onload = (e: any) => {
-          this.userAvatar  = e.target.result;
+          this.userAvatar = e.target.result;
           this.avatar = this.userAvatar;
+          console.log("Avatar:", this.avatar);
+          console.log("User avatar:", this.userAvatar);
         };
-        reader.readAsDataURL(this.avatar);
+        reader.readAsDataURL(result);
       },
       error: (error) => {
-        console.log(error);
+        console.log("Avatar error:", error);
       },
       complete: () => {
-        console.log("Avatar retrieved");
+        console.log("Avatar retrieval complete");
       }
     });
   }
+  
 
   // Common method to update user information
   updateUserInformation(updateField: string): void { 

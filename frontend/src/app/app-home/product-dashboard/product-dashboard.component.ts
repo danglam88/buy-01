@@ -21,6 +21,14 @@ export class ProductDashboardComponent implements OnInit {
     ) {
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
+          console.log("Product created")
+          this.getSellerProducts();
+        }
+      });
+
+      this.productService.productDeleted.subscribe((deleteCreated) => {
+        if (deleteCreated) {
+          console.log("Product deleted")
           this.getSellerProducts();
         }
       });
@@ -33,7 +41,6 @@ export class ProductDashboardComponent implements OnInit {
   getSellerProducts(){
     this.productService.getSellerProductsInfo().subscribe({
       next: (result) => {
-        console.log("sellerProducts" + JSON.stringify(result));
         this.sellerProducts = result;
       },
       error: (error) => {
@@ -54,7 +61,6 @@ export class ProductDashboardComponent implements OnInit {
   }
 
   openProductDetail(productData: Product): void {
-    console.log(productData)
      this.dialog.open(ProductDetailComponent, {
       data: {
         product: productData, 

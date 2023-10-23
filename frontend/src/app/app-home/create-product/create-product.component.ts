@@ -66,8 +66,7 @@ export class CreateProductComponent implements OnInit {
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       const formData = new FormData();
-      let index = 0;
-      if (index < this.selectedFiles.length) {
+      for (let index = 0; index < this.selectedFiles.length; index++) {
         const file = this.selectedFiles[index].file;
         formData.append('files', file);
       }
@@ -79,10 +78,14 @@ export class CreateProductComponent implements OnInit {
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
           console.log("createProduct result: " + JSON.stringify(result));
+          this.productService.productCreated.emit(true);
         },
         error: (error) => {
-          console.error("product creation error: " + JSON.stringify(error));
-          this.toastr.error(JSON.stringify(error));
+          if (error.status === 400) {
+            this.toastr.error(error.error);
+          } else if (error.status === 401) {
+            this.toastr.error(error.error);
+          } 
         },
         complete: () => {
           this.toastr.success('Product created successfully.');
