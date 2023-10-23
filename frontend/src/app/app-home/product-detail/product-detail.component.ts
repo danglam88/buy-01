@@ -7,6 +7,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaService } from 'src/app/services/media.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'product-detail',
@@ -43,14 +44,21 @@ export class ProductDetailComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
+    private router:Router
   ) {
     this.product = data.product;
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+
+    this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
+      if (productMediaUpdated) {
+        this.productImages = {};
+        this.getImage(this.product.id);
+      }
+    });
   }
 
+
   ngOnInit(): void {
-    console.log("userId of product: " + this.product.userId)
-    console.log("userId of user: " + this.userID)
     this.productDetailForm = this.builder.group({
       name: [
         this.product.name,
@@ -95,7 +103,6 @@ export class ProductDetailComponent implements OnInit {
           if (result.hasOwnProperty(key)) {
             this.mediaService.getImageByMediaId(result[key]).subscribe({
               next: (image) => {
-                console.log((image));
                 const reader = new FileReader();
                 reader.onload = () => {
                   this.productImages[key] = { data: reader.result, mediaId: result[key] };
@@ -110,7 +117,7 @@ export class ProductDetailComponent implements OnInit {
         }
         const objectLength = Object.keys(result).length;
         this.noOfImages = objectLength;
-
+        this.currentIndexOfImageSlider = this.noOfImages - 1;
       },
       error: (error) => {
         console.log(error);
@@ -126,19 +133,18 @@ export class ProductDetailComponent implements OnInit {
     this.product[field] = this.productDetailForm.controls[field].value;
     this.productService.updateProduct(this.product).subscribe({
       next: (result) => {
-        console.log(result);
-        this.toastr.success(`Product ${field} updated`, 'Success');
+        this.toastr.success(`Product ${field} updated`);
         this.editingField = null;
       },
       error: (error) => {
-        this.displayError(`Product ${field} update failed`);
+        this.toastr.error(`Product ${field} update failed`);
         console.log(error);
       }
     });
   }
 
   displayError(message: string): void {
-    this.toastr.error(message, 'Error');
+    
   }
 
   editProfileField(field: string): void {
@@ -153,7 +159,6 @@ export class ProductDetailComponent implements OnInit {
       this.isDeletingImages = true;
       this.isEditingImages = true; 
     }
-    console.log("editing field: " + this.editingField);
     setTimeout(() => {
       this[field + 'Input']?.nativeElement.focus();
     });
@@ -164,6 +169,8 @@ export class ProductDetailComponent implements OnInit {
     this.isAddingImages = false;
     this.isDeletingImages = false;
     this.isEditingImages = false;
+    this.selectedFiles = [];
+    this.previewUrl = null;
   }
 
   cancelEdit(): void {
@@ -187,15 +194,10 @@ export class ProductDetailComponent implements OnInit {
         console.log('Product deleted');
         this.productService.deleteProduct(this.product).subscribe({
           next: (result) => {
-            console.log(result);
+            this.productService.productDeleted.emit(true);
           },
           error: (error) => {
             console.log(error);
-            if (error.status == 401) {
-              this.toastr.error('Operation not allowed');
-            } else if (error.status == 404) {
-              this.toastr.error('Product not found');
-            }
           },
           complete: () => {
             console.log('Product deleted');
@@ -237,7 +239,6 @@ export class ProductDetailComponent implements OnInit {
         this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
       }
     }
-    console.log("selectedFiles 1: " + this.selectedFiles);
   }
 
   displaySelectedImage(file: File) {
@@ -258,13 +259,10 @@ export class ProductDetailComponent implements OnInit {
     }
     this.previewUrl = null;
   }
+
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
-    console.log("selectedFiles 2: " + this.selectedFiles)
-    console.log("selectedFiles length: " + this.selectedFiles.length)
-
     if (this.selectedFiles.length === 0) {
-      console.log("true")
       this.resetImageInput();
     }
   }
@@ -280,17 +278,11 @@ export class ProductDetailComponent implements OnInit {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
-              console.log(result);
               this.getImage(this.product.id);
               this.toastr.success('Image deleted');
             },
             error: (error) => {
               console.log(error);
-              if (error.status == 401) {
-                this.toastr.error('Operation not allowed');
-              } else if (error.status == 404) {
-                this.toastr.error('Image not found');
-              }
             },
             complete: () => {
               console.log('Image deleted');
@@ -303,6 +295,15 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  saveEditedImages() {
+    if (this.selectedFiles.length > 5) {
+      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
+    } else {
+      this.saveEachSelectedFile(this.product.id, 0)
+      this.mediaService.productMediaUpdated.emit(true);
+    }
+  }
+
   saveEachSelectedFile(productId: string, index: number) {
     if (index < this.selectedFiles.length) {
       const file = this.selectedFiles[index].file;
@@ -312,15 +313,14 @@ export class ProductDetailComponent implements OnInit {
   
       this.mediaService.uploadMedia(formData).subscribe({
         next: (result) => {;
-          // Process next file
-          // empty productImages 
-          this.productImages = {};
-          this.getImage(productId);
-            // Set currentIndex to the index of the new image
+          this.getImage(this.product.id);
           this.saveEachSelectedFile(productId, index + 1);
+          this.selectedFiles = [];
+          this.previewUrl = null;
+
         },
         error: (error) => {
-          this.toastr.error(error)
+          console.log(error);
         },
       });
     } else {
@@ -330,18 +330,5 @@ export class ProductDetailComponent implements OnInit {
       this.editingField = '';
     }
   }
-  
-  //WE NEED TO AUTO RELOAD IMAGES AFTER NEW IMAGES ADDED
-  saveEditedImages() {
-    if (this.selectedFiles.length > 5) {
-      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
-    } else {
-    console.log("this selected file" + JSON.stringify(this.selectedFiles));
-    console.log("product id" + this.product.id);
-    console.log("editing field" + this.editingField)
-    this.saveEachSelectedFile(this.product.id, 0)
-    console.log("this.noOfImages: " + this.noOfImages)
-    this.currentIndexOfImageSlider = this.noOfImages - 1;
-    }
-  }
+
 }

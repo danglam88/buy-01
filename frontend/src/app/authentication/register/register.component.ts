@@ -85,11 +85,6 @@ export class RegisterComponent implements OnInit {
   cancelUploadImage() {
     this.previewUrl = null;
     this.fileInput.nativeElement.value = '';
-    // Optionally reset the file input if needed
-   //const fileInput = document.querySelector<HTMLInputElement>('#image');
-    // if (fileInput) {
-    //   fileInput.value = '';
-    // }
   }
 
   // Register user
