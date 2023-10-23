@@ -13,27 +13,44 @@
               <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Default Avatar" class="round">
             </div>
           </div>
+          <div class="requirement-info" >
+            File types: JPG, PNG, GIF.
+            Max file size: 2MB.
+          </div>
           <!--Upload Avatar Button-->
           <div class="buttons">
             <label for="image"class="upload-button" *ngIf="!previewUrl" >Upload Avatar</label>
             <input type="file" id="image" name="image" accept="image/*" (change)="onFileSelected($event)" style="display: none;" #fileInput>
-            <button class="upload-button" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
+            <button class="cancel-button" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
           </div>
+
           <!--Name Field-->
+          <div class="field-requirement-info">
+            * Min: 1 / Max: 50 characters.
+          </div>
           <div class="field input-field">
-            <input placeholder="Name" class="input" formControlName="name" #nameInput>
+            <input placeholder="Name" class="input" formControlName="name" #nameInput required>
           </div>
           <!--Email Field-->
+          <div class="field-requirement-info">
+            * Valid email required. 
+          </div>
           <div class="field input-field">
-              <input type="email" placeholder="Email" class="input" formControlName="email">
+              <input type="email" placeholder="Email" class="input" formControlName="email" required>
           </div>
           <!--Password Field-->
+          <div class="field-requirement-info">
+            * 6-50 chars with 1 uppercase, 1 lowercase, 1 digit, and 1 special character (@$!%*?&). 
+          </div>
           <div class="field input-field">
-              <input type="password" placeholder="Create password" class="password" formControlName="password">
+              <input type="password" placeholder="Create password" class="password" formControlName="password" required>
           </div>
           <!--Role Option-->
+          <div class="field-requirement-info">
+            * Select a role.
+          </div>
           <div class="field input-field">
-            <mat-select placeholder="Choose a role" class="roles" formControlName="role">
+            <mat-select placeholder="Choose a role" class="roles" formControlName="role" required>
               <mat-option class="options" value="Client">Client</mat-option>
               <mat-option class="options" value="Seller">Seller</mat-option>
             </mat-select>

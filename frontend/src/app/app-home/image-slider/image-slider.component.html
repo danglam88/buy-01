@@ -4,9 +4,7 @@
   </button>
   <div class="image-container">
     <img [src]="currentImage" class="slider-image">
-    <button mat-icon-button class="remove-button" (click)="removeImage(currentIndex)">
-      <mat-icon>clear</mat-icon>
-    </button>
+    <a class="remove-image" (click)="removeImage(currentIndex)" style="display: inline;">&#215;</a>
   </div>
   <button mat-icon-button (click)="nextSlide()" [disabled]="currentIndex === images.length - 1">
     <mat-icon>chevron_right</mat-icon>

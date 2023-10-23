@@ -110,14 +110,19 @@ export class CreateProductComponent implements OnInit {
 
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
-    if (files.length > 0) {
+
+    // Check if adding these files would exceed the limit
+    if (this.selectedFiles.length + files.length > 5) {
+      // Display a Toastr error message
+      this.toastr.error('You can only add a maximum of 5 images.');
+    } else if (files.length > 0) {
+      // Add the selected files that do not exceed the limit
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         this.displaySelectedImage(file);
         this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
       }
     }
-    console.log("selectedFiles 1: " + this.selectedFiles);
   }
 
   displaySelectedImage(file: File) {

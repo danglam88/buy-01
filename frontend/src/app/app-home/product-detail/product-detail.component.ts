@@ -333,11 +333,15 @@ export class ProductDetailComponent implements OnInit {
   
   //WE NEED TO AUTO RELOAD IMAGES AFTER NEW IMAGES ADDED
   saveEditedImages() {
+    if (this.selectedFiles.length > 5) {
+      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
+    } else {
     console.log("this selected file" + JSON.stringify(this.selectedFiles));
     console.log("product id" + this.product.id);
     console.log("editing field" + this.editingField)
     this.saveEachSelectedFile(this.product.id, 0)
     console.log("this.noOfImages: " + this.noOfImages)
     this.currentIndexOfImageSlider = this.noOfImages - 1;
+    }
   }
 }

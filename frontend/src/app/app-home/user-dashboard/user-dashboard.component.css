@@ -20,6 +20,7 @@ mat-card {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  margin-top: 25px;
 }
 
 .role {
@@ -27,11 +28,11 @@ mat-card {
 	background-color: #FEBB0B;
 	border-radius: 5px;
 	font-size: 14px;
-	font-weight: bold;
+
 	padding: 6px 10px;
 	position: absolute;
-	top: 30px;
-	left: 30px;
+	top: 40px;
+	left: 40px;
 }
 
 .title {
@@ -49,17 +50,6 @@ mat-card {
 }
 
 
-mat-form-field {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-mat-dialog-content {
-  display: flex;
-  margin-top: 0;
-  margin-left: 15%;
-}
-
 
 img {
   max-width: 100%;
@@ -69,8 +59,8 @@ img {
 }
 
 
-button {
-  margin-top: 20px;
+.field-form-button {
+  margin-top: -30px !important;
 }
 
 
@@ -106,6 +96,7 @@ button {
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+  margin-bottom: -10px;
 }
 
 .profile-image img {
@@ -124,37 +115,132 @@ button {
   margin-top: 10px; 
 }
 
-.delete-button {
-  margin-top: 30px;
-  background-color: #d13535;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 23%;
-  height: 100vh;
-  width: 150px;
-  height: 50px;
-  cursor: pointer;
-
-  background: red;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-  background: #e62222;
-}
-
-.delete-button .text {
-  color: white;
-  font-size: 14px;
-}
-
-.delete-button:hover {
-  background: #ff3636;
-}
-
 .edit-button {
   background-color: transparent;
   border: none;
   margin-left: 20px;
   cursor: pointer;
+}
+
+
+*, *:after, *:before {
+	box-sizing: border-box;
+}
+
+body {
+	line-height: 1.5;
+	background-color: #f1f3fb;
+	padding: 0 2rem;
+}
+
+img {
+	max-width: 100%;
+	display: block;
+}
+
+
+input {
+	appearance: none;
+	border-radius: 0;
+
+}
+
+.card {
+	margin: 2rem auto;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 425px;
+	background-color: #FFF;
+	border-radius: 10px;
+	box-shadow: 0 10px 20px 0 rgba(#999, .25);
+	padding: .75rem;
+}
+
+.card-form {
+	padding: 2rem 1rem 0 !important;
+}
+
+
+.input {
+	display: flex;
+	position: relative;
+	padding-top: 1.5rem;
+	&+.input {
+		margin-top: 1.5rem;
+	}
+}
+
+.input-label {
+	color: #8597a3;
+	position: absolute;
+	top: 1.5rem;
+	transition: .25s ease;
+}
+
+.input-field {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  padding-top: 1.5rem;
+  border: 0;
+  z-index: 1;
+  background-color: transparent;
+  border-bottom: 2px solid #eee;
+  font: inherit;
+  font-size: 1.125rem;
+  padding: .25rem 0;
+}
+
+.input-field:focus, .input-field:valid {
+  outline: 0;
+}
+
+.input-field + .input-label {
+  color: #5F6368;
+  transform: translateY(-1.5rem);
+}
+
+/* Specific styles for div */
+.input-field:not([type="text"]) {
+  cursor: not-allowed;
+}
+
+.action {
+	margin-top: 2rem;
+}
+
+.action-button {
+	font: inherit;
+	font-size: 1rem;
+	padding: 1em;
+	width: 100%;
+	font-weight: 500;
+  cursor: pointer;
+	background-color: #e62222;
+	border-radius: 6px;
+	color: #FFF;
+	border: 0;
+}
+
+.action-button:hover {
+  background: #ff3636;
+}
+
+/* CSS */
+.button-80 {
+  height: 100%;
+  margin-left: 20px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.button-80:not(:disabled):hover {
+  transform: scale(1.3);
+}
+
+.button-80:not(:disabled):hover:active {
+  transform: scale(1.05) translateY(.125rem);
 }

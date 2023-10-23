@@ -6,87 +6,61 @@
     <span class="role">{{ userInfo.role }}</span>
     <h1 mat-dialog-title class="title">My Profile</h1>
   </div>
-  <!--Image-->
-  <!-- Cannot choose another pic after cancel -->
-  <div class="profile-image">
-    <div>
-      <img [src]="previewUrl ? previewUrl : avatar">
+  <!-- code here -->
+	<div class="card">
+    <!-- Profile Picture -->
+    <div class="profile-image">
+      <div>
+        <img [src]="previewUrl ? previewUrl : avatar">
+      </div>
+      <div>
+        <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>
+        <button mat-button color="primary" (click)="fileInput.click()" *ngIf="!previewUrl">Edit Image</button>
+        <button mat-button color="primary" *ngIf="!previewUrl && avatar !== defaultAvatar" (click) = "removeAvatar()">Remove Avatar</button>
+        <button mat-button color="primary" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
+        <button mat-button color="primary" *ngIf="previewUrl" (click)="updateAvatar()">Save</button>
+      </div>
     </div>
-    <div>
-      <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>
-      <button mat-button color="primary" (click)="fileInput.click()" *ngIf="!previewUrl">Edit Image</button>
-      <button mat-button color="primary" *ngIf="!previewUrl && avatar !== defaultAvatar" (click) = "removeAvatar()">Remove Avatar</button>
-      <button mat-button color="primary" (click)="cancelUploadImage()" *ngIf="previewUrl">Cancel</button>
-      <button mat-button color="primary" *ngIf="previewUrl" (click)="updateAvatar()">Save</button>
+    <!-- Form -->
+    <form class="card-form" [formGroup]="userProfileForm">
+      <!--Name-->
+      <div class="input">
+        <input type="text" formControlName="name" class="input-field" [placeholder]="userInfo.name" *ngIf="editingField == 'name'" #nameInput/>
+        <div class="input-field" *ngIf="editingField !== 'name'"> {{userInfo.name}} </div>
+        <label class="input-label">Name</label>
+        <div class="profile-button">
+          <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'name'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'name'" (click)="updateName()"><i class="fa-solid fa-check fa-xl"  style="color: #45c33c;"></i></button>
+        </div>
+      </div>
+      <!--Email-->
+      <div class="input">
+        <input type="email" formControlName="email" class="input-field" [placeholder]="userInfo.email" *ngIf="editingField === 'email'" #emailInput/>
+        <div class="input-field" *ngIf="editingField !== 'email'"> {{userInfo.email}} </div>
+        <label class="input-label">Email</label>
+        <div class="profile-button">
+          <button class="edit-button" (click)="editProfileField('email')" *ngIf="editingField !== 'email'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'email'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'email'" (click)="updateEmail()"><i class="fa-solid fa-check fa-xl"  style="color: #45c33c;"></i></button>
+        </div>
+      </div>
+      <!--Password-->
+      <div class="input">
+        <input type="password" formControlName="password" class="input-field" *ngIf="editingField === 'password'" #passwordInput/>
+        <div class="input-field" *ngIf="editingField !== 'password'"> ●●●●●●●●●● </div>
+        <label class="input-label">Password</label>
+        <div class="profile-button">
+          <button class="edit-button" (click)="editProfileField('password')" *ngIf="editingField !== 'password'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'password'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
+          <button class="button-80" *ngIf="editingField === 'password'" (click)="updatePassword()"><i class="fa-solid fa-check fa-xl"  style="color: #45c33c;"></i></button>
+        </div>
+      </div>
+    </form>
+    <div class="action">
+      <button class="action-button" (click)="deleteUser()">Delete My Account</button>
     </div>
-  </div>
-  <mat-dialog-content>
-    <div>
-      <form [formGroup]="userProfileForm">
-        <!--Name-->
-        <div class="profile-field">
-          <div class="profile-label">
-            <strong>Name:</strong>
-          </div>
-          <div class="profile-value" *ngIf="editingField !== 'name'">
-            {{ userInfo.name }}
-          </div>
-          <div class="profile-value" *ngIf="editingField == 'name'">
-            <mat-form-field *ngIf="editingField === 'name'">
-              <input matInput formControlName="name" [placeholder]="userInfo.name" #nameInput>
-            </mat-form-field>
-          </div>
-          <div class="profile-button">
-            <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-            <button mat-button color="primary" *ngIf="editingField === 'name'" (click)="updateName()">Save</button>
-            <button mat-button color="primary" *ngIf="editingField === 'name'" (click)="cancelFieldEdit()">Cancel</button>
-          </div>
-        </div>
-        <!--Email-->
-        <div class="profile-field">
-          <div class="profile-label">
-            <strong>Email:</strong>
-          </div>
-          <div class="profile-value" *ngIf="editingField !== 'email'">
-            {{ userInfo.email }}
-          </div>
-          <div class="profile-value" *ngIf="editingField == 'email'">
-            <mat-form-field *ngIf="editingField === 'email'">
-              <input matInput formControlName="email" [placeholder]="userInfo.email" #emailInput>
-            </mat-form-field>
-          </div>
-          <div class="profile-button">
-            <button class="edit-button" (click)="editProfileField('email')" *ngIf="editingField !== 'email'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-            <button mat-button color="primary" *ngIf="editingField === 'email'" (click)="updateEmail()">Save</button>
-            <button mat-button color="primary" *ngIf="editingField === 'email'" (click)="cancelFieldEdit()">Cancel</button>
-          </div>
-        </div>
-        <!--Password-->
-        <div class="profile-field">
-          <div class="profile-label">
-            <strong>Password:</strong>
-          </div>
-          <div class="profile-value" *ngIf="editingField !== 'password'">
-            ********
-          </div>
-          <div class="profile-value" *ngIf="editingField == 'password'">
-            <mat-form-field *ngIf="editingField === 'password'">
-              <input matInput formControlName="password" type="password" #passwordInput>
-            </mat-form-field>
-          </div>
-          <div class="profile-button">
-            <button class="edit-button" (click)="editProfileField('password')" *ngIf="editingField !== 'password'"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-            <button mat-button color="primary" *ngIf="editingField === 'password'" (click)="updatePassword()">Save</button>
-            <button mat-button color="primary" *ngIf="editingField === 'password'" (click)="cancelFieldEdit()">Cancel</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </mat-dialog-content>
-  <button class="delete-button" (click)="deleteUser()">
-    <span class="text">
-        Delete My Account
-    </span>
-  </button>
+	</div>
 </mat-card>
+
 <app-footer></app-footer>
