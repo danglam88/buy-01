@@ -21,11 +21,11 @@ public class Product {
     private String id;
 
     @NotBlank(message = "Name is required")
-    @Size(max = 255, min = 2, message = "Name cannot exceed 255 characters")
+    @Size(max = 50, min = 1, message = "Name cannot exceed 255 characters")
     private String name;
 
     @NotBlank(message = "Description is required")
-    @Size(max = 255, min = 2, message = "Name cannot exceed 255 characters")
+    @Size(max = 1000, min = 1, message = "Description cannot exceed 255 characters")
     private String description;
 
     @NotNull(message = "Price is required")
