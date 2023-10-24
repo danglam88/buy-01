@@ -4,6 +4,6 @@ export class Product {
     description: string;
     price: number;
     quantity: number;
-    userId: string;
+    editable: boolean;
 }
 

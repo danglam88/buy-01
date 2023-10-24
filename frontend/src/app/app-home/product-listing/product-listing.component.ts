@@ -3,6 +3,9 @@ import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-product-listing',
   templateUrl: './product-listing.component.html',
@@ -14,8 +17,12 @@ export class ProductListingComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog, 
-    private productService: ProductService
-    ) {}
+    private productService: ProductService,
+    private router: Router,
+    private toastr: ToastrService
+    ) {
+      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    }
   
 
   ngOnInit(): void {
@@ -25,7 +32,10 @@ export class ProductListingComponent implements OnInit {
         this.products = result;
       },
       error: (error) => {
-        console.log("Ops: " + error);
+        if (error.status == 401 || error.status == 403) {
+          this.toastr.error('Operation not permitted. Log in again.');
+          this.router.navigate(['../login']);
+        }
       },
       complete: () => {
         console.log("All products retrieved");
