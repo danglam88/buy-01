@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Product } from '../../Models/Product';
-import { CreateProductComponent } from '../create-product/create-product.component';
+import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 
@@ -16,8 +15,8 @@ export class ProductDashboardComponent implements OnInit {
   sellerProducts: any = [];
   
   constructor(
+    private productService: ProductService,
     private dialog: MatDialog,
-    private productService: ProductService
     ) {
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
@@ -49,11 +48,6 @@ export class ProductDashboardComponent implements OnInit {
           console.log("Products not found");
         }
       },
-    });
-  }
-
-  openCreateProduct(): void {
-     this.dialog.open(CreateProductComponent, {
     });
   }
 
