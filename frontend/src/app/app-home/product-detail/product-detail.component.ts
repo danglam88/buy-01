@@ -283,6 +283,7 @@ export class ProductDetailComponent implements OnInit {
             next: (result) => {
               this.getImage(this.product.id);
               this.toastr.success('Image deleted');
+              this.mediaService.productMediaDeleted.emit(true);
             },
             error: (error) => {
               console.log(error);
