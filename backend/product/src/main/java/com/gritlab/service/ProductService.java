@@ -140,8 +140,13 @@ public class ProductService {
         }
     }
 
+    @KafkaListener(topics = "DELETE_MEDIA", groupId = "my-consumer-group")
+    public void deleteMedia(String message) {
+        productRepository.deleteById(message);
+    }
+
     @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
-    public void consumeMessage(String message) {
+    public void deleteUser(String message) {
         List<Product> products = productRepository.findAllByUserId(message);
         for (Product product : products) {
             kafkaTemplate.send("DELETE_PRODUCT", product.getId());
@@ -150,7 +155,7 @@ public class ProductService {
     }
 
     @KafkaListener(topics = "DEFAULT_SELLER", groupId = "my-consumer-group")
-    public void consumeMessage2(String message) {
+    public void defaultSeller(String message) {
         Product product1 = Product.builder()
                 .name("iPhone 15")
                 .description("Excellent")
@@ -173,7 +178,7 @@ public class ProductService {
     }
 
     @KafkaListener(topics = "CHECK_PRODUCT_REQUEST", groupId = "my-consumer-group")
-    public void checkProduct(String message) {
+    public void checkProductRequest(String message) {
 
         System.out.println(message);
 

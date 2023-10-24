@@ -94,6 +94,10 @@ public class MediaService {
             if (!checkProduct(media.getProductId(), userId)) {
                 throw new InvalidParamException("Media with this id does not belong to the current user");
             } else {
+                Optional<List<Media>> mediaOptional = mediaRepository.findByProductId(media.getProductId());
+                if (mediaOptional.isPresent() && mediaOptional.get().size() == 1) {
+                    kafkaTemplate.send("DELETE_MEDIA", media.getProductId());
+                }
                 mediaRepository.deleteById(id);
             }
         }
@@ -123,12 +127,12 @@ public class MediaService {
     }
 
     @KafkaListener(topics = "DELETE_PRODUCT", groupId = "my-consumer-group")
-    public void consumeMessage(String message) {
+    public void deleteProduct(String message) {
         mediaRepository.deleteAllByProductId(message);
     }
 
     @KafkaListener(topics = "DEFAULT_PRODUCT", groupId = "my-consumer-group")
-    public void consumeMessage2(String message) throws IOException {
+    public void defaultProduct(String message) throws IOException {
         String productId = message.split(" ")[0];
         String fileName = message.split(" ")[1];
         Path filePath = Paths.get("media/upload/" + fileName);
@@ -146,7 +150,7 @@ public class MediaService {
     }
 
     @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")
-    public void consumeBinaryData(BinaryData binaryData) {
+    public void binaryData(BinaryData binaryData) {
         System.out.println("Received binary data: " + binaryData);
         Media media = Media.builder()
                 .imageData(Base64.getDecoder().decode(binaryData.getFileContentBase64()))

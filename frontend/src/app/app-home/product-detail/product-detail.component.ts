@@ -53,8 +53,12 @@ export class ProductDetailComponent implements OnInit {
 
     this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
       if (productMediaUpdated) {
+        console.log("productMediaUpdated: ", productMediaUpdated)
         this.productImages = {};
         this.getImage(this.product.id);
+        console.log("currentIndexofImageSlider: ", this.currentIndexOfImageSlider)
+        console.log("noOfImages: ", this.noOfImages)
+        this.currentIndexOfImageSlider = this.noOfImages ;
       }
     });
     const encryptedUserRole = sessionStorage.getItem('role');
@@ -108,6 +112,7 @@ export class ProductDetailComponent implements OnInit {
     // Get product images from media service
     this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
+        console.log("RESULT: ", JSON.stringify(result))
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
             this.mediaService.getImageByMediaId(result[key]).subscribe({
@@ -126,7 +131,6 @@ export class ProductDetailComponent implements OnInit {
         }
         const objectLength = Object.keys(result).length;
         this.noOfImages = objectLength;
-        this.currentIndexOfImageSlider = this.noOfImages - 1;
       },
       error: (error) => {
         console.log(error);
