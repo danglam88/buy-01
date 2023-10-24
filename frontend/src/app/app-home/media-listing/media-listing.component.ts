@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MediaService } from 'src/app/services/media.service';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-media-listing',
@@ -10,7 +12,12 @@ export class MediaListingComponent implements OnInit {
   mediaImageData: any;
   @Input() productId: string;
 
-  constructor(private mediaService: MediaService) { 
+  constructor(
+    private mediaService: MediaService, 
+    private toastr: ToastrService,
+    private router: Router
+  ) { 
+      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
     // Handles deletion of product media. If so, will get product media to display updates
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
@@ -37,14 +44,17 @@ export class MediaListingComponent implements OnInit {
             reader.readAsDataURL(mediaResult); 
             },
             error: (error) => {
-              console.error(error);
+              if (error.status == 401 || error.status == 403) {
+                this.toastr.error('Operation not permitted. Log in again.');
+                this.router.navigate(['../login']);
+              }
             },
           });
         },
         error: (error) => {
-          console.error(error);
-          if (error.status == 404) {
-            console.log('Media not found');
+          if (error.status == 401 || error.status == 403) {
+            this.toastr.error('Operation not permitted. Log in again.');
+            this.router.navigate(['../login']);
           }
         },
       });

@@ -1,5 +1,6 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Media;
@@ -64,7 +65,7 @@ public class MediaService {
     public Media addMedia(MultipartFile file, String productId, String userId) {
 
         if (!checkProduct(productId, userId)) {
-            throw new InvalidParamException("Product with this id does not belong to the current user");
+            throw new ForbiddenException("Product with this id does not belong to the current user");
         }
 
         checkFile(file);
@@ -92,7 +93,7 @@ public class MediaService {
             Media media = mediaRepository.findById(id).orElseThrow();
 
             if (!checkProduct(media.getProductId(), userId)) {
-                throw new InvalidParamException("Media with this id does not belong to the current user");
+                throw new ForbiddenException("Media with this id does not belong to the current user");
             } else {
                 Optional<List<Media>> mediaOptional = mediaRepository.findByProductId(media.getProductId());
                 if (mediaOptional.isPresent() && mediaOptional.get().size() == 1) {
@@ -136,17 +137,13 @@ public class MediaService {
         String productId = message.split(" ")[0];
         String fileName = message.split(" ")[1];
         Path filePath = Paths.get("media/upload/" + fileName);
-        try {
-            byte[] fileContent = Files.readAllBytes(filePath);
-            Media media = Media.builder()
-                    .imageData(fileContent)
-                    .imagePath(fileName)
-                    .productId(productId)
-                    .build();
-            mediaRepository.save(media);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        byte[] fileContent = Files.readAllBytes(filePath);
+        Media media = Media.builder()
+                .imageData(fileContent)
+                .imagePath(fileName)
+                .productId(productId)
+                .build();
+        mediaRepository.save(media);
     }
 
     @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")

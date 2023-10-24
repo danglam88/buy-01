@@ -74,20 +74,18 @@ export class UserDashboardComponent implements OnInit {
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
-        // if user has avatar, get it and
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
           this.getUserAvatar(this.userInfo.id);
         } else {
           this.avatar = this.defaultAvatar;
           this.userAvatar = null;
-          console.log("This.avatar:", this.avatar);
-          console.log("User avatar:", this.userAvatar);
         }
       },
       error: (error) => {
         console.log(error);
-        if (error.status == 404) {
-          console.log("User not found");
+        if (error.status == 401 || error.status == 403) {
+          this.toastr.error('Operation not allowed');
+          this.router.navigate(['../login']);
         }
       },
       complete: () => {
@@ -96,21 +94,22 @@ export class UserDashboardComponent implements OnInit {
     });
   }
 
+  // Get user avatar
   getUserAvatar(userId: string): void {
     this.userService.getUserAvatar(userId).subscribe({
       next: (result) => {
-        console.log("Avatar result:", result);
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.userAvatar = e.target.result;
           this.avatar = this.userAvatar;
-          console.log("Avatar:", this.avatar);
-          console.log("User avatar:", this.userAvatar);
         };
         reader.readAsDataURL(result);
       },
       error: (error) => {
-        console.log("Avatar error:", error);
+        if (error.status == 401 || error.status == 403) {
+          this.toastr.error('Operation not allowed');
+          this.router.navigate(['../login']);
+        } 
       },
       complete: () => {
         console.log("Avatar retrieval complete");
@@ -118,8 +117,34 @@ export class UserDashboardComponent implements OnInit {
     });
   }
   
+  // Update user name
+  updateName(): void {
+    this.updateUserInformation('name');
+  }
+  
+  // Update user email
+  updateEmail(): void {
+    this.updateUserInformation('email');
+  }
 
-  // Common method to update user information
+  // Update user password
+  updatePassword(): void {
+    this.updateUserInformation('password');
+  }
+
+  // Update user avatar
+  updateAvatar(): void {
+    this.updateUserInformation('avatar');
+  }
+
+  // Remove user avatar
+  removeAvatar(): void {
+    this.updateUserInformation('removeAvatar');
+    this.avatar = this.defaultAvatar;
+    this.cancelUploadImage();
+  }
+
+  // Common method to update user information. Add the field to formData and call the updateUser method
   updateUserInformation(updateField: string): void { 
     if (updateField === 'avatar'  || updateField === 'removeAvatar' || (this.userProfileForm.controls[updateField].valid)) {
       const formData = new FormData();
@@ -161,9 +186,9 @@ export class UserDashboardComponent implements OnInit {
         formData.append('name', this.userInfo.name);
         formData.append('email', this.userInfo.email);
         formData.append('role', this.userInfo.role);
-       // formData.append('file', );
       } 
-      
+    
+      // Update user information
      this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
           console.log(result);
@@ -172,12 +197,11 @@ export class UserDashboardComponent implements OnInit {
         error: (error) => {
           console.log(error);
           if (error.status == 400) {
-            this.toastr.error('Image must be maximum 2MB');
-          } else if (error.status == 401) {
+            this.toastr.error(error.error[0]);
+          } else if (error.status == 401 || error.status == 403) {
             this.toastr.error('Operation not allowed');
-          } else if (error.status == 404) {
-            this.toastr.error('User not found');
-          }
+            this.router.navigate(['../login']);
+          } 
         },
         complete: () => {
           this.toastr.success(`${updateField} updated`);
@@ -186,7 +210,6 @@ export class UserDashboardComponent implements OnInit {
           if (updateField === 'email' || updateField === 'password') {
             this.router.navigate(['../login']);
           }
-        
         },
       });
     } else {
@@ -194,43 +217,7 @@ export class UserDashboardComponent implements OnInit {
     }
   }
   
-
-  // Update user name
-  updateName(): void {
-    this.updateUserInformation('name');
-
-  }
-
-  // Update user email
-  updateEmail(): void {
-    this.updateUserInformation('email');
-  }
-
-  // Update user password
-  updatePassword(): void {
-    this.updateUserInformation('password');
-  }
-
-  updateAvatar(): void {
-    this.updateUserInformation('avatar');
-  }
-
-  removeAvatar(): void {
-   this.updateUserInformation('removeAvatar');
-   this.avatar = this.defaultAvatar;
-   this.cancelUploadImage();
-  }
-
-  cancelUploadImage(): void {
-    this.previewUrl = null
-    if (this.userAvatar != null) {
-      this.avatar = this.userAvatar;
-    } else {
-      this.avatar = this.defaultAvatar;
-    }
-    this.fileInput.nativeElement.value = '';
-  }
-
+  // File input operations: select to preview image
   onFileSelected(event: any) {
     this.editProfileField('avatar');
     const file = event.target.files[0];
@@ -248,6 +235,7 @@ export class UserDashboardComponent implements OnInit {
     }
   }
 
+  // Common method to capture which field is being updated and show the input field
   editProfileField(field: string): void {
     this.isEditingProfile = true;
     this.editingField = field;
@@ -266,9 +254,22 @@ export class UserDashboardComponent implements OnInit {
     }
   }
 
+  // Cancel editing profile
   cancelFieldEdit(): void {
     this.editingField = null;
   }
+
+  // Cancel uploading avatar
+  cancelUploadImage(): void {
+    this.previewUrl = null
+    if (this.userAvatar != null) {
+      this.avatar = this.userAvatar;
+    } else {
+      this.avatar = this.defaultAvatar;
+    }
+    this.fileInput.nativeElement.value = '';
+  }
+
 
   // Delete user
   deleteUser(): void {
@@ -286,31 +287,29 @@ export class UserDashboardComponent implements OnInit {
           },
           error: (error) => {
             console.log(error);
-            if (error.status == 401) {
+            if (error.status == 401 || error.status == 403) {
               this.toastr.error('Operation not allowed');
-            } else if (error.status == 404) {
-              this.toastr.error('User not found');
-            }
+              this.router.navigate(['../login']);
+            } 
           },
           complete: () => {
-            console.log('User deleted');
+            this.toastr.success('User deleted');
+            this.router.navigate(['../login']);
           }
         });
-        this.toastr.success('User deleted');
-        this.router.navigate(['../login']);
       }
     });
   }
 
    // Function to convert a Base64-encoded data URI to a Blob
-dataURItoBlob(dataURI: string): Blob {
-  const byteString = atob(dataURI.split(',')[1]);
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
+  dataURItoBlob(dataURI: string): Blob {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
   }
-  return new Blob([ab], { type: mimeString });
-}
 }

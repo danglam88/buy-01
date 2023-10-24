@@ -20,7 +20,7 @@
                     <button 
                         mat-icon-button 
                         class="remove-button" 
-                        *ngIf="editingField === 'deleteImages' && userRole === 'SELLER' && userID === product?.userId && noOfImages > 1"
+                        *ngIf="editingField === 'deleteImages' && userRole === 'SELLER' && product?.editable === true && noOfImages > 1"
                         (click)="deleteImage(currentImage)"
                     >
                         <mat-icon>clear</mat-icon>
@@ -46,10 +46,10 @@
                 <div class="product-button">
                      <!-- Delete and Add Images Buttons -->
                     <div class="button-container">
-                        <div *ngIf="userRole === 'SELLER' && userID === product?.userId">
+                        <div *ngIf="userRole === 'SELLER' && product?.editable === true ">
                         <button class="editImages-button" (click)="editProfileField('deleteImages')" *ngIf="!isAddingImages && !isEditingImages && noOfImages > 1">Delete Images</button>
                         </div>
-                        <div *ngIf="userRole === 'SELLER' && userID === product?.userId">
+                        <div *ngIf="userRole === 'SELLER' && product?.editable === true ">
                         <button class="addImages-button" (click)="editProfileField('addImages')" *ngIf="!isDeletingImages && !isEditingImages">Add Images</button>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name' && userRole === 'SELLER' && userID === product?.userId"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i> </button>
+                        <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name' && userRole === 'SELLER' && product?.editable === true "><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i> </button>
                         <button class="confirm-button" *ngIf="editingField === 'name'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
                         <button class="confirm-button" *ngIf="editingField === 'name'" (click) = "updateField('name')"><i class="fa-solid fa-check fa-xl"  style="color: #45c33c;"></i></button>
                     </div>
@@ -92,7 +92,7 @@
                         </div>
                     </div>
                     <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('price')" *ngIf="editingField !== 'price' && userRole === 'SELLER' && userID === product?.userId"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+                        <button class="edit-button" (click)="editProfileField('price')" *ngIf="editingField !== 'price' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
                         <button class="confirm-button" *ngIf="editingField === 'price'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
                         <button class="confirm-button"  *ngIf="editingField === 'price'" (click) = "updateField('price')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
                     </div>
@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('quantity')" *ngIf="editingField !== 'quantity' && userRole === 'SELLER' && userID === product?.userId"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+                        <button class="edit-button" (click)="editProfileField('quantity')" *ngIf="editingField !== 'quantity' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
                         <button class="confirm-button" *ngIf="editingField === 'quantity'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
                         <button class="confirm-button"  *ngIf="editingField === 'quantity'" (click) = "updateField('quantity')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
                     </div>
@@ -120,7 +120,7 @@
                             <h2>Product Description</h2>
                         </div>
                         <div class="product-button">
-                            <button class="edit-button" (click)="editProfileField('desc')" *ngIf="editingField !== 'desc' && userRole === 'SELLER' && userID === product?.userId"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
+                            <button class="edit-button" (click)="editProfileField('desc')" *ngIf="editingField !== 'desc' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
                             <button class="confirm-button" *ngIf="editingField === 'desc'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
                             <button class="confirm-button" *ngIf="editingField === 'desc'" (click) = "updateField('description')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
                         </div>
@@ -128,14 +128,14 @@
                     <div *ngIf="editingField !== 'desc'">
                         <p>{{product?.description}}</p>
                     </div>
-                    <div style="margin-top: 20px" *ngIf="editingField == 'desc' && userRole === 'SELLER' && userID === product?.userId">
+                    <div style="margin-top: 20px" *ngIf="editingField == 'desc' && userRole === 'SELLER' && product?.editable === true">
                         <div class="field input-field">
                             <input matInput placeholder="Description" formControlName="description" #descriptionInput>
                         </div>
                     </div>                 
                 </div>
                 <div class="ekart-product-detail-addtoCart">
-                    <button class="delete-button" *ngIf="userRole === 'SELLER' && userID === product?.userId" (click) ="deleteProduct()">
+                    <button class="delete-button" *ngIf="userRole === 'SELLER' && product?.editable === true" (click) ="deleteProduct()">
                         <span class="text">
                             Delete Product
                         </span>
