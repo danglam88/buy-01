@@ -24,7 +24,7 @@ export class MediaListingComponent implements OnInit {
 
   getProductMedia(productId: string){
     // create interval
-    setInterval(() => {
+    setTimeout(() => {
       this.mediaService.getImageByProductId(productId).subscribe({
         next: (result) => {
           this.mediaService.getImageByMediaId(result[0]).subscribe({
@@ -47,6 +47,6 @@ export class MediaListingComponent implements OnInit {
           }
         },
       });
-    }, 1000);
+    }, 500);
   }
 }
