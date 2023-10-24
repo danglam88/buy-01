@@ -81,7 +81,7 @@ public class ProductController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         productService.updateProduct(id, updatedData, userDetails.getId());
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
@@ -91,6 +91,6 @@ public class ProductController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         productService.deleteProduct(id, userDetails.getId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

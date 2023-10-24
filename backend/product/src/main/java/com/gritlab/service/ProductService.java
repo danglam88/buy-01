@@ -90,6 +90,10 @@ public class ProductService {
 
     public Product addProduct(Product request, List<MultipartFile> files, String userId) {
 
+        if (files.size() > 5) {
+            throw new InvalidParamException("Maximum 5 files allowed");
+        }
+
         for (MultipartFile file : files) {
             checkFile(file);
         }
@@ -111,7 +115,7 @@ public class ProductService {
                 binaryDataKafkaTemplate.send("BINARY_DATA", binaryData);
             } catch (IOException e) {
                 productRepository.deleteById(newProduct.getId());
-                throw new RuntimeException("Error reading file content", e);
+                throw new InvalidParamException("Error reading file content");
             }
         }
 

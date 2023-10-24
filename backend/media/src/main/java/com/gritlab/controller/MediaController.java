@@ -66,12 +66,12 @@ public class MediaController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteProduct(@PathVariable String id,
+    private ResponseEntity<Void> deleteMedia(@PathVariable String id,
                                                Authentication authentication) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         mediaService.deleteMedia(id, userDetails.getId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
