@@ -10,11 +10,22 @@ export class MediaListingComponent implements OnInit {
   mediaImageData: any;
   @Input() productId: string;
 
-  constructor(private mediaService: MediaService) { }
+  constructor(private mediaService: MediaService) { 
+    this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
+      if (productMediaDeleted) {
+        console.log("productMediaDeleted: ", productMediaDeleted)
+        this.getProductMedia(this.productId);
+      }
+    });
+  }
 
   ngOnInit(): void {
     console.log("productId: ", this.productId)
-    this.mediaService.getImageByProductId(this.productId).subscribe({
+    this.getProductMedia(this.productId);
+  }
+
+  getProductMedia(productId: string){
+    this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         console.log("result: ", JSON.stringify(result))
         this.mediaService.getImageByMediaId(result["0"]).subscribe({

@@ -13,6 +13,7 @@ export class MediaService {
   private mediaByMediaIdUrl="https://localhost:8445/media/";
   private token = sessionStorage.getItem('token');
   productMediaUpdated = new EventEmitter<any>();
+  productMediaDeleted = new EventEmitter<any>();
 
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService) { 
