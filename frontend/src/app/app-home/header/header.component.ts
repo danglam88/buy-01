@@ -28,17 +28,20 @@ export class HeaderComponent {
       }
     });
 
+    // Decrypt role from session storage
     const encryptedRole = sessionStorage.getItem('role');
     if (encryptedRole) {
       this.role = this.encryptionService.decrypt(encryptedRole);
     }
   }
 
+  // Logs user out
   logout() {
     this.authService.logout();
     this.router.navigate(['login']);
   }
 
+  // Opens create product modal
   openCreateProduct(): void {
     this.dialog.open(CreateProductComponent, {
    });

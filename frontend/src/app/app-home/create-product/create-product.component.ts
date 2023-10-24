@@ -32,6 +32,7 @@ export class CreateProductComponent implements OnInit {
 
   ngOnInit() {}
 
+  // Creates a product form with validation
   createProductForm = this.builder.group({
     name: [
       '',
@@ -59,11 +60,7 @@ export class CreateProductComponent implements OnInit {
     ],
   });
 
-  closeModal(): void {
-    this.dialogRef.close();
-  }
-
-  // PRODUCTS ARE STILL CREATED IF THERE IS PROBLEMS WITH MEDIA?
+  // Create a product and handles errors, including validation errors from createProductForm
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       const formData = new FormData();
@@ -94,33 +91,26 @@ export class CreateProductComponent implements OnInit {
         }
       });
     } else {
-      this.handleValidationErrors();
+      if (this.createProductForm.controls.name.invalid) {
+        this.toastr.error('Name must be between 1 and 50 characters.');
+      } else if (this.createProductForm.controls.price.invalid) {
+        this.toastr.error('Please enter a valid price.');
+      } else if (this.createProductForm.controls.quantity.invalid) {
+        this.toastr.error('Please enter a valid quantity.');
+      } else if (this.createProductForm.controls.description.invalid) {
+        this.toastr.error('Description must be between 1 and 1000 characters.');
+      } else if (this.selectedFiles.length === 0) {
+        this.toastr.error('Please upload at least one image.');
+      }
     }
   }
 
-  handleValidationErrors() {
-    if (this.createProductForm.controls.name.invalid) {
-      this.toastr.error('Name must be between 1 and 50 characters.');
-    } else if (this.createProductForm.controls.price.invalid) {
-      this.toastr.error('Please enter a valid price.');
-    } else if (this.createProductForm.controls.quantity.invalid) {
-      this.toastr.error('Please enter a valid quantity.');
-    } else if (this.createProductForm.controls.description.invalid) {
-      this.toastr.error('Description must be between 1 and 1000 characters.');
-    } else if (this.selectedFiles.length === 0) {
-      this.toastr.error('Please upload at least one image.');
-    }
-  }
-
+  // Handles the image selection from file input and displays the selected image to previewUrl
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
-
-    // Check if adding these files would exceed the limit
     if (this.selectedFiles.length + files.length > 5) {
-      // Display a Toastr error message
       this.toastr.error('You can only add a maximum of 5 images.');
     } else if (files.length > 0) {
-      // Add the selected files that do not exceed the limit
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         this.displaySelectedImage(file);
@@ -140,15 +130,7 @@ export class CreateProductComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  resetImageInput() {
-    this.selectedFiles = [];
-    const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
-    if (fileInput) {
-      fileInput.value = '';
-    }
-    this.previewUrl = null;
-  }
-
+  // Removes selected image before saving
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
     if (this.selectedFiles.length === 0) {
@@ -156,6 +138,10 @@ export class CreateProductComponent implements OnInit {
       this.fileInput.nativeElement.value = '';
       this.previewUrl = null;
     }
+  }
 
+  // Close the modal
+  closeModal(): void {
+    this.dialogRef.close();
   }
 }

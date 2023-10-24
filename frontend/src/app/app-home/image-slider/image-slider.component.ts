@@ -12,11 +12,9 @@ export class ImageSliderComponent  {
   currentIndex = 0;
 
   get currentImage(): string {
-  
     if (this.images.length > 0) {
       return this.images[this.currentIndex].url;
     }
-    // Handle the case when there are no images
     return '';
   }
 
