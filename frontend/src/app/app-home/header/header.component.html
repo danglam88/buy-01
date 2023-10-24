@@ -4,8 +4,9 @@
   </div>  
   <nav class="site-navigation">
     <ul class="nav">
-      <button class="button-79" *ngIf="role === 'SELLER'" role="button" (click)="openCreateProduct()">Create Product</button>
-  
+      
+      <li *ngIf="role === 'SELLER'" role="button" (click)="openCreateProduct()"><a>+ Create Product</a></li>
+      <li><a>|</a></li>
       <li><a routerLink="../home" [ngClass]="{ 'selected': currentRoute === '/home' }">Home</a></li>
       <li *ngIf="role === 'SELLER'"><a routerLink="../product-dashboard" [ngClass]="{ 'selected': currentRoute === '/product-dashboard' }">My Products</a></li>
       <li><a routerLink="../user-dashboard" [ngClass]="{ 'selected': currentRoute === '/user-dashboard' }">Profile</a></li>
