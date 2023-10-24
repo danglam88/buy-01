@@ -3,6 +3,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { EncryptionService } from 'src/app/services/encryption.service';
 
 @Component({
   selector: 'app-log-in',
@@ -19,6 +20,7 @@ export class LogInComponent {
   constructor(private builder: FormBuilder, 
     private toastr:ToastrService,
     private authService:AuthenticationService,
+    private encryptionService: EncryptionService,
     private router:Router) {
       this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       sessionStorage.clear();
@@ -35,10 +37,13 @@ export class LogInComponent {
     console.log(JSON.stringify(this.loginform.value));
     this.authService.authenticate(this.userInfo).subscribe({
       next: (result) => {
-        console.log(result);
-        sessionStorage.setItem('token', result['token']);
-        sessionStorage.setItem('role', result['role']);
-        sessionStorage.setItem('id', result['id']);
+        const encryptedToken = this.encryptionService.encrypt(result['token']);
+        const encryptedRole = this.encryptionService.encrypt(result['role']);
+        const encryptedId = this.encryptionService.encrypt(result['id']);
+  
+        sessionStorage.setItem('token', encryptedToken);
+        sessionStorage.setItem('role', encryptedRole);
+        sessionStorage.setItem('id', encryptedId);
       },
       error: (error) => {
         console.log(error);
@@ -52,7 +57,8 @@ export class LogInComponent {
       },
       complete: () => {
         this.authService.login();
-        sessionStorage.setItem('loggedIn', 'true');
+        const encryptedLoggedIn = this.encryptionService.encrypt('true');
+        sessionStorage.setItem('loggedIn', encryptedLoggedIn);
         this.router.navigate(['../home']);
       }
     });

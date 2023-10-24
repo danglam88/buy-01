@@ -39,6 +39,7 @@ import { UserService } from './services/user.service';
 import { MediaService } from './services/media.service';
 import { ProductService } from './services/product.service';
 import { AuthenticationService } from '../app/services/authentication.service';
+import { EncryptionService } from 'src/app/services/encryption.service'
 @NgModule({
   declarations: [
     AppComponent,
@@ -59,7 +60,7 @@ import { AuthenticationService } from '../app/services/authentication.service';
     ConfirmationDialogComponent,
     ImageSliderComponent,
     MediaListingComponent,
-    MediaComponent
+    MediaComponent,
   ],
   imports: [
     BrowserModule,
@@ -73,7 +74,7 @@ import { AuthenticationService } from '../app/services/authentication.service';
     ToastrModule.forRoot(),
     MatDialogModule
   ],
-  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService],
+  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService, EncryptionService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

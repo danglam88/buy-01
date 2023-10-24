@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaService } from 'src/app/services/media.service';
 import { Router } from '@angular/router';
+import { EncryptionService } from 'src/app/services/encryption.service';
 
 @Component({
   selector: 'product-detail',
@@ -18,12 +19,12 @@ export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
   isEditingProfile: boolean = false;
   editingField: string | null = null;
-  userRole = sessionStorage.getItem('role');
+  userRole : string = '';
   productImages: any = {};
   mediaID: any = {};
   productDetailForm: FormGroup;
   noOfImages: number;
-  userID = sessionStorage.getItem('id');
+  userID: string = '';
   selectedFiles: Array<{ file: File, url: string }> = [];
   previewUrl: string | ArrayBuffer | null = null;
   isAddingImages = false;
@@ -44,7 +45,8 @@ export class ProductDetailComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private router:Router
+    private router:Router,
+    private encryptionService: EncryptionService
   ) {
     this.product = data.product;
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
@@ -55,6 +57,14 @@ export class ProductDetailComponent implements OnInit {
         this.getImage(this.product.id);
       }
     });
+    const encryptedUserRole = sessionStorage.getItem('role');
+    if (encryptedUserRole) {
+      this.userRole = this.encryptionService.decrypt(encryptedUserRole);
+    }
+    const encryptedUserID = sessionStorage.getItem('id');
+    if (encryptedUserID) {
+      this.userID = this.encryptionService.decrypt(encryptedUserID);
+    }
   }
 
   ngOnInit(): void {
