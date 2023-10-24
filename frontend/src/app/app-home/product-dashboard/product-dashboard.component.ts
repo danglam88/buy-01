@@ -55,7 +55,7 @@ export class ProductDashboardComponent implements OnInit {
         });
       },
       error: (error) => {
-        if (error.status == 401 || error.status == 403) {
+        if (error.status == 400 || error.status == 403) {
           this.toastr.error('Operation not permitted. Log in again.');
           this.router.navigate(['../login']);
         }

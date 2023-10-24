@@ -77,10 +77,10 @@ export class CreateProductComponent implements OnInit {
 
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          console.log("createProduct result: " + JSON.stringify(result));
           this.productService.productCreated.emit(true);
         },
         error: (error) => {
+          console.log("createProduct error: " + JSON.stringify(error));
           if (error.status === 400) {
             this.toastr.error(error.error);
           } else if (error.status === 401) {
@@ -91,11 +91,9 @@ export class CreateProductComponent implements OnInit {
             this.router.navigate(['../login']);
           }
         },
-        complete: () => {
-          this.toastr.success('Product created successfully.');
-          this.closeModal();
-        }
       });
+      this.toastr.success('Product created successfully.');
+      this.closeModal();
     } else {
       if (this.createProductForm.controls.name.invalid) {
         this.toastr.error('Name must be between 1 and 50 characters.');
