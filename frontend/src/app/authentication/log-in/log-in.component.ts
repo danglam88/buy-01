@@ -34,7 +34,6 @@ export class LogInComponent {
   });
 
   login() {
-    console.log(JSON.stringify(this.loginform.value));
     this.authService.authenticate(this.userInfo).subscribe({
       next: (result) => {
         const encryptedToken = this.encryptionService.encrypt(result['token']);
