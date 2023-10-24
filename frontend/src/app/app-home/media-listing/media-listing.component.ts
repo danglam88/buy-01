@@ -11,6 +11,7 @@ export class MediaListingComponent implements OnInit {
   @Input() productId: string;
 
   constructor(private mediaService: MediaService) { 
+    // Handles deletion of product media. If so, will get product media to display updates
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
         this.getProductMedia(this.productId);
@@ -22,6 +23,7 @@ export class MediaListingComponent implements OnInit {
     this.getProductMedia(this.productId);
   }
 
+  // Gets product media in a timeout to allow for product media to be created before getting it
   getProductMedia(productId: string){
     setTimeout(() => {
       this.mediaService.getImageByProductId(productId).subscribe({

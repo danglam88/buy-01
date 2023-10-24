@@ -18,6 +18,7 @@ export class ProductDashboardComponent implements OnInit {
     private productService: ProductService,
     private dialog: MatDialog,
     ) {
+      // Handle product creation and get seller's products again
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
           console.log("Product created")
@@ -25,6 +26,7 @@ export class ProductDashboardComponent implements OnInit {
         }
       });
 
+      // Handle product deletion and get the seller's products again
       this.productService.productDeleted.subscribe((deleteCreated) => {
         if (deleteCreated) {
           console.log("Product deleted")
@@ -37,6 +39,7 @@ export class ProductDashboardComponent implements OnInit {
     this.getSellerProducts();
   }
 
+  // Get all of the seller products
   getSellerProducts(){
     this.productService.getSellerProductsInfo().subscribe({
       next: (result) => {
@@ -51,6 +54,7 @@ export class ProductDashboardComponent implements OnInit {
     });
   }
 
+  // Opens product detail modal
   openProductDetail(productData: Product): void {
      this.dialog.open(ProductDetailComponent, {
       data: {

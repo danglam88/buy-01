@@ -10,7 +10,6 @@
     <mat-dialog-content>
         <form [formGroup]="productDetailForm">
             <div class="product-detail-image">
-
                 <!-- Image Slider -->
                 <div class="image-slider" *ngIf="editingField !== 'addImages'">
                     <button mat-icon-button *ngIf="noOfImages > 1" (click)="previousSlide()">
@@ -31,7 +30,6 @@
                     <mat-icon>chevron_right</mat-icon>
                     </button>
                 </div>
-
                 <!-- Add Images: slider will change to placeholder -->
                 <div *ngIf="editingField === 'addImages'">
                     <div class="product-image">
@@ -44,10 +42,8 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Delete or Add Image Buttons + Upload and Cancel -->
                 <div class="product-button">
-
                      <!-- Delete and Add Images Buttons -->
                     <div class="button-container">
                         <div *ngIf="userRole === 'SELLER' && userID === product?.userId">
@@ -57,22 +53,17 @@
                         <button class="addImages-button" (click)="editProfileField('addImages')" *ngIf="!isDeletingImages && !isEditingImages">Add Images</button>
                         </div>
                     </div>
-
                     <!-- Upload new images and Cancel buttons -->
                     <div class="upload-cancel-container">
                         <div *ngIf="selectedFiles.length === 0 && editingField === 'addImages'">
                             <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput multiple>
                             <button class="upload-button" (click)="fileInput.click()" *ngIf="!previewUrl">Upload Image</button>
-                            
                         </div>
-                        
                         <button class="cancel-button" *ngIf="isEditingImages" (click)="cancelFieldEdit()">Cancel</button>
                         <button class="save-button" *ngIf="editingField === 'addImages' && selectedFiles.length > 0 && isAddingImages && isEditingImages" (click)="saveEditedImages()">Save</button>
-                        
                     </div>
                 </div>                  
             </div>
-
             <div class="product-detail">
                 <!--Name-->
                 <div class="product-detail-name">
@@ -134,7 +125,6 @@
                             <button class="confirm-button" *ngIf="editingField === 'desc'" (click) = "updateField('description')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
                         </div>
                     </div>
-                    
                     <div *ngIf="editingField !== 'desc'">
                         <p>{{product?.description}}</p>
                     </div>

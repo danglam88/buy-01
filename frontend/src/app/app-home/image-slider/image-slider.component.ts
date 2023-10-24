@@ -11,27 +11,29 @@ export class ImageSliderComponent  {
 
   currentIndex = 0;
 
+  // Getter method to get current image
   get currentImage(): string {
-  
     if (this.images.length > 0) {
       return this.images[this.currentIndex].url;
     }
-    // Handle the case when there are no images
     return '';
   }
 
+  // Go to previous slide
   previousSlide() {
     if (this.images.length > 0) {
       this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
     }
   }
 
+  // Go to previous slide
   nextSlide() {
     if (this.images.length > 0) {
       this.currentIndex = (this.currentIndex + 1) % this.images.length;
     }
   }
   
+  // Remove image
   removeImage(index: number) {
     if (this.images.length > 0) {
       this.imageRemoved.emit(index);

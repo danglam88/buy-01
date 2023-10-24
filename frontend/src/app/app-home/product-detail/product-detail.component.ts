@@ -7,8 +7,8 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { MediaService } from 'src/app/services/media.service';
-import { Router } from '@angular/router';
 import { EncryptionService } from 'src/app/services/encryption.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'product-detail',
@@ -17,7 +17,6 @@ import { EncryptionService } from 'src/app/services/encryption.service';
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
-  isEditingProfile: boolean = false;
   editingField: string | null = null;
   userRole : string = '';
   productImages: any = {};
@@ -45,20 +44,18 @@ export class ProductDetailComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private router:Router,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService, 
+    private router: Router,
   ) {
-    this.product = data.product;
+    this.product = data.product; // get product details from product-listing component
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
+    // Handles product media updates and get product images again from media service
     this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
       if (productMediaUpdated) {
-        console.log("productMediaUpdated: ", productMediaUpdated)
         this.productImages = {};
         this.getImage(this.product.id);
-        console.log("currentIndexofImageSlider: ", this.currentIndexOfImageSlider)
-        console.log("noOfImages: ", this.noOfImages)
-        this.currentIndexOfImageSlider = this.noOfImages ;
+        this.currentIndexOfImageSlider = this.noOfImages;
       }
     });
     const encryptedUserRole = sessionStorage.getItem('role');
@@ -72,6 +69,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Creates a productDetail form for updating with validation. 
+    // Only seller of that product can update
     this.productDetailForm = this.builder.group({
       name: [
         this.product.name,
@@ -108,8 +107,8 @@ export class ProductDetailComponent implements OnInit {
     this.getImage(this.product.id);
   }
 
+   // Get product images from media service, save to productImages and display in image slider
   getImage(productId: string){
-    // Get product images from media service
     this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         console.log("RESULT: ", JSON.stringify(result))
@@ -137,7 +136,8 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
-  // Capture which field is being updated
+
+  // Update the product based on which field is being edited
   updateField(field: string): void {
     if (this.productDetailForm.controls[field].invalid) {
       this.toastr.error(`Product ${field} is invalid`);
@@ -150,46 +150,63 @@ export class ProductDetailComponent implements OnInit {
         this.editingField = null;
       },
       error: (error) => {
-        this.toastr.error(`Product ${field} update failed`);
         console.log(error);
+        if (error.status === 403) {
+          this.toastr.error('Operation not permitted. Log in again.');
+          this.dialogRef.close();
+        } else {
+          this.toastr.error(`Product ${field} update failed`);
+        }
       }
     });
   }
 
-  editProfileField(field: string): void {
-    this.isEditingProfile = true;
-    this.editingField = field;
-    if (field === 'addImages') {
-      this.isAddingImages = true;
-      this.isDeletingImages = false;
-      this.isEditingImages = true; 
-    } else if (field === 'deleteImages') {
-      this.isAddingImages = false;
-      this.isDeletingImages = true;
-      this.isEditingImages = true; 
+  // Delete image from product
+  deleteImage(currentImage: any) {
+    if (currentImage) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        data: {
+          confirmationText: 'Delete this image?' 
+        }
+      });
+      dialogRef.afterClosed().subscribe((confirm: boolean) => {
+        if (confirm) {
+          this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
+            next: (result) => {
+              this.getImage(this.product.id);
+              this.toastr.success('Image deleted');
+              this.mediaService.productMediaDeleted.emit(true);
+            },
+            error: (error) => {
+              console.log(error);
+              if (error.status === 403) {
+                this.toastr.error('Operation not permitted. Log in again.');
+                this.dialogRef.close();
+                this.router.navigate(['../login']);
+              }
+            },
+            complete: () => {
+              console.log('Image deleted');
+            }
+          });
+        }
+      });
+    } else {
+      console.log("currentImage is null or undefined");
     }
-    setTimeout(() => {
-      this[field + 'Input']?.nativeElement.focus();
-    });
+  }
+  
+  // Save newly uploaded images
+  saveEditedImages() {
+    if (this.selectedFiles.length > 5) {
+      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
+    } else {
+      this.saveEachSelectedFile(this.product.id, 0)
+      this.mediaService.productMediaUpdated.emit(true);
+    }
   }
 
-  cancelFieldEdit(): void {
-    this.editingField = null;
-    this.isAddingImages = false;
-    this.isDeletingImages = false;
-    this.isEditingImages = false;
-    this.selectedFiles = [];
-    this.previewUrl = null;
-  }
-
-  cancelEdit(): void {
-    this.isEditingProfile = false;
-  }
-
-  closeModal(): void {
-    this.dialogRef.close();
-  }
-
+  // Delete the product and handle errors
   deleteProduct(): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
@@ -206,6 +223,11 @@ export class ProductDetailComponent implements OnInit {
           },
           error: (error) => {
             console.log(error);
+            if (error.status === 403) {
+              this.toastr.error('Operation not permitted. Log in again.');
+              this.dialogRef.close();
+              this.router.navigate(['../login']);
+            }
           },
           complete: () => {
             console.log('Product deleted');
@@ -217,6 +239,34 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  // Capture which field is being updated on the productDetailForm and set the editingField to that field 
+  editProfileField(field: string): void {
+    this.editingField = field;
+    if (field === 'addImages') {
+      this.isAddingImages = true;
+      this.isDeletingImages = false;
+      this.isEditingImages = true; 
+    } else if (field === 'deleteImages') {
+      this.isAddingImages = false;
+      this.isDeletingImages = true;
+      this.isEditingImages = true; 
+    }
+    setTimeout(() => {
+      this[field + 'Input']?.nativeElement.focus();
+    });
+  }
+
+  // Cancel editing the field of the productDetailForm
+  cancelFieldEdit(): void {
+    this.editingField = null;
+    this.isAddingImages = false;
+    this.isDeletingImages = false;
+    this.isEditingImages = false;
+    this.selectedFiles = [];
+    this.previewUrl = null;
+  }
+
+  // Get the current image from the image slider
   get currentImage(): { url: string, mediaId: string } | null {
     const currentImageData = this.productImages[this.currentIndexOfImageSlider];
     if (currentImageData) {
@@ -237,6 +287,7 @@ export class ProductDetailComponent implements OnInit {
     this.currentIndexOfImageSlider = (this.currentIndexOfImageSlider + 1) % this.noOfImages;
   }
 
+  // File input operations: select
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
     if (files.length > 0) {
@@ -248,6 +299,7 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  // File input operations: display
   displaySelectedImage(file: File) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -258,6 +310,17 @@ export class ProductDetailComponent implements OnInit {
     };
     reader.readAsDataURL(file);
   }
+
+
+  // File input operations: remove
+  onImageRemoved(index: number) {
+    this.selectedFiles.splice(index, 1);
+    if (this.selectedFiles.length === 0) {
+      this.resetImageInput();
+    }
+  }
+
+  // File input operations: reset
   resetImageInput() {
     this.selectedFiles = [];
     const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
@@ -267,51 +330,7 @@ export class ProductDetailComponent implements OnInit {
     this.previewUrl = null;
   }
 
-  onImageRemoved(index: number) {
-    this.selectedFiles.splice(index, 1);
-    if (this.selectedFiles.length === 0) {
-      this.resetImageInput();
-    }
-  }
-
-  deleteImage(currentImage: any) {
-    if (currentImage) {
-      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-        data: {
-          confirmationText: 'Delete this image?' 
-        }
-      });
-      dialogRef.afterClosed().subscribe((confirm: boolean) => {
-        if (confirm) {
-          this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
-            next: (result) => {
-              this.getImage(this.product.id);
-              this.toastr.success('Image deleted');
-              this.mediaService.productMediaDeleted.emit(true);
-            },
-            error: (error) => {
-              console.log(error);
-            },
-            complete: () => {
-              console.log('Image deleted');
-            }
-          });
-        }
-      });
-    } else {
-      console.log("currentImage is null or undefined");
-    }
-  }
-
-  saveEditedImages() {
-    if (this.selectedFiles.length > 5) {
-      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
-    } else {
-      this.saveEachSelectedFile(this.product.id, 0)
-      this.mediaService.productMediaUpdated.emit(true);
-    }
-  }
-
+  // Save each selected image file to the product
   saveEachSelectedFile(productId: string, index: number) {
     if (index < this.selectedFiles.length) {
       const file = this.selectedFiles[index].file;
@@ -328,6 +347,11 @@ export class ProductDetailComponent implements OnInit {
 
         },
         error: (error) => {
+          if (error.status === 403) {
+            this.toastr.error('Operation not permitted. Log in again.');
+            this.dialogRef.close();
+            this.router.navigate(['../login']);
+          }
           console.log(error);
         },
       });
@@ -338,4 +362,10 @@ export class ProductDetailComponent implements OnInit {
       this.editingField = '';
     }
   }
+
+  // Close modal
+  closeModal(): void {
+    this.dialogRef.close();
+  }
+
 }
