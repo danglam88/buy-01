@@ -24,6 +24,7 @@ a:hover {
 
 
 .site-header {
+  min-width: 900px;
   height: 100px;
   background-color: #778da9;
   border-bottom: 1px solid #778da9;
