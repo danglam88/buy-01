@@ -11,12 +11,6 @@ import { EncryptionService } from 'src/app/services/encryption.service';
   styleUrls: ['./log-in.component.css']
 })
 export class LogInComponent {
-  
-  userInfo: any = {
-    username: '',
-    password: ''
-  };
-
   constructor(private builder: FormBuilder, 
     private toastr:ToastrService,
     private authService:AuthenticationService,
@@ -26,15 +20,13 @@ export class LogInComponent {
       sessionStorage.clear();
     }
 
-  userdata:any;
-
   loginform=this.builder.group({
     username:this.builder.control('',Validators.required),
     password:this.builder.control('',Validators.required),
   });
 
   login() {
-    this.authService.authenticate(this.userInfo).subscribe({
+    this.authService.authenticate(this.loginform.value).subscribe({
       next: (result) => {
         const encryptedToken = this.encryptionService.encrypt(result['token']);
         const encryptedRole = this.encryptionService.encrypt(result['role']);
