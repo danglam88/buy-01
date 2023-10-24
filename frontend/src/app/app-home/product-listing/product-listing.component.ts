@@ -19,6 +19,7 @@ export class ProductListingComponent implements OnInit {
   
 
   ngOnInit(): void {
+    // Get all products and display them
     this.productService?.getAllProductsInfo().subscribe({
       next: (result) => {
         this.products = result;
@@ -32,6 +33,7 @@ export class ProductListingComponent implements OnInit {
     });
   }
 
+  // Open productDetail modal
   openProductDetail(productData: Product): void {
     console.log(productData)
      this.dialog.open(ProductDetailComponent, {
