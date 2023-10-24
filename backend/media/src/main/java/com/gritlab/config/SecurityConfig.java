@@ -50,8 +50,11 @@ public class SecurityConfig {
     @Value("${spring.kafka.consumer.value-deserializer}")
     private String valueDeserializer;
 
-    @Value("${spring.kafka.consumer.group-id}")
-    private String groupId;
+    @Value("${spring.kafka.consumer.my-group-id}")
+    private String myGroupId;
+
+    @Value("${spring.kafka.consumer.binary-group-id}")
+    private String binaryGroupId;
 
     @Autowired
     private CorsFilter corsFilter;
@@ -132,7 +135,7 @@ public class SecurityConfig {
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, myGroupId);
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 
@@ -142,7 +145,7 @@ public class SecurityConfig {
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BinaryDataDeserializer.class.getName());
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "binary-consumer-group");
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, binaryGroupId);
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 

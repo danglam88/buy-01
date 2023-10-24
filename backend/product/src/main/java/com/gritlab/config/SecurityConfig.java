@@ -45,9 +45,6 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
 
-    @Value("${spring.kafka.consumer.group-id}")
-    private String groupId;
-
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
@@ -144,7 +141,6 @@ public class SecurityConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -154,7 +150,6 @@ public class SecurityConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BinaryDataSerializer.class.getName());
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "binary-consumer-group");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
