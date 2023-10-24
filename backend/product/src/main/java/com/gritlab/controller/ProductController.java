@@ -1,5 +1,7 @@
 package com.gritlab.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.model.Product;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
@@ -27,20 +29,26 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping()
-    public ResponseEntity<List<Product>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<?> findAll() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String productsNoUserId = objectMapper.writeValueAsString(productService.findAll());
+        return ResponseEntity.ok(objectMapper.readTree(productsNoUserId));
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<List<Product>> findBySellerId(Authentication authentication) {
+    public ResponseEntity<?> findBySellerId(Authentication authentication) throws JsonProcessingException {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(productService.findBySellerId(userDetails.getId()));
+        ObjectMapper objectMapper = new ObjectMapper();
+        String productsNoUserId = objectMapper.writeValueAsString(productService.findBySellerId(userDetails.getId()));
+        return ResponseEntity.ok(objectMapper.readTree(productsNoUserId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> findById(@PathVariable String id) {
+    public ResponseEntity<?> findById(@PathVariable String id) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
         Product product = productService.getProduct(id).orElseThrow();
-        return ResponseEntity.ok(product);
+        String productNoUserId = objectMapper.writeValueAsString(product);
+        return ResponseEntity.ok(objectMapper.readTree(productNoUserId));
     }
 
     @PostMapping
