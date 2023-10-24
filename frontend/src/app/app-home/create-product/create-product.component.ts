@@ -17,6 +17,7 @@ export class CreateProductComponent implements OnInit {
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   selectedFiles: Array<{ file: File, url: string }> = [];
   @ViewChild('nameInput') nameInput: ElementRef;
+  @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor(
     private builder: FormBuilder,
@@ -152,7 +153,9 @@ export class CreateProductComponent implements OnInit {
     this.selectedFiles.splice(index, 1);
     if (this.selectedFiles.length === 0) {
       console.log("true")
-      this.resetImageInput();
+      this.fileInput.nativeElement.value = '';
+      this.previewUrl = null;
     }
+
   }
 }

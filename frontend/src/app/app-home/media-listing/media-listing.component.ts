@@ -13,29 +13,29 @@ export class MediaListingComponent implements OnInit {
   constructor(private mediaService: MediaService) { }
 
   ngOnInit(): void {
-    if (this.productId) {
-      this.mediaService.getImageByProductId(this.productId).subscribe({
-        next: (result) => {
-          this.mediaService.getImageByMediaId(result["0"]).subscribe({
-            next: (mediaResult) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              this.mediaImageData = reader.result; 
-            };
-            reader.readAsDataURL(mediaResult); 
-            },
-            error: (error) => {
-              console.error(error);
-            },
-          });
-        },
-        error: (error) => {
-          console.error(error);
-          if (error.status == 404) {
-            console.log('Media not found');
-          }
-        },
-      });
-    }
+    console.log("productId: ", this.productId)
+    this.mediaService.getImageByProductId(this.productId).subscribe({
+      next: (result) => {
+        console.log("result: ", JSON.stringify(result))
+        this.mediaService.getImageByMediaId(result["0"]).subscribe({
+          next: (mediaResult) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.mediaImageData = reader.result; 
+          };
+          reader.readAsDataURL(mediaResult); 
+          },
+          error: (error) => {
+            console.error(error);
+          },
+        });
+      },
+      error: (error) => {
+        console.error(error);
+        if (error.status == 404) {
+          console.log('Media not found');
+        }
+      },
+    });
   }
 }
