@@ -13,40 +13,40 @@ export class MediaListingComponent implements OnInit {
   constructor(private mediaService: MediaService) { 
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
-        console.log("productMediaDeleted: ", productMediaDeleted)
         this.getProductMedia(this.productId);
       }
     });
   }
 
   ngOnInit(): void {
-    console.log("productId: ", this.productId)
     this.getProductMedia(this.productId);
   }
 
   getProductMedia(productId: string){
-    this.mediaService.getImageByProductId(productId).subscribe({
-      next: (result) => {
-        console.log("result: ", JSON.stringify(result))
-        this.mediaService.getImageByMediaId(result["0"]).subscribe({
-          next: (mediaResult) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            this.mediaImageData = reader.result; 
-          };
-          reader.readAsDataURL(mediaResult); 
-          },
-          error: (error) => {
-            console.error(error);
-          },
-        });
-      },
-      error: (error) => {
-        console.error(error);
-        if (error.status == 404) {
-          console.log('Media not found');
-        }
-      },
-    });
+    // create interval
+    setInterval(() => {
+      this.mediaService.getImageByProductId(productId).subscribe({
+        next: (result) => {
+          this.mediaService.getImageByMediaId(result[0]).subscribe({
+            next: (mediaResult) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              this.mediaImageData = reader.result; 
+            };
+            reader.readAsDataURL(mediaResult); 
+            },
+            error: (error) => {
+              console.error(error);
+            },
+          });
+        },
+        error: (error) => {
+          console.error(error);
+          if (error.status == 404) {
+            console.log('Media not found');
+          }
+        },
+      });
+    }, 1000);
   }
 }
