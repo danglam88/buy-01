@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { EncryptionService } from '../services/encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +17,14 @@ export class ProductService {
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+    private encryptionService: EncryptionService) {
     // Load product data from local storage when the service is initialized
     this.loadProductData();
+    const encryptedToken = sessionStorage.getItem('token');
+    if (encryptedToken) {
+      this.token = this.encryptionService.decrypt(encryptedToken);
+    }
   }
 
   getAllProductsInfo(): Observable<object> {

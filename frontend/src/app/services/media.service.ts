@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { EncryptionService } from '../services/encryption.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,13 @@ export class MediaService {
   private token = sessionStorage.getItem('token');
   productMediaUpdated = new EventEmitter<any>();
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient,
+    private encryptionService: EncryptionService) { 
+    const encryptedToken = sessionStorage.getItem('token');
+    if (encryptedToken) {
+      this.token = this.encryptionService.decrypt(encryptedToken);
+    }
+  }
  
   getImageByProductId(productId: any): Observable<object> {
     let headers = new HttpHeaders();

@@ -150,9 +150,6 @@ export class UserDashboardComponent implements OnInit {
           formData.append('password', this.userProfileForm.value[updateField]);
       }
   
-
-      
-  
       // Check if the updateField is 'avatar' and add the file to formData
       if (updateField === 'avatar') {
         formData.append('name', this.userInfo.name);

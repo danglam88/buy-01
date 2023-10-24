@@ -11,7 +11,6 @@ export class ImageSliderComponent  {
 
   currentIndex = 0;
 
-
   get currentImage(): string {
   
     if (this.images.length > 0) {
@@ -22,7 +21,6 @@ export class ImageSliderComponent  {
   }
 
   previousSlide() {
-
     if (this.images.length > 0) {
       this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
     }

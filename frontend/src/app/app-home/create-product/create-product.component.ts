@@ -147,11 +147,9 @@ export class CreateProductComponent implements OnInit {
     }
     this.previewUrl = null;
   }
+
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
-    console.log("selectedFiles 2: " + this.selectedFiles)
-    console.log("selectedFiles length: " + this.selectedFiles.length)
-
     if (this.selectedFiles.length === 0) {
       console.log("true")
       this.resetImageInput();

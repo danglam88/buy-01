@@ -26,9 +26,6 @@ export class MediaListingComponent implements OnInit {
             error: (error) => {
               console.error(error);
             },
-            complete: () => {
-              //console.log('Media retrieved');
-            }
           });
       },
       error: (error) => {
@@ -37,9 +34,6 @@ export class MediaListingComponent implements OnInit {
           console.log('Media not found');
         }
       },
-      complete: () => {
-       // console.log('All media retrieved');
-      }
     });
   }
 }
