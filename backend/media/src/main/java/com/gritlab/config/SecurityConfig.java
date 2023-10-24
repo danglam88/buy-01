@@ -90,7 +90,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic2() {
+    public NewTopic deleteMedia() {
+        return TopicBuilder.name("DELETE_MEDIA")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic deleteProduct() {
         return TopicBuilder.name("DELETE_PRODUCT")
                 .partitions(1)
                 .replicas(1)
@@ -98,7 +106,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic4() {
+    public NewTopic defaultProduct() {
         return TopicBuilder.name("DEFAULT_PRODUCT")
                 .partitions(1)
                 .replicas(1)
@@ -106,7 +114,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic11() {
+    public NewTopic checkProductRequest() {
         return TopicBuilder.name("CHECK_PRODUCT_REQUEST")
                 .partitions(1)
                 .replicas(1)
@@ -114,7 +122,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic13() {
+    public NewTopic binaryData() {
         return TopicBuilder.name("BINARY_DATA")
                 .partitions(1)
                 .replicas(1)

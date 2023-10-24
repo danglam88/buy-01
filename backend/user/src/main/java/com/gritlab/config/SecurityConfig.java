@@ -103,7 +103,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic() {
+    public NewTopic deleteUser() {
         return TopicBuilder.name("DELETE_USER")
                 .partitions(1)
                 .replicas(1)
@@ -111,7 +111,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic topic3() {
+    public NewTopic defaultSeller() {
         return TopicBuilder.name("DEFAULT_SELLER")
                 .partitions(1)
                 .replicas(1)
