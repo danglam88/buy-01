@@ -85,6 +85,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/reg", "/auth")
                         .permitAll()
+                        .requestMatchers("/users") // Matching the exact URL
+                        .denyAll()
                         .requestMatchers("/users/**")
                         .authenticated()
                         .anyRequest()
