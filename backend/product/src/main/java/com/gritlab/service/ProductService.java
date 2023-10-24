@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,9 +23,6 @@ import java.util.Optional;
 public class ProductService {
 
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private ProductRepository productRepository;
