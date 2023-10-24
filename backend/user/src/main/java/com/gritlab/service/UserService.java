@@ -1,6 +1,6 @@
 package com.gritlab.service;
 
-import com.gritlab.exception.InvalidFileException;
+import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.*;
 import com.gritlab.repository.UserRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
@@ -101,7 +101,7 @@ public class UserService {
                     regRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            throw new InvalidFileException("Failed to upload file");
+            throw new InvalidParamException("Failed to upload file");
         }
     }
 
@@ -121,27 +121,27 @@ public class UserService {
                     userRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            throw new InvalidFileException("Failed to upload file");
+            throw new InvalidParamException("Failed to upload file");
         }
     }
 
-    public void checkFile(MultipartFile file) throws InvalidFileException {
+    public void checkFile(MultipartFile file) throws InvalidParamException {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                throw new InvalidFileException("File must be image");
+                throw new InvalidParamException("File must be image");
             }
         } catch (IOException ex) {
-            throw new InvalidFileException("Failed to upload file");
+            throw new InvalidParamException("Failed to upload file");
         }
 
         if (file.isEmpty()) {
-            throw new InvalidFileException("File must not be empty");
+            throw new InvalidParamException("File must not be empty");
         }
 
         String extension = getExtension(file.getOriginalFilename());
         if (!isValidExtension(extension)) {
-            throw new InvalidFileException("Allowed extensions: " + String.join(",", allowedExtensions));
+            throw new InvalidParamException("Allowed extensions: " + String.join(",", allowedExtensions));
         }
     }
 
@@ -226,10 +226,9 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public User authorizeUser(Authentication authentication, String userId)
-            throws BadCredentialsException, NoSuchElementException {
+    public User authorizeUser(Authentication authentication, String userId) throws BadCredentialsException {
         if (userId != null && !this.findUserById(userId)) {
-            throw new NoSuchElementException();
+            throw new BadCredentialsException("Operation is not allowed");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = getUserByEmail(userDetails.getUsername());
