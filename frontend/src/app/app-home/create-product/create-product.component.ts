@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-product',
@@ -25,7 +26,8 @@ export class CreateProductComponent implements OnInit {
     private productService: ProductService,
     private mediaService: MediaService,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<CreateProductComponent>
+    public dialogRef: MatDialogRef<CreateProductComponent>, 
+    private router: Router,
   ) {
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
@@ -83,7 +85,11 @@ export class CreateProductComponent implements OnInit {
             this.toastr.error(error.error);
           } else if (error.status === 401) {
             this.toastr.error(error.error);
-          } 
+          } else if (error.status === 403){  
+            this.toastr.error("Operation not permitted. Log in again.");
+            this.closeModal();
+            this.router.navigate(['../login']);
+          }
         },
         complete: () => {
           this.toastr.success('Product created successfully.');
