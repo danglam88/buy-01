@@ -82,8 +82,16 @@ export class CreateProductComponent implements OnInit {
         error: (error) => {
           console.log("createProduct error: " + JSON.stringify(error));
           if (error.status === 400) {
+            if (error.error.message) {
+              this.toastr.error(error.error.message);
+            } else if (error.error) {
+              this.toastr.error(error.error[0]);
+            } else {
+              this.toastr.error('Something went wrong');
+            }
+          } else if (error.status === 401) {
             this.toastr.error(error.error);
-          }  else if (error.status === 401 || error.status === 403){  
+          } else if (error.status === 403){  
             this.toastr.error("Operation not permitted. Log in again.");
             this.closeModal();
             this.router.navigate(['../login']);

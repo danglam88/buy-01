@@ -105,7 +105,13 @@ export class RegisterComponent implements OnInit {
         error: (error) => {
           console.log(error);
           if (error.status == 400) {
-            this.toastr.error(error.error[0]);
+            if (error.error.message) {
+              this.toastr.error(error.error.message);
+            } else if (error.error) {
+              this.toastr.error(error.error[0]);
+            } else {
+              this.toastr.error('Something went wrong');
+            }
           } 
         },
         complete: () => {
