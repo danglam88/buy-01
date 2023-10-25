@@ -26,6 +26,12 @@ public class ExceptionFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             if (e instanceof BadCredentialsException || e instanceof UnauthorizedException) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            } else if (e instanceof ServletException) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().print("{\"error\":\"Maximum upload size (2MB) exceeded\"}");
+                response.getWriter().flush();
             } else {
                 e.printStackTrace();
                 response.setStatus(HttpStatus.FORBIDDEN.value());
