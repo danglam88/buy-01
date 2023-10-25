@@ -1,5 +1,6 @@
 package com.gritlab.component;
 
+import com.gritlab.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,8 @@ public class ExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             if (e instanceof BadCredentialsException) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            } else if (e instanceof UnauthorizedException) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             } else {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
