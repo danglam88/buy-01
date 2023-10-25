@@ -28,6 +28,8 @@ export class LogInComponent {
   login() {
     this.authService.authenticate(this.loginform.value).subscribe({
       next: (result) => {
+        const encryptedObj = this.encryptionService.encrypt(JSON.stringify(result));
+        
         const encryptedToken = this.encryptionService.encrypt(result['token']);
         const encryptedRole = this.encryptionService.encrypt(result['role']);
         const encryptedId = this.encryptionService.encrypt(result['id']);
@@ -35,6 +37,8 @@ export class LogInComponent {
         sessionStorage.setItem('token', encryptedToken);
         sessionStorage.setItem('role', encryptedRole);
         sessionStorage.setItem('id', encryptedId);
+
+        sessionStorage.setItem('srt', encryptedObj);
       },
       error: (error) => {
         console.log(error);

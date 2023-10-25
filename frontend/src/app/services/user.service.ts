@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,15 +12,25 @@ export class UserService {
   private updateUserUrl="http://localhost:8080/users/";
   private deleteUserUrl="http://localhost:8080/users/";
   private avatarUserUrl="http://localhost:8080/users/avatar/";
-  private token : string = '';
 
-  constructor(private httpClient: HttpClient,
-    private encryptionService: EncryptionService) {
-    const encryptedToken = sessionStorage.getItem('token');
-    if (encryptedToken) {
-      this.token = this.encryptionService.decrypt(encryptedToken);
+  constructor(
+    private httpClient: HttpClient,
+    private encryptionService: EncryptionService, 
+    private router: Router,
+    ) {}
+  
+    get token() : string {
+      const encryptedSecret = sessionStorage.getItem('srt');
+      if (encryptedSecret) {
+        try {
+          const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
+          return currentToken;
+        } catch (error) {
+          this.router.navigate(['../login']);
+        }
+      }
+      return '';
     }
-   }
 
   getUserInfo(): Observable<object> {
     let headers = new HttpHeaders();

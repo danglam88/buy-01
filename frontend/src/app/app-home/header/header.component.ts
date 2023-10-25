@@ -11,7 +11,6 @@ import { CreateProductComponent } from '../create-product/create-product.compone
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  role: string = ''; // Initialize to an empty string
   currentRoute: string;
   isLoggedIn = this.authService.loggedIn;
 
@@ -27,12 +26,19 @@ export class HeaderComponent {
         this.currentRoute = event.url;
       }
     });
+  }
 
-    // Decrypt role from session storage
-    const encryptedRole = sessionStorage.getItem('role');
-    if (encryptedRole) {
-      this.role = this.encryptionService.decrypt(encryptedRole);
+  get role() : string {
+    const encryptedSecret = sessionStorage.getItem('srt');
+    if (encryptedSecret) {
+      try {
+        const role = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["role"];
+        return role;
+      } catch (error) {
+        this.router.navigate(['../login']);
+      }
     }
+    return '';
   }
 
   // Logs user out

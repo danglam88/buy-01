@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -15,31 +14,24 @@ export class ProductService {
   private createProductUrl="http://localhost:8081/products";
   private updateProductUrl="http://localhost:8081/products/";
   private deleteProductUrl="http://localhost:8081/products/";
-  private token : string = '';
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,
     private router: Router,
-    private toastr: ToastrService,
     ) {
     // Load product data from local storage when the service is initialized
     this.loadProductData();
-    const encryptedToken = sessionStorage.getItem('token');
-    if (encryptedToken) {
-      this.token = this.encryptionService.decrypt(encryptedToken);
-    }
   }
 
-  getToken() : string {
-    const encryptedToken = sessionStorage.getItem('token');
-    if (encryptedToken) {
+  get token() : string {
+    const encryptedSecret = sessionStorage.getItem('srt');
+    if (encryptedSecret) {
       try {
-        const token = this.encryptionService.decrypt(encryptedToken);
-        return token;
+        const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
+        return currentToken;
       } catch (error) {
-        this.toastr.error('Invalid Token');
         this.router.navigate(['../login']);
       }
     }
@@ -47,6 +39,7 @@ export class ProductService {
   }
 
   getAllProductsInfo(): Observable<object> {
+    console.log("this.currentToken: ",this.token)
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
@@ -64,7 +57,6 @@ export class ProductService {
 
   createProduct(product: any): Observable<Object> {
     let headers = new HttpHeaders();
-    this.token = this.getToken();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
