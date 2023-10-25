@@ -4,7 +4,6 @@
   </div>  
   <nav class="site-navigation">
     <ul class="nav">
-      
       <li *ngIf="role === 'SELLER'" role="button" (click)="openCreateProduct()"><a>+ Create Product</a></li>
       <li *ngIf="role === 'SELLER'"><a id="exception-line">|</a></li>
       <li><a routerLink="../home" [ngClass]="{ 'selected': currentRoute === '/home' }">Home</a></li>

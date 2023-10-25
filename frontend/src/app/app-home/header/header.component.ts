@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service'
 import { CreateProductComponent } from '../create-product/create-product.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-header',
@@ -13,20 +14,26 @@ import { CreateProductComponent } from '../create-product/create-product.compone
 export class HeaderComponent {
   currentRoute: string;
   isLoggedIn = this.authService.loggedIn;
+  tokenEx: boolean;
+
 
   constructor(
     private router: Router, 
     private authService: AuthenticationService, 
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef
     ) 
     {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.currentRoute = event.url;
       }
-    });
+    });    
   }
+
+  
 
   get role() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -35,7 +42,8 @@ export class HeaderComponent {
         const role = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["role"];
         return role;
       } catch (error) {
-        this.router.navigate(['../login']);
+        this.throwOut();
+        this.tokenEx = true;
       }
     }
     return '';
@@ -45,6 +53,14 @@ export class HeaderComponent {
   logout() {
     this.authService.logout();
     this.router.navigate(['login']);
+  }
+
+  throwOut(): void {
+    if (!this.tokenEx) {
+      this.toastr.error('Data corrupted. Please log in again.', 'Illegal Operation');
+      this.logout();
+    }
+   
   }
 
   // Opens create product modal
