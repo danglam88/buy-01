@@ -139,7 +139,7 @@ export class ProductDetailComponent implements OnInit {
               },
               error: (error) => {
                 if (error.status === 401 || error.status === 403) {
-                  this.toastr.error('Operation not permitted. Log in again.');
+                  this.toastr.error('Session expired. Log-in again.');
                   this.dialogRef.close();
                   this.router.navigate(['../login']);
                 }
@@ -170,7 +170,7 @@ export class ProductDetailComponent implements OnInit {
       },
       error: (error) => {
         if (error.status === 401 || error.status === 403) {
-          this.toastr.error('Operation not permitted. Log in again.');
+          this.toastr.error('Session expired. Log-in again.');
           this.dialogRef.close();
         } else if (error.status === 400) {
           this.router.navigate(['../forbidden']);
@@ -200,7 +200,7 @@ export class ProductDetailComponent implements OnInit {
             error: (error) => {
               console.log(error);
               if (error.status === 401 || error.status === 403) {
-                this.toastr.error('Operation not permitted. Log in again.');
+                this.toastr.error('Session expired. Log-in again.');
                 this.dialogRef.close();
                 this.router.navigate(['../login']);
               }
@@ -243,7 +243,7 @@ export class ProductDetailComponent implements OnInit {
           },
           error: (error) => {
             if (error.status === 401 || error.status === 403) {
-              this.toastr.error('Operation not permitted. Log in again.');
+              this.toastr.error('Session expired. Log-in again.');
               this.dialogRef.close();
               this.router.navigate(['../login']);
             } else if (error.status === 400) {
@@ -377,7 +377,7 @@ export class ProductDetailComponent implements OnInit {
               this.toastr.error('Something went wrong');
             }
           } else if (error.status === 403) {
-            this.toastr.error('Operation not permitted. Log in again.');
+            this.toastr.error('Session expired. Log-in again.');
             this.dialogRef.close();
             this.router.navigate(['../login']);
           }

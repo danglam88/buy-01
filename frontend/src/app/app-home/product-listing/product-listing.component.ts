@@ -43,7 +43,7 @@ export class ProductListingComponent implements OnInit {
       },
       error: (error) => {
         if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Operation not permitted. Log in again.');
+          this.toastr.error('Session expired. Log-in again.');
           this.router.navigate(['../login']);
         }
       },
