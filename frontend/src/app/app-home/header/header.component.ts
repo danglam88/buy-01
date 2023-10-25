@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -23,7 +23,6 @@ export class HeaderComponent {
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
     ) 
     {
     this.router.events.subscribe((event) => {
@@ -33,7 +32,6 @@ export class HeaderComponent {
     });    
   }
 
-  
 
   get role() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -66,6 +64,6 @@ export class HeaderComponent {
   // Opens create product modal
   openCreateProduct(): void {
     this.dialog.open(CreateProductComponent, {
-   });
+    });
  }
 }

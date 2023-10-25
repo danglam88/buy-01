@@ -60,11 +60,8 @@ export class ProductDetailComponent implements OnInit {
     // Handles product media deletion and get product images again from media service
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
-        console.log("Product media deleted event emitted")
         this.productImages = {};
         this.getProductImages(this.product.id);
-        console.log("This.currentIndexOfImageSlider: ", this.currentIndexOfImageSlider);
-        console.log("This.noOfImages: ", this.noOfImages)
         if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
           this.currentIndexOfImageSlider = 0;
         }
@@ -177,7 +174,9 @@ export class ProductDetailComponent implements OnInit {
         if (error.status === 401 || error.status === 403) {
           this.toastr.error('Operation not permitted. Log in again.');
           this.dialogRef.close();
-        } else {
+        } else if (error.status === 400) {
+          this.router.navigate(['../forbidden']);
+        } else{ 
           this.toastr.error(`Product ${field} update failed`);
         }
       }
@@ -250,6 +249,8 @@ export class ProductDetailComponent implements OnInit {
               this.toastr.error('Operation not permitted. Log in again.');
               this.dialogRef.close();
               this.router.navigate(['../login']);
+            } else if (error.status === 400) {
+              this.router.navigate(['../forbidden']);
             }
           },
           complete: () => {

@@ -97,9 +97,7 @@ export class CreateProductComponent implements OnInit {
             } else {
               this.toastr.error('Something went wrong');
             }
-          } else if (error.status === 401) {
-            this.toastr.error(error.error);
-          } else if (error.status === 403){  
+          } else if (error.status === 403 || error.status === 401){  
             this.toastr.error("Operation not permitted. Log in again.");
             this.closeModal();
             this.router.navigate(['../login']);
