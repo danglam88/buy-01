@@ -72,4 +72,6 @@ a:hover {
 }
 
 
-
+#exception-line {
+  cursor: none;
+}

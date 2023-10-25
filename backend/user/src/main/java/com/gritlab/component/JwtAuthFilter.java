@@ -1,5 +1,7 @@
 package com.gritlab.component;
 
+import com.gritlab.exception.UnauthorizedException;
+import com.gritlab.model.UserInfoUserDetails;
 import com.gritlab.service.JwtService;
 import com.gritlab.service.UserInfoUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @Component
 @Order(3)
@@ -24,32 +27,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
 
-    @Autowired
-    private UserInfoUserDetailsService userDetailsService;
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws IOException, ServletException {
+            FilterChain filterChain) throws IOException, ServletException, NoSuchElementException {
 
-            String authHeader = request.getHeader("Authorization");
-            String token = null;
-            String username = null;
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                username = jwtService.extractUsername(token);
-            }
+        String authHeader = request.getHeader("Authorization");
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails,
-                                    null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
+                String username = jwtService.extractUsername(token);
+                String userId = jwtService.extractUserID(token);
+                String userRole = jwtService.extractUserRole(token);
+
+                if (!jwtService.isTokenExpired(token) && username != null && userId != null && userRole != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserInfoUserDetails userDetails = new UserInfoUserDetails(username, userId, userRole);
+
+                    if (jwtService.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(userDetails,
+                                        null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
+            } catch (Exception ex) {
+                System.out.println("Failed to get data from token");
+                throw new UnauthorizedException("Authorization failed");
             }
-            filterChain.doFilter(request, response);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }

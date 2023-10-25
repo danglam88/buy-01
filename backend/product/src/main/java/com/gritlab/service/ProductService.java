@@ -1,5 +1,6 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
@@ -124,29 +125,38 @@ public class ProductService {
 
     public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
 
-        Product product = productRepository.findByUserIdAndId(userId, id).orElseThrow();
+        if (productRepository.existsById(id)) {
+            if (productRepository.existsByUserIdAndId(userId, id)) {
+                Product product = productRepository.findByUserIdAndId(userId, id).orElseThrow();
 
-        Product updatedProduct = Product.builder()
-            .name(data.getName())
-            .description(data.getDescription())
-            .price(data.getPrice())
-            .quantity(data.getQuantity())
-            .id(product.getId())
-            .userId(product.getUserId())
-            .build();
-            productRepository.save(updatedProduct);
-    }
-
-    public void deleteProduct(String id, String userId)  {
-        if (productRepository.existsByUserIdAndId(userId, id)) {
-            kafkaTemplate.send("DELETE_PRODUCT", id);
-            productRepository.deleteById(id);
+                Product updatedProduct = Product.builder()
+                        .name(data.getName())
+                        .description(data.getDescription())
+                        .price(data.getPrice())
+                        .quantity(data.getQuantity())
+                        .id(product.getId())
+                        .userId(product.getUserId())
+                        .build();
+                productRepository.save(updatedProduct);
+            } else {
+                throw new ForbiddenException("Access denied");
+            }
+        } else {
+            throw new NoSuchElementException();
         }
     }
 
-    @KafkaListener(topics = "DELETE_MEDIA", groupId = "my-consumer-group")
-    public void deleteMedia(String message) {
-        productRepository.deleteById(message);
+    public void deleteProduct(String id, String userId)  {
+        if (productRepository.existsById(id)) {
+            if (productRepository.existsByUserIdAndId(userId, id)) {
+                kafkaTemplate.send("DELETE_PRODUCT", id);
+                productRepository.deleteById(id);
+            } else {
+                throw new ForbiddenException("Access denied");
+            }
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
