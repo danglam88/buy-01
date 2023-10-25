@@ -13,6 +13,8 @@ public class UserInfoUserDetails implements UserDetails {
 
     private String username;
 
+    private String id;
+
     private String password;
 
     private List<GrantedAuthority> authorities;
@@ -21,6 +23,14 @@ public class UserInfoUserDetails implements UserDetails {
         this.username = user.getEmail();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(user.getRole().toString().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    public UserInfoUserDetails(String username, String id, String role) {
+        this.username = username;
+        this.id = id;
+        this.authorities = Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
@@ -39,6 +49,8 @@ public class UserInfoUserDetails implements UserDetails {
     public String getUsername() {
         return this.username;
     }
+
+    public String getId() {return this.id; }
 
     @Override
     public boolean isAccountNonExpired() {

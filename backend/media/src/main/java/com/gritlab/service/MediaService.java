@@ -90,7 +90,12 @@ public class MediaService {
         if (!checkProduct(media.getProductId(), userId)) {
             throw new ForbiddenException("Media with this id does not belong to the current user");
         } else {
-            mediaRepository.deleteById(id);
+            Optional<List<Media>> mediaOptional = mediaRepository.findByProductId(media.getProductId());
+            if (mediaOptional.isPresent() && mediaOptional.get().size() > 1) {
+                mediaRepository.deleteById(id);
+            } else if (mediaOptional.isPresent()) {
+                throw new InvalidParamException("Product must have at least one image");
+            }
         }
     }
 

@@ -159,11 +159,6 @@ public class ProductService {
         }
     }
 
-    @KafkaListener(topics = "DELETE_MEDIA", groupId = "my-consumer-group")
-    public void deleteMedia(String message) {
-        productRepository.deleteById(message);
-    }
-
     @KafkaListener(topics = "DELETE_USER", groupId = "my-consumer-group")
     public void deleteUser(String message) {
         List<Product> products = productRepository.findAllByUserId(message);

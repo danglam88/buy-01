@@ -24,9 +24,7 @@ public class ExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            if (e instanceof BadCredentialsException) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            } else if (e instanceof UnauthorizedException) {
+            if (e instanceof BadCredentialsException || e instanceof UnauthorizedException) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             } else {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
