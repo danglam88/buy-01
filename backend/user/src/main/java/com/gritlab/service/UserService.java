@@ -226,9 +226,9 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public User authorizeUser(Authentication authentication, String userId) throws BadCredentialsException {
+    public User authorizeUser(Authentication authentication, String userId) {
         if (userId != null && !this.findUserById(userId)) {
-            throw new BadCredentialsException("Operation is not allowed");
+            throw new NoSuchElementException("User not found");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = getUserByEmail(userDetails.getUsername());

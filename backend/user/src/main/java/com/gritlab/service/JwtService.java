@@ -27,9 +27,22 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public String extractUserID(String token) {
+        return getClaim(token, "id");
+    }
+
+    public String extractUserRole(String token) {
+        return getClaim(token, "role");
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    public String getClaim(String token, String name) {
+        final Claims claims = extractAllClaims(token);
+        return claims.get(name, String.class);
     }
 
     private Claims extractAllClaims(String token) {
@@ -41,7 +54,7 @@ public class JwtService {
                 .getBody();
     }
 
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
