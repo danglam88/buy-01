@@ -2,6 +2,8 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -18,13 +20,30 @@ export class ProductService {
   productDeleted = new EventEmitter<any>();
 
   constructor(private httpClient: HttpClient,
-    private encryptionService: EncryptionService) {
+    private encryptionService: EncryptionService,
+    private router: Router,
+    private toastr: ToastrService,
+    ) {
     // Load product data from local storage when the service is initialized
     this.loadProductData();
     const encryptedToken = sessionStorage.getItem('token');
     if (encryptedToken) {
       this.token = this.encryptionService.decrypt(encryptedToken);
     }
+  }
+
+  getToken() : string {
+    const encryptedToken = sessionStorage.getItem('token');
+    if (encryptedToken) {
+      try {
+        const token = this.encryptionService.decrypt(encryptedToken);
+        return token;
+      } catch (error) {
+        this.toastr.error('Invalid Token');
+        this.router.navigate(['../login']);
+      }
+    }
+    return '';
   }
 
   getAllProductsInfo(): Observable<object> {
@@ -45,6 +64,7 @@ export class ProductService {
 
   createProduct(product: any): Observable<Object> {
     let headers = new HttpHeaders();
+    this.token = this.getToken();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }

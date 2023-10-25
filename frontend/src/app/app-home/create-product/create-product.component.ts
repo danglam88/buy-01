@@ -83,17 +83,18 @@ export class CreateProductComponent implements OnInit {
           console.log("createProduct error: " + JSON.stringify(error));
           if (error.status === 400) {
             this.toastr.error(error.error);
-          } else if (error.status === 401) {
-            this.toastr.error(error.error);
-          } else if (error.status === 403){  
+          }  else if (error.status === 401 || error.status === 403){  
             this.toastr.error("Operation not permitted. Log in again.");
             this.closeModal();
             this.router.navigate(['../login']);
           }
         },
+        complete: () => {
+          this.toastr.success('Product created successfully.');
+          this.closeModal();
+        }
       });
-      this.toastr.success('Product created successfully.');
-      this.closeModal();
+     
     } else {
       if (this.createProductForm.controls.name.invalid) {
         this.toastr.error('Name must be between 1 and 50 characters.');
