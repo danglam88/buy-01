@@ -285,6 +285,9 @@ export class ProductDetailComponent implements OnInit {
     this.isEditingImages = false;
     this.selectedFiles = [];
     this.previewUrl = null;
+    console.log("currentIndexOfImageSlider: ", this.currentIndexOfImageSlider)
+    this.currentIndexOfImageSlider = 0
+    console.log("this.noOfImages: ", this.noOfImages);
   }
 
   // Get the current image from the image slider
@@ -382,6 +385,9 @@ export class ProductDetailComponent implements OnInit {
             this.router.navigate(['../login']);
           }
           console.log(error);
+          this.previewUrl = null;
+          this.selectedFiles = [];
+          console.log("this.noOfImages: ", this.noOfImages)
         },
       });
     } else {
