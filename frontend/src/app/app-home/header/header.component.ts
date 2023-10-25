@@ -65,4 +65,5 @@ export class HeaderComponent {
     this.dialog.open(CreateProductComponent, {
     });
  }
+
 }

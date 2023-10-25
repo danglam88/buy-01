@@ -149,3 +149,9 @@
   color: #5F6368;
   text-align: left;
 }
+
+@media (max-width: 767px) {
+  .product--details--info {
+    width: 100%;
+  }
+}
