@@ -2,6 +2,7 @@ package com.gritlab.advice;
 
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Response;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,6 +43,15 @@ public class BadRequestExceptionHandler {
                 .stream()
                 .map(error -> error.getDefaultMessage())
                 .collect(Collectors.toList());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public List<String> handleJsonParseError(HttpMessageNotReadableException ex) {
+        List<String> errorMessages = new ArrayList<>();
+        errorMessages.add(ex.getMessage());
+        return errorMessages;
     }
 }
 
