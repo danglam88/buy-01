@@ -17,14 +17,14 @@
                     </button>
                     <div class="image-container">
                         <img [src]="currentImage?.url" class="slider-image">
-                    <button 
-                        mat-icon-button 
-                        class="remove-button" 
+                    <a
+                        class="remove-image" 
                         *ngIf="editingField === 'deleteImages' && userRole === 'SELLER' && product?.editable === true && noOfImages > 1"
                         (click)="deleteImage(currentImage)"
+                        style="display: inline;"
                     >
-                        <mat-icon>clear</mat-icon>
-                    </button>
+                    &#215;
+                    </a>
                     </div>
                     <button mat-icon-button *ngIf="noOfImages > 1" (click)="nextSlide()">
                     <mat-icon>chevron_right</mat-icon>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <!-- Delete or Add Image Buttons + Upload and Cancel -->
-                <div class="product-button">
+                <div class="edit-button">
                      <!-- Delete and Add Images Buttons -->
                     <div class="button-container">
                         <div *ngIf="userRole === 'SELLER' && product?.editable === true ">
