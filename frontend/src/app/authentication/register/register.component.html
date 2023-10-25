@@ -3,14 +3,14 @@
       <div class="form-content">
         <header>Register</header>
         <!--Form-->
-        <form class="register-form" [formGroup]="registerform" (ngSubmit)="register()">
+        <form class="register-form" [formGroup]="registerform" (ngSubmit)="register()" (keydown)="onKeydown($event)" >
           <!--Avatar Preview Container-->
           <div class="profile-picture">
             <div id="preview" *ngIf="previewUrl" class="avatar-container">
               <img [src]="previewUrl" alt="Image Preview" class="round">
             </div>
             <div *ngIf="!previewUrl">
-              <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Default Avatar" class="round">
+              <img [src]="previewUrl ? previewUrl : imgPlaceholder" alt="Default Avatar" class="round">
             </div>
           </div>
           <div class="requirement-info" >
@@ -57,7 +57,7 @@
           </div>
           <!--Register Button-->
           <div class="field button-field">
-              <button>Register</button>
+              <button type="submit" (keyup.enter)="register()">Register</button>
           </div>
         </form>
         <!--Form End-->
