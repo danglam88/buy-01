@@ -98,14 +98,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic defaultProduct() {
-        return TopicBuilder.name("DEFAULT_PRODUCT")
-                .partitions(1)
-                .replicas(1)
-                .build();
-    }
-
-    @Bean
     public NewTopic checkProductRequest() {
         return TopicBuilder.name("CHECK_PRODUCT_REQUEST")
                 .partitions(1)

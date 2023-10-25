@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +23,6 @@ public class DBInitService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -63,7 +59,6 @@ public class DBInitService {
             String hashedPassword = passwordEncoder.encode("Seller1@" + sellerId);
             seller.setPassword(hashedPassword);
             userRepository.save(seller);
-            kafkaTemplate.send("DEFAULT_SELLER", sellerId);
         }
     }
 

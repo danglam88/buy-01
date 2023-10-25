@@ -127,20 +127,6 @@ public class MediaService {
         mediaRepository.deleteAllByProductId(message);
     }
 
-    @KafkaListener(topics = "DEFAULT_PRODUCT", groupId = "my-consumer-group")
-    public void defaultProduct(String message) throws IOException {
-        String productId = message.split(" ")[0];
-        String fileName = message.split(" ")[1];
-        Path filePath = Paths.get("media/upload/" + fileName);
-        byte[] fileContent = Files.readAllBytes(filePath);
-        Media media = Media.builder()
-                .imageData(fileContent)
-                .imagePath(fileName)
-                .productId(productId)
-                .build();
-        mediaRepository.save(media);
-    }
-
     @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")
     public void binaryData(BinaryData binaryData) {
         System.out.println("Received binary data: " + binaryData);

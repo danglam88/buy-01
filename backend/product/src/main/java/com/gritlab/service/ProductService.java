@@ -168,29 +168,6 @@ public class ProductService {
         productRepository.deleteAllByUserId(message);
     }
 
-    @KafkaListener(topics = "DEFAULT_SELLER", groupId = "my-consumer-group")
-    public void defaultSeller(String message) {
-        Product product1 = Product.builder()
-                .name("iPhone 15")
-                .description("Excellent")
-                .price(1499.0)
-                .quantity(1)
-                .userId(message)
-                .build();
-        productRepository.save(product1);
-        kafkaTemplate.send("DEFAULT_PRODUCT", product1.getId() + " iPhone15.jpg");
-
-        Product product2 = Product.builder()
-                .name("MAC Studio")
-                .description("Fantastic")
-                .price(4899.0)
-                .quantity(1)
-                .userId(message)
-                .build();
-        productRepository.save(product2);
-        kafkaTemplate.send("DEFAULT_PRODUCT", product2.getId() + " MacStudio.jpg");
-    }
-
     @KafkaListener(topics = "CHECK_PRODUCT_REQUEST", groupId = "my-consumer-group")
     public void checkProductRequest(String message) {
 
