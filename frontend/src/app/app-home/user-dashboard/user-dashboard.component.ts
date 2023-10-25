@@ -84,7 +84,7 @@ export class UserDashboardComponent implements OnInit {
       error: (error) => {
         console.log(error);
         if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Operation not allowed');
+          this.toastr.error('Session expired. Log-in again.');
           this.router.navigate(['../login']);
         }
       },
@@ -107,7 +107,7 @@ export class UserDashboardComponent implements OnInit {
       },
       error: (error) => {
         if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Operation not allowed');
+          this.toastr.error('Session expired. Log-in again.');
           this.router.navigate(['../login']);
         } 
       },
@@ -205,7 +205,7 @@ export class UserDashboardComponent implements OnInit {
               this.toastr.error('Something went wrong');
             }
           } else if (error.status == 401 || error.status == 403) {
-            this.toastr.error('Operation not allowed');
+            this.toastr.error('Session expired. Log-in again.');
             this.router.navigate(['../login']);
           } 
         },
@@ -294,7 +294,7 @@ export class UserDashboardComponent implements OnInit {
           error: (error) => {
             console.log(error);
             if (error.status == 401 || error.status == 403) {
-              this.toastr.error('Operation not allowed');
+              this.toastr.error('Session expired. Log-in again.');
               this.router.navigate(['../login']);
             } 
           },
