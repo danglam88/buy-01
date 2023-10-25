@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Inject, ViewChild, ElementRef } from '@angular/core';
 import { Product } from '../../Models/Product';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn  } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -60,11 +60,8 @@ export class ProductDetailComponent implements OnInit {
     // Handles product media deletion and get product images again from media service
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
-        console.log("Product media deleted event emitted")
         this.productImages = {};
         this.getProductImages(this.product.id);
-        console.log("This.currentIndexOfImageSlider: ", this.currentIndexOfImageSlider);
-        console.log("This.noOfImages: ", this.noOfImages)
         if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
           this.currentIndexOfImageSlider = 0;
         }
@@ -98,17 +95,19 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
       price: [
-        this.product.price,
+        '',
         [
           Validators.required,
           Validators.pattern(/^\d+(\.\d+)?$/),
+          this.greaterThanZeroValidator(), // Custom validator for price
         ],
       ],
       quantity: [
-        this.product.quantity,
+        '',
         [
           Validators.required,
           Validators.pattern(/^[0-9]+$/),
+          this.greaterThanZeroValidator(), // Custom validator for quantity
         ],
       ],
       description: [
@@ -175,7 +174,9 @@ export class ProductDetailComponent implements OnInit {
         if (error.status === 401 || error.status === 403) {
           this.toastr.error('Operation not permitted. Log in again.');
           this.dialogRef.close();
-        } else {
+        } else if (error.status === 400) {
+          this.router.navigate(['../forbidden']);
+        } else{ 
           this.toastr.error(`Product ${field} update failed`);
         }
       }
@@ -248,6 +249,8 @@ export class ProductDetailComponent implements OnInit {
               this.toastr.error('Operation not permitted. Log in again.');
               this.dialogRef.close();
               this.router.navigate(['../login']);
+            } else if (error.status === 400) {
+              this.router.navigate(['../forbidden']);
             }
           },
           complete: () => {
@@ -396,5 +399,16 @@ export class ProductDetailComponent implements OnInit {
   closeModal(): void {
     this.dialogRef.close();
   }
+
+  greaterThanZeroValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = parseFloat(control.value);
+      if (isNaN(value) || value <= 0) {
+        return { greaterThanZero: true };
+      }
+      return null;
+    };
+  }
+
 
 }

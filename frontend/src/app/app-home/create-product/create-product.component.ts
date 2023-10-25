@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
@@ -46,11 +46,19 @@ export class CreateProductComponent implements OnInit {
     ],
     price: [
       '',
-      [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)],
+      [
+        Validators.required,
+        Validators.pattern(/^\d+(\.\d+)?$/),
+        this.greaterThanZeroValidator(), // Custom validator for price
+      ],
     ],
     quantity: [
       '',
-      [Validators.required, Validators.pattern(/^[0-9]+$/)],
+      [
+        Validators.required,
+        Validators.pattern(/^[0-9]+$/),
+        this.greaterThanZeroValidator(), // Custom validator for quantity
+      ],
     ],
     description: [
       '',
@@ -89,9 +97,7 @@ export class CreateProductComponent implements OnInit {
             } else {
               this.toastr.error('Something went wrong');
             }
-          } else if (error.status === 401) {
-            this.toastr.error(error.error);
-          } else if (error.status === 403){  
+          } else if (error.status === 403 || error.status === 401){  
             this.toastr.error("Operation not permitted. Log in again.");
             this.closeModal();
             this.router.navigate(['../login']);
@@ -157,4 +163,15 @@ export class CreateProductComponent implements OnInit {
   closeModal(): void {
     this.dialogRef.close();
   }
+
+  greaterThanZeroValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = parseFloat(control.value);
+      if (isNaN(value) || value <= 0) {
+        return { greaterThanZero: true };
+      }
+      return null;
+    };
+  }
+
 }

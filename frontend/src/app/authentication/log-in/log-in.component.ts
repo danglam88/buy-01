@@ -1,21 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { EncryptionService } from 'src/app/services/encryption.service';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
+
 
 @Component({
   selector: 'app-log-in',
   templateUrl: './log-in.component.html',
   styleUrls: ['./log-in.component.css']
 })
-export class LogInComponent {
+export class LogInComponent  implements OnInit{
   constructor(private builder: FormBuilder, 
     private toastr:ToastrService,
     private authService:AuthenticationService,
     private encryptionService: EncryptionService,
-    private router:Router) {
+    private router:Router,
+    private dialog: MatDialog,
+  ) {
       this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       sessionStorage.clear();
     }
@@ -24,6 +28,17 @@ export class LogInComponent {
     username:this.builder.control('',Validators.required),
     password:this.builder.control('',Validators.required),
   });
+
+  ngOnInit(): void {
+    console.log("thrown out")
+    const openDialogs: MatDialogRef<any>[] = this.dialog.openDialogs;
+    if (openDialogs && openDialogs.length > 0) {
+      openDialogs.forEach((dialog: MatDialogRef<any>) => {
+        dialog.close();
+      });
+    }
+
+  }
 
   login() {
     this.authService.authenticate(this.loginform.value).subscribe({
