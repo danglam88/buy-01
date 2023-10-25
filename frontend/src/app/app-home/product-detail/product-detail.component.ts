@@ -380,7 +380,11 @@ export class ProductDetailComponent implements OnInit {
             if (error.error.message) {
               this.toastr.error(error.error.message);
             } else if (error.error) {
-              this.toastr.error(error.error[0]);
+              if (error.error[0]) {
+                this.toastr.error(error.error[0]);
+              } else {
+                this.toastr.error(error.error);
+              }
             } else {
               this.toastr.error('Something went wrong');
             }
