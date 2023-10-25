@@ -221,6 +221,7 @@ export class ProductDetailComponent implements OnInit {
     if (this.noOfImages + this.selectedFiles.length > 5) {
       this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
     } else {
+      console.log("this.selectedFiles: ", this.selectedFiles)
       this.saveEachSelectedFile(this.product.id, 0)
       this.mediaService.productMediaUpdated.emit(true);
     }
@@ -315,8 +316,14 @@ export class ProductDetailComponent implements OnInit {
     if (files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        this.displaySelectedImage(file);
-        this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
+        if (this.isImageFile(file)) {
+          this.displaySelectedImage(file);
+          this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
+        } else {
+          // get file name
+          const corruptedFile = file.name;
+          this.toastr.error('Cannot add ' + corruptedFile + ' because of invalid file type. Please select an image of type (e.g., JPEG, PNG, GIF).');
+        }
       }
     }
   }
@@ -411,5 +418,8 @@ export class ProductDetailComponent implements OnInit {
     };
   }
 
-
+  isImageFile(file: File): boolean {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    return allowedTypes.includes(file.type);
+  }
 }
