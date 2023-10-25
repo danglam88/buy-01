@@ -2,7 +2,6 @@ package com.gritlab.advice;
 
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Response;
-import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;

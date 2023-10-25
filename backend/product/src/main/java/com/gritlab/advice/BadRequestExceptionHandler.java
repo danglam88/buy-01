@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.ArrayList;
@@ -53,6 +54,13 @@ public class BadRequestExceptionHandler {
         List<String> errorMessages = new ArrayList<>();
         errorMessages.add(ex.getMessage());
         return errorMessages;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleMaxUploadSizeExceeded(MaxUploadSizeExceededException exception) {
+        return new Response("Maximum upload size (2MB) exceeded");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
