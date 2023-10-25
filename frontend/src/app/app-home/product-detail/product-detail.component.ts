@@ -127,7 +127,6 @@ export class ProductDetailComponent implements OnInit {
   getProductImages(productId: string){
     this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
-        console.log("RESULT: ", JSON.stringify(result))
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
             this.mediaService.getImageByMediaId(result[key]).subscribe({
@@ -170,7 +169,6 @@ export class ProductDetailComponent implements OnInit {
         this.editingField = null;
       },
       error: (error) => {
-        console.log(error);
         if (error.status === 401 || error.status === 403) {
           this.toastr.error('Operation not permitted. Log in again.');
           this.dialogRef.close();
@@ -244,7 +242,6 @@ export class ProductDetailComponent implements OnInit {
             this.productService.productDeleted.emit(true);
           },
           error: (error) => {
-            console.log(error);
             if (error.status === 401 || error.status === 403) {
               this.toastr.error('Operation not permitted. Log in again.');
               this.dialogRef.close();
