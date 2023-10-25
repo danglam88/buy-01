@@ -39,8 +39,14 @@ export class LogInComponent {
       error: (error) => {
         console.log(error);
         if (error.status == 400) {
-          for (let i = 0; i < error.error.length; i++) {
-            this.toastr.error(error.error[i]);
+          if (error.error.message) {
+            this.toastr.error(error.error.message);
+          } else if (error.error) {
+            for (let i = 0; i < error.error.length; i++) {
+              this.toastr.error(error.error[i]);
+            }
+          } else {
+            this.toastr.error('Something went wrong');
           }
         } else if (error.status == 401) {
           this.toastr.error('Invalid credentials');

@@ -2,6 +2,7 @@ package com.gritlab.advice;
 
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Response;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -52,6 +53,15 @@ public class BadRequestExceptionHandler {
         List<String> errorMessages = new ArrayList<>();
         errorMessages.add(ex.getMessage());
         return errorMessages;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public List<String> handleConstraintViolationException(ConstraintViolationException ex) {
+        return ex.getConstraintViolations().stream()
+                .map(violation -> violation.getMessage())
+                .collect(Collectors.toList());
     }
 }
 

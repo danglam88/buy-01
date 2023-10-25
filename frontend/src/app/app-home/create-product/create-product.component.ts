@@ -82,7 +82,13 @@ export class CreateProductComponent implements OnInit {
         error: (error) => {
           console.log("createProduct error: " + JSON.stringify(error));
           if (error.status === 400) {
-            this.toastr.error(error.error);
+            if (error.error.message) {
+              this.toastr.error(error.error.message);
+            } else if (error.error) {
+              this.toastr.error(error.error[0]);
+            } else {
+              this.toastr.error('Something went wrong');
+            }
           } else if (error.status === 401) {
             this.toastr.error(error.error);
           } else if (error.status === 403){  
