@@ -1,325 +1,267 @@
 .overlay{
-    position: absolute; /* Sit on top of the page content */
-    width: 100%; /* Full width (cover the whole page) */
-    height: 100%; /* Full height (cover the whole page) */
-    background-color: rgba(0,0,0,0.3); /* Black background with opacity */
-    z-index: 9999; /* Specify a stack order in case you're using a different order for other elements */
-    cursor: pointer !important; /* Add a pointer on hover */
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.3);
+  z-index: 9999;
+  cursor: pointer !important;
 }
 
-
 .product--details--info {
-    position: fixed; /* Use fixed instead of absolute for centering */
-    z-index: 10;
-    background-color: white;
-    transition: 1s;
-    width: 480px;
-    top: 50%; /* Vertically center */
-    left: 50%; /* Horizontally center */
-    transform: translate(-50%, -50%); /* Centering trick */
-    padding: 10px 25px;
-    border-radius: 16px;
-	box-shadow: 0 30px 30px -25px rgba(#4133B7, .25);
-    margin-top: 10px;
+  position: fixed;
+  z-index: 10;
+  background-color: white;
+  transition: 1s;
+  width: 480px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 25px;
+  border-radius: 16px;
+  box-shadow: 0 30px 30px -25px rgba(#4133B7, .25);
+  margin-top: 10px;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .title {
-    margin: 0;
-    font-weight: bold;
-    flex-grow: 1;
-    text-align: center;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+}
 
 .product-detail-close{
-    cursor: pointer; 
-    color: #28282B;
-    font-size: 20px;
-    margin: 22px;
+  cursor: pointer; 
+  color: #28282B;
+  font-size: 20px;
+  margin: 22px;
 }
 .product-detail-image{
-    width: 100%;
-    height: 320px;
-    border-radius: 10px;
-    margin-bottom: 50px;
+  width: 100%;
+  height: 320px;
+  border-radius: 10px;
+  margin-bottom: 50px;
 }
 .product-detail{
-    padding: 10px 0px;
+  padding: 10px 0px;
 }
 
 .product-detail-name, .product-detail-price, .product-detail-desc-heading{
-    display: flex;
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 10px; 
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 10px; 
 }
-  
+
 .product-button {
-    flex-shrink: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-  }
-  
-  .button-container {
-    display: flex;
-    align-items: center;
-    gap: 10px; 
-    margin-left: 4.5%;
-  }
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
 
-  .upload-cancel-container {
-    display: flex; /* Display its children in a row */
-    align-items: center;
-    gap: 10px;
-    margin-left: 4%;
-  }
-  
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+  margin-left: 4.5%;
+}
+
+.upload-cancel-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 4%;
+}
+
+.preview-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  margin-bottom: -8px !important;
+}
+
+.editImages-button, .addImages-button
+.confirm-button {
+  margin: 0; 
+}
 
 
-  .preview-image {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    margin-bottom: -8px !important;
-  }
-
-  .editImages-button, .addImages-button
-  .confirm-button {
-    margin: 0; 
-  }
-  
-
-  .product-value {
-    flex-grow: 3;
-  }
+.product-value {
+  flex-grow: 3;
+}
 
 
 span{
-    padding: 5px 10px;
-    margin: 5px 5px;
-    border-radius: 5px;
+  padding: 5px 10px;
+  margin: 5px 5px;
+  border-radius: 5px;
 }
 
 
 .product-detail-desc{
-    margin-top: 10px;
-    font-size: 14px;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 .product-detail-edit{
-    margin: 20px 0px;
+  margin: 20px 0px;
 }
 .btn-edit-product-detail{
-    border: none;
-    background-color: #28282B;
-    padding: 10px 30px;
-    font-size: 20px;
-    color: #fff;
+  border: none;
+  background-color: #28282B;
+  padding: 10px 30px;
+  font-size: 20px;
+  color: #fff;
 }
 
 body {
-  margin: 32px;
+margin: 32px;
 }
 
-.image-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-    border: none !important;
-
-  }
-
 .delete-button {
-    margin-top: 30px;
-    background-color: #d13535;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 150px;
-    height: 50px;
-    cursor: pointer;
-    display: flex;
-    background: red;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-    background: #e62222;
+  margin-top: 30px;
+  background-color: #d13535;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 150px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  background: red;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #e62222;
 }
 
 .editImages-button, .addImages-button, .cancel-button, .upload-button, .save-button{
-    align-items: center !important;
-    justify-content: space-between !important;
-    color: #fff;
-    background-color: #0171d3;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    padding: 5px 10px;
-    border: none; 
-    border-radius: 5px; 
-    margin-top: 20px;
-    width: 150px;
+  align-items: center !important;
+  justify-content: space-between !important;
+  color: #fff;
+  background-color: #0171d3;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none; 
+  border-radius: 5px; 
+  margin-top: 20px;
+  width: 150px;
 }
 
 .addImages-button {
-  margin-left: -5px;
+margin-left: -5px;
 }
 
 .upload-button, .save-button {
-    background-color: #0171d3 !important;
-    color: white;
-  }
-  
-  .cancel-button {
-    background-color: #FF0000 !important;
-    color: white;
-  }
+  background-color: #0171d3 !important;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #FF0000 !important;
+  color: white;
+}
 
 
 .delete-button .text {
-    color: white;
-    font-size: 14px;
+  color: white;
+  font-size: 14px;
 }
 
 .delete-button:hover {
-    background: #ff3636;
+  background: #ff3636;
 }
 
 .edit-button {
-    background-color: transparent;
-    border: none;
-    margin-left: 20px;
-  }
+  background-color: transparent;
+  border: none;
+  margin-left: 20px;
+}
 
-  .confirm-button {
-    height: 100%;
-    margin-left: 10px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-  }
-
-  .confirm-button:not(:disabled):hover {
-    transform: scale(1.3);
-  }
-  
-  .confirm-button:not(:disabled):hover:active {
-    transform: scale(1.05) translateY(.125rem);
-  }
-.scroll {
-    overflow-y: scroll;
-}
-.scroll::-webkit-scrollbar {
-    width:5px;
-}
-.scroll::-webkit-scrollbar-track {
-    -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.3); 
-    border-radius:5px;
-}
-.scroll::-webkit-scrollbar-thumb {
-    border-radius:5px;
-    -webkit-box-shadow: inset 0 0 6px #28282B; 
+.confirm-button {
+  height: 100%;
+  margin-left: 10px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .field{
-    position: relative;
-    height: 50px;
-    width: 100%;
-    margin-left: -3px;
-    border-radius: 6px;
+  position: relative;
+  height: 50px;
+  width: 100%;
+  margin-left: -3px;
+  border-radius: 6px;
 }
 .field input,
 .field button{
-    height: 100%;
-    width: 100%;
-    border: none;
-    font-size: 16px;
-    font-weight: 400;
-    border-radius: 6px;
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 16px;
+  font-weight: 400;
+  border-radius: 6px;
 }
 .field input{
-    outline: none;
-    padding: 0 15px;
-    border: 1px solid#CACACA;
+  outline: none;
+  padding: 0 15px;
+  border: 1px solid#CACACA;
+}
+
+.product-image{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0px !important; 
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+  
+.slider-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
 }
 
 
 .image-slider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .slider-image {
-    /* max-width: 100%;
-    max-height: 300px; */
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-  }
-  
-  .remove-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: grey;
-    border-radius: 50%;
-    padding: 3px;
-  }
-  
-  .product-image{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 0px !important; 
-    object-fit: cover;
-    border-radius: 6px;
-  }
-
-    
-  .slider-image {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-  }
-  
-
-.image-slider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .image-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 5px;
-  margin-left: 5px;
+position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-right: 5px;
+margin-left: 5px;
+border: none !important;
 }
 
 .remove-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: #fff;
-  border-radius: 50%;
-  padding: 3px;
+position: absolute;
+top: 5px;
+right: 5px;
+background-color: #fff;
+border-radius: 50%;
+padding: 3px;
 }
 
 .image-area img{
-  max-width: 100%;
-  height: auto;
+max-width: 100%;
+height: auto;
 }
 .remove-image {
 display: none;
@@ -334,19 +276,18 @@ background: #555;
 border: 3px solid #fff;
 color: #FFF;
 box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  -webkit-transition: background 0.5s;
-  transition: background 0.5s;
+text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+-webkit-transition: background 0.5s;
+transition: background 0.5s;
 }
 .remove-image:hover {
- background: #E54E4E;
-  padding: 3px 7px 5px;
-  top: -11px;
+background: #E54E4E;
+padding: 3px 7px 5px;
+top: -11px;
 right: -11px;
 }
 .remove-image:active {
- background: #E54E4E;
-  top: -10px;
+background: #E54E4E;
+top: -10px;
 right: -11px;
 }
-
