@@ -106,3 +106,12 @@
 .button-79:not(:disabled):active {
   transform: translateY(.125rem);
 }
+
+@media (max-width: 767px) {
+  .productlist--container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0;
+    justify-content: center;
+  }
+}

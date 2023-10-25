@@ -291,3 +291,10 @@ background: #E54E4E;
 top: -10px;
 right: -11px;
 }
+
+
+@media (max-width: 767px) {
+  .product--details--info {
+    width: 100%;
+  }
+}

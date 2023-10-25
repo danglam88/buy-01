@@ -1,8 +1,6 @@
 mat-card {
-  max-width: 600px; /* Adjust the width as needed */
   margin: 0 auto;
   margin-top: 5%;
-  padding: 20px;
   box-shadow: 0 4px 6px #778da9;
   min-height: 250px;
   display: flex;
@@ -13,6 +11,8 @@ mat-card {
   border-radius: 20px;
   background-color: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(15px);
+  min-width: 350px;
+  justify-items: center;
 }
 
 .header {
@@ -243,4 +243,13 @@ input {
 
 .button-80:not(:disabled):hover:active {
   transform: scale(1.05) translateY(.125rem);
+}
+
+@media (max-width: 767px) {
+  .mat-card {
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: center;
+  }
 }
