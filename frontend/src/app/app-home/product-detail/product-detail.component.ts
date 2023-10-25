@@ -18,12 +18,10 @@ import { Router } from '@angular/router';
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
   editingField: string | null = null;
-  userRole : string = '';
   productImages: any = {};
   mediaID: any = {};
   productDetailForm: FormGroup;
   noOfImages: number;
-  userID: string = '';
   selectedFiles: Array<{ file: File, url: string }> = [];
   previewUrl: string | ArrayBuffer | null = null;
   isAddingImages = false;
@@ -72,15 +70,19 @@ export class ProductDetailComponent implements OnInit {
         }
       }
     });
+  }
 
-    const encryptedUserRole = sessionStorage.getItem('role');
-    if (encryptedUserRole) {
-      this.userRole = this.encryptionService.decrypt(encryptedUserRole);
+  get userRole() : string {
+    const encryptedSecret = sessionStorage.getItem('srt');
+    if (encryptedSecret) {
+      try {
+        const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["role"];
+        return currentToken;
+      } catch (error) {
+        this.router.navigate(['../login']);
+      }
     }
-    const encryptedUserID = sessionStorage.getItem('id');
-    if (encryptedUserID) {
-      this.userID = this.encryptionService.decrypt(encryptedUserID);
-    }
+    return '';
   }
 
   ngOnInit(): void {

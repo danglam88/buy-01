@@ -28,21 +28,22 @@ export class LogInComponent {
   login() {
     this.authService.authenticate(this.loginform.value).subscribe({
       next: (result) => {
-        const encryptedToken = this.encryptionService.encrypt(result['token']);
-        const encryptedRole = this.encryptionService.encrypt(result['role']);
-        const encryptedId = this.encryptionService.encrypt(result['id']);
-  
-        sessionStorage.setItem('token', encryptedToken);
-        sessionStorage.setItem('role', encryptedRole);
-        sessionStorage.setItem('id', encryptedId);
+        const encryptedObj = this.encryptionService.encrypt(JSON.stringify(result));
+        sessionStorage.setItem('srt', encryptedObj);
       },
       error: (error) => {
         console.log(error);
         if (error.status == 400) {
-          for (let i = 0; i < error.error.length; i++) {
-            this.toastr.error(error.error[i]);
+          if (error.error.message) {
+            this.toastr.error(error.error.message);
+          } else if (error.error) {
+            for (let i = 0; i < error.error.length; i++) {
+              this.toastr.error(error.error[i]);
+            }
+          } else {
+            this.toastr.error('Something went wrong');
           }
-        } else if (error.status == 401) {
+        } else if (error.status == 401 || error.status == 403) {
           this.toastr.error('Invalid credentials');
         }
       },

@@ -49,7 +49,7 @@ public class AuthController {
                             user.get().getId(), user.get().getRole().toString());
 
                     AuthResponse authResponse =
-                            new AuthResponse(token, user.get().getId(), user.get().getRole().toString());
+                            new AuthResponse(token, user.get().getRole().toString());
                     return ResponseEntity.status(HttpStatus.OK).body(authResponse);
                 }
             }

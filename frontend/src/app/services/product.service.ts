@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +14,32 @@ export class ProductService {
   private createProductUrl="https://localhost:8444/products";
   private updateProductUrl="https://localhost:8444/products/";
   private deleteProductUrl="https://localhost:8444/products/";
-  private token = sessionStorage.getItem('token');
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
   constructor(private httpClient: HttpClient,
-    private encryptionService: EncryptionService) {
+    private encryptionService: EncryptionService,
+    private router: Router,
+    ) {
     // Load product data from local storage when the service is initialized
     this.loadProductData();
-    const encryptedToken = sessionStorage.getItem('token');
-    if (encryptedToken) {
-      this.token = this.encryptionService.decrypt(encryptedToken);
+  }
+
+  get token() : string {
+    const encryptedSecret = sessionStorage.getItem('srt');
+    if (encryptedSecret) {
+      try {
+        const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
+        return currentToken;
+      } catch (error) {
+        this.router.navigate(['../login']);
+      }
     }
+    return '';
   }
 
   getAllProductsInfo(): Observable<object> {
+    console.log("this.currentToken: ",this.token)
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);

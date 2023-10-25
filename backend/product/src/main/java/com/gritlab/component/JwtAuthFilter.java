@@ -33,9 +33,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
+            String token = authHeader.substring(7);
             try {
-                String token = authHeader.substring(7);
                 String username = jwtService.extractUsername(token);
                 String userId = jwtService.extractUserID(token);
                 String userRole = jwtService.extractUserRole(token);
@@ -50,8 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             } catch (Exception ex) {
-                System.out.println("Failed to get data from token");
-                throw new UnauthorizedException("Authorization failed");
+                System.out.println(ex.getMessage());
             }
         }
 
