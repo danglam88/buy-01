@@ -285,9 +285,7 @@ export class ProductDetailComponent implements OnInit {
     this.isEditingImages = false;
     this.selectedFiles = [];
     this.previewUrl = null;
-    console.log("currentIndexOfImageSlider: ", this.currentIndexOfImageSlider)
-    this.currentIndexOfImageSlider = 0
-    console.log("this.noOfImages: ", this.noOfImages);
+    this.currentIndexOfImageSlider = 0;
   }
 
   // Get the current image from the image slider
