@@ -1,5 +1,6 @@
 package com.gritlab.service;
 
+import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
@@ -138,9 +139,15 @@ public class ProductService {
     }
 
     public void deleteProduct(String id, String userId)  {
-        if (productRepository.existsByUserIdAndId(userId, id)) {
-            kafkaTemplate.send("DELETE_PRODUCT", id);
-            productRepository.deleteById(id);
+        if (productRepository.existsById(id)) {
+            if (productRepository.existsByUserIdAndId(userId, id)) {
+                kafkaTemplate.send("DELETE_PRODUCT", id);
+                productRepository.deleteById(id);
+            } else {
+                throw new ForbiddenException("Access denied");
+            }
+        } else {
+            throw new NoSuchElementException();
         }
     }
 
