@@ -15,9 +15,10 @@
 .product--price{
     padding:2px 6px;
     position:absolute;
-    margin-top: -25px;
+    margin-top: -24px;
     background-color:#28282B;
     color:white;
+    margin-left: 0.38%;
 }
 
 .product--image{
@@ -31,6 +32,7 @@
     font-weight: 200;
     color: #28282B;
     margin-top: 7px;
+    margin-left: 2.3%;
 }
 
 .highlight-product{

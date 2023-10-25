@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 })
 
 export class RegisterComponent implements OnInit {
+  imgPlaceholder = '../../assets/images/placeholder.png';
+
   previewUrl: string | ArrayBuffer | null = null;
   selectedFile: File;
   userInfo: any = {};
@@ -133,4 +135,16 @@ export class RegisterComponent implements OnInit {
       }
     }
   }
+
+  onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      // Check if the form is invalid
+      if (this.registerform.invalid) {
+        event.preventDefault(); // Prevent the default Enter key behavior (form submission)
+      } else {
+        this.register();
+      }
+    }
+  }
+  
 }
