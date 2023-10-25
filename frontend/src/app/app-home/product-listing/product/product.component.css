@@ -10,6 +10,7 @@
     border-radius: 6px;
     height: 90%;
     cursor: pointer;
+    justify-content: center;
 }
 
 .product--price{
@@ -42,3 +43,17 @@
     border: #efefef 2px solid;
     transform: scale(1.05);
 }
+
+
+@media (max-width: 767px) {
+    .productlist--item {
+
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 1100) {
+    .productlist--item {
+        width: 100%;
+    }
+  }

@@ -117,10 +117,3 @@ form{
     align-items: center;
     justify-content: center;
 }
-
-@media screen and (max-width: 400px) {
-    .form{
-        padding: 20px 10px;
-    }
-    
-}

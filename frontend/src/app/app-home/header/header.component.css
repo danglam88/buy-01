@@ -24,8 +24,7 @@ a:hover {
 
 
 .site-header {
-  min-width: 1250px;
-  height: 100px;
+  min-height: 100px;
   background-color: #778da9;
   border-bottom: 1px solid #778da9;
   padding: 1.5em 1em;
@@ -33,6 +32,7 @@ a:hover {
   justify-content: space-between;
   position: relative;
   top: 0;
+
 }
 
 .button-79{
@@ -74,4 +74,45 @@ a:hover {
 
 #exception-line {
   cursor: none;
+}
+
+@media screen and (max-width: 768px) {
+.site-header {
+  width: 100%;
+  overflow-x: scroll;
+}
+}
+
+/* Define styles for your dropdown button and menu */
+.dropdown-button {
+  display: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.dropdown-menu {
+  display: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  position: absolute;
+  top: 100%;
+  right: 0;
+}
+
+/* Add CSS for the dropdown to be visible on small screens */
+@media (max-width: 767px) {
+  .site-identity {
+    display: none;
+  }
+
+  #exception-line {
+    display: none;
+  }
+
+  .site-header {
+    width: 100%;
+    overflow-x: scroll;
+    min-width: 400px;
+  }
+
 }

@@ -16,7 +16,6 @@ export class HeaderComponent {
   isLoggedIn = this.authService.loggedIn;
   tokenEx: boolean;
 
-
   constructor(
     private router: Router, 
     private authService: AuthenticationService, 
@@ -66,4 +65,5 @@ export class HeaderComponent {
     this.dialog.open(CreateProductComponent, {
     });
  }
+
 }

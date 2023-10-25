@@ -39,7 +39,6 @@ export class ProductService {
   }
 
   getAllProductsInfo(): Observable<object> {
-    console.log("this.currentToken: ",this.token)
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);

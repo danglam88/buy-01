@@ -30,7 +30,6 @@ export class LogInComponent  implements OnInit{
   });
 
   ngOnInit(): void {
-    console.log("thrown out")
     const openDialogs: MatDialogRef<any>[] = this.dialog.openDialogs;
     if (openDialogs && openDialogs.length > 0) {
       openDialogs.forEach((dialog: MatDialogRef<any>) => {
@@ -47,7 +46,6 @@ export class LogInComponent  implements OnInit{
         sessionStorage.setItem('srt', encryptedObj);
       },
       error: (error) => {
-        console.log(error);
         if (error.status == 400) {
           if (error.error.message) {
             this.toastr.error(error.error.message);

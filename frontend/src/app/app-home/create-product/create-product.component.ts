@@ -88,7 +88,6 @@ export class CreateProductComponent implements OnInit {
           this.productService.productCreated.emit(true);
         },
         error: (error) => {
-          console.log("createProduct error: " + JSON.stringify(error));
           if (error.status === 400) {
             if (error.error.message) {
               this.toastr.error(error.error.message);
@@ -153,7 +152,6 @@ export class CreateProductComponent implements OnInit {
   onImageRemoved(index: number) {
     this.selectedFiles.splice(index, 1);
     if (this.selectedFiles.length === 0) {
-      console.log("true")
       this.fileInput.nativeElement.value = '';
       this.previewUrl = null;
     }

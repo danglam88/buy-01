@@ -55,7 +55,6 @@ export class ProductListingComponent implements OnInit {
 
   // Open productDetail modal
   openProductDetail(productData: Product): void {
-    console.log(productData)
      this.dialog.open(ProductDetailComponent, {
       data: {
         product: productData, 
