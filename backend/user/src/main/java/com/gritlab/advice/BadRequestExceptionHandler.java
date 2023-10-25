@@ -2,9 +2,9 @@ package com.gritlab.advice;
 
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Response;
+import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -57,11 +57,18 @@ public class BadRequestExceptionHandler {
         return errorMessages;
     }
 
+    @ExceptionHandler(ServletException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleMaxUploadSizeExceeded(ServletException exception) {
+        return new Response("Maximum upload size (2MB) exceeded");
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleMaxUploadSizeExceeded(MaxUploadSizeExceededException exception) {
-        return new Response("Request processing failed: Maximum upload size exceeded");
+        return new Response("Maximum upload size (2MB) exceeded");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
