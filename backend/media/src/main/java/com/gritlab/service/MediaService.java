@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -88,19 +85,12 @@ public class MediaService {
 
     public void deleteMedia(String id, String userId)  {
 
-        if (mediaRepository.existsById(id)) {
+        Media media = mediaRepository.findById(id).orElseThrow();
 
-            Media media = mediaRepository.findById(id).orElseThrow();
-
-            if (!checkProduct(media.getProductId(), userId)) {
-                throw new ForbiddenException("Media with this id does not belong to the current user");
-            } else {
-                Optional<List<Media>> mediaOptional = mediaRepository.findByProductId(media.getProductId());
-                if (mediaOptional.isPresent() && mediaOptional.get().size() == 1) {
-                    kafkaTemplate.send("DELETE_MEDIA", media.getProductId());
-                }
-                mediaRepository.deleteById(id);
-            }
+        if (!checkProduct(media.getProductId(), userId)) {
+            throw new ForbiddenException("Media with this id does not belong to the current user");
+        } else {
+            mediaRepository.deleteById(id);
         }
     }
 

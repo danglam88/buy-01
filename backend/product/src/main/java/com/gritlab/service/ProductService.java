@@ -125,17 +125,25 @@ public class ProductService {
 
     public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
 
-        Product product = productRepository.findByUserIdAndId(userId, id).orElseThrow();
+        if (productRepository.existsById(id)) {
+            if (productRepository.existsByUserIdAndId(userId, id)) {
+                Product product = productRepository.findByUserIdAndId(userId, id).orElseThrow();
 
-        Product updatedProduct = Product.builder()
-            .name(data.getName())
-            .description(data.getDescription())
-            .price(data.getPrice())
-            .quantity(data.getQuantity())
-            .id(product.getId())
-            .userId(product.getUserId())
-            .build();
-            productRepository.save(updatedProduct);
+                Product updatedProduct = Product.builder()
+                        .name(data.getName())
+                        .description(data.getDescription())
+                        .price(data.getPrice())
+                        .quantity(data.getQuantity())
+                        .id(product.getId())
+                        .userId(product.getUserId())
+                        .build();
+                productRepository.save(updatedProduct);
+            } else {
+                throw new ForbiddenException("Access denied");
+            }
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     public void deleteProduct(String id, String userId)  {
