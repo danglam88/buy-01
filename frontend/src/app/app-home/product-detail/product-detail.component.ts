@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Inject, ViewChild, ElementRef } from '@angular/core';
 import { Product } from '../../Models/Product';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn  } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -98,17 +98,19 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
       price: [
-        this.product.price,
+        '',
         [
           Validators.required,
           Validators.pattern(/^\d+(\.\d+)?$/),
+          this.greaterThanZeroValidator(), // Custom validator for price
         ],
       ],
       quantity: [
-        this.product.quantity,
+        '',
         [
           Validators.required,
           Validators.pattern(/^[0-9]+$/),
+          this.greaterThanZeroValidator(), // Custom validator for quantity
         ],
       ],
       description: [
@@ -388,5 +390,16 @@ export class ProductDetailComponent implements OnInit {
   closeModal(): void {
     this.dialogRef.close();
   }
+
+  greaterThanZeroValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = parseFloat(control.value);
+      if (isNaN(value) || value <= 0) {
+        return { greaterThanZero: true };
+      }
+      return null;
+    };
+  }
+
 
 }
