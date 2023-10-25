@@ -45,6 +45,9 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
 
+    @Value("${spring.kafka.producer.max-request-size}")
+    private String maxRequestSize;
+
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
@@ -134,6 +137,7 @@ public class SecurityConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BinaryDataSerializer.class.getName());
+        configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 

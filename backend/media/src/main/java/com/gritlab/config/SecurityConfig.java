@@ -56,6 +56,9 @@ public class SecurityConfig {
     @Value("${spring.kafka.consumer.binary-group-id}")
     private String binaryGroupId;
 
+    @Value("${spring.kafka.consumer.max-partition-fetch-bytes}")
+    private String maxPartitionFetchBytes;
+
     @Autowired
     private CorsFilter corsFilter;
 
@@ -137,6 +140,7 @@ public class SecurityConfig {
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BinaryDataDeserializer.class.getName());
+        configProps.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, binaryGroupId);
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
