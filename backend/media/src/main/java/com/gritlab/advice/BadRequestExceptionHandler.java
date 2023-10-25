@@ -57,13 +57,6 @@ public class BadRequestExceptionHandler {
         return errorMessages;
     }
 
-    @ExceptionHandler(ServletException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public Response handleMaxUploadSizeExceeded(ServletException exception) {
-        return new Response("Maximum upload size (2MB) exceeded");
-    }
-
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody

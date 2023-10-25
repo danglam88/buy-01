@@ -54,7 +54,7 @@ export class HeaderComponent {
 
   throwOut(): void {
     if (!this.tokenEx) {
-      this.toastr.error('Data corrupted. Please log in again.', 'Illegal Operation');
+      this.toastr.error('Data corrupted. Log-in again.', 'Illegal Operation');
       this.logout();
     }
    
