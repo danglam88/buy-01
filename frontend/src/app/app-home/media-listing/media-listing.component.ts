@@ -58,6 +58,6 @@ export class MediaListingComponent implements OnInit {
           }
         },
       });
-    }, 100);
+    }, 500);
   }
 }

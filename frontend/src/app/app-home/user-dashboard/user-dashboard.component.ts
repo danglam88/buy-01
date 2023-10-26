@@ -243,7 +243,8 @@ export class UserDashboardComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     } else {
-      this.toastr.error('Check condition for a valid image file');
+      console.log("invalid image upload");
+      this.toastr.error('Cannot upload '+ file.name + '. Check condition for a valid image file');
       this.fileInput.nativeElement.value = '';
     }
   }
