@@ -70,7 +70,7 @@ export class RegisterComponent implements OnInit {
   // File upload
   onFileSelected(event: any) {
     const file = event.target.files[0];
-    if (file) {
+    if (this.isImageFile(file) && this.isFileSizeValid(file)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
@@ -150,5 +150,14 @@ export class RegisterComponent implements OnInit {
       }
     }
   }
-  
+
+  isImageFile(file: File): boolean {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    return allowedTypes.includes(file.type);
+  }
+
+  isFileSizeValid(file: File): boolean {
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+    return file.size <= maxSizeInBytes;
+  }  
 }

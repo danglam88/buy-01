@@ -135,8 +135,18 @@ export class CreateProductComponent implements OnInit {
     } else if (files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        this.displaySelectedImage(file);
-        this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
+        // Check the file type (allow only images)
+        if (this.isImageFile(file)) {
+          // Check the file size (limit to 2MB)
+          if (this.isFileSizeValid(file)) {
+            this.displaySelectedImage(file);
+            this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
+          } else {
+            this.toastr.error('File size exceeds the limit (2MB). Please select a smaller image.');
+          }
+        } else {
+          this.toastr.error('Invalid file type. Please select an image (e.g., JPEG, PNG, GIF).');
+        }
       }
     }
   }
@@ -176,4 +186,13 @@ export class CreateProductComponent implements OnInit {
     };
   }
 
+  isImageFile(file: File): boolean {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    return allowedTypes.includes(file.type);
+  }
+
+  isFileSizeValid(file: File): boolean {
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+    return file.size <= maxSizeInBytes;
+  }
 }
