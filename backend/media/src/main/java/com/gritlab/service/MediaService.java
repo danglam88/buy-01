@@ -166,6 +166,10 @@ public class MediaService {
 
     public void checkFile(MultipartFile file) throws InvalidParamException {
 
+        if (file.isEmpty()) {
+            throw new InvalidParamException("File must not be empty");
+        }
+
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
                 throw new InvalidParamException("File must be image");
@@ -174,8 +178,8 @@ public class MediaService {
             throw new InvalidParamException("Failed to upload file");
         }
 
-        if (file.isEmpty()) {
-            throw new InvalidParamException("File must not be empty");
+        if (file.getSize() > 2 * 1024 * 1024) {
+            throw new InvalidParamException("File size must be less than 2MB");
         }
 
         String extension = getExtension(file.getOriginalFilename());
