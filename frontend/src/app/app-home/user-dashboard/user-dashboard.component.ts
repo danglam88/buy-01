@@ -242,6 +242,9 @@ export class UserDashboardComponent implements OnInit {
         console.error('Error reading the selected image:', error);
       };
       reader.readAsDataURL(file);
+    } else {
+      this.toastr.error('Check condition for a valid image file');
+      this.fileInput.nativeElement.value = '';
     }
   }
 
