@@ -142,10 +142,10 @@ export class CreateProductComponent implements OnInit {
             this.displaySelectedImage(file);
             this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
           } else {
-            this.toastr.error('File size exceeds the limit (2MB). Please select a smaller image.');
+            this.toastr.error('Cannot upload '+ file.name + '. File size exceeds the limit (2MB). Please select a smaller image.');
           }
         } else {
-          this.toastr.error('Invalid file type. Please select an image (e.g., JPEG, PNG, GIF).');
+          this.toastr.error('Cannot upload '+ file.name + '. Invalid file type. Please select an image (e.g., JPEG, PNG, GIF).');
         }
       }
     }
