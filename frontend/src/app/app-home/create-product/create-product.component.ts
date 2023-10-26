@@ -49,6 +49,7 @@ export class CreateProductComponent implements OnInit {
       [
         Validators.required,
         Validators.pattern(/^\d+(\.\d+)?$/),
+        Validators.max(999999999.99),
         this.greaterThanZeroValidator(), // Custom validator for price
       ],
     ],
@@ -57,6 +58,7 @@ export class CreateProductComponent implements OnInit {
       [
         Validators.required,
         Validators.pattern(/^[0-9]+$/),
+        Validators.max(999999999),
         this.greaterThanZeroValidator(), // Custom validator for quantity
       ],
     ],

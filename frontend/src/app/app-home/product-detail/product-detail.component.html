@@ -84,7 +84,7 @@
                 <!--Price-->
                 <div class="product-detail-price">
                     <div class="product-value" *ngIf="editingField !== 'price'">
-                        <h2>€{{product?.price}}</h2>
+                        <h2>€ {{product?.price}}</h2>
                     </div>
                     <div class="product-value" *ngIf="editingField == 'price' && userRole === 'SELLER'">
                         <div class="field input-field" *ngIf="editingField === 'price'">

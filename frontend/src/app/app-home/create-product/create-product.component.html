@@ -43,8 +43,11 @@
                     <div class="product-detail-label">
                         <h2>Product Price:</h2>
                     </div>
+                    <div class="field-requirement-info">
+                        * Min: 0.1 / Max: 999999999.99
+                      </div>    
                     <mat-form-field class="form-field">
-                        <input matInput placeholder="€" formControlName="price" type="number" required>
+                        <input matInput placeholder="€ " formControlName="price" type="number" required>
                     </mat-form-field>
                 </div>
                 <!-- Product Quantity -->
@@ -52,6 +55,9 @@
                     <div class="product-detail-label">
                         <h2>Product Quantity:</h2>
                     </div>
+                    <div class="field-requirement-info">
+                        * Min: 1 / Max: 999999999
+                      </div>   
                     <mat-form-field class="form-field">
                         <input matInput placeholder="Quantity" formControlName="quantity" type="number" required>
                     </mat-form-field>
