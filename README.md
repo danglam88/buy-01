@@ -99,7 +99,7 @@ An example of a valid form-data object for creating a new user is:
 To install the project, clone the repository to your local machine.
 
 ```bash
-git clone https://github.com/danglam88/buy-01.git
+git clone https://01.gritlab.ax/git/danglam/buy-01.git
 ```
 
 Make sure you have Docker Desktop installed and configured properly on your machine.

@@ -175,7 +175,17 @@ export class ProductDetailComponent implements OnInit {
           this.toastr.error('Session expired. Log-in again.');
           this.dialogRef.close();
         } else if (error.status === 400) {
-          this.router.navigate(['../forbidden']);
+          if (error.error.message) {
+            this.toastr.error(error.error.message);
+          } else if (error.error) {
+            if (error.error[0]) {
+              this.toastr.error(error.error[0]);
+            } else {
+              this.toastr.error(error.error);
+            }
+          } else {
+            this.toastr.error('Something went wrong');
+          }
         } else{ 
           this.toastr.error(`Product ${field} update failed`);
         }
@@ -250,7 +260,17 @@ export class ProductDetailComponent implements OnInit {
               this.dialogRef.close();
               this.router.navigate(['../login']);
             } else if (error.status === 400) {
-              this.router.navigate(['../forbidden']);
+              if (error.error.message) {
+                this.toastr.error(error.error.message);
+              } else if (error.error) {
+                if (error.error[0]) {
+                  this.toastr.error(error.error[0]);
+                } else {
+                  this.toastr.error(error.error);
+                }
+              } else {
+                this.toastr.error('Something went wrong');
+              }
             }
           },
           complete: () => {

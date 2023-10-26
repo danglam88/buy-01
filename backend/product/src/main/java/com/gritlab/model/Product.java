@@ -30,7 +30,7 @@ public class Product {
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Value must be greater than 0.0")
-    @DecimalMax(value = "999999999.99", inclusive = false, message = "Value must be less than 999999999.99")
+    @DecimalMax(value = "999999999.99", message = "Value must be less than 999999999.99")
     private Double price;
 
     @NotNull(message = "Quantity is required")
