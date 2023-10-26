@@ -27,7 +27,7 @@ This is a Java project that developes and end-to-end e-commerce platform with Sp
 
 ## Back-end Specifications
 
-The list of RESTful APIs to perform CRUD operations on Users, Products and Media are:
+The list of RESTful APIs to perform CRUD operations on Users (https://localhost:8443), Products (https://localhost:8444) and Media (https://localhost:8445) are:
 
 - POST `/auth` - Authenticate a user by their username (email) and password then return a 7-day valid token to them (accessible without authentication)
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)
