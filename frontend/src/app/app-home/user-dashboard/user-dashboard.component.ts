@@ -244,7 +244,7 @@ export class UserDashboardComponent implements OnInit {
       reader.readAsDataURL(file);
     } else {
       console.log("invalid image upload");
-      this.toastr.error('Cannot upload '+ file.name + '. Check condition for a valid image file');
+      this.toastr.error('Cannot upload '+ file.name + '. Image file size must be less than 2MB and only JPEG, PNG and GIF are allowed)');
       this.fileInput.nativeElement.value = '';
     }
   }
