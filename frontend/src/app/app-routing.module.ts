@@ -11,11 +11,11 @@ import { ProductListingComponent } from './app-home/product-listing/product-list
 import { CreateProductComponent } from './app-home/create-product/create-product.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
+
   { path: 'login', component: LogInComponent },
   { path: 'register', component: RegisterComponent },
   //AuthenticateGuard is used to protect the routes, if no user in session, currently it redirects user to login page, if the user in session is a buyer, it shows you do not have acess
-  //Problem is: login is currently led to home
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', canActivate: [AuthenticateGuard],component: ProductListingComponent },
   { path: 'product-dashboard', canActivate: [AuthenticateGuard],component: ProductDashboardComponent}, //canActivate: [AuthenticateGuard] 
   { path: 'user-dashboard', canActivate: [AuthenticateGuard],component: UserDashboardComponent },
