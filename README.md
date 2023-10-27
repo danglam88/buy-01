@@ -27,7 +27,7 @@ This is a Java project that developes and end-to-end e-commerce platform with Sp
 
 ## Back-end Specifications
 
-The list of RESTful APIs to perform CRUD operations on Users (https://localhost:8443), Products (https://localhost:8444) and Media (https://localhost:8445) are:
+The list of RESTful APIs to perform CRUD operations on Users (http://localhost:8080), Products (http://localhost:8081) and Media (http://localhost:8082) are:
 
 - POST `/auth` - Authenticate a user by their username (email) and password then return a 7-day valid token to them (accessible without authentication)
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)
@@ -114,7 +114,7 @@ To run the project, navigate to the project root directory and then run the comm
 docker-compose up -d
 ```
 
-This will start the server at `https://localhost:4200/` and the above-mentioned APIs are ready for use.
+This will start the server at `http://localhost:4200/` and the above-mentioned APIs are ready for use.
 
 Postman is a great tool for testing RESTful APIs. You can download it [here](https://www.postman.com/downloads/).
 
