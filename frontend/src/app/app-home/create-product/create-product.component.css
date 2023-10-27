@@ -1,5 +1,14 @@
 .product--details--info {
   border-radius: 10px;
+  position: fixed; 
+  z-index: 10;
+  background-color: white;
+  transition: 1s;
+  width: 480px;
+  top: 50%; /* Vertically center */
+  left: 50%; /* Horizontally center */
+  transform: translate(-50%, -50%); /* Centering trick */
+  padding: 10px 20px;
 }
 
 .header {
@@ -15,53 +24,37 @@
   flex-grow: 1;
   text-align: center;
 }
+
 .create-product-close {
   cursor: pointer;
   color: #28282B;
   font-size: 20px;
   margin: 22px;
 }
-  .product-form {
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  .form-field {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  .image-actions {
-    display: flex;
-    align-items: center; 
-    margin-top: 10px; 
-  }
-  
-  .product-image{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px !important; 
-    object-fit: cover;
-    border-radius: 6px;
-  }
 
-  .product--details--info {
-    position: fixed; /* Use fixed instead of absolute for centering */
-    z-index: 10;
-    background-color: white;
-    transition: 1s;
-    width: 480px;
-    top: 50%; /* Vertically center */
-    left: 50%; /* Horizontally center */
-    transform: translate(-50%, -50%); /* Centering trick */
-    padding: 10px 20px;
+.product-form {
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-.product-detail-image{
+.form-field {
   width: 100%;
-  height: 320px;
+  margin-bottom: 20px;
+  position: relative;
+  height: 80px;
+  margin-left: -3px;
+  border-radius: 6px;
 }
+
+.product-image{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px !important; 
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 .product-detail{
   padding: 10px 0px;
 }
@@ -69,13 +62,16 @@
 .scroll {
   overflow-y: scroll;
 }
+
 .scroll::-webkit-scrollbar {
   width:5px;
 }
+
 .scroll::-webkit-scrollbar-track {
   -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.3); 
   border-radius:5px;
 }
+
 .scroll::-webkit-scrollbar-thumb {
   border-radius:5px;
   -webkit-box-shadow: inset 0 0 6px #28282B; 
@@ -89,11 +85,7 @@
 }
 
 .upload-button {
-  /* justify-items: center !important;
-  align-items: center !important; 
-  justify-content: space-between; */
   justify-content: space-between !important;
- 
   color: #fff;
   background-color: #0171d3;
   transition: all 0.3s ease;
@@ -103,7 +95,6 @@
   border-radius: 5px; 
   margin-top: 10px;
   width: 150px;
-  
 }
 
 .upload-button:hover {
@@ -118,18 +109,10 @@
   font-weight: 400;
   border-radius: 6px;
   color: #fff;
-    background-color: #0171d3;
-    transition: all 0.3s ease;
-    cursor: pointer;
+  background-color: #0171d3;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
-}
-
-.form-field {
-  position: relative;
-  height: 80px;
-  width: 100%;
-  margin-left: -3px;
-  border-radius: 6px;
 }
 
 .requirement-info {

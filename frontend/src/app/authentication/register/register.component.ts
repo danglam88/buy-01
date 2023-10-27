@@ -81,7 +81,6 @@ export class RegisterComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     } else {
-      console.log("invalid image upload");
       this.toastr.error('Cannot upload '+ file.name + '. Check condition for a valid image file');
       this.fileInput.nativeElement.value = '';
     }
@@ -106,7 +105,6 @@ export class RegisterComponent implements OnInit {
       
       this.regService.register(formData).subscribe({
         next: (result) => {
-          console.log(result);
         },
         error: (error) => {
           console.log(error);

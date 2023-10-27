@@ -26,7 +26,7 @@ export class ProductDashboardComponent implements OnInit {
       // Handle product creation and get seller's products again
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
-          console.log("Product created")
+          console.log("Product Created")
           this.getSellerProducts();
         }
       });
@@ -34,7 +34,6 @@ export class ProductDashboardComponent implements OnInit {
       // Handle product deletion and get the seller's products again
       this.productService.productDeleted.subscribe((deleteCreated) => {
         if (deleteCreated) {
-          console.log("Product deleted")
           this.getSellerProducts();
         }
       });

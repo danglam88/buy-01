@@ -274,7 +274,7 @@ export class ProductDetailComponent implements OnInit {
             }
           },
           complete: () => {
-            console.log('Product deleted');
+            // console.log('Product deleted');
           }
         });
         this.toastr.success('Product deleted');

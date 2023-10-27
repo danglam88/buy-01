@@ -89,7 +89,7 @@ export class UserDashboardComponent implements OnInit {
         }
       },
       complete: () => {
-        console.log("User info retrieved");
+        console.log("User Info Retrieved");
       }
     });
   }
@@ -111,9 +111,6 @@ export class UserDashboardComponent implements OnInit {
           this.router.navigate(['../login']);
         } 
       },
-      complete: () => {
-        console.log("Avatar retrieval complete");
-      }
     });
   }
   
@@ -191,7 +188,6 @@ export class UserDashboardComponent implements OnInit {
       // Update user information
      this.userService.updateUser(formData, this.userInfo.id).subscribe({
         next: (result) => {
-          console.log(result);
           this.getUserInfo();
         },
         error: (error) => {
@@ -243,7 +239,6 @@ export class UserDashboardComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     } else {
-      console.log("invalid image upload");
       this.toastr.error('Cannot upload '+ file.name + '. Image file size must be less than 2MB and only JPEG, PNG and GIF are allowed)');
       this.fileInput.nativeElement.value = '';
     }
@@ -297,7 +292,6 @@ export class UserDashboardComponent implements OnInit {
         console.log('User deleted');
         this.userService.deleteUser(this.userInfo).subscribe({
           next: (result) => {
-            console.log(result);
           },
           error: (error) => {
             console.log(error);
