@@ -8,10 +8,10 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class MediaService {
-  private uploadMediaUrl="http://localhost:8082/media";
-  private mediaByProductIdUrl="http://localhost:8082/media/product/";
-  private deleteMediaUrl="http://localhost:8082/media/";
-  private mediaByMediaIdUrl="http://localhost:8082/media/";
+  private uploadMediaUrl="https://localhost:8445/media";
+  private mediaByProductIdUrl="https://localhost:8445/media/product/";
+  private deleteMediaUrl="https://localhost:8445/media/";
+  private mediaByMediaIdUrl="https://localhost:8445/media/";
   productMediaUpdated = new EventEmitter<any>();
   productMediaDeleted = new EventEmitter<any>();
 

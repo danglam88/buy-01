@@ -8,10 +8,10 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class UserService {
-  private userInfoUrl="http://localhost:8080/users/userInfo";
-  private updateUserUrl="http://localhost:8080/users/";
-  private deleteUserUrl="http://localhost:8080/users/";
-  private avatarUserUrl="http://localhost:8080/users/avatar/";
+  private userInfoUrl="https://localhost:8443/users/userInfo";
+  private updateUserUrl="https://localhost:8443/users/";
+  private deleteUserUrl="https://localhost:8443/users/";
+  private avatarUserUrl="https://localhost:8443/users/avatar/";
 
   constructor(
     private httpClient: HttpClient,
