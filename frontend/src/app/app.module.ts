@@ -61,6 +61,7 @@ import { EncryptionService } from 'src/app/services/encryption.service'
     ImageSliderComponent,
     MediaListingComponent,
     MediaComponent,
+    HighlightDirective
   ],
   imports: [
     BrowserModule,
