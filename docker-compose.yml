@@ -11,7 +11,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - mongodb-user
 
   product-microservice:
     build:
@@ -23,7 +23,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - mongodb-product
 
   media-microservice:
     build:
@@ -35,7 +35,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - mongodb-media
 
   frontend:
     build: ./frontend
@@ -44,14 +44,26 @@ services:
     networks:
       - buy01-network
 
-  mongodb:
+  mongodb-user:
     image: mongo:latest
     ports:
       - "27017:27017"
     networks:
       - buy01-network
-    #volumes:
-      #- mongodb-data:/data/db
+
+  mongodb-product:
+    image: mongo:latest
+    ports:
+      - "27018:27018"
+    networks:
+      - buy01-network
+
+  mongodb-media:
+    image: mongo:latest
+    ports:
+      - "27019:27019"
+    networks:
+      - buy01-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -80,7 +92,3 @@ services:
 networks:
   buy01-network:
     driver: bridge
-
-#volumes:
-  #mongodb-data:
-    #driver: local
