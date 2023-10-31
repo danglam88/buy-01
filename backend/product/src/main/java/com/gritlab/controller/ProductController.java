@@ -52,11 +52,11 @@ public class ProductController {
     }
 
     @PostMapping
-    private ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
-                                                 BindingResult result,
-                                                 @RequestPart("files") List<MultipartFile> files,
-                                                 Authentication authentication,
-                                                 UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
+    public ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
+                                                BindingResult result,
+                                                @RequestPart("files") List<MultipartFile> files,
+                                                Authentication authentication,
+                                                UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
         if (result.hasErrors()) {
             throw new MethodArgumentNotValidException((MethodParameter) null, result);
         }
