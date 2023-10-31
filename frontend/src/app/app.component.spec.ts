@@ -26,4 +26,8 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.content span')?.textContent).toContain('buy-01-frontend app is running!');
   });
+
+  it('My test case', () => {
+    expect(true).toBe(true);
+  })
 });
