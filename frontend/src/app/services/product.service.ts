@@ -9,11 +9,11 @@ import { Router } from '@angular/router';
 })
 export class ProductService {
   private productList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-  private allProductsInfoUrl="https://localhost:8444/products";
-  private sellerProductsInfoUrl="https://localhost:8444/products/seller";
-  private createProductUrl="https://localhost:8444/products";
-  private updateProductUrl="https://localhost:8444/products/";
-  private deleteProductUrl="https://localhost:8444/products/";
+  private allProductsInfoUrl="http://localhost:8081/products";
+  private sellerProductsInfoUrl="http://localhost:8081/products/seller";
+  private createProductUrl="http://localhost:8081/products";
+  private updateProductUrl="http://localhost:8081/products/";
+  private deleteProductUrl="http://localhost:8081/products/";
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
