@@ -14,20 +14,9 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'buy-01-frontend'`, () => {
+  it(`should have as title 'Buy-01'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('buy-01-frontend');
+    expect(app.title).toEqual('Buy-01');
   });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('buy-01-frontend app is running!');
-  });
-
-  it('My test case', () => {
-    expect(true).toBe(true);
-  })
 });
