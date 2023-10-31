@@ -72,7 +72,7 @@ An example of a valid JSON object for registering a new user is:
 
 An example of a valid form-data object for creating a new product is:
 
-```formData
+```form-data
 {
     "name": "Name of Product",
     "description": "Description of Product",
@@ -84,7 +84,7 @@ An example of a valid form-data object for creating a new product is:
 
 An example of a valid form-data object for creating a new user is:
 
-```formData
+```form-data
 {
     "name": "Name of User",
     "email": "abcxyz@gmail.com",
