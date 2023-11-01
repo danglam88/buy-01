@@ -1,14 +1,30 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
 import { AuthenticateGuard } from './authenticate.guard';
+import { AuthenticationService } from '../services/authentication.service';
+import { ToastrService } from 'ngx-toastr';
+import { EncryptionService } from '../services/encryption.service';
 
-describe('authenticateGuard', () => {
-  const guard: AuthenticateGuard = TestBed.get(AuthenticateGuard);
+describe('AuthenticateGuard', () => {
+  let guard: AuthenticateGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AuthenticateGuard],
+      imports: [HttpClientTestingModule],
+      providers: [
+        AuthenticateGuard,
+        AuthenticationService,
+        EncryptionService,
+        {
+          provide: ToastrService,
+          useValue: {
+            // mock necessary methods here if required
+          }
+        }
+      ],
     });
+
+    guard = TestBed.inject(AuthenticateGuard);
   });
 
   it('should be created', () => {

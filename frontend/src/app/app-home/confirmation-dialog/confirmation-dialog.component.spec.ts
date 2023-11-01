@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AngularMaterialModule } from 'src/app/angular-material.module';
 
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
 
@@ -8,7 +9,8 @@ describe('ConfirmationDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmationDialogComponent]
+      declarations: [ConfirmationDialogComponent],
+      imports: [AngularMaterialModule],
     });
     fixture = TestBed.createComponent(ConfirmationDialogComponent);
     component = fixture.componentInstance;

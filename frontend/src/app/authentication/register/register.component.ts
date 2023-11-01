@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 
 export class RegisterComponent implements OnInit {
   imgPlaceholder = '../../assets/images/placeholder.png';
-
   previewUrl: string | ArrayBuffer | null = null;
   selectedFile: File;
   userInfo: any = {};

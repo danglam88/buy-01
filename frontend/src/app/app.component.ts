@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements DoCheck {
-  title = 'buy-01-frontend';
+  title = 'Buy-01';
   isToolbarVisible: boolean = false;
   constructor(private router: Router) {}
 
