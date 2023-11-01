@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +9,8 @@ import { Observable } from 'rxjs';
 export class AuthenticationService {
   constructor(private httpClient: HttpClient) { }
 
-  private authUrl="https://localhost:8443/auth";
-
   authenticate(user: any): Observable<object> {
-    return this.httpClient.post(`${this.authUrl}`, user);
+    return this.httpClient.post(`${environment.authUrl}`, user);
   }
 
   loggedIn = false;
