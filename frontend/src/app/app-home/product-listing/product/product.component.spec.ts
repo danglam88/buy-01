@@ -21,20 +21,6 @@ describe('ProductComponent', () => {
     fixture = TestBed.createComponent(ProductComponent);
     component = fixture.componentInstance;
 
-    // Create a dummy Product instance
-    const dummyProduct: Product = {
-      id: '1',
-      name: 'shoes',
-      description: 'new shoes',
-      price: 23,
-      quantity: 12,
-      editable: true,
-    };
-
-    // Assign the dummy Product instance to the component's product input
-    component.product = dummyProduct;
-
-
     component.product = {
       id: "1", 
       name: 'Mock Product',
