@@ -34,6 +34,16 @@ describe('ProductComponent', () => {
     // Assign the dummy Product instance to the component's product input
     component.product = dummyProduct;
 
+
+    component.product = {
+      id: "1", 
+      name: 'Mock Product',
+      price: 10.0, 
+      quantity: 1,
+      description: 'Mock Description',
+      editable: false, 
+    };
+
     fixture.detectChanges();
   });
 

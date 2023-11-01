@@ -3,6 +3,9 @@ import { AngularMaterialModule } from 'src/app/angular-material.module';
 
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
 
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; // Import MatDialogRef
+
+
 describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;
   let fixture: ComponentFixture<ConfirmationDialogComponent>;
@@ -11,6 +14,10 @@ describe('ConfirmationDialogComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ConfirmationDialogComponent],
       imports: [AngularMaterialModule],
+      providers: [
+        { provide: MatDialogRef, useValue: {} }, // Provide the mock MatDialogRef
+        { provide: MAT_DIALOG_DATA, useValue: {} }
+      ]
     });
     fixture = TestBed.createComponent(ConfirmationDialogComponent);
     component = fixture.componentInstance;

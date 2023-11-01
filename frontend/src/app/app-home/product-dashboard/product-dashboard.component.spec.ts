@@ -56,9 +56,48 @@ describe('ProductDashboardComponent', () => {
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
     httpTestingController = TestBed.inject(HttpTestingController);
-  });
+   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should get seller products', () => {
+    spyOn(productService, 'getSellerProductsInfo').and.callThrough();
+    const mockProducts = [
+      {
+        "id": "1",
+        "name": "Mock Product 1",
+        "description": "Mock Product 1 description",
+        "price": 100,
+        "quantity": 10,
+        }
+    ];
+
+    component.getSellerProducts();
+    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
+    //expect(component.sellerProducts).toEqual(mockProducts);
+  });
+  
+  it('should open product detail', () => {
+    spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open
+    const mockProduct = {
+      "id": "1",
+      "name": "Mock Product 1",
+      "description": "Mock Product 1 description",
+      "price": 100,
+      "quantity": 10,
+      "editable": true
+    };
+  
+    component.openProductDetail(mockProduct);
+    expect(component['dialog'].open).toHaveBeenCalled(); // Access the dialog service directly
+  });
+  
+  it('should show <p>You have no products!</p> when sellerProducts is empty', () => {
+    component.sellerProducts = [];
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('p').textContent).toContain('You have no products!');
   });
 });
