@@ -1,14 +1,16 @@
 import { Component, OnInit, Input, Inject, ViewChild, ElementRef } from '@angular/core';
-import { Product } from '../../Models/Product';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn  } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProductService } from 'src/app/services/product.service';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+
+import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
-import { Router } from '@angular/router';
+import { Product } from '../../Models/Product';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'product-detail',
@@ -46,7 +48,7 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
   ) {
     this.product = data.product; // get product details from product-listing component
-    this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
     // Handles product media updates and get product images again from media service
     this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {

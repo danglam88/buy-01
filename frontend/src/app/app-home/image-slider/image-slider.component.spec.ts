@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ImageSliderComponent } from './image-slider.component';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import { AngularMaterialModule } from 'src/app/angular-material.module';
 
 describe('ImageSliderComponent', () => {
   let component: ImageSliderComponent;
@@ -16,7 +15,7 @@ describe('ImageSliderComponent', () => {
   beforeEach(async () => { // Use async to allow for component compilation
     TestBed.configureTestingModule({
       declarations: [ImageSliderComponent],
-      imports: [MatInputModule, MatIconModule],
+      imports: [AngularMaterialModule],
     });
 
     fixture = TestBed.createComponent(ImageSliderComponent);

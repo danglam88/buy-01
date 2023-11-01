@@ -1,17 +1,13 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { CreateProductComponent } from './create-product.component';
+import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { ProductService } from 'src/app/services/product.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; // Import MatDialogRef
-import { HttpClientTestingModule } from '@angular/common/http/testing'; // Import HttpClientTestingModule
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field'; 
-import { MatInputModule } from '@angular/material/input';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { CreateProductComponent } from './create-product.component';
 import { ImageSliderComponent } from '../image-slider/image-slider.component';
-import { MatIconModule } from '@angular/material/icon';
-
+import { ProductService } from 'src/app/services/product.service';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('CreateProductComponent', () => {
   let component: CreateProductComponent;
@@ -29,14 +25,12 @@ describe('CreateProductComponent', () => {
       declarations: [CreateProductComponent, ImageSliderComponent],
       imports: [
         ToastrModule.forRoot(), 
+        AngularMaterialModule,
         FormsModule, 
         ReactiveFormsModule, 
         HttpClientTestingModule,
         MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
         NoopAnimationsModule,
-        MatIconModule
       ],
       providers: [
         ProductService,

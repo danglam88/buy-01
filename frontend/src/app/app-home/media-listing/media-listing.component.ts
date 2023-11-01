@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./media-listing.component.css']
 })
 export class MediaListingComponent implements OnInit {
-  mediaImageData: any;
+  mediaImageData:any;
   @Input() productId: string;
 
   constructor(
@@ -17,7 +17,7 @@ export class MediaListingComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router
   ) { 
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+     // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
     // Handles deletion of product media. If so, will get product media to display updates
     this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
       if (productMediaDeleted) {
