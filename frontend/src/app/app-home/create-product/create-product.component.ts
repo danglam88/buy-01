@@ -3,7 +3,6 @@ import { FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
-import { MediaService } from 'src/app/services/media.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -24,12 +23,11 @@ export class CreateProductComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private productService: ProductService,
-    private mediaService: MediaService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
     private router: Router,
   ) {
-    this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
   ngOnInit() {}
