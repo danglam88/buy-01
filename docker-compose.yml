@@ -5,6 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: user/Dockerfile
+      platform: linux/amd64
     ports:
       - "8443:8443"
     networks:
@@ -16,6 +17,7 @@ services:
     build:
       context: ./backend
       dockerfile: product/Dockerfile
+      platform: linux/amd64
     ports:
       - "8444:8444"
     networks:
@@ -27,6 +29,7 @@ services:
     build:
       context: ./backend
       dockerfile: media/Dockerfile
+      platform: linux/amd64
     ports:
       - "8445:8445"
     networks:
@@ -35,7 +38,10 @@ services:
       - kafka
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      platform: linux/amd64
     ports:
       - "4200:4200"
     networks:
