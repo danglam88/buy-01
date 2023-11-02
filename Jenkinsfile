@@ -16,10 +16,10 @@ pipeline {
                     docker network rm \$(docker network ls -q) || true
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
-                    docker save -o user-microservice.tar buy-01-build-user-microservice
-                    docker save -o product-microservice.tar buy-01-build-product-microservice
-                    docker save -o media-microservice.tar buy-01-build-media-microservice
-                    docker save -o frontend.tar buy-01-build-frontend
+                    docker save -o user-microservice.tar buy-01-pipeline-user-microservice
+                    docker save -o product-microservice.tar buy-01-pipeline-product-microservice
+                    docker save -o media-microservice.tar buy-01-pipeline-media-microservice
+                    docker save -o frontend.tar buy-01-pipeline-frontend
                     scp *.tar danglam@danglam.live:/mnt/myvolume
                     '''
                 }
