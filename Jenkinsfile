@@ -7,7 +7,7 @@ pipeline {
             steps {
                 script {
                     // Execute the build commands
-                    sh """
+                    bash """
                     docker rm -f \$(docker ps -aq)
                     docker rmi -f \$(docker images -aq)
                     docker volume rm \$(docker volume ls -q)
@@ -31,7 +31,7 @@ pipeline {
                     // Using try-catch for the deploy and potential rollback
                     try {
                         // Execute the deploy commands
-                        sh """
+                        bash """
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
@@ -47,7 +47,7 @@ pipeline {
                     } catch (Exception e) {
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
-                        sh """
+                        bash """
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
