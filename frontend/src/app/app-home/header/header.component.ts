@@ -5,6 +5,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service'
 import { CreateProductComponent } from '../create-product/create-product.component';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -20,6 +21,7 @@ export class HeaderComponent {
   // }
   //is token expired
   tokenEx: boolean;
+  routerSubscription: Subscription;
 
 
   constructor(
@@ -30,11 +32,17 @@ export class HeaderComponent {
     private toastr: ToastrService,
     ) 
     {
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.currentRoute = event.url;
-      }
-    });    
+      this.routerSubscription = this.router.events.subscribe((event: any) => {
+        if (event instanceof NavigationEnd) {
+          this.currentRoute = event.url;
+        }
+      });   
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   get role() : string {
@@ -71,4 +79,6 @@ export class HeaderComponent {
     this.dialog.open(CreateProductComponent, {
     });
  }
+
+ 
 }

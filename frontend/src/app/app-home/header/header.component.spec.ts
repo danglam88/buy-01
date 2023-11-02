@@ -1,38 +1,46 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderComponent } from './header.component';
 import { MatDialog } from '@angular/material/dialog';
-import { MatDialogModule } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
-import { ToastrService, ToastrModule } from 'ngx-toastr'; 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router, NavigationEnd } from '@angular/router';
+import { ToastrModule } from 'ngx-toastr';
+import { of } from 'rxjs';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   let authService: AuthenticationService;
+  let router: Router;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [HeaderComponent],
       providers: [
         AuthenticationService,
         EncryptionService,
-        ToastrService, 
-        MatDialog
+        { provide: MatDialog, useValue: {} },
+        {
+          provide: Router,
+          useValue: {
+            navigate: jasmine.createSpy('navigate'),
+            events: of(new NavigationEnd(0, 'url', 'url'))
+          }
+        },
       ],
       imports: [
         HttpClientTestingModule,
         BrowserAnimationsModule,
-        MatDialogModule,
-        ToastrModule.forRoot() 
-      ]
-    });
+        ToastrModule.forRoot(),
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthenticationService);
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -40,10 +48,17 @@ describe('HeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // it('should check if user is logged in', () => {
-  //   expect(component.isLoggedIn).toBeFalse();
-  //   authService.login();
-  //   expect(component.isLoggedIn).toBeTrue();
-  // });
+  it('should logout and navigate to login', () => {
+    spyOn(authService, 'logout');
+    component.logout();
+    expect(authService.loggedIn).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith(['login']);
+  });
 
+  it('should throw out if token is invalid', () => {
+    component.tokenEx = true;
+    spyOn(component, 'logout');
+    component.throwOut();
+    expect(authService.loggedIn).toBeFalse();
+  });
 });
