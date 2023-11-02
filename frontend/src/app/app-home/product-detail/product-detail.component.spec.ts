@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'; 
 import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { DebugElement } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { By } from '@angular/platform-browser';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing'; 
 import { AngularMaterialModule } from 'src/app/angular-material.module';
@@ -14,7 +17,7 @@ import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from 'src/app/services/validation.service';
-import { ToastrService } from 'ngx-toastr';
+
 
 class ToastrServiceStub {
   error(message: string) {}
@@ -32,6 +35,7 @@ describe('ProductDetailComponent', () => {
   let matDialog: MatDialog;
   let matDialogRef: MatDialogRef<any>;
   let toastrService: ToastrService;
+  let anchorElement: DebugElement;
   const mockDialogRef = {
     open: jasmine.createSpy('open'),
     close: jasmine.createSpy('close'),
@@ -81,6 +85,10 @@ describe('ProductDetailComponent', () => {
     encryptionService = TestBed.inject(EncryptionService);
     fixture.detectChanges();
  
+  });
+
+  beforeEach(() => {
+    anchorElement = fixture.debugElement.query(By.css('.remove-image')); // Replace with the actual CSS selector
   });
 
   it('should create', () => {
@@ -539,5 +547,27 @@ describe('ProductDetailComponent', () => {
     component.noOfImages = 2;
     component.nextSlide();
     expect(component.currentIndexOfImageSlider).toEqual(0);
+  });
+
+  it('should show the remove-image anchor when conditions are met', () => {
+    component.editingField = 'deleteImages';
+    const anchorElement = spyOn(sessionStorage, 'getItem').and.returnValue('{"role": "SELLER"}');
+    component.product.editable = true;
+    component.noOfImages = 2;
+
+    fixture.detectChanges();
+
+    expect(anchorElement).toBeTruthy();
+  });
+
+  it('should hide the remove-image anchor when conditions are not met', () => {
+    component.editingField = 'otherField';
+    spyOn(sessionStorage, 'getItem').and.returnValue('{"role": "SELLER"}');
+    component.product.editable = false;
+    component.noOfImages = 0;
+
+    fixture.detectChanges();
+
+    expect(anchorElement).toBeNull();
   });
 });
