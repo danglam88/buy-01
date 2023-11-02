@@ -4,28 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.service.ProductService;
-import com.gritlab.utility.ImageFileTypeChecker;
-import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class ProductServiceTest {
 
@@ -83,7 +79,6 @@ public class ProductServiceTest {
             files.add(mockFile1);
         }
 
-        // Add more mocks for your specific test cases if needed
         when(mockFile1.getOriginalFilename()).thenReturn("file1.jpg");
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
@@ -102,7 +97,6 @@ public class ProductServiceTest {
 
         MultipartFile mockFile1 = mock(MultipartFile.class);
 
-        // Add more mocks for your specific test cases if needed
         when(mockFile1.getOriginalFilename()).thenReturn("file1.txt");
 
         Throwable exception = assertThrows(InvalidParamException.class, () -> {
@@ -110,6 +104,83 @@ public class ProductServiceTest {
         });
 
         assertEquals("File must be an image", exception.getMessage());
+    }
+
+    @Test
+    void getExtensionWhenValidFileName_thenReturnExtension() {
+        String ext = productService.getExtension("mockFile1.jpg");
+        assertEquals("jpg", ext);
+    }
+
+    @Test
+    void getExtensionWhenInvalidFileName_thenReturnEmptyString() {
+        String ext = productService.getExtension("mockFile1");
+        assertEquals("", ext);
+    }
+
+    @Test
+    void updateProductWhenProductIsNotExists_thenThrowAnError() {
+
+        Product request = new Product(
+                null, "Product Name", "Product Desc", 10.0, 1, null);
+
+        String userID = "user-id-1";
+        String productID = "product-id-1";
+
+        //Mocks for product repository for this case
+        when(productRepository.existsById(productID)).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> {
+            productService.updateProduct(productID, request, userID);
+        });
+    }
+
+    @Test
+    void updateProductWhenProductIsNotBelongToUser_thenThrowAnError() {
+
+        Product request = new Product(
+                null, "Product Name", "Product Desc", 10.0, 1, null);
+
+        String userID = "user-id-1";
+        String productID = "product-id-1";
+
+        //Mocks for product repository for this case
+        when(productRepository.existsById(productID)).thenReturn(true);
+
+        when(productRepository.existsByUserIdAndId(userID, productID)).thenReturn(false);
+
+        assertThrows(ForbiddenException.class, () -> {
+            productService.updateProduct(productID, request, userID);
+        });
+    }
+
+    @Test
+    void deleteProductWhenProductIsNotExists_thenThrowAnError() {
+
+        String userID = "user-id-1";
+        String productID = "product-id-1";
+
+        //Mocks for product repository for this case
+        when(productRepository.existsById(productID)).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> {
+            productService.deleteProduct(productID, userID);
+        });
+    }
+
+    @Test
+    void deleteProductWhenProductIsNotBelongToUser_thenThrowAnError() {
+        String userID = "user-id-1";
+        String productID = "product-id-1";
+
+        //Mocks for product repository for this case
+        when(productRepository.existsById(productID)).thenReturn(true);
+
+        when(productRepository.existsByUserIdAndId(userID, productID)).thenReturn(false);
+
+        assertThrows(ForbiddenException.class, () -> {
+            productService.deleteProduct(productID, userID);
+        });
     }
 }
 

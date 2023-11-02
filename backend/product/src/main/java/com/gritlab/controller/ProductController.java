@@ -73,7 +73,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Void> updateProduct(
+    public ResponseEntity<Void> updateProduct(
             @PathVariable String id,
             @Valid @RequestBody Product updatedData,
             Authentication authentication) {
@@ -85,7 +85,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteProduct(
+    public ResponseEntity<Void> deleteProduct(
             @PathVariable String id,
             Authentication authentication) {
 
