@@ -20,7 +20,7 @@ pipeline {
                     docker save -o product-microservice.tar buy-01-pipeline-product-microservice
                     docker save -o media-microservice.tar buy-01-pipeline-media-microservice
                     docker save -o frontend.tar buy-01-pipeline-frontend
-                    scp *.tar danglam@danglam.live:/mnt/myvolume
+                    /usr/bin/scp *.tar danglam@danglam.live:/mnt/myvolume
                     '''
                 }
             }
