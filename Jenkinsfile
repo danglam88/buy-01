@@ -9,7 +9,7 @@ pipeline {
             steps {
                 script {
                     // Execute the build commands
-                    sh """
+                    sh "/bin/sh -c '''
                     docker rm -f \$(docker ps -aq)
                     docker rmi -f \$(docker images -aq)
                     docker volume rm \$(docker volume ls -q)
@@ -21,7 +21,7 @@ pipeline {
                     docker save -o media-microservice.tar buy-01-build-media-microservice
                     docker save -o frontend.tar buy-01-build-frontend
                     scp *.tar danglam@danglam.live:/mnt/myvolume
-                    """
+                    '''"
                 }
             }
         }
@@ -33,7 +33,7 @@ pipeline {
                     // Using try-catch for the deploy and potential rollback
                     try {
                         // Execute the deploy commands
-                        sh """
+                        sh "/bin/sh -c '''
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
@@ -45,11 +45,11 @@ pipeline {
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
                         docker-compose up -d
-                        """
+                        '''"
                     } catch (Exception e) {
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
-                        bash """
+                        sh "/bin/sh -c '''
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
@@ -62,7 +62,7 @@ pipeline {
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
                         docker-compose up -d
-                        """
+                        '''"
                         // Rethrow the exception to mark the pipeline as failed
                         throw e
                     }
