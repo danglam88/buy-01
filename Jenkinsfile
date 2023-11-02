@@ -9,7 +9,7 @@ pipeline {
             steps {
                 script {
                     // Execute the build commands
-                    sh """
+                    sh '''
                     docker rm -f \$(docker ps -aq)
                     docker rmi -f \$(docker images -aq)
                     docker volume rm \$(docker volume ls -q)
@@ -21,7 +21,7 @@ pipeline {
                     docker save -o media-microservice.tar buy-01-build-media-microservice
                     docker save -o frontend.tar buy-01-build-frontend
                     scp *.tar danglam@danglam.live:/mnt/myvolume
-                    """
+                    '''
                 }
             }
         }
@@ -33,23 +33,26 @@ pipeline {
                     // Using try-catch for the deploy and potential rollback
                     try {
                         // Execute the deploy commands
-                        sh """
+                        sh '''
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
                         docker network rm \$(docker network ls -q)
                         cd /mnt/myvolume
+                        if [ ! -d "/mnt/myvolume/backup" ]; then
+                            mkdir -p /mnt/myvolume/backup
+                        fi
                         mv *.tar backup/
                         docker load -i user-microservice.tar
                         docker load -i product-microservice.tar
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
                         docker-compose up -d
-                        """
+                        '''
                     } catch (Exception e) {
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
-                        sh """
+                        sh '''
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
@@ -62,7 +65,7 @@ pipeline {
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
                         docker-compose up -d
-                        """
+                        '''
                         // Rethrow the exception to mark the pipeline as failed
                         throw e
                     }
@@ -73,8 +76,16 @@ pipeline {
 
     post {
         always {
-            // Clean up actions, if any
             echo "The pipeline has completed execution."
+        }
+
+        success {
+            script {
+                sh '''
+                cd /mnt/myvolume
+                mv *.tar backup/
+                '''
+            }
         }
 
         failure {
