@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing'; // Import HttpClientTestingModule
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
+import { of } from 'rxjs';
 
 import { ProductDashboardComponent } from './product-dashboard.component';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -14,9 +15,7 @@ import { ProductComponent } from '../product-listing/product/product.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ToastrService } from 'ngx-toastr';
 
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; // Import MatDialogRef
-
-
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; 
 
 describe('ProductDashboardComponent', () => {
   let component: ProductDashboardComponent;
@@ -62,8 +61,8 @@ describe('ProductDashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should get seller products', () => {
-    spyOn(productService, 'getSellerProductsInfo').and.callThrough();
+  it('should get seller products and change editable property to true', () => {
+    spyOn(component, 'getSellerProducts').and.callThrough();
     const mockProducts = [
       {
         "id": "1",
@@ -71,13 +70,24 @@ describe('ProductDashboardComponent', () => {
         "description": "Mock Product 1 description",
         "price": 100,
         "quantity": 10,
-        }
+      }
     ];
-
+  
+    // Mock the response from the productService
+    spyOn(productService, 'getSellerProductsInfo').and.returnValue(of(mockProducts));
+  
     component.getSellerProducts();
+  
+    expect(component.getSellerProducts).toHaveBeenCalled();
     expect(productService.getSellerProductsInfo).toHaveBeenCalled();
-    //expect(component.sellerProducts).toEqual(mockProducts);
+  
+    // After getSellerProducts is called, the component.sellerProducts should be equal to the mockProducts
+    expect(component.sellerProducts).toEqual(mockProducts);
+  
+    // Additionally, check that the editable property is set to true for each product
+    expect(component.sellerProducts.every(product => product.editable === true)).toBeTrue();
   });
+  
   
   it('should open product detail', () => {
     spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open
@@ -99,5 +109,27 @@ describe('ProductDashboardComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('p').textContent).toContain('You have no products!');
+  });
+
+  it('should subscribe to productCreated event and call getSellerProducts when productCreated is emitted', () => {
+    spyOn(component, 'getSellerProducts');
+    const productCreatedEventSpy = spyOn(productService.productCreated, 'subscribe');
+
+    productCreatedEventSpy.and.callThrough(); // Just pass the callback through
+
+    productService.productCreated.emit(true);
+
+    expect(component.getSellerProducts).toHaveBeenCalled();
+  });
+
+  it('should subscribe to productDeleted event and call getSellerProducts when productDeleted is emitted', () => {
+    spyOn(component, 'getSellerProducts');
+    const productDeletedEventSpy = spyOn(productService.productDeleted, 'subscribe');
+
+    productDeletedEventSpy.and.callThrough(); // Just pass the callback through
+
+    productService.productDeleted.emit(true);
+
+    expect(component.getSellerProducts).toHaveBeenCalled();
   });
 });

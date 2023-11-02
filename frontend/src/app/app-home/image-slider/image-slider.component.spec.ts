@@ -20,7 +20,7 @@ describe('ImageSliderComponent', () => {
 
     fixture = TestBed.createComponent(ImageSliderComponent);
     component = fixture.componentInstance;
-    component.images = selectedFiles; 
+    component.images = selectedFiles;
     fixture.detectChanges();
   });
 
@@ -43,4 +43,16 @@ describe('ImageSliderComponent', () => {
     component.nextSlide();
     expect(component.currentIndex).toEqual(0);
   });
+
+  it('should remove the image and update currentIndex when calling removeImage', () => {
+    const initialLength = component.images.length;
+    const indexToRemove = 1;
+    component.currentIndex = indexToRemove; 
+    const emitSpy = spyOn(component.imageRemoved, 'emit');
+    component.removeImage(indexToRemove);
+  
+    expect(component.images.length).toEqual(initialLength );
+    expect(component.currentIndex).toEqual(0); 
+    expect(emitSpy).toHaveBeenCalledWith(indexToRemove);
+  });  
 });
