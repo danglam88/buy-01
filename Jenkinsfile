@@ -23,17 +23,17 @@ pipeline {
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
 
-                    docker tag buy-01-pipeline-user-microservice user-microservice:latest
-                    docker push user-microservice:latest
+                    docker tag buy-01-pipeline-user-microservice danglamgritlab/user-microservice:latest
+                    docker push danglamgritlab/user-microservice:latest
 
-                    docker tag buy-01-pipeline-product-microservice product-microservice:latest
-                    docker push product-microservice:latest
+                    docker tag buy-01-pipeline-product-microservice danglamgritlab/product-microservice:latest
+                    docker push danglamgritlab/product-microservice:latest
 
-                    docker tag buy-01-pipeline-media-microservice media-microservice:latest
-                    docker push media-microservice:latest
+                    docker tag buy-01-pipeline-media-microservice danglamgritlab/media-microservice:latest
+                    docker push danglamgritlab/media-microservice:latest
 
-                    docker tag buy-01-pipeline-frontend frontend:latest
-                    docker push frontend:latest
+                    docker tag buy-01-pipeline-frontend danglamgritlab/frontend:latest
+                    docker push danglamgritlab/frontend:latest
                     '''
                 }
             }
@@ -54,10 +54,10 @@ pipeline {
 
                         cd /mnt/myvolume
 
-                        docker pull user-microservice:latest
-                        docker pull product-microservice:latest
-                        docker pull media-microservice:latest
-                        docker pull frontend:latest
+                        docker pull danglamgritlab/user-microservice:latest
+                        docker pull danglamgritlab/product-microservice:latest
+                        docker pull danglamgritlab/media-microservice:latest
+                        docker pull danglamgritlab/frontend:latest
 
                         docker-compose up -d
                         '''
@@ -78,7 +78,7 @@ pipeline {
                         docker load -i product-microservice.tar
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
-                        
+
                         docker-compose up -d
                         '''
                         // Rethrow the exception to mark the pipeline as failed
@@ -99,10 +99,10 @@ pipeline {
                 sh '''
                 cd /mnt/myvolume
 
-                docker save -o user-microservice.tar user-microservice
-                docker save -o product-microservice.tar product-microservice
-                docker save -o media-microservice.tar media-microservice
-                docker save -o frontend.tar frontend
+                docker save -o user-microservice.tar danglamgritlab/user-microservice
+                docker save -o product-microservice.tar danglamgritlab/product-microservice
+                docker save -o media-microservice.tar danglamgritlab/media-microservice
+                docker save -o frontend.tar danglamgritlab/frontend
 
                 if [ ! -d "/mnt/myvolume/backup" ]; then
                     mkdir -p /mnt/myvolume/backup
