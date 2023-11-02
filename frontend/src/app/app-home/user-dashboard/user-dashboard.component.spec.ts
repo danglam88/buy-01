@@ -8,10 +8,12 @@ import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { FooterComponent } from '../footer/footer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
+import { ValidationService } from 'src/app/services/validation.service';
 
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
   let fixture: ComponentFixture<UserDashboardComponent>;
+  let validationService: ValidationService;
 
   beforeEach(() => {
     let userService: UserService;
@@ -23,12 +25,13 @@ describe('UserDashboardComponent', () => {
                 ToastrModule.forRoot(), 
                 AngularMaterialModule,
                 ReactiveFormsModule], 
-      providers: [UserService],
+      providers: [UserService, ValidationService],
     });
     fixture = TestBed.createComponent(UserDashboardComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
+    validationService = TestBed.inject(ValidationService);
   });
 
   it('should create', () => {

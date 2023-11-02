@@ -2,10 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { UserService } from './user.service';
 import { EncryptionService } from '../services/encryption.service';
+import { Router } from '@angular/router';
 
 describe('UserService', () => {
-  let service: UserService;
+  let userService: UserService;
   let httpTestingController: HttpTestingController;
+  let router: Router;
+  let encryptionService: EncryptionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -13,7 +16,9 @@ describe('UserService', () => {
       providers: [UserService, EncryptionService],
     });
 
-    service = TestBed.inject(UserService);
+    userService = TestBed.inject(UserService);
+    router = TestBed.inject(Router);
+    encryptionService = TestBed.inject(EncryptionService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -22,13 +27,70 @@ describe('UserService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(userService).toBeTruthy();
   });
 
-  it('should retrieve user information', () => {
+  it('should return the token when it is valid', () => {
+    const encryptedSecret = 'str';
+    const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
+      
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); 
+
+    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
+  
+    const token = userService.token;
+  
+    expect(token).toBe('mockedToken');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+ 
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+  
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+  
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const token = userService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = userService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should return an empty string when no token is available', () => {
+    spyOn(sessionStorage, 'getItem').and.returnValue(null);
+    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = userService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+   it('should get user information', () => {
     const mockUserInfo = { /* Provide mock user info here */ };
 
-    service.getUserInfo().subscribe((userInfo) => {
+    userService.getUserInfo().subscribe((userInfo) => {
       expect(userInfo).toEqual(mockUserInfo);
     });
 
@@ -42,7 +104,7 @@ describe('UserService', () => {
     const mockUser = { /* Provide mock user data here */ };
     const userId = '123'; // Replace with an actual user ID
 
-    service.updateUser(mockUser, userId).subscribe((response) => {
+    userService.updateUser(mockUser, userId).subscribe((response) => {
       expect(response).toBeTruthy();
     });
 
@@ -57,7 +119,7 @@ describe('UserService', () => {
       id: '123',
     }
 
-    service.deleteUser(mockUser).subscribe((response) => {
+    userService.deleteUser(mockUser).subscribe((response) => {
       expect(response).toBeTruthy();
     });
 
@@ -70,7 +132,7 @@ describe('UserService', () => {
   it('should retrieve a user avatar', () => {
     const userId = '123'; // Replace with an actual user ID
 
-    service.getUserAvatar(userId).subscribe((avatarBlob) => {
+    userService.getUserAvatar(userId).subscribe((avatarBlob) => {
       expect(avatarBlob).toBeTruthy();
     });
 

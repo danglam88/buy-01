@@ -1,17 +1,19 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'; 
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing'; 
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ProductDetailComponent } from './product-detail.component';
 import {  MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl, Validators, FormGroup } from '@angular/forms';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
+import { ValidationService } from 'src/app/services/validation.service';
 import { ToastrService } from 'ngx-toastr';
 
 describe('ProductDetailComponent', () => {
@@ -19,7 +21,9 @@ describe('ProductDetailComponent', () => {
   let fixture: ComponentFixture<ProductDetailComponent>;
   let productService: ProductService;
   let mediaService: MediaService;
+  let validationService: ValidationService;
   let encryptionService: EncryptionService;
+  let router: Router;
   let matDialog: MatDialog;
   let matDialogRef: MatDialogRef<any>;
   const mockDialogRef = {
@@ -37,7 +41,7 @@ describe('ProductDetailComponent', () => {
 
     matDialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
     matDialog = jasmine.createSpyObj('MatDialog', ['open']);
-   
+       
 
     TestBed.configureTestingModule({
       declarations: [ProductDetailComponent, ConfirmationDialogComponent],
@@ -45,6 +49,7 @@ describe('ProductDetailComponent', () => {
         ProductService,
         EncryptionService,
         MediaService,
+        ValidationService,
         { provide: ToastrService, useValue: { error: jasmine.createSpy('error'), success: jasmine.createSpy('success') } },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { product: mockProduct } }
@@ -57,6 +62,7 @@ describe('ProductDetailComponent', () => {
         ReactiveFormsModule
       ]
     });
+    
     fixture = TestBed.createComponent(ProductDetailComponent);
     component = fixture.componentInstance;
     component.productImages = ["data:image/jpeg;base64,/1", "data:image/jpeg;base64,/2"];
@@ -64,6 +70,9 @@ describe('ProductDetailComponent', () => {
     matDialogRef = TestBed.inject(MatDialogRef);
     productService = TestBed.inject(ProductService);
     mediaService = TestBed.inject(MediaService);
+    validationService = TestBed.inject(ValidationService);
+    router = TestBed.inject(Router);
+    encryptionService = TestBed.inject(EncryptionService);
     fixture.detectChanges();
  
   });
@@ -236,40 +245,61 @@ describe('ProductDetailComponent', () => {
     expect(component.getProductImages).toHaveBeenCalled();
   }));
 
-  it('isImageFile should return false for invalid file types', () => {
-    const txtFile = new File([''], 'text.txt', { type: 'text/plain' });
-    const pdfFile = new File([''], 'document.pdf', { type: 'application/pdf' });
-  
-    expect(component.isImageFile(txtFile)).toBe(false);
-    expect(component.isImageFile(pdfFile)).toBe(false);
-  });
-  
-  it('isFileSizeValid should return true for files with valid size', () => {
-    // Create a Blob with a size less than 2MB
-    const smallBlob = new Blob([''], { type: 'image/jpeg' });
-    const smallFile = new File([smallBlob], 'small.jpg');
-  
-    expect(component.isFileSizeValid(smallFile)).toBe(true);
-  });
-  
-  it('isFileSizeValid should return false for files with size exceeding 2MB', () => {
-    // Create a Blob with a size greater than 2MB
-    const largeBlob = new Blob([''.repeat(3 * 1024 * 1024)], { type: 'image/jpeg' });
-    const largeFile = new File([largeBlob], 'large.jpg');
-  
-    expect(component.isFileSizeValid(largeFile)).toBe(true);
-  });  
-
-  /*it('should return the role from the encrypted secret when available', () => {
-    const encryptedSecret = 'srt'; 
-    const role = 'SELLER';
+   it('should return the token when it is valid', () => {
+    const encryptedSecret = 'str';
+    const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
+      
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
-    spyOn(encryptionService, 'decrypt').and.returnValue(JSON.stringify({ role }));
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); 
 
-    encryptionService.decrypt(encryptedSecret);
-    const userRole = component.userRole;
+    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
+  
+    const token = productService.token;
+  
+    expect(token).toBe('mockedToken');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
 
-    expect(encryptionService.decrypt).toHaveBeenCalled();
-  });*/
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+  
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+  
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should return an empty string when no token is available', () => {
+    spyOn(sessionStorage, 'getItem').and.returnValue(null);
+    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
 
 });

@@ -1,17 +1,22 @@
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { EncryptionService } from '../services/encryption.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { MediaService } from './media.service';
 
 describe('MediaService', () => {
-  let service: MediaService;
+  let mediaService: MediaService;
+  let router: Router;
+  let encryptionService: EncryptionService;
   let httpTestingController: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [MediaService],
+      providers: [MediaService, EncryptionService],
     });
-    service = TestBed.inject(MediaService);
-    
+    mediaService = TestBed.inject(MediaService);
+    encryptionService = TestBed.inject(EncryptionService);
+    router = TestBed.inject(Router);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -20,14 +25,71 @@ describe('MediaService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(mediaService).toBeTruthy();
+  });
+
+  it('should return the token when it is valid', () => {
+    const encryptedSecret = 'str';
+    const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
+      
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); 
+
+    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
+  
+    const token = mediaService.token;
+  
+    expect(token).toBe('mockedToken');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+  
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+  
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const token = mediaService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = mediaService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should return an empty string when no token is available', () => {
+    spyOn(sessionStorage, 'getItem').and.returnValue(null);
+    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = mediaService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   it('should get image by product ID', () => {
     const productId = "1";
     const imageIDs = ["1", "2"]; // Replace with your dummy data
 
-    service.getImageByProductId(productId).subscribe((data) => {
+    mediaService.getImageByProductId(productId).subscribe((data) => {
       expect(data).toEqual(imageIDs);
     });
 
@@ -39,7 +101,7 @@ describe('MediaService', () => {
     const mediaId = "1";
     const imageBlob = new Blob(); 
 
-    service.getImageByMediaId(mediaId).subscribe((data) => {
+    mediaService.getImageByMediaId(mediaId).subscribe((data) => {
       expect(data).toEqual(imageBlob);
     });
 
@@ -55,7 +117,7 @@ describe('MediaService', () => {
     mediaForm.append('productId', productId);
     const response = null; 
     
-    service.uploadMedia(mediaForm).subscribe((data) => {
+    mediaService.uploadMedia(mediaForm).subscribe((data) => {
       expect(data).toEqual(response);
     });
 
@@ -67,7 +129,7 @@ describe('MediaService', () => {
     const mediaId = "1";
     const response = {}; // Replace with your dummy response
 
-    service.deleteMedia(mediaId).subscribe((data) => {
+    mediaService.deleteMedia(mediaId).subscribe((data) => {
       expect(data).toEqual(response);
     });
 

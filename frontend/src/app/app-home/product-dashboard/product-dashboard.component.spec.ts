@@ -14,6 +14,7 @@ import { ProductComponent } from '../product-listing/product/product.component';
 
 import { ProductService } from 'src/app/services/product.service';
 import { ToastrService } from 'ngx-toastr';
+import { ValidationService } from 'src/app/services/validation.service';
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; 
 
@@ -22,6 +23,7 @@ describe('ProductDashboardComponent', () => {
   let fixture: ComponentFixture<ProductDashboardComponent>;
   let productService: ProductService;
   let httpTestingController: HttpTestingController;
+  let validationService: ValidationService;
 
     // Create a mock MatDialogRef
     const mockDialogRef = {
@@ -39,6 +41,7 @@ describe('ProductDashboardComponent', () => {
       ],
       providers: [
         ProductService,
+        ValidationService,
         { provide: ToastrService, useValue: { error: jasmine.createSpy('error'), success: jasmine.createSpy('success') } },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
         { provide: MAT_DIALOG_DATA, useValue: {} }
@@ -54,6 +57,7 @@ describe('ProductDashboardComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
+    validationService = TestBed.inject(ValidationService);
     httpTestingController = TestBed.inject(HttpTestingController);
    });
 

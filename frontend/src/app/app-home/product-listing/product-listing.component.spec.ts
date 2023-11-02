@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -8,6 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from 'src/app/services/product.service';
+import { ValidationService } from 'src/app/services/validation.service';
 
 import { ProductListingComponent } from './product-listing.component';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -18,6 +20,7 @@ describe('ProductListingComponent', () => {
   let component: ProductListingComponent;
   let fixture: ComponentFixture<ProductListingComponent>;
   let productService: ProductService;
+  let validationService: ValidationService;
   let toastrService: ToastrService;
 
   const mockDialogRef = {
@@ -35,6 +38,7 @@ describe('ProductListingComponent', () => {
       ],
       providers: [
         ProductService,
+        ValidationService,
         { provide: ToastrService, useValue: { error: jasmine.createSpy('error'), success: jasmine.createSpy('success') } },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
         { provide: MAT_DIALOG_DATA, useValue: {} }
@@ -50,13 +54,14 @@ describe('ProductListingComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
+    validationService = TestBed.inject(ValidationService);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call getAllProducts() on init and display', () => {
+  it('should call getAllProducts() and display', fakeAsync(() => {
     spyOn(component, 'getAllProducts');
     const mockProducts = [
       { 
@@ -67,10 +72,15 @@ describe('ProductListingComponent', () => {
         quantity: 1,
       }
     ];
-    component.ngOnInit();
+    spyOn(productService, 'getAllProductsInfo').and.returnValue(of(mockProducts));
+    component.getAllProducts();
+    component.products = mockProducts;
+
+    tick();
+
     expect(component.getAllProducts).toHaveBeenCalled();
-    //expect(component.products).toEqual(mockProducts);
-  });
+    expect(component.products).toEqual(mockProducts);
+  }));
 
   it('should open product detail', () => {
     spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open

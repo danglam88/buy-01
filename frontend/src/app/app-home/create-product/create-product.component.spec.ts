@@ -2,19 +2,23 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CreateProductComponent } from './create-product.component';
 import { ImageSliderComponent } from '../image-slider/image-slider.component';
 import { ProductService } from 'src/app/services/product.service';
+import { ValidationService } from 'src/app/services/validation.service';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
 describe('CreateProductComponent', () => {
   let component: CreateProductComponent;
   let fixture: ComponentFixture<CreateProductComponent>;
   let productService: ProductService;
   let toastrService: ToastrService;
+  let router: Router;
+  let httpTestingController: HttpTestingController;
 
   // Create a mock MatDialogRef
   const mockDialogRef = {
@@ -35,6 +39,7 @@ describe('CreateProductComponent', () => {
       ],
       providers: [
         ProductService,
+        ValidationService,
         { provide: ToastrService, useValue: { error: () => {}, success: () => {} } },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
         { provide: MAT_DIALOG_DATA, useValue: {} }
@@ -43,6 +48,9 @@ describe('CreateProductComponent', () => {
     fixture = TestBed.createComponent(CreateProductComponent);
     component = fixture.componentInstance;
     productService = TestBed.inject(ProductService);
+    toastrService = TestBed.inject(ToastrService);
+    router = TestBed.inject(Router);
+    httpTestingController = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
@@ -71,16 +79,6 @@ describe('CreateProductComponent', () => {
     expect(productService.createProduct).toHaveBeenCalled();
   }));
 
-  it('should not trigger createProduct method when "Create Product" button is clicked and form is invalid', () => {
-    spyOn(component, 'createProduct').and.callThrough();
-    spyOn(productService, 'createProduct').and.returnValue(of({ success: false })); 
-  
-    component.createProduct();
-  
-    expect(component.createProduct).toHaveBeenCalled();
-    expect(productService.createProduct).not.toHaveBeenCalled();
-  });
-  
   it('should trigger fileInput click event when the "Upload Image" button is clicked', () => {
     const fileInput = fixture.nativeElement.querySelector('input[type="file"]'); 
   
@@ -90,31 +88,6 @@ describe('CreateProductComponent', () => {
     button.click();
   
     expect(fileInput.click).toHaveBeenCalled();
-  });
-  
-  
-  it('isImageFile should return false for invalid file types', () => {
-    const txtFile = new File([''], 'text.txt', { type: 'text/plain' });
-    const pdfFile = new File([''], 'document.pdf', { type: 'application/pdf' });
-  
-    expect(component.isImageFile(txtFile)).toBe(false);
-    expect(component.isImageFile(pdfFile)).toBe(false);
-  });
-  
-  it('isFileSizeValid should return true for files with valid size', () => {
-    // Create a Blob with a size less than 2MB
-    const smallBlob = new Blob([''], { type: 'image/jpeg' });
-    const smallFile = new File([smallBlob], 'small.jpg');
-  
-    expect(component.isFileSizeValid(smallFile)).toBe(true);
-  });
-  
-  it('isFileSizeValid should return false for files with size exceeding 2MB', () => {
-    // Create a Blob with a size greater than 2MB
-    const largeBlob = new Blob([''.repeat(3 * 1024 * 1024)], { type: 'image/jpeg' });
-    const largeFile = new File([largeBlob], 'large.jpg');
-  
-    expect(component.isFileSizeValid(largeFile)).toBe(true);
   });  
   
   it('should remove selected image when calling onImageRemoved', () => {

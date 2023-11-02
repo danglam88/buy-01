@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
+import { ValidationService } from 'src/app/services/validation.service';
 import { Product } from '../../Models/Product';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
@@ -39,6 +40,7 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private mediaService: MediaService,
+    private validationService: ValidationService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<ProductDetailComponent>,
     private builder: FormBuilder,
@@ -102,7 +104,7 @@ export class ProductDetailComponent implements OnInit {
           Validators.required,
           Validators.pattern(/^\d+(\.\d+)?$/),
           Validators.maxLength(10),
-          this.greaterThanZeroValidator(), // Custom validator for price
+          this.validationService.greaterThanZeroValidator(), // Custom validator for price
         ],
       ],
       quantity: [
@@ -111,7 +113,7 @@ export class ProductDetailComponent implements OnInit {
           Validators.required,
           Validators.pattern(/^[0-9]+$/),
           Validators.maxLength(10),
-          this.greaterThanZeroValidator(), // Custom validator for quantity
+          this.validationService.greaterThanZeroValidator(), // Custom validator for quantity
         ],
       ],
       description: [
@@ -342,9 +344,9 @@ export class ProductDetailComponent implements OnInit {
         const file = files[i];
 
         // Check the file type (allow only images)
-        if (this.isImageFile(file)) {
+        if (this.validationService.isImageFile(file)) {
           // Check the file size (limit to 2MB)
-          if (this.isFileSizeValid(file)) {
+          if (this.validationService.isFileSizeValid(file)) {
             this.displaySelectedImage(file);
             this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
           } else {
@@ -439,25 +441,5 @@ export class ProductDetailComponent implements OnInit {
   // Close modal
   closeModal(): void {
     this.dialogRef.close();
-  }
-
-  greaterThanZeroValidator(): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const value = parseFloat(control.value);
-      if (isNaN(value) || value <= 0) {
-        return { greaterThanZero: true };
-      }
-      return null;
-    };
-  }
-
-  isImageFile(file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    return allowedTypes.includes(file.type);
-  }
-
-  isFileSizeValid(file: File): boolean {
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-    return file.size <= maxSizeInBytes;
   }
 }

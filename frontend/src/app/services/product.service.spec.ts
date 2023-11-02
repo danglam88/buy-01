@@ -1,12 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 
 import { ProductService } from './product.service';
 import { EncryptionService } from '../services/encryption.service';
 
 describe('ProductService', () => {
   let productService: ProductService;
+  let encryptionService: EncryptionService;
   let httpTestingController: HttpTestingController;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -15,6 +18,8 @@ describe('ProductService', () => {
     });
 
     productService = TestBed.inject(ProductService);
+    router = TestBed.inject(Router);
+    encryptionService = TestBed.inject(EncryptionService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -24,6 +29,63 @@ describe('ProductService', () => {
 
   it('should be created', () => {
     expect(productService).toBeTruthy();
+  });
+
+  it('should return the token when it is valid', () => {
+    const encryptedSecret = 'str';
+    const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
+      
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); 
+
+    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
+  
+    const token = productService.token;
+  
+    expect(token).toBe('mockedToken');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+  
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+  
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
+  it('should return an empty string when no token is available', () => {
+    spyOn(sessionStorage, 'getItem').and.returnValue(null);
+    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   it('should retrieve all products', () => {

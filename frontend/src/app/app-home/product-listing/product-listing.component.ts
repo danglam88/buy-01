@@ -30,7 +30,6 @@ export class ProductListingComponent implements OnInit {
       });
     }
   
-
   ngOnInit(): void {
     // Get all products and display them
     this.getAllProducts();

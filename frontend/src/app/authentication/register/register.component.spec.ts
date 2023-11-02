@@ -7,35 +7,43 @@ import { Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ToastrModule } from 'ngx-toastr';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { MatSelectModule } from '@angular/material/select'; 
+import { ValidationService } from 'src/app/services/validation.service';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
   let regService: RegistratonService;
+  let validationService: ValidationService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
       providers: [
         FormBuilder,
-        { provide: ToastrService, useClass: ToastrServiceStub},
+        { provide: ToastrService, useClass: ToastrServiceStub },
+        ValidationService, // Provide ValidationService here
         RegistratonService,
         Router,
-        ToastrService
+        ToastrService,
       ],
       imports: [
         ReactiveFormsModule,
         HttpClientTestingModule,
         AngularMaterialModule,
-        ToastrModule.forRoot()
-      ]
+        ToastrModule.forRoot(),
+      ],
     }).compileComponents();
-
+  
     fixture = TestBed.createComponent(RegisterComponent);
     regService = TestBed.inject(RegistratonService);
     component = fixture.componentInstance;
+    validationService = TestBed.inject(ValidationService);
     fixture.detectChanges();
   });
+  
 
   class ToastrServiceStub {
     success(message: string) {
