@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +9,7 @@ import { Observable } from 'rxjs';
 export class RegistratonService {
   constructor(private httpClient: HttpClient) { }
 
-  private regUrl="http://localhost:8080/reg";
-
   register(user: any): Observable<object> {
-    return this.httpClient.post(`${this.regUrl}`, user);
+    return this.httpClient.post(`${environment.regUrl}`, user);
   }
 }

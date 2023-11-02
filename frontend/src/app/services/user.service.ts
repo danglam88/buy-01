@@ -3,16 +3,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private userInfoUrl="http://localhost:8080/users/userInfo";
-  private updateUserUrl="http://localhost:8080/users/";
-  private deleteUserUrl="http://localhost:8080/users/";
-  private avatarUserUrl="http://localhost:8080/users/avatar/";
-
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService, 
@@ -38,7 +34,7 @@ export class UserService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.get(`${this.userInfoUrl}`, { headers });
+    return this.httpClient.get(`${environment.userInfoUrl}`, { headers });
   }
 
   updateUser(user: any, id: string): Observable<object> {
@@ -47,7 +43,7 @@ export class UserService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.put(`${this.updateUserUrl}` + id, user, { headers });
+    return this.httpClient.put(`${environment.userUrl}` + id, user, { headers });
   }
 
   deleteUser(user: any): Observable<object> {
@@ -56,7 +52,7 @@ export class UserService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.delete(`${this.deleteUserUrl}` + user.id, { headers });
+    return this.httpClient.delete(`${environment.userUrl}` + user.id, { headers });
   }
 
   getUserAvatar(userId: string): Observable<Blob> {
@@ -65,7 +61,7 @@ export class UserService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.get(`${this.avatarUserUrl}` + userId , { headers, responseType: 'blob' });
+    return this.httpClient.get(`${environment.avatarUserUrl}` + userId , { headers, responseType: 'blob' });
   }
 
 }

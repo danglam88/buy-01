@@ -3,17 +3,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
   private productList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-  private allProductsInfoUrl="http://localhost:8081/products";
-  private sellerProductsInfoUrl="http://localhost:8081/products/seller";
-  private createProductUrl="http://localhost:8081/products";
-  private updateProductUrl="http://localhost:8081/products/";
-  private deleteProductUrl="http://localhost:8081/products/";
+  
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
@@ -43,7 +40,7 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-     return this.httpClient.get(`${this.allProductsInfoUrl}`, { headers });
+     return this.httpClient.get(`${environment.productUrl}`, { headers });
   }
 
   getSellerProductsInfo(): Observable<object> {
@@ -51,7 +48,7 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-     return this.httpClient.get(`${this.sellerProductsInfoUrl}`, { headers });
+     return this.httpClient.get(`${environment.sellerProductUrl}`, { headers });
   }
 
   createProduct(product: any): Observable<Object> {
@@ -59,7 +56,7 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-    return this.httpClient.post(`${this.createProductUrl}`, product, { headers });
+    return this.httpClient.post(`${environment.productUrl}`, product, { headers });
   }
 
   updateProduct(product: any): Observable<object> {
@@ -68,7 +65,7 @@ export class ProductService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.put(`${this.updateProductUrl}` + product.id, product, { headers });
+    return this.httpClient.put(`${environment.productUrl}/` + product.id, product, { headers });
   }
 
   deleteProduct(user: any): Observable<object> {
@@ -77,7 +74,7 @@ export class ProductService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.delete(`${this.deleteProductUrl}` + user.id, { headers });
+    return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
   }
 
   // Get the product list as an observable

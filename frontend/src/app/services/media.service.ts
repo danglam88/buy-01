@@ -3,15 +3,12 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MediaService {
-  private uploadMediaUrl="http://localhost:8082/media";
-  private mediaByProductIdUrl="http://localhost:8082/media/product/";
-  private deleteMediaUrl="http://localhost:8082/media/";
-  private mediaByMediaIdUrl="http://localhost:8082/media/";
   productMediaUpdated = new EventEmitter<any>();
   productMediaDeleted = new EventEmitter<any>();
 
@@ -40,7 +37,7 @@ export class MediaService {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
 
-    return this.httpClient.get(`${this.mediaByProductIdUrl}` + productId,  { headers });
+    return this.httpClient.get(`${environment.productMediaUrl}` + productId,  { headers });
   }
 
   getImageByMediaId(mediaId: any): Observable<Blob> {
@@ -48,7 +45,7 @@ export class MediaService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-    return this.httpClient.get<Blob>(`${this.mediaByMediaIdUrl}` + mediaId, { headers: headers, responseType: 'blob' as 'json' })
+    return this.httpClient.get<Blob>(`${environment.mediaUrl}/` + mediaId, { headers: headers, responseType: 'blob' as 'json' })
     
   }
 
@@ -57,7 +54,7 @@ export class MediaService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-    return this.httpClient.post(`${this.uploadMediaUrl}`,  media, { headers });
+    return this.httpClient.post(`${environment.mediaUrl}`,  media, { headers });
   }
 
   deleteMedia(mediaId: any): Observable<object> {
@@ -65,6 +62,6 @@ export class MediaService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-    return this.httpClient.delete(`${this.deleteMediaUrl}` + mediaId, { headers });
+    return this.httpClient.delete(`${environment.mediaUrl}/` + mediaId, { headers });
   }
 }
