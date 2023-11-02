@@ -50,7 +50,7 @@ describe('CreateProductComponent', () => {
         ProductService,
         ValidationService,
         { provide: ToastrService, useClass: ToastrServiceStub },
-        { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
+        { provide: MatDialogRef, useValue: mockDialogRef }, 
         { provide: MAT_DIALOG_DATA, useValue: {} }
       ],
     });
@@ -67,9 +67,13 @@ describe('CreateProductComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should trigger createProduct method when "Create Product" button is clicked', fakeAsync(() => {
+  it('should create product form', () => {
+    expect(component.createProductForm).toBeTruthy();
+  });
+
+  it('should call createProduct() "Create Product" when form is valid and there is at least 1 selectedFile', fakeAsync(() => {
     spyOn(component, 'createProduct').and.callThrough();
-    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); // Simulate a successful response
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
      
     component.createProductForm.controls.name.setValue('Valid Name');
     component.createProductForm.controls.price.setValue('10.00');
@@ -88,7 +92,7 @@ describe('CreateProductComponent', () => {
     expect(productService.createProduct).toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401', fakeAsync(() => {
+  it('should handle error 403 or 401 for createProduct()', fakeAsync(() => {
     spyOn(component, 'createProduct').and.callThrough();
     const errorResponse = {
       status: 403,
@@ -118,7 +122,7 @@ describe('CreateProductComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
   }));
 
-  it('should not trigger createProduct method when "Create Product" button is clicked and form is invalid', fakeAsync(() => {
+  it('should show error message when name in form is invalid', fakeAsync(() => {
     spyOn(component, 'createProduct').and.callThrough();
     spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
     spyOn(toastrService, 'error');
@@ -141,9 +145,99 @@ describe('CreateProductComponent', () => {
     expect(productService.createProduct).not.toHaveBeenCalled(); 
     expect(toastrService.error).toHaveBeenCalledWith('Name must be between 1 and 50 characters.'); 
   }));
-  
 
-  it('should trigger fileInput click event when the "Upload Image" button is clicked', () => {
+  it('should show error message when price in form is invalid', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
+    spyOn(toastrService, 'error');
+   
+    component.createProductForm.get('price').setErrors({ 'required': true });
+    component.createProductForm.controls.name.setValue('Valid Name');
+    component.createProductForm.controls.quantity.setValue('10');
+    component.createProductForm.controls.description.setValue('Valid description');
+  
+    component.selectedFiles.push({
+      file: new File([], 'image.jpg'),
+      url: 'test-url',
+    });
+
+    component.createProduct();
+  
+    tick();
+  
+    expect(component.createProduct).toHaveBeenCalled(); 
+    expect(productService.createProduct).not.toHaveBeenCalled(); 
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid price.'); 
+  }));
+  
+  it('should show error message when quantity in form is invalid', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
+    spyOn(toastrService, 'error');
+   
+    component.createProductForm.get('quantity').setErrors({ 'required': true });
+    component.createProductForm.controls.name.setValue('Valid Name');
+    component.createProductForm.controls.price.setValue('10');
+    component.createProductForm.controls.description.setValue('Valid description');
+  
+    component.selectedFiles.push({
+      file: new File([], 'image.jpg'),
+      url: 'test-url',
+    });
+
+    component.createProduct();
+  
+    tick();
+  
+    expect(component.createProduct).toHaveBeenCalled(); 
+    expect(productService.createProduct).not.toHaveBeenCalled(); 
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid quantity.'); 
+  }));
+
+  it('should show error message when description in form is invalid', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
+    spyOn(toastrService, 'error');
+   
+    component.createProductForm.get('description').setErrors({ 'required': true });
+    component.createProductForm.controls.name.setValue('Valid Name');
+    component.createProductForm.controls.quantity.setValue('10');
+    component.createProductForm.controls.price.setValue('10');
+  
+    component.selectedFiles.push({
+      file: new File([], 'image.jpg'),
+      url: 'test-url',
+    });
+
+    component.createProduct();
+  
+    tick();
+  
+    expect(component.createProduct).toHaveBeenCalled(); 
+    expect(productService.createProduct).not.toHaveBeenCalled(); 
+    expect(toastrService.error).toHaveBeenCalledWith('Description must be between 1 and 1000 characters.'); 
+  }));
+
+  it('should show error message when there are no image file to upload', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
+    spyOn(toastrService, 'error');
+   
+    component.createProductForm.controls.name.setValue('Valid Name');
+    component.createProductForm.controls.quantity.setValue('10');
+    component.createProductForm.controls.price.setValue('10');
+    component.createProductForm.controls.description.setValue('Valid Description');
+
+    component.createProduct();
+  
+    tick();
+  
+    expect(component.createProduct).toHaveBeenCalled(); 
+    expect(productService.createProduct).not.toHaveBeenCalled(); 
+    expect(toastrService.error).toHaveBeenCalledWith('Please upload at least one image.'); 
+  }));
+
+  it('should call fileInput() click event when "Upload Image" button is clicked', () => {
     const fileInput = fixture.nativeElement.querySelector('input[type="file"]'); 
   
     const button = fixture.nativeElement.querySelector('.upload-button');
@@ -161,7 +255,7 @@ describe('CreateProductComponent', () => {
     expect(component.selectedFiles.length).toBe(0);
   });
 
-  it('should add a selected file when calling onFileSelected with a valid image', () => {
+  it('should add a selected file when calling onFileSelected() with a valid image', () => {
     const file = new File([''], 'image.jpg', { type: 'image/jpeg' });
     const event = {
       target: { files: [file] }
@@ -171,7 +265,6 @@ describe('CreateProductComponent', () => {
   });
 
   it('should show app-image-slider when selectedFiles has items', () => {
-    // Simulate selected files
     component.selectedFiles = [{ file: new File([''], 'image.jpg'), url: 'test-url' }];
     fixture.detectChanges();
 
@@ -206,5 +299,4 @@ describe('CreateProductComponent', () => {
     expect(previewImage).toBeTruthy();
     expect(previewImage.getAttribute('src')).toContain('uploadPhoto.jpg');
   });
-
 });

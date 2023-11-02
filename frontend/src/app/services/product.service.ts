@@ -9,8 +9,6 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ProductService {
-  private productList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-  
   private allProductsInfoUrl="http://localhost:8081/products";
   private sellerProductsInfoUrl="http://localhost:8081/products/seller";
   private createProductUrl="http://localhost:8081/products";

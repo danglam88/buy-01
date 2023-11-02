@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -16,12 +17,18 @@ import { ProductDetailComponent } from '../product-detail/product-detail.compone
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 
+class ToastrServiceStub {
+  error(message: string) {}
+  success(message: string) {}
+}
+
 describe('ProductListingComponent', () => {
   let component: ProductListingComponent;
   let fixture: ComponentFixture<ProductListingComponent>;
   let productService: ProductService;
   let validationService: ValidationService;
   let toastrService: ToastrService;
+  let router: Router;
 
   const mockDialogRef = {
     open: jasmine.createSpy('open')
@@ -39,7 +46,7 @@ describe('ProductListingComponent', () => {
       providers: [
         ProductService,
         ValidationService,
-        { provide: ToastrService, useValue: { error: jasmine.createSpy('error'), success: jasmine.createSpy('success') } },
+        { provide: ToastrService, useClass: ToastrServiceStub },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
         { provide: MAT_DIALOG_DATA, useValue: {} }
       ],
@@ -55,10 +62,23 @@ describe('ProductListingComponent', () => {
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
     validationService = TestBed.inject(ValidationService);
+    toastrService = TestBed.inject(ToastrService);
+    router = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should subscribe to productCreated event and call getAllProducts() when productCreated is emitted', () => {
+    spyOn(component, 'getAllProducts');
+    const productCreatedEventSpy = spyOn(productService.productCreated, 'subscribe');
+
+    productCreatedEventSpy.and.callThrough(); // Just pass the callback through
+
+    productService.productCreated.emit(true);
+
+    expect(component.getAllProducts).toHaveBeenCalled();
   });
 
   it('should call getAllProducts() and display', fakeAsync(() => {
@@ -82,6 +102,26 @@ describe('ProductListingComponent', () => {
     expect(component.products).toEqual(mockProducts);
   }));
 
+  it('should handle error with status 403 or 401 for getAllProducts()', fakeAsync(() => {
+    spyOn(component, 'getAllProducts').and.callThrough();
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
+
+    spyOn(productService, 'getAllProductsInfo').and.returnValue(throwError(errorResponse));
+    spyOn(toastrService, 'error');
+    spyOn(router, 'navigate');
+
+    component.getAllProducts();
+    tick();
+
+    expect(component.getAllProducts).toHaveBeenCalled();
+    expect(productService.getAllProductsInfo).toHaveBeenCalled();
+    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
+    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+  }));
+
   it('should open product detail', () => {
     spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open
     const mockProduct = {
@@ -96,5 +136,11 @@ describe('ProductListingComponent', () => {
     component.openProductDetail(mockProduct);
     expect(component['dialog'].open).toHaveBeenCalled(); // Access the dialog service directly
   });
-  
+
+  it('should show <p>There are no products!</p> when product is empty', () => {
+    component.products = [];
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('p').textContent).toContain('There are no products!');
+  });
 });

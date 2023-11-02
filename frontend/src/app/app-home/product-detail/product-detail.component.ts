@@ -238,7 +238,6 @@ export class ProductDetailComponent implements OnInit {
     if (this.noOfImages + this.selectedFiles.length > 5) {
       this.toastr.error('Image Limit Exceeded: You can only add a maximum of 5 images');
     } else {
-      console.log("this.selectedFiles: ", this.selectedFiles)
       this.saveEachSelectedFile(this.product.id, 0)
       this.mediaService.productMediaUpdated.emit(true);
     }

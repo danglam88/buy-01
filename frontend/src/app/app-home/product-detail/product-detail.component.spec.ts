@@ -7,7 +7,7 @@ import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ProductDetailComponent } from './product-detail.component';
 import {  MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormsModule, ReactiveFormsModule, FormControl, Validators, FormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 import { ProductService } from 'src/app/services/product.service';
@@ -17,12 +17,8 @@ import { ValidationService } from 'src/app/services/validation.service';
 import { ToastrService } from 'ngx-toastr';
 
 class ToastrServiceStub {
-  error(message: string) {
-    // Do nothing in the stub
-  }
-  success(message: string) {
-    // Do nothing in the stub
-  }
+  error(message: string) {}
+  success(message: string) {}
 }
 
 describe('ProductDetailComponent', () => {
@@ -52,7 +48,6 @@ describe('ProductDetailComponent', () => {
     matDialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
     matDialog = jasmine.createSpyObj('MatDialog', ['open']);
        
-
     TestBed.configureTestingModule({
       declarations: [ProductDetailComponent, ConfirmationDialogComponent],
       providers: [
@@ -92,17 +87,57 @@ describe('ProductDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should subscribe to productMediaUpdated event when emitted', () => {
+    spyOn(component, 'getProductImages');
+    const productMediaUpdatedEventSpy = spyOn(mediaService.productMediaUpdated, 'subscribe');
+
+    productMediaUpdatedEventSpy.and.callThrough(); 
+
+    mediaService.productMediaUpdated.emit(true);
+
+    expect(component.getProductImages).toHaveBeenCalled();
+  });
+
+  it('should return the user role', () => {
+    const encryptedSecret = 'str';
+    const decryptedSecret = JSON.stringify({ role: 'SELLER' });
+      
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate'); 
+
+    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
+  
+    const userRole = component.userRole;
+  
+    expect(userRole).toEqual('SELLER');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return an empty string when no encrypted secret is stored', () => {
+      spyOn(sessionStorage, 'getItem').and.returnValue(null); 
+      const userRole = component.userRole;
+      expect(userRole).toEqual('');
+  });
+
+  it('should navigate to login when the secret is invalid', () => {
+    const encryptedSecret = 'str';
+  
+    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
+  
+    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+  
+    const token = productService.token;
+  
+    expect(token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+  });
+  
   it('should create product form', () => {
     expect(component.productDetailForm).toBeTruthy();
   });
 
-  it('should return an empty string when no encrypted secret is stored', () => {
-    spyOn(sessionStorage, 'getItem').and.returnValue(null); // Simulate no encrypted secret
-    const userRole = component.userRole;
-    expect(userRole).toEqual('');
-  });
-
- 
   it('should call getProductImages() and assign to productImages to display', fakeAsync(() => {
     spyOn(component, 'getProductImages').and.callThrough();
   
@@ -114,7 +149,7 @@ describe('ProductDetailComponent', () => {
     spyOn(mediaService, 'getImageByProductId').and.returnValue(of(['1', '2']));
     spyOn(mediaService, 'getImageByMediaId').and.callFake((mediaId: string) => {
         const blob = new Blob([mockImages[mediaId]], { type: 'image/jpeg' });
-        return of(blob); // Simulate a successful result
+        return of(blob); 
     });
   
     component.getProductImages('productId');
@@ -125,7 +160,7 @@ describe('ProductDetailComponent', () => {
     expect(component.productImages).toEqual(mockImages);
   }));
   
-  it('should update name field', () => {
+  it('should update name', () => {
     const fieldName = 'name';
     const fieldValue = 'New Product Name';
   
@@ -134,9 +169,84 @@ describe('ProductDetailComponent', () => {
     component.productDetailForm.controls[fieldName].setValue(fieldValue);
     component.product = {  
       id: '1',
-      name: fieldName,
-      description: 'Mock Product 1 description',
+      name: fieldValue,
+      description: 'Mock Product Description',
       price: 100,
+      quantity: 10,
+      editable: true
+    };
+  
+    spyOn(component, 'updateField').and.callThrough();
+  
+   component.updateField(fieldName);
+  
+    expect(component.updateField).toHaveBeenCalled();
+    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
+    expect(component.editingField).toBeNull();
+  });
+
+  it('should update price', () => {
+    const fieldName = 'price';
+    const fieldValue = 10;
+  
+    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
+  
+    component.productDetailForm.controls[fieldName].setValue(fieldValue);
+    component.product = {  
+      id: '1',
+      name: 'Mock Product Name',
+      description: 'Mock Product Description',
+      price: fieldValue,
+      quantity: 10,
+      editable: true
+    };
+  
+    spyOn(component, 'updateField').and.callThrough();
+  
+   component.updateField(fieldName);
+  
+    expect(component.updateField).toHaveBeenCalled();
+    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
+    expect(component.editingField).toBeNull();
+  });
+
+  it('should update quantity', () => {
+    const fieldName = 'quantity';
+    const fieldValue = 10;
+  
+    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
+  
+    component.productDetailForm.controls[fieldName].setValue(fieldValue);
+    component.product = {  
+      id: '1',
+      name: 'Mock Product Name',
+      description: 'Mock Product Description',
+      price: 10,
+      quantity: fieldValue,
+      editable: true
+    };
+  
+    spyOn(component, 'updateField').and.callThrough();
+  
+   component.updateField(fieldName);
+  
+    expect(component.updateField).toHaveBeenCalled();
+    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
+    expect(component.editingField).toBeNull();
+  });
+
+  it('should update description', () => {
+    const fieldName = 'description';
+    const fieldValue = 'Mock Product Description';
+  
+    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
+  
+    component.productDetailForm.controls[fieldName].setValue(fieldValue);
+    component.product = {  
+      id: '1',
+      name: 'Mock Product Name',
+      description: fieldValue,
+      price: 10,
       quantity: 10,
       editable: true
     };
@@ -184,12 +294,12 @@ describe('ProductDetailComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
   }));
 
-  it('should open a confirmation dialog and delete the image when confirmed', fakeAsync(() => {
-    const mockCurrentImage = { mediaId: '123' }; // Mock current image data
+  it('delete image when user confirmed', fakeAsync(() => {
+    const mockCurrentImage = { mediaId: '123' }; 
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(true)); // Simulate user confirmation
+    dialogRef.afterClosed.and.returnValue(of(true)); 
 
-    spyOn(matDialog, 'open').and.returnValue(dialogRef); // Mock the dialog open method
+    spyOn(matDialog, 'open').and.returnValue(dialogRef); 
 
     spyOn(mediaService, 'deleteMedia').and.returnValue(of({ success: true }));
     spyOn(component, 'getProductImages');
@@ -207,12 +317,12 @@ describe('ProductDetailComponent', () => {
     expect(mediaService.productMediaDeleted.emit).toHaveBeenCalledWith(true);
   }));
 
-  it('should open a confirmation dialog and not delete the image when not confirmed', fakeAsync(() => {
-    const mockCurrentImage = { mediaId: '123' }; // Mock current image data
+  it('should not delete image when user does not confirmed', fakeAsync(() => {
+    const mockCurrentImage = { mediaId: '123' }; 
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(false)); // Simulate user not confirming
+    dialogRef.afterClosed.and.returnValue(of(false)); 
 
-    spyOn(matDialog, 'open').and.returnValue(dialogRef); // Mock the dialog open method
+    spyOn(matDialog, 'open').and.returnValue(dialogRef); 
 
     spyOn(mediaService, 'deleteMedia');
     spyOn(component, 'getProductImages');
@@ -232,15 +342,15 @@ describe('ProductDetailComponent', () => {
 
   it('should handle error with status 403 or 401 for deleteImage()', fakeAsync(() => {
     spyOn(component, 'deleteImage').and.callThrough();
-    const mockCurrentImage = { mediaId: '123' }; // Mock current image data
+    const mockCurrentImage = { mediaId: '123' }; 
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(true)); // Simulate user not confirming
+    dialogRef.afterClosed.and.returnValue(of(true)); 
     
     const errorResponse = {
       status: 403,
       error: 'Forbidden',
     };
-    spyOn(matDialog, 'open').and.returnValue(dialogRef); // Mock the dialog open method  
+    spyOn(matDialog, 'open').and.returnValue(dialogRef);  
     spyOn(mediaService, 'deleteMedia').and.returnValue(throwError(errorResponse));
     spyOn(toastrService, 'error');
     spyOn(router, 'navigate');
@@ -257,11 +367,11 @@ describe('ProductDetailComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
   }));
 
-  it('should open a confirmation dialog and delete the product when confirmed', fakeAsync(() => {
+  it('should delete product when confirmed', fakeAsync(() => {
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(true)); // Simulate user confirmation
+    dialogRef.afterClosed.and.returnValue(of(true)); 
 
-    spyOn(matDialog, 'open').and.returnValue(dialogRef); // Mock the dialog open method
+    spyOn(matDialog, 'open').and.returnValue(dialogRef); 
 
     spyOn(productService, 'deleteProduct').and.returnValue(of({ success: true }));
     spyOn(productService.productDeleted, 'emit');
@@ -277,12 +387,31 @@ describe('ProductDetailComponent', () => {
     expect(productService.productDeleted.emit).toHaveBeenCalledWith(true);
   }));
 
+  it('should not delete product when user does not confirmed', fakeAsync(() => {
+    const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+    dialogRef.afterClosed.and.returnValue(of(false)); 
+
+    spyOn(matDialog, 'open').and.returnValue(dialogRef); 
+    spyOn(productService, 'deleteProduct');
+    spyOn(productService.productDeleted, 'emit');
+
+    component.deleteProduct();
+
+    tick();
+
+    expect(matDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
+      data: { confirmationText: 'Delete this product?' },
+    });
+    expect(productService.deleteProduct).not.toHaveBeenCalled();
+    expect(productService.productDeleted.emit).not.toHaveBeenCalledWith(true);
+  }));
+
   it('should handle error with status 403 or 401 for deleteProduct', fakeAsync(() => {
     spyOn(component, 'deleteProduct').and.callThrough();
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(true)); // Simulate user confirmation
+    dialogRef.afterClosed.and.returnValue(of(true)); 
 
-    spyOn(matDialog, 'open').and.returnValue(dialogRef); // Mock the dialog open method
+    spyOn(matDialog, 'open').and.returnValue(dialogRef);
     const errorResponse = {
       status: 403,
       error: 'Forbidden',
@@ -291,7 +420,6 @@ describe('ProductDetailComponent', () => {
     spyOn(productService, 'deleteProduct').and.returnValue(throwError(errorResponse));
     spyOn(toastrService, 'error');
     spyOn(router, 'navigate');
-
 
     component.deleteProduct();
     tick();
@@ -306,7 +434,7 @@ describe('ProductDetailComponent', () => {
 
   it('should save the selected files when the image limit is not exceeded', () => {
     const maxImageLimit = 5;
-    component.noOfImages = maxImageLimit - 2; // Simulate having space for selected files
+    component.noOfImages = maxImageLimit - 2; 
     const selectedFiles = [{ 
       file: new File([], 'image1.jpg'),
       url: 'image1.jpg',
@@ -323,7 +451,7 @@ describe('ProductDetailComponent', () => {
 
   it('shoud not save the selected files when the image limit is exceeded', () => {
     const maxImageLimit = 5;
-    component.noOfImages = maxImageLimit + 2; // Simulate exceeding space for selected files
+    component.noOfImages = maxImageLimit + 2; 
     const selectedFiles = [{ 
       file: new File([], 'image1.jpg'),
       url: 'image1.jpg',
@@ -395,61 +523,21 @@ describe('ProductDetailComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
   }));
 
-   it('should return the token when it is valid', () => {
-    const encryptedSecret = 'str';
-    const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
-      
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
-    const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); 
-
-    spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
-  
-    const token = productService.token;
-  
-    expect(token).toBe('mockedToken');
-    expect(navigateSpy).not.toHaveBeenCalled();
+  it('should initialize currentIndex to 0', () => {
+    expect(component.currentIndexOfImageSlider).toEqual(0);
   });
 
-  it('should navigate to login when the secret is invalid', () => {
-    const encryptedSecret = 'str';
-  
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
-  
-    const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
-  
-    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
-  
-    const token = productService.token;
-  
-    expect(token).toBe('');
-    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
-  });
-  
-  it('should navigate to login when the secret is invalid', () => {
-    const encryptedSecret = 'str';
-  
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
-    spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
-  
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
-  
-    const token = productService.token;
-  
-    expect(token).toBe('');
-    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
-  });
-  
-  it('should return an empty string when no token is available', () => {
-    spyOn(sessionStorage, 'getItem').and.returnValue(null);
-    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
-  
-    const token = productService.token;
-  
-    expect(token).toBe('');
-    expect(navigateSpy).not.toHaveBeenCalled();
+  it('should update currentIndex when moving to the previous slide', () => {
+    component.currentIndexOfImageSlider = 2;
+    component.noOfImages = 3;
+    component.previousSlide();
+    expect(component.currentIndexOfImageSlider).toEqual(1);
   });
 
+  it('should update currentIndex when moving to the next slide', () => {
+    component.currentIndexOfImageSlider = 1;
+    component.noOfImages = 2;
+    component.nextSlide();
+    expect(component.currentIndexOfImageSlider).toEqual(0);
+  });
 });

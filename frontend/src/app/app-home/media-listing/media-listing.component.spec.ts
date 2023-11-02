@@ -10,13 +10,10 @@ import { MediaComponent } from './media/media.component';
 import { of, throwError } from 'rxjs';
 
 class ToastrServiceStub {
-  error(message: string) {
-    // Do nothing in the stub
-  }
-  success(message: string) {
-    // Do nothing in the stub
-  }
+  error(message: string) {}
+  success(message: string) {}
 }
+
 describe('MediaListingComponent', () => {
   let component: MediaListingComponent;
   let fixture: ComponentFixture<MediaListingComponent>;
@@ -88,4 +85,63 @@ describe('MediaListingComponent', () => {
     expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
   }));
+
+  it('should handle error with status 403 or 401 for getImageByProductId', fakeAsync(() => {
+    spyOn(component, 'getProductMedia').and.callThrough();
+  
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
+
+    spyOn(mediaService, 'getImageByProductId').and.returnValue(of({ success: true }));
+    spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
+    spyOn(toastrService, 'error');
+    spyOn(router, 'navigate');
+
+    component.productId = '123';
+    component.getProductMedia(component.productId);
+    tick(250);
+
+    expect(component.getProductMedia).toHaveBeenCalled();
+    expect(mediaService.getImageByProductId).toHaveBeenCalled();
+    expect(mediaService.getImageByMediaId).toHaveBeenCalled();
+    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
+    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+  }));
+
+  it('should handle error with status 403 or 401 for getImageByMediaId', fakeAsync(() => {
+    spyOn(component, 'getProductMedia').and.callThrough();
+  
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
+
+    spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
+    spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
+    spyOn(toastrService, 'error');
+    spyOn(router, 'navigate');
+
+    component.productId = '123';
+    component.getProductMedia(component.productId);
+    tick(250);
+
+    expect(component.getProductMedia).toHaveBeenCalled();
+    expect(mediaService.getImageByProductId).toHaveBeenCalled();
+    expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
+    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
+    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+  }));
+  
+  it('should call getProductMedia() when deleteProduct is emitted', () => {
+    spyOn(component, 'getProductMedia');
+    const deleteMediaEventSpy = spyOn(mediaService.productMediaDeleted, 'subscribe');
+
+    deleteMediaEventSpy.and.callThrough(); // Just pass the callback through
+
+    mediaService.productMediaDeleted.emit(true);
+
+    expect(component.getProductMedia).toHaveBeenCalled();
+  });
 });
