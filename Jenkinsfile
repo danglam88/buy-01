@@ -5,7 +5,7 @@ pipeline {
 
     options {
         timestamps()  // Add timestamps to console output
-        timeout(time: 30, unit: 'MINUTES')  // Set a timeout of 1 hour for the entire pipeline
+        timeout(time: 30, unit: 'MINUTES')  // Set a timeout of 30 minutes for the entire pipeline
     }
 
     stages {
