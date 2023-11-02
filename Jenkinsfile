@@ -1,13 +1,5 @@
 def predefinedEmails = 'dang.lam@gritlab.ax'
 
-// Define a function to cleanup Docker artifacts with a custom timeout that works on both macOS and Ubuntu
-def cleanupDocker(timeoutSeconds) {
-    sh(script: """
-        docker-compose down --remove-orphans
-        docker system prune -f
-    """, returnStdout: true).trim()
-}
-
 pipeline {
     agent none // We define the specific agents within each stage
 
@@ -21,10 +13,11 @@ pipeline {
             agent { label 'master' } // This stage will be executed on the 'master' agent
             steps {
                 script {
-                    cleanupDocker()  // Cleanup any Docker artifacts from previous builds
-
                     // Execute the build commands
                     sh '''
+                    docker-compose down --remove-orphans
+                    docker system prune -f
+
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
 
@@ -50,10 +43,11 @@ pipeline {
                 script {
                     // Using try-catch for the deploy and potential rollback
                     try {
-                        cleanupDocker()  // Cleanup any Docker artifacts from previous builds
-
                         // Execute the deploy commands
                         sh '''
+                        docker-compose down --remove-orphans
+                        docker system prune -f
+
                         cd /mnt/myvolume
                         rm -rf *.tar
 
@@ -65,11 +59,12 @@ pipeline {
                         docker-compose up -d
                         '''
                     } catch (Exception e) {
-                        cleanupDocker()  // Cleanup any Docker artifacts from previous builds
-
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
                         sh '''
+                        docker-compose down --remove-orphans
+                        docker system prune -f
+
                         cd /mnt/myvolume
                         rm -rf *.tar
                         cp backup/*.tar .
