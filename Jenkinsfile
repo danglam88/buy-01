@@ -2,34 +2,15 @@ def predefinedEmails = 'dang.lam@gritlab.ax'
 
 // Define a function to cleanup Docker artifacts
 def cleanupDocker() {
-    // Using sh returnStdout: true to capture the output without failing the build
-    // when commands return a non-zero exit code
     sh(script: '''
         set +e  # Disable exit on error
-        if [ "$(docker ps -aq)" ]; then
-            docker rm -f $(docker ps -aq)
-        else
-            echo "No containers to remove."
-        fi
+        docker ps -aq | xargs -r docker rm -f  # Remove all containers if any exist
+        docker images -aq | xargs -r docker rmi -f  # Remove all images if any exist
+        docker volume ls -q | xargs -r docker volume rm  # Remove all volumes if any exist
         
-        if [ "$(docker images -aq)" ]; then
-            docker rmi -f $(docker images -aq)
-        else
-            echo "No images to remove."
-        fi
+        # List all networks, exclude default networks, and remove the rest if any exist
+        docker network ls --format "{{.ID}} {{.Name}}" | grep -v -E "(bridge|host|none)" | awk '{print $1}' | xargs -r docker network rm
         
-        if [ "$(docker volume ls -q)" ]; then
-            docker volume rm $(docker volume ls -q)
-        else
-            echo "No volumes to remove."
-        fi
-        
-        docker_networks=$(docker network ls -q)
-        if [ "$docker_networks" ]; then
-            docker network rm $docker_networks || true  # Ignore errors
-        else
-            echo "No networks to remove."
-        fi
         set -e  # Re-enable exit on error
     ''', returnStdout: true).trim()
 }
@@ -92,7 +73,7 @@ pipeline {
                         '''
                     } catch (Exception e) {
                         cleanupDocker()  // Cleanup any Docker artifacts from previous builds
-                        
+
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
                         sh '''
