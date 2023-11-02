@@ -10,10 +10,10 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
-                    docker rm -f \$(docker ps -aq)
-                    docker rmi -f \$(docker images -aq)
-                    docker volume rm \$(docker volume ls -q)
-                    docker network rm \$(docker network ls -q)
+                    docker rm -f \$(docker ps -aq) || true
+                    docker rmi -f \$(docker images -aq) || true
+                    docker volume rm \$(docker volume ls -q) || true
+                    docker network rm \$(docker network ls -q) || true
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
                     docker save -o user-microservice.tar buy-01-build-user-microservice
@@ -34,10 +34,10 @@ pipeline {
                     try {
                         // Execute the deploy commands
                         sh '''
-                        docker rm -f \$(docker ps -aq)
-                        docker rmi -f \$(docker images -aq)
-                        docker volume rm \$(docker volume ls -q)
-                        docker network rm \$(docker network ls -q)
+                        docker rm -f \$(docker ps -aq) || true
+                        docker rmi -f \$(docker images -aq) || true
+                        docker volume rm \$(docker volume ls -q) || true
+                        docker network rm \$(docker network ls -q) || true
                         cd /mnt/myvolume
                         if [ ! -d "/mnt/myvolume/backup" ]; then
                             mkdir -p /mnt/myvolume/backup
