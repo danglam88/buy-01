@@ -19,13 +19,21 @@ pipeline {
                     docker rmi -f \$(docker images -aq) || true
                     docker volume rm \$(docker volume ls -q) || true
                     docker network rm \$(docker network ls -q) || true
+
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
-                    docker save -o user-microservice.tar buy-01-pipeline-user-microservice
-                    docker save -o product-microservice.tar buy-01-pipeline-product-microservice
-                    docker save -o media-microservice.tar buy-01-pipeline-media-microservice
-                    docker save -o frontend.tar buy-01-pipeline-frontend
-                    /usr/bin/scp *.tar danglam@danglam.live:/mnt/myvolume
+
+                    docker tag buy-01-pipeline-user-microservice user-microservice:latest
+                    docker push user-microservice:latest
+
+                    docker tag buy-01-pipeline-product-microservice product-microservice:latest
+                    docker push product-microservice:latest
+
+                    docker tag buy-01-pipeline-media-microservice media-microservice:latest
+                    docker push media-microservice:latest
+
+                    docker tag buy-01-pipeline-frontend frontend:latest
+                    docker push frontend:latest
                     '''
                 }
             }
@@ -43,32 +51,34 @@ pipeline {
                         docker rmi -f \$(docker images -aq) || true
                         docker volume rm \$(docker volume ls -q) || true
                         docker network rm \$(docker network ls -q) || true
+
                         cd /mnt/myvolume
-                        if [ ! -d "/mnt/myvolume/backup" ]; then
-                            mkdir -p /mnt/myvolume/backup
-                        fi
-                        mv *.tar backup/
-                        docker load -i user-microservice.tar
-                        docker load -i product-microservice.tar
-                        docker load -i media-microservice.tar
-                        docker load -i frontend.tar
+
+                        docker pull user-microservice:latest
+                        docker pull product-microservice:latest
+                        docker pull media-microservice:latest
+                        docker pull frontend:latest
+
                         docker-compose up -d
                         '''
                     } catch (Exception e) {
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
                         sh '''
-                        docker rm -f \$(docker ps -aq)
-                        docker rmi -f \$(docker images -aq)
-                        docker volume rm \$(docker volume ls -q)
-                        docker network rm \$(docker network ls -q)
+                        docker rm -f \$(docker ps -aq) || true
+                        docker rmi -f \$(docker images -aq) || true
+                        docker volume rm \$(docker volume ls -q) || true
+                        docker network rm \$(docker network ls -q) || true
+
                         cd /mnt/myvolume
                         rm -rf *.tar
                         cp backup/*.tar .
+
                         docker load -i user-microservice.tar
                         docker load -i product-microservice.tar
                         docker load -i media-microservice.tar
                         docker load -i frontend.tar
+                        
                         docker-compose up -d
                         '''
                         // Rethrow the exception to mark the pipeline as failed
@@ -88,6 +98,16 @@ pipeline {
             script {
                 sh '''
                 cd /mnt/myvolume
+
+                docker save -o user-microservice.tar user-microservice
+                docker save -o product-microservice.tar product-microservice
+                docker save -o media-microservice.tar media-microservice
+                docker save -o frontend.tar frontend
+
+                if [ ! -d "/mnt/myvolume/backup" ]; then
+                    mkdir -p /mnt/myvolume/backup
+                fi
+
                 mv *.tar backup/
                 '''
             }
