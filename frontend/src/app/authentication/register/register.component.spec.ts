@@ -1,103 +1,80 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register.component';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegistratonService } from '../../services/registraton.service';
-import { Router } from '@angular/router';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AngularMaterialModule } from 'src/app/angular-material.module';
+import { ToastrService } from 'ngx-toastr';
 import { ToastrModule } from 'ngx-toastr';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientModule } from '@angular/common/http';
-import { MatSelectModule } from '@angular/material/select'; 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ValidationService } from 'src/app/services/validation.service';
+import { AngularMaterialModule } from 'src/app/angular-material.module';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
-  let regService: RegistratonService;
-  let validationService: ValidationService;
+  let toastrService: ToastrService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
       providers: [
-        FormBuilder,
-        { provide: ToastrService, useClass: ToastrServiceStub },
-        ValidationService, // Provide ValidationService here
         RegistratonService,
-        Router,
         ToastrService,
+        ValidationService
       ],
-      imports: [
-        ReactiveFormsModule,
+      imports: [FormsModule, 
+        ReactiveFormsModule, 
+        ToastrModule.forRoot(), 
         HttpClientTestingModule,
-        AngularMaterialModule,
-        ToastrModule.forRoot(),
-      ],
-    }).compileComponents();
-  
+        AngularMaterialModule]
+    })
+      .compileComponents();
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(RegisterComponent);
-    regService = TestBed.inject(RegistratonService);
     component = fixture.componentInstance;
-    validationService = TestBed.inject(ValidationService);
+    toastrService = TestBed.inject(ToastrService); 
+    spyOn(toastrService, 'error'); 
     fixture.detectChanges();
   });
-  
 
-  class ToastrServiceStub {
-    success(message: string) {
-      
-    }
-  
-    error(message: string) {
-      
-    }
-  
-  }
-
-  it('should create the RegisterComponent', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have initialized the form with the expected fields', () => {
-    expect(component.registerform).toBeDefined();
-    expect(component.registerform.get('name')).toBeDefined();
-    expect(component.registerform.get('email')).toBeDefined();
-    expect(component.registerform.get('password')).toBeDefined();
-    expect(component.registerform.get('role')).toBeDefined();
-  });
-
-  it('should create a valid form', () => {
-    const nameControl = component.registerform.get('name');
-    nameControl.setValue('Ashley');
-
-    const emailControl = component.registerform.get('email');
-    emailControl.setValue('Ashley@gmail.com');
-
-    const passwordControl = component.registerform.get('password');
-    passwordControl.setValue('Ashley1234!');
-
-    const roleControl = component.registerform.get('role');
-    roleControl.setValue('Seller');
-
-    expect(component.registerform.valid).toBeTruthy();
-  });
-
-  it('should call register() method and perform registration', () => {
-    const spy = spyOn(regService, 'register').and.callThrough();
-
-    component.registerform.setValue({
-      name: 'Ashley',
-      email: 'Ashley@gmail.com',
-      password: 'Ashley1234!',
-      role: 'Seller'
-    });
-
+  it('should display error for invalid name input', () => {
+    component.registerform.controls['name'].setValue(''); 
     component.register();
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid name (maximum 50 characters)');
   });
 
-  afterEach(() => {
-    TestBed.resetTestingModule();
+  it('should display error for invalid email input', () => {
+    component.registerform.controls['name'].setValue('Ashley'); 
+    component.registerform.controls['email'].setValue('invalidEmail'); 
+    component.register();
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid email');
   });
+
+  it('should display error for invalid password input', () => {
+    component.registerform.controls['name'].setValue('Ashley'); 
+    component.registerform.controls['email'].setValue('ashley@gmail.com'); 
+    component.registerform.controls['password'].setValue('weak'); 
+    component.register();
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid password (from 6 to 50 characters) which contains at least one uppercase letter, one lowercase letter, one digit and one special character (@$!%*?&)');
+  });
+
+  it('should display error for missing role selection', () => {
+    component.registerform.controls['name'].setValue('Ashley'); 
+    component.registerform.controls['email'].setValue('ashley@gmail.com'); 
+    component.registerform.controls['password'].setValue('Ashley1234!'); 
+    component.registerform.controls['role'].setValue(''); 
+    component.register();
+    expect(toastrService.error).toHaveBeenCalledWith('Please select a role');
+  });
+
+  it('should not allow registration with invalid form data', () => {
+    component.register();
+    expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid name (maximum 50 characters)');
+  });
+
 });
