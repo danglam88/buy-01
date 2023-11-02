@@ -1,18 +1,31 @@
 def predefinedEmails = 'dang.lam@gritlab.ax'
 
-// Define a function to cleanup Docker artifacts
-def cleanupDocker() {
-    sh(script: '''
+// Define a function to cleanup Docker artifacts with a custom timeout that works on both macOS and Ubuntu
+def cleanupDocker(timeoutSeconds) {
+    sh(script: """
         set +e  # Disable exit on error
-        docker ps -aq | /usr/bin/xargs -r docker rm -f  # Remove all containers if any exist
-        docker images -aq | /usr/bin/xargs -r docker rmi -f  # Remove all images if any exist
-        docker volume ls -q | /usr/bin/xargs -r docker volume rm  # Remove all volumes if any exist
-        
-        # List all networks, exclude default networks, and remove the rest if any exist
-        docker network ls --format "{{.ID}} {{.Name}}" | /usr/bin/grep -v -E "(bridge|host|none)" | /usr/bin/awk '{print $1}' | /usr/bin/xargs -r docker network rm
-        
+        set -x  # Enable verbose output
+
+        ( 
+            docker ps -aq | while read line; do if [ -n "$line" ]; then echo $line | xargs docker rm -f; fi; done
+            docker images -aq | while read line; do if [ -n "$line" ]; then echo $line | xargs docker rmi -f; fi; done
+            docker volume ls -q | while read line; do if [ -n "$line" ]; then echo $line | xargs docker volume rm; fi; done
+            
+            # List all networks, exclude default networks, and remove the rest if any exist
+            docker network ls --format "{{.ID}} {{.Name}}" | grep -v -E "(bridge|host|none)" | while read line; do if [ -n "$line" ]; then echo $line | awk '{print $1}' | xargs docker network rm; fi; done
+        ) & cleanup_pid=$!
+
+        # macOS doesn't support the timeout command out-of-the-box, and sleep doesn't have the ability to send signals.
+        # We use perl as a cross-platform alternative to the timeout command.
+        perl -e 'alarm shift; exec @ARGV' "$timeoutSeconds" sh -c 'wait $cleanup_pid'
+        cleanup_exit_code=$?
+
+        if [ $cleanup_exit_code -eq 142 ]; then  # If exit code is 142, it means the timeout was reached
+            echo "Cleanup process timed out after ${timeoutSeconds} seconds"
+        fi
+
         set -e  # Re-enable exit on error
-    ''', returnStdout: true).trim()
+    """, returnStdout: true).trim()
 }
 
 pipeline {
