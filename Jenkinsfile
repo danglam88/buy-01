@@ -1,3 +1,5 @@
+def predefinedEmails = 'dang.lam@gritlab.ax'
+
 pipeline {
     agent none // We define the specific agents within each stage
 
@@ -7,7 +9,7 @@ pipeline {
             steps {
                 script {
                     // Execute the build commands
-                    bash """
+                    sh """
                     docker rm -f \$(docker ps -aq)
                     docker rmi -f \$(docker images -aq)
                     docker volume rm \$(docker volume ls -q)
@@ -31,7 +33,7 @@ pipeline {
                     // Using try-catch for the deploy and potential rollback
                     try {
                         // Execute the deploy commands
-                        bash """
+                        sh """
                         docker rm -f \$(docker ps -aq)
                         docker rmi -f \$(docker images -aq)
                         docker volume rm \$(docker volume ls -q)
@@ -73,6 +75,49 @@ pipeline {
         always {
             // Clean up actions, if any
             echo "The pipeline has completed execution."
+        }
+
+        failure {
+            script {
+                def culprits = currentBuild.rawBuild.getCulprits()*.getFullName().join(', ')
+                if (culprits) {
+                    mail to: "${culprits}, ${predefinedEmails}",
+                        subject: "Jenkins Build FAILURE: ${currentBuild.fullDisplayName}",
+                        body: '''Hello,
+
+The Jenkins build ${currentBuild.fullDisplayName} has failed.
+
+Best regards,
+Gritlab Jenkins
+'''
+                } else {
+                    mail to: "${predefinedEmails}",
+                        subject: "Jenkins Build FAILURE: ${currentBuild.fullDisplayName}",
+                        body: '''Hello,
+
+The Jenkins build ${currentBuild.fullDisplayName} has failed.
+
+Best regards,
+Gritlab Jenkins
+'''
+                }
+            }
+        }
+        
+        changed {
+            script {
+                if (currentBuild.resultIsBetterOrEqualTo('SUCCESS') && currentBuild.previousBuild.resultIsWorseOrEqualTo('FAILURE')) {
+                    mail to: "${predefinedEmails}",
+                         subject: "Jenkins Build RECOVERED: ${currentBuild.fullDisplayName}",
+                         body: '''Hello,
+
+The Jenkins build ${currentBuild.fullDisplayName} has recovered from failure.
+
+Best regards,
+Gritlab Jenkins
+'''
+                }
+            }
         }
     }
 }
