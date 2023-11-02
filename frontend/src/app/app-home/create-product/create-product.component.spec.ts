@@ -9,8 +9,17 @@ import { ImageSliderComponent } from '../image-slider/image-slider.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ValidationService } from 'src/app/services/validation.service';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { of, throwError  } from 'rxjs';
 import { Router } from '@angular/router';
+
+class ToastrServiceStub {
+  error(message: string) {
+    // Do nothing in the stub
+  }
+  success(message: string) {
+    // Do nothing in the stub
+  }
+}
 
 describe('CreateProductComponent', () => {
   let component: CreateProductComponent;
@@ -40,7 +49,7 @@ describe('CreateProductComponent', () => {
       providers: [
         ProductService,
         ValidationService,
-        { provide: ToastrService, useValue: { error: () => {}, success: () => {} } },
+        { provide: ToastrService, useClass: ToastrServiceStub },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
         { provide: MAT_DIALOG_DATA, useValue: {} }
       ],
@@ -78,6 +87,61 @@ describe('CreateProductComponent', () => {
     expect(component.createProduct).toHaveBeenCalled();
     expect(productService.createProduct).toHaveBeenCalled();
   }));
+
+  it('should handle error with status 403 or 401', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
+
+    spyOn(productService, 'createProduct').and.returnValue(throwError(errorResponse));
+    spyOn(toastrService, 'error');
+    spyOn(router, 'navigate');
+
+    component.createProductForm.controls.name.setValue('Valid Name');
+    component.createProductForm.controls.price.setValue('10.00');
+    component.createProductForm.controls.quantity.setValue('10');
+    component.createProductForm.controls.description.setValue('Valid description');
+  
+    component.selectedFiles.push({
+      file: new File([], 'image.jpg'),
+      url: 'test-url',
+    });
+
+    component.createProduct();
+    tick();
+
+    expect(component.createProduct).toHaveBeenCalled();
+    expect(productService.createProduct).toHaveBeenCalled();
+    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
+    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+  }));
+
+  it('should not trigger createProduct method when "Create Product" button is clicked and form is invalid', fakeAsync(() => {
+    spyOn(component, 'createProduct').and.callThrough();
+    spyOn(productService, 'createProduct').and.returnValue(of({ success: true })); 
+    spyOn(toastrService, 'error');
+   
+    component.createProductForm.get('name').setErrors({ 'required': true });
+    component.createProductForm.controls.price.setValue('10.00');
+    component.createProductForm.controls.quantity.setValue('10');
+    component.createProductForm.controls.description.setValue('Valid description');
+  
+    component.selectedFiles.push({
+      file: new File([], 'image.jpg'),
+      url: 'test-url',
+    });
+
+    component.createProduct();
+  
+    tick();
+  
+    expect(component.createProduct).toHaveBeenCalled(); 
+    expect(productService.createProduct).not.toHaveBeenCalled(); 
+    expect(toastrService.error).toHaveBeenCalledWith('Name must be between 1 and 50 characters.'); 
+  }));
+  
 
   it('should trigger fileInput click event when the "Upload Image" button is clicked', () => {
     const fileInput = fixture.nativeElement.querySelector('input[type="file"]'); 

@@ -178,6 +178,7 @@ export class ProductDetailComponent implements OnInit {
         if (error.status === 401 || error.status === 403) {
           this.toastr.error('Session expired. Log-in again.');
           this.dialogRef.close();
+          this.router.navigate(['../login']);
         } else if (error.status === 400) {
           if (error.error.message) {
             this.toastr.error(error.error.message);
@@ -235,7 +236,7 @@ export class ProductDetailComponent implements OnInit {
   // Save newly uploaded images
   saveEditedImages() {
     if (this.noOfImages + this.selectedFiles.length > 5) {
-      this.toastr.error('You can only add a maximum of 5 images', 'Image Limit Exceeded');
+      this.toastr.error('Image Limit Exceeded: You can only add a maximum of 5 images');
     } else {
       console.log("this.selectedFiles: ", this.selectedFiles)
       this.saveEachSelectedFile(this.product.id, 0)

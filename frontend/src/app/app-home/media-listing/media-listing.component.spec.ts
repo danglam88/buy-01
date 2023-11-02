@@ -7,20 +7,29 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MediaService } from 'src/app/services/media.service';
 import { MediaListingComponent } from './media-listing.component';
 import { MediaComponent } from './media/media.component';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
+class ToastrServiceStub {
+  error(message: string) {
+    // Do nothing in the stub
+  }
+  success(message: string) {
+    // Do nothing in the stub
+  }
+}
 describe('MediaListingComponent', () => {
   let component: MediaListingComponent;
   let fixture: ComponentFixture<MediaListingComponent>;
   let mediaService: MediaService;
   let router: Router;
+  let toastrService: ToastrService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [MediaListingComponent, MediaComponent],
       providers: [
         MediaService,
-        { provide: ToastrService, useValue: { error: jasmine.createSpy('error'), success: jasmine.createSpy('success') } },
+        { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       imports: [
         RouterTestingModule,
@@ -32,10 +41,8 @@ describe('MediaListingComponent', () => {
     fixture = TestBed.createComponent(MediaListingComponent);
     component = fixture.componentInstance;
     mediaService = TestBed.inject(MediaService);
-
-    // Manually spy on the Router's navigate method
+    toastrService = TestBed.inject(ToastrService);
     router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.stub();
 
     fixture.detectChanges();
   });
@@ -58,18 +65,27 @@ describe('MediaListingComponent', () => {
     expect(mediaService.getImageByMediaId).toHaveBeenCalled();
   }));
 
+  it('should handle error with status 403 or 401 for getImageByProductId', fakeAsync(() => {
+    spyOn(component, 'getProductMedia').and.callThrough();
   
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
 
- /* it('should navigate to login page if error status is 401 or 403', fakeAsync(() => {
-    spyOn(mediaService, 'getImageByProductId').and.returnValue(of({ success: false }));
-    spyOn(mediaService, 'getImageByMediaId').and.returnValue(of(new Blob()));
+    spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
+    spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
+    spyOn(toastrService, 'error');
+    spyOn(router, 'navigate');
 
     component.productId = '123';
     component.getProductMedia(component.productId);
-
     tick(250);
 
-    // Expect that the Router's navigate method was called with the correct arguments
+    expect(component.getProductMedia).toHaveBeenCalled();
+    expect(mediaService.getImageByProductId).toHaveBeenCalled();
+    expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
+    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
     expect(router.navigate).toHaveBeenCalledWith(['../login']);
-  }));*/
+  }));
 });
