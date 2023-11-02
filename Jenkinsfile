@@ -1,5 +1,39 @@
 def predefinedEmails = 'dang.lam@gritlab.ax'
 
+// Define a function to cleanup Docker artifacts
+def cleanupDocker() {
+    // Using sh returnStdout: true to capture the output without failing the build
+    // when commands return a non-zero exit code
+    sh(script: '''
+        set +e  # Disable exit on error
+        if [ "$(docker ps -aq)" ]; then
+            docker rm -f $(docker ps -aq)
+        else
+            echo "No containers to remove."
+        fi
+        
+        if [ "$(docker images -aq)" ]; then
+            docker rmi -f $(docker images -aq)
+        else
+            echo "No images to remove."
+        fi
+        
+        if [ "$(docker volume ls -q)" ]; then
+            docker volume rm $(docker volume ls -q)
+        else
+            echo "No volumes to remove."
+        fi
+        
+        docker_networks=$(docker network ls -q)
+        if [ "$docker_networks" ]; then
+            docker network rm $docker_networks || true  # Ignore errors
+        else
+            echo "No networks to remove."
+        fi
+        set -e  # Re-enable exit on error
+    ''', returnStdout: true).trim()
+}
+
 pipeline {
     agent none // We define the specific agents within each stage
 
@@ -13,32 +47,10 @@ pipeline {
             agent { label 'master' } // This stage will be executed on the 'master' agent
             steps {
                 script {
+                    cleanupDocker()  // Cleanup any Docker artifacts from previous builds
+
                     // Execute the build commands
                     sh '''
-                    if [ "$(docker ps -aq)" ]; then
-                        docker rm -f $(docker ps -aq)
-                    else
-                        echo "No containers to remove."
-                    fi
-
-                    if [ "$(docker images -aq)" ]; then
-                        docker rmi -f $(docker images -aq)
-                    else
-                        echo "No images to remove."
-                    fi
-
-                    if [ "$(docker volume ls -q)" ]; then
-                        docker volume rm $(docker volume ls -q)
-                    else
-                        echo "No volumes to remove."
-                    fi
-
-                    if [ "$(docker network ls -q)" ]; then
-                        docker network rm $(docker network ls -q)
-                    else
-                        echo "No networks to remove."
-                    fi
-
                     export DOCKER_DEFAULT_PLATFORM=linux/amd64
                     docker-compose build
 
@@ -64,32 +76,10 @@ pipeline {
                 script {
                     // Using try-catch for the deploy and potential rollback
                     try {
+                        cleanupDocker()  // Cleanup any Docker artifacts from previous builds
+
                         // Execute the deploy commands
                         sh '''
-                        if [ "$(docker ps -aq)" ]; then
-                            docker rm -f $(docker ps -aq)
-                        else
-                            echo "No containers to remove."
-                        fi
-
-                        if [ "$(docker images -aq)" ]; then
-                            docker rmi -f $(docker images -aq)
-                        else
-                            echo "No images to remove."
-                        fi
-
-                        if [ "$(docker volume ls -q)" ]; then
-                            docker volume rm $(docker volume ls -q)
-                        else
-                            echo "No volumes to remove."
-                        fi
-
-                        if [ "$(docker network ls -q)" ]; then
-                            docker network rm $(docker network ls -q)
-                        else
-                            echo "No networks to remove."
-                        fi
-
                         cd /mnt/myvolume
                         rm -rf *.tar
 
@@ -101,33 +91,11 @@ pipeline {
                         docker-compose up -d
                         '''
                     } catch (Exception e) {
+                        cleanupDocker()  // Cleanup any Docker artifacts from previous builds
+                        
                         // If deploy fails, the rollback commands are executed
                         echo "Deployment failed. Executing rollback."
                         sh '''
-                        if [ "$(docker ps -aq)" ]; then
-                            docker rm -f $(docker ps -aq)
-                        else
-                            echo "No containers to remove."
-                        fi
-
-                        if [ "$(docker images -aq)" ]; then
-                            docker rmi -f $(docker images -aq)
-                        else
-                            echo "No images to remove."
-                        fi
-
-                        if [ "$(docker volume ls -q)" ]; then
-                            docker volume rm $(docker volume ls -q)
-                        else
-                            echo "No volumes to remove."
-                        fi
-
-                        if [ "$(docker network ls -q)" ]; then
-                            docker network rm $(docker network ls -q)
-                        else
-                            echo "No networks to remove."
-                        fi
-
                         cd /mnt/myvolume
                         rm -rf *.tar
                         cp backup/*.tar .
