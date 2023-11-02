@@ -11,10 +11,16 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
+
 export class HeaderComponent {
   currentRoute: string;
-  isLoggedIn = this.authService.loggedIn;
+  //is user logged in
+  get isLoggedIn(): boolean {
+    return this.authService.loggedIn;
+  }
+  //is token expired
   tokenEx: boolean;
+
 
   constructor(
     private router: Router, 
@@ -30,7 +36,6 @@ export class HeaderComponent {
       }
     });    
   }
-
 
   get role() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -52,6 +57,7 @@ export class HeaderComponent {
     this.router.navigate(['login']);
   }
 
+  // Throws user out if token is expired or corrupted
   throwOut(): void {
     if (!this.tokenEx) {
       this.toastr.error('Data corrupted. Log-in again.', 'Illegal Operation');
@@ -65,5 +71,4 @@ export class HeaderComponent {
     this.dialog.open(CreateProductComponent, {
     });
  }
-
 }

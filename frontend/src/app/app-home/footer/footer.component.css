@@ -1,7 +1,7 @@
-
 section{
   text-align:center;
 }
+
 .footer #button{
 	width:50px;
 	height:50px;
@@ -15,6 +15,7 @@ section{
     -ms-transition: all 1s ease;
     transition: all 1s ease;
 }
+
 .footer #button:hover{
 	width:35px;
 	height:35px;
@@ -26,6 +27,7 @@ section{
     transition: all 1s ease;
 	position:relative;
 }
+
 .footer {
 	bottom:0;
 	left:0;
@@ -41,6 +43,7 @@ section{
     transition: all 1s ease;
 	z-index:999;
 }
+
 .footer:hover {
 	-webkit-transition: all 1s ease;
     -moz-transition: all 1s ease;
@@ -49,6 +52,7 @@ section{
     transition: all 1s ease;
 	height: 8em;
 }
+
 .footer #container{
 	margin-top:5px;
 	width:100%;
@@ -58,6 +62,7 @@ section{
   left:0;
 	background: #778da9;
 }
+
 .footer #cont{
   position:relative;
   top:-45px;
@@ -66,11 +71,13 @@ section{
 	height:auto;
 	margin:0 auto;
 }
+
 .footer_center{
 	width:500px;
 	float:left;
   text-align:center;
 }
+
 .text{
   font-family: Poppins, sans-serif;
   font-weight: 50;

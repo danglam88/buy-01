@@ -1,4 +1,3 @@
-
 a {
   font-family: Poppins, sans-serif;
   font-weight: 200; 
@@ -11,8 +10,8 @@ a {
 
 a:hover {
   color: #ffffff;
-  /* text-shadow: 2px 2px 4px #f4c440;  */
 }
+
 .selected {
   border: 1px solid #ffffff;
   padding: 5px 20px;
@@ -21,7 +20,6 @@ a:hover {
   color: #ffffff;
   font-weight: 400;
 }
-
 
 .site-header {
   min-height: 30px;
@@ -32,7 +30,6 @@ a:hover {
   justify-content: space-between;
   position: relative;
   top: 0;
-
 }
 
 .button-79{
@@ -71,19 +68,18 @@ a:hover {
   margin: 1.4em 1em 1em 2em;
 }
 
-
 #exception-line {
   cursor: none;
 }
 
 @media screen and (max-width: 768px) {
-.site-header {
-  width: 100%;
-  overflow-x: scroll;
-}
+  .site-header {
+    width: 100%;
+    overflow-x: scroll;
+  }
 }
 
-/* Define styles for your dropdown button and menu */
+/* Define styles for your dropdown button and menu - Need to fix*/
 .dropdown-button {
   display: none;
   cursor: pointer;

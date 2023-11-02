@@ -1,7 +1,10 @@
 <header class="site-header">
+  <!-- TITLE -->
   <div class="site-identity">
     <h1><a class="buy01" routerLink="../home">Buy-01</a></h1>
-  </div>  
+  </div> 
+  
+  <!-- NAVIGATION -->
   <nav class="site-navigation">
     <ul class="nav">
       <li *ngIf="role === 'SELLER'" role="button" (click)="openCreateProduct()"><a>+ Create Product</a></li>
@@ -12,7 +15,6 @@
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>
-
 </header>
 
  
