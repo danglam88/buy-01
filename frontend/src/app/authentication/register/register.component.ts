@@ -17,16 +17,20 @@ export class RegisterComponent implements OnInit {
   userInfo: any = {};
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
+  toastrConfig: any = {};
 
   constructor(
     private builder: FormBuilder, 
     private toastr: ToastrService,
     private regService: RegistratonService,
     private router: Router) {
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right'; 
+      this.toastrConfig = this.toastr.toastrConfig;
+    this.toastrConfig.positionClass = 'toast-bottom-right';
      }
 
-  ngOnInit() {}
+  ngOnInit() {
+   //this.toastr.toastrConfig.positionClass = 'toast-bottom-right'; // Set toastr position
+  }
 
   ngAfterViewInit() {
     // Set focus on the name input element when the component initializes

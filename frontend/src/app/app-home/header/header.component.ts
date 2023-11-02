@@ -15,9 +15,9 @@ import { ToastrService } from 'ngx-toastr';
 export class HeaderComponent {
   currentRoute: string;
   //is user logged in
-  get isLoggedIn(): boolean {
-    return this.authService.loggedIn;
-  }
+  // get isLoggedIn(): boolean {
+  //   return this.authService.loggedIn;
+  // }
   //is token expired
   tokenEx: boolean;
 

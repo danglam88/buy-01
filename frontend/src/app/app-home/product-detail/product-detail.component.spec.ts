@@ -1,7 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'; 
 import { of } from 'rxjs';
-import { DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing'; 
 import { AngularMaterialModule } from 'src/app/angular-material.module';
@@ -15,7 +13,6 @@ import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ToastrService } from 'ngx-toastr';
-import { DialogRef } from '@angular/cdk/dialog';
 
 describe('ProductDetailComponent', () => {
   let component: ProductDetailComponent;
