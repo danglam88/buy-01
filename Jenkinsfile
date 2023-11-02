@@ -4,12 +4,12 @@ def predefinedEmails = 'dang.lam@gritlab.ax'
 def cleanupDocker() {
     sh(script: '''
         set +e  # Disable exit on error
-        docker ps -aq | xargs -r docker rm -f  # Remove all containers if any exist
-        docker images -aq | xargs -r docker rmi -f  # Remove all images if any exist
-        docker volume ls -q | xargs -r docker volume rm  # Remove all volumes if any exist
+        docker ps -aq | /usr/bin/xargs -r docker rm -f  # Remove all containers if any exist
+        docker images -aq | /usr/bin/xargs -r docker rmi -f  # Remove all images if any exist
+        docker volume ls -q | /usr/bin/xargs -r docker volume rm  # Remove all volumes if any exist
         
         # List all networks, exclude default networks, and remove the rest if any exist
-        docker network ls --format "{{.ID}} {{.Name}}" | grep -v -E "(bridge|host|none)" | awk '{print $1}' | xargs -r docker network rm
+        docker network ls --format "{{.ID}} {{.Name}}" | /usr/bin/grep -v -E "(bridge|host|none)" | /usr/bin/awk '{print $1}' | /usr/bin/xargs -r docker network rm
         
         set -e  # Re-enable exit on error
     ''', returnStdout: true).trim()
