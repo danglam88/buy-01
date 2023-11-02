@@ -79,7 +79,7 @@ pipeline {
 
         failure {
             script {
-                def culprits = currentBuild.rawBuild.getCulprits()*.getFullName().join(', ')
+                def culprits = currentBuild.rawBuild.getCulprits().collect { it.getFullName() }.join(', ')
                 if (culprits) {
                     mail to: "${culprits}, ${predefinedEmails}",
                         subject: "Jenkins Build FAILURE: ${currentBuild.fullDisplayName}",
@@ -103,7 +103,7 @@ Gritlab Jenkins
                 }
             }
         }
-        
+
         changed {
             script {
                 if (currentBuild.resultIsBetterOrEqualTo('SUCCESS') && currentBuild.previousBuild.resultIsWorseOrEqualTo('FAILURE')) {
