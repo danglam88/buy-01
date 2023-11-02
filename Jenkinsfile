@@ -3,6 +3,11 @@ def predefinedEmails = 'dang.lam@gritlab.ax'
 pipeline {
     agent none // We define the specific agents within each stage
 
+    options {
+        timestamps()  // Add timestamps to console output
+        timeout(time: 30, unit: 'MINUTES')  // Set a timeout of 1 hour for the entire pipeline
+    }
+
     stages {
         stage('Build') {
             agent { label 'master' } // This stage will be executed on the 'master' agent
