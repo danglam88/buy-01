@@ -38,7 +38,7 @@ pipeline {
         }
         
         stage('Deploy') {
-            agent { label 'deploy' } // This stage will be executed on the 'deploy' agent
+            agent { label 'master' } // This stage will be executed on the 'master' agent
             steps {
                 script {
                     // Using try-catch for the deploy and potential rollback
@@ -48,7 +48,7 @@ pipeline {
                         docker-compose down --remove-orphans
                         docker system prune -f
 
-                        cd /mnt/myvolume
+                        cd ~/deploy
                         rm -rf *.tar
 
                         docker pull danglamgritlab/user-microservice:latest
@@ -65,7 +65,7 @@ pipeline {
                         docker-compose down --remove-orphans
                         docker system prune -f
 
-                        cd /mnt/myvolume
+                        cd ~/deploy
                         rm -rf *.tar
                         cp backup/*.tar .
 
@@ -92,15 +92,15 @@ pipeline {
         success {
             script {
                 sh '''
-                cd /mnt/myvolume
+                cd ~/deploy
 
                 docker save -o user-microservice.tar danglamgritlab/user-microservice
                 docker save -o product-microservice.tar danglamgritlab/product-microservice
                 docker save -o media-microservice.tar danglamgritlab/media-microservice
                 docker save -o frontend.tar danglamgritlab/frontend
 
-                if [ ! -d "/mnt/myvolume/backup" ]; then
-                    mkdir -p /mnt/myvolume/backup
+                if [ ! -d "~/deploy/backup" ]; then
+                    mkdir -p ~/deploy/backup
                 fi
 
                 mv *.tar backup/
