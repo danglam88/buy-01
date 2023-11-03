@@ -84,7 +84,7 @@ public class ProductService {
         return extension;
     }
 
-    private boolean isValidExtension(String extension) {
+    public boolean isValidExtension(String extension) {
         for (String allowedExtension : allowedExtensions) {
             if (allowedExtension.equals(extension)) {
                 return true;

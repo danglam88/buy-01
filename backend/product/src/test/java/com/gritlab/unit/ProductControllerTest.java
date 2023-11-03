@@ -1,38 +1,30 @@
 package com.gritlab.unit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.controller.ProductController;
 import com.gritlab.model.Product;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 
 public class ProductControllerTest {
 
@@ -52,6 +44,66 @@ public class ProductControllerTest {
         MockitoAnnotations.initMocks(this);
         productController = new ProductController(productService);
         ucb = UriComponentsBuilder.newInstance();
+    }
+
+    @Test
+    public void testFindAll() throws JsonProcessingException {
+        // Arrange
+        List<Product> products = createMockProducts(3);
+        Mockito.when(productService.findAll()).thenReturn(products);
+
+        // Act
+        ResponseEntity<?> response = productController.findAll();
+
+        // Assert
+        ObjectMapper objectMapper = new ObjectMapper();
+        assertEquals(200, response.getStatusCodeValue());
+        String expectedJson = objectMapper.writeValueAsString(products);
+        String actualJson = objectMapper.writeValueAsString(response.getBody());
+        assertEquals(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testFindBySellerId() throws JsonProcessingException {
+
+        // Mock UserDetails
+        UserDetails userDetails = mock(UserDetails.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getId()).thenReturn("user-id-1");
+
+        List<Product> products = createMockProducts(1);
+
+        Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
+        Mockito.when(productService.findBySellerId(userDetails.getId())).thenReturn(products);
+
+        // Act
+        ResponseEntity<?> response = productController.findBySellerId(authentication);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String expectedJson = objectMapper.writeValueAsString(products);
+        String actualJson = objectMapper.writeValueAsString(response.getBody());
+        assertEquals(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testFindById() throws JsonProcessingException {
+        // Arrange
+        String productId = "product-id-1";
+        Product product = createMockProducts(1).get(0);
+        Mockito.when(productService.getProduct(productId)).thenReturn(Optional.of(product));
+
+        // Act
+        ResponseEntity<?> response = productController.findById(productId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        String expectedJson = objectMapper.writeValueAsString(product);
+        String actualJson = objectMapper.writeValueAsString(response.getBody());
+        assertEquals(expectedJson, actualJson);
     }
 
     @Test
@@ -127,6 +179,17 @@ public class ProductControllerTest {
         assertNotNull(responseEntity);
 
         assertEquals(200, responseEntity.getStatusCodeValue());
+    }
+
+    private List<Product> createMockProducts(int length) {
+        List<Product> list = new ArrayList<>();
+
+        for (int i = 1; i <= length; i++) {
+            list.add(new Product(
+                    "product-id-" + i, "Product Name", "Product Desc", 10.0, 1, "user-id-" + i
+            ));
+        }
+        return list;
     }
 }
 

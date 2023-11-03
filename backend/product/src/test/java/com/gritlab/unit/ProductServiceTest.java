@@ -1,7 +1,6 @@
 package com.gritlab.unit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.gritlab.exception.ForbiddenException;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class ProductServiceTest {
 
@@ -119,6 +119,28 @@ public class ProductServiceTest {
     }
 
     @Test
+    void updateProductWhenRequestIsValid_thenNothing() {
+
+        Product request = new Product(
+                null, "Product Name", "Product Desc", 10.0, 1, null);
+
+        String userID = "user-id-1";
+        String productID = "product-id-1";
+
+        Optional<Product> product = Optional.of(new Product(
+                productID, "Product Name", "Product Desc", 10.0, 1, userID));
+
+        //Mocks for product repository for this case
+        when(productRepository.existsById(productID)).thenReturn(true);
+
+        when(productRepository.existsByUserIdAndId(userID, productID)).thenReturn(true);
+
+        when(productRepository.findByUserIdAndId(userID, productID)).thenReturn(product);
+
+        productService.updateProduct(productID, request, userID);
+    }
+
+    @Test
     void updateProductWhenProductIsNotExists_thenThrowAnError() {
 
         Product request = new Product(
@@ -181,6 +203,16 @@ public class ProductServiceTest {
         assertThrows(ForbiddenException.class, () -> {
             productService.deleteProduct(productID, userID);
         });
+    }
+
+    @Test
+    void isValidExtension_WhenValid_thenReturnTrue() {
+        assertTrue(productService.isValidExtension("jpg"));
+    }
+
+    @Test
+    void isValidExtension_WhenInvalid_thenReturnFalse() {
+        assertFalse(productService.isValidExtension("exe"));
     }
 }
 
