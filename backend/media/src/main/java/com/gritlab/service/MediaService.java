@@ -15,9 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 @Service
@@ -158,7 +155,7 @@ public class MediaService {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                throw new InvalidParamException("File must be image");
+                throw new InvalidParamException("File must be an image");
             }
         } catch (IOException ex) {
             throw new InvalidParamException("Failed to upload file");

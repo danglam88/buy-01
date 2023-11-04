@@ -52,11 +52,11 @@ public class ProductController {
     }
 
     @PostMapping
-    private ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
-                                                 BindingResult result,
-                                                 @RequestPart("files") List<MultipartFile> files,
-                                                 Authentication authentication,
-                                                 UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
+    public ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
+                                                BindingResult result,
+                                                @RequestPart("files") List<MultipartFile> files,
+                                                Authentication authentication,
+                                                UriComponentsBuilder ucb) throws MethodArgumentNotValidException {
         if (result.hasErrors()) {
             throw new MethodArgumentNotValidException((MethodParameter) null, result);
         }
@@ -73,7 +73,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Void> updateProduct(
+    public ResponseEntity<Void> updateProduct(
             @PathVariable String id,
             @Valid @RequestBody Product updatedData,
             Authentication authentication) {
@@ -85,7 +85,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteProduct(
+    public ResponseEntity<Void> deleteProduct(
             @PathVariable String id,
             Authentication authentication) {
 
