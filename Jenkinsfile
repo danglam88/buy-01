@@ -19,15 +19,15 @@ pipeline {
 
                     cd backend
 
-                    docker build -t user-microservice -f user/ .
+                    docker build -t user-microservice -f user/Dockerfile .
                     docker tag user-microservice danglamgritlab/user-microservice:latest
                     docker push danglamgritlab/user-microservice:latest
 
-                    docker build -t product-microservice -f product/ .
+                    docker build -t product-microservice -f product/Dockerfile .
                     docker tag product-microservice danglamgritlab/product-microservice:latest
                     docker push danglamgritlab/product-microservice:latest
 
-                    docker build -t media-microservice -f media/ .
+                    docker build -t media-microservice -f media/Dockerfile .
                     docker tag media-microservice danglamgritlab/media-microservice:latest
                     docker push danglamgritlab/media-microservice:latest
 
