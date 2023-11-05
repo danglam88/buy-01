@@ -3,7 +3,6 @@ services:
 
   user-microservice:
     image: danglamgritlab/user-microservice:latest
-    pull_policy: always
     restart: unless-stopped
     ports:
       - "8443:8443"
@@ -14,7 +13,6 @@ services:
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
-    pull_policy: always
     restart: unless-stopped
     ports:
       - "8444:8444"
@@ -25,7 +23,6 @@ services:
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
-    pull_policy: always
     restart: unless-stopped
     ports:
       - "8445:8445"
@@ -36,7 +33,6 @@ services:
 
   frontend:
     image: danglamgritlab/frontend:latest
-    pull_policy: always
     restart: unless-stopped
     ports:
       - "4200:4200"
@@ -45,6 +41,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     ports:
       - "9092:9092"
     networks:
@@ -59,6 +56,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    restart: unless-stopped
     ports:
       - "2181:2181"
     networks:

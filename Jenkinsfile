@@ -9,6 +9,13 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Build Environment') {
+            agent { label 'build-agent' }
+            steps {
+                cleanWs() // Clean the workspace on the 'build' agent
+            }
+        }
+
         stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
@@ -85,6 +92,8 @@ pipeline {
         stage('Deploy') {
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
+                cleanWs() // Clean the workspace on the 'deploy' agent
+
                 script {
                     // Execute the deploy commands
                     sh '''
