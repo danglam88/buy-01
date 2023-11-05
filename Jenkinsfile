@@ -9,18 +9,13 @@ pipeline {
     }
 
     stages {
-        stage('Prepare Build Environment') {
-            agent { label 'build-agent' }
-            steps {
-                cleanWs() // Clean the workspace on the 'build' agent
-            }
-        }
-
         stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the frontend tests
                     steps {
+                        cleanWs() // Clean the workspace on the 'build' agent for the frontend tests
+
                         sh '''
                         cd frontend
                         npm install
@@ -29,8 +24,10 @@ pipeline {
                     }
                 }
                 stage('Media-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the media-microservice tests
                     steps {
+                        cleanWs() // Clean the workspace on the 'build' agent for the media-microservice tests
+
                         sh '''
                         cd backend/media
                         mvn test
@@ -38,8 +35,10 @@ pipeline {
                     }
                 }
                 stage('Product-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the product-microservice tests
                     steps {
+                        cleanWs() // Clean the workspace on the 'build' agent for the product-microservice tests
+
                         sh '''
                         cd backend/product
                         mvn test
@@ -47,8 +46,10 @@ pipeline {
                     }
                 }
                 stage('User-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the user-microservice tests
                     steps {
+                        cleanWs() // Clean the workspace on the 'build' agent for the user-microservice tests
+
                         sh '''
                         cd backend/user
                         mvn test
@@ -59,8 +60,10 @@ pipeline {
         }
 
         stage('Build') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+            agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the build itself
             steps {
+                cleanWs() // Clean the workspace on the 'build' agent for the build itself
+
                 script {
                     // Execute the build commands
                     sh '''

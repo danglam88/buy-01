@@ -3,6 +3,7 @@ services:
 
   user-microservice:
     image: danglamgritlab/user-microservice:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     ports:
       - "8443:8443"
@@ -13,6 +14,7 @@ services:
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     ports:
       - "8444:8444"
@@ -23,6 +25,7 @@ services:
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     ports:
       - "8445:8445"
@@ -33,6 +36,7 @@ services:
 
   frontend:
     image: danglamgritlab/frontend:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     ports:
       - "4200:4200"
