@@ -17,23 +17,23 @@ pipeline {
                     sh '''
                     docker system prune -f
 
-                    cd buy-01/backend
+                    cd backend
 
                     docker build -t user-microservice -f user/ .
-                    docker tag buy-01-pipeline-user-microservice danglamgritlab/user-microservice:latest
+                    docker tag user-microservice danglamgritlab/user-microservice:latest
                     docker push danglamgritlab/user-microservice:latest
 
                     docker build -t product-microservice -f product/ .
-                    docker tag buy-01-pipeline-product-microservice danglamgritlab/product-microservice:latest
+                    docker tag product-microservice danglamgritlab/product-microservice:latest
                     docker push danglamgritlab/product-microservice:latest
 
                     docker build -t media-microservice -f media/ .
-                    docker tag buy-01-pipeline-media-microservice danglamgritlab/media-microservice:latest
+                    docker tag media-microservice danglamgritlab/media-microservice:latest
                     docker push danglamgritlab/media-microservice:latest
 
                     cd ../frontend
                     docker build -t frontend .
-                    docker tag buy-01-pipeline-frontend danglamgritlab/frontend:latest
+                    docker tag frontend danglamgritlab/frontend:latest
                     docker push danglamgritlab/frontend:latest
                     '''
                 }
