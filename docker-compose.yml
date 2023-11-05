@@ -2,9 +2,9 @@ version: '3.8'
 services:
 
   user-microservice:
-    build:
-      context: ./backend
-      dockerfile: user/Dockerfile
+    image: danglamgritlab/user-microservice:latest
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "8443:8443"
     networks:
@@ -13,9 +13,9 @@ services:
       - kafka
 
   product-microservice:
-    build:
-      context: ./backend
-      dockerfile: product/Dockerfile
+    image: danglamgritlab/product-microservice:latest
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "8444:8444"
     networks:
@@ -24,9 +24,9 @@ services:
       - kafka
 
   media-microservice:
-    build:
-      context: ./backend
-      dockerfile: media/Dockerfile
+    image: danglamgritlab/media-microservice:latest
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "8445:8445"
     networks:
@@ -35,9 +35,9 @@ services:
       - kafka
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: danglamgritlab/frontend:latest
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "4200:4200"
     networks:
