@@ -9,13 +9,54 @@ pipeline {
     }
 
     stages {
+        stage('Unit Tests') {
+            parallel {
+                stage('Frontend Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd frontend
+                        ng test --watch=false --browsers ChromeHeadless
+                        '''
+                    }
+                }
+                stage('Media-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/media
+                        mvn test
+                        '''
+                    }
+                }
+                stage('Product-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/product
+                        mvn test
+                        '''
+                    }
+                }
+                stage('User-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/user
+                        mvn test
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
                 script {
                     // Execute the build commands
                     sh '''
-                    docker system prune -f
+                    docker system prune -a -f
 
                     cd backend
 
@@ -49,7 +90,7 @@ pipeline {
                         // Execute the deploy commands
                         sh '''
                         docker-compose down --remove-orphans
-                        docker system prune -f
+                        docker system prune -a -f
 
                         rm -rf ~/*.tar
 
@@ -65,7 +106,7 @@ pipeline {
                         echo "Deployment failed. Executing rollback."
                         sh '''
                         docker-compose down --remove-orphans
-                        docker system prune -f
+                        docker system prune -a -f
 
                         rm -rf ~/*.tar
                         cp ~/backup/*.tar ~/
