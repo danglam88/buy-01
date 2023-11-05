@@ -109,7 +109,9 @@ pipeline {
                         subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
                         body: """Hello,
 
-The Jenkins build ${currentBuild.fullDisplayName} has succeeded.
+The Jenkins Pipeline ${currentBuild.fullDisplayName} has succeeded.
+
+See full details at: ${env.BUILD_URL}
 
 Best regards,
 Gritlab Jenkins
@@ -129,7 +131,9 @@ Gritlab Jenkins
                     subject: "Jenkins Pipeline FAILURE: ${currentBuild.fullDisplayName}",
                     body: """Hello,
 
-The Jenkins build ${currentBuild.fullDisplayName} has failed.
+The Jenkins Pipeline ${currentBuild.fullDisplayName} has failed.
+
+See full details at: ${env.BUILD_URL}
 
 Best regards,
 Gritlab Jenkins
@@ -144,7 +148,9 @@ Gritlab Jenkins
                         subject: "Jenkins Pipeline RECOVERED: ${currentBuild.fullDisplayName}",
                         body: """Hello,
 
-The Jenkins build ${currentBuild.fullDisplayName} has recovered from failure.
+The Jenkins Pipeline ${currentBuild.fullDisplayName} has recovered from failure.
+
+See full details at: ${env.BUILD_URL}
 
 Best regards,
 Gritlab Jenkins
