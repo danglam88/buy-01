@@ -86,8 +86,6 @@ pipeline {
     }
 
     post {
-        agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
-
         always {
             echo "The pipeline has completed execution."
         }
