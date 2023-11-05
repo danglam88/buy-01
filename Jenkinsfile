@@ -1,4 +1,4 @@
-def predefinedEmails = 'dang.lam@gritlab.ax'
+def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 pipeline {
     agent any // We define the specific agents within each stage
@@ -104,6 +104,16 @@ pipeline {
 
                 mv ~/*.tar ~/backup/
                 '''
+
+                mail to: "${predefinedEmails}",
+                        subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
+                        body: """Hello,
+
+The Jenkins build ${currentBuild.fullDisplayName} has succeeded.
+
+Best regards,
+Gritlab Jenkins
+"""
             }
         }
 
@@ -116,14 +126,14 @@ pipeline {
                 def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
         
                 mail to: recipient,
-                    subject: "Jenkins Build FAILURE: ${currentBuild.fullDisplayName}",
-                    body: '''Hello,
+                    subject: "Jenkins Pipeline FAILURE: ${currentBuild.fullDisplayName}",
+                    body: """Hello,
 
 The Jenkins build ${currentBuild.fullDisplayName} has failed.
 
 Best regards,
 Gritlab Jenkins
-'''
+"""
     }
 }
 
@@ -131,14 +141,14 @@ Gritlab Jenkins
             script {
                 if (currentBuild.resultIsBetterOrEqualTo('SUCCESS') && currentBuild.previousBuild.resultIsWorseOrEqualTo('FAILURE')) {
                     mail to: "${predefinedEmails}",
-                        subject: "Jenkins Build RECOVERED: ${currentBuild.fullDisplayName}",
-                        body: '''Hello,
+                        subject: "Jenkins Pipeline RECOVERED: ${currentBuild.fullDisplayName}",
+                        body: """Hello,
 
 The Jenkins build ${currentBuild.fullDisplayName} has recovered from failure.
 
 Best regards,
 Gritlab Jenkins
-'''
+"""
                 }
             }
         }

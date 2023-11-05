@@ -1,6 +1,6 @@
-const userBaseUrl = 'https://danglam.live:8443'
-const productBaseUrl = 'https://danglam.live:8444'
-const mediaBaseUrl = 'https://danglam.live:8445'
+const userBaseUrl = 'https://164.92.252.125:8443'
+const productBaseUrl = 'https://164.92.252.125:8444'
+const mediaBaseUrl = 'https://164.92.252.125:8445'
 
 export const environment = {
     production: true,
