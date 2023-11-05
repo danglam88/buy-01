@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "buy-01-frontend": {
+    "buy-01": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/buy-01-frontend",
+            "outputPath": "dist/buy-01",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -74,10 +74,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "buy-01-frontend:build:production"
+              "browserTarget": "buy-01:build:production"
             },
             "development": {
-              "browserTarget": "buy-01-frontend:build:development"
+              "browserTarget": "buy-01:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -85,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "buy-01-frontend:build"
+            "browserTarget": "buy-01:build"
           }
         },
         "test": {

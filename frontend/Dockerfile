@@ -27,16 +27,16 @@ RUN npx ng build
 FROM nginx:alpine
 
 # Copy the build output to replace the default nginx contents
-COPY --from=build /app/dist/buy-01-frontend /usr/share/nginx/html
+COPY --from=build /app/dist/buy-01 /usr/share/nginx/html
 RUN rm -rf /usr/share/nginx/html/assets/cert
 RUN chmod -R 755 /usr/share/nginx/html && chown -R nginx:nginx /usr/share/nginx/html
 
 # Copy the SSL certificate and key
-COPY src/assets/cert/localhost+2.pem /etc/nginx
-COPY src/assets/cert/localhost+2-key.pem /etc/nginx
-RUN chmod 600 /etc/nginx/localhost+2-key.pem
-RUN chmod 644 /etc/nginx/localhost+2.pem
-RUN chown -R nginx:nginx /etc/nginx/localhost+2.pem /etc/nginx/localhost+2-key.pem
+COPY src/assets/cert/164.92.252.125.pem /etc/nginx
+COPY src/assets/cert/164.92.252.125-key.pem /etc/nginx
+RUN chmod 600 /etc/nginx/164.92.252.125-key.pem
+RUN chmod 644 /etc/nginx/164.92.252.125.pem
+RUN chown -R nginx:nginx /etc/nginx/164.92.252.125.pem /etc/nginx/164.92.252.125-key.pem
 
 # Remove the default Nginx configuration file
 RUN rm /etc/nginx/conf.d/default.conf
