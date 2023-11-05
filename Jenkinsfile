@@ -85,42 +85,20 @@ pipeline {
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
                 script {
-                    // Using try-catch for the deploy and potential rollback
-                    try {
-                        // Execute the deploy commands
-                        sh '''
-                        docker-compose down --remove-orphans
-                        docker system prune -a -f
+                    // Execute the deploy commands
+                    sh '''
+                    docker-compose down --remove-orphans
+                    docker system prune -a -f
 
-                        rm -rf ~/*.tar
+                    rm -rf ~/*.tar
 
-                        docker pull danglamgritlab/user-microservice:latest
-                        docker pull danglamgritlab/product-microservice:latest
-                        docker pull danglamgritlab/media-microservice:latest
-                        docker pull danglamgritlab/frontend:latest
+                    docker pull danglamgritlab/user-microservice:latest
+                    docker pull danglamgritlab/product-microservice:latest
+                    docker pull danglamgritlab/media-microservice:latest
+                    docker pull danglamgritlab/frontend:latest
 
-                        docker-compose up -d
-                        '''
-                    } catch (Exception e) {
-                        // If deploy fails, the rollback commands are executed
-                        echo "Deployment failed. Executing rollback."
-                        sh '''
-                        docker-compose down --remove-orphans
-                        docker system prune -a -f
-
-                        rm -rf ~/*.tar
-                        cp ~/backup/*.tar ~/
-
-                        docker load -i ~/user-microservice.tar
-                        docker load -i ~/product-microservice.tar
-                        docker load -i ~/media-microservice.tar
-                        docker load -i ~/frontend.tar
-
-                        docker-compose up -d
-                        '''
-                        // Rethrow the exception to mark the pipeline as failed
-                        throw e
-                    }
+                    docker-compose up -d
+                    '''
                 }
             }
         }
@@ -133,6 +111,8 @@ pipeline {
 
         success {
             script {
+                // If deploy succeeds, the backup commands are executed
+                echo "Deployment succeeded. Executing backup."
                 sh '''
                 docker save -o ~/user-microservice.tar danglamgritlab/user-microservice
                 docker save -o ~/product-microservice.tar danglamgritlab/product-microservice
@@ -162,6 +142,23 @@ Gritlab Jenkins
 
         failure {
             script {
+                // If deploy fails, the rollback commands are executed
+                echo "Deployment failed. Executing rollback."
+                sh '''
+                docker-compose down --remove-orphans
+                docker system prune -a -f
+
+                rm -rf ~/*.tar
+                cp ~/backup/*.tar ~/
+
+                docker load -i ~/user-microservice.tar
+                docker load -i ~/product-microservice.tar
+                docker load -i ~/media-microservice.tar
+                docker load -i ~/frontend.tar
+
+                docker-compose up -d
+                '''
+
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->
                     changeSet.items.collect { it.author.fullName }
                 }.join(', ')
@@ -185,6 +182,21 @@ Gritlab Jenkins
         changed {
             script {
                 if (currentBuild.resultIsBetterOrEqualTo('SUCCESS') && currentBuild.previousBuild.resultIsWorseOrEqualTo('FAILURE')) {
+                    // If deploy recovers from failure, the backup commands are executed
+                    echo "Deployment recovered. Executing backup."
+                    sh '''
+                    docker save -o ~/user-microservice.tar danglamgritlab/user-microservice
+                    docker save -o ~/product-microservice.tar danglamgritlab/product-microservice
+                    docker save -o ~/media-microservice.tar danglamgritlab/media-microservice
+                    docker save -o ~/frontend.tar danglamgritlab/frontend
+
+                    if [ ! -d "~/backup" ]; then
+                        mkdir -p ~/backup
+                    fi
+
+                    mv ~/*.tar ~/backup/
+                    '''
+
                     mail to: "${predefinedEmails}",
                         subject: "Jenkins Pipeline RECOVERED: ${currentBuild.fullDisplayName}",
                         body: """Hello,
