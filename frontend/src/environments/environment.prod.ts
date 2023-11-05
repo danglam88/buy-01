@@ -1,6 +1,6 @@
-const userBaseUrl = 'https://164.92.252.125:8443'
-const productBaseUrl = 'https://164.92.252.125:8444'
-const mediaBaseUrl = 'https://164.92.252.125:8445'
+const userBaseUrl = 'https://localhost:8443'
+const productBaseUrl = 'https://localhost:8444'
+const mediaBaseUrl = 'https://localhost:8445'
 
 export const environment = {
     production: true,
