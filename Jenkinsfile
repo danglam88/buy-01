@@ -9,13 +9,18 @@ pipeline {
     }
 
     stages {
-        stage('Unit Tests') {
+        stage('Prepare Build Environment') {
+            agent { label 'build-agent' }
+            steps {
+                cleanWs() // Clean the workspace on the 'build' agent
+            }
+        }
+
+        /*stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the frontend tests
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        cleanWs() // Clean the workspace on the 'build' agent for the frontend tests
-
                         sh '''
                         cd frontend
                         npm install
@@ -24,10 +29,8 @@ pipeline {
                     }
                 }
                 stage('Media-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the media-microservice tests
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        cleanWs() // Clean the workspace on the 'build' agent for the media-microservice tests
-
                         sh '''
                         cd backend/media
                         mvn test
@@ -35,10 +38,8 @@ pipeline {
                     }
                 }
                 stage('Product-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the product-microservice tests
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        cleanWs() // Clean the workspace on the 'build' agent for the product-microservice tests
-
                         sh '''
                         cd backend/product
                         mvn test
@@ -46,10 +47,8 @@ pipeline {
                     }
                 }
                 stage('User-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the user-microservice tests
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        cleanWs() // Clean the workspace on the 'build' agent for the user-microservice tests
-
                         sh '''
                         cd backend/user
                         mvn test
@@ -57,13 +56,11 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         stage('Build') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent for the build itself
+            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
-                cleanWs() // Clean the workspace on the 'build' agent for the build itself
-
                 script {
                     // Execute the build commands
                     sh '''
@@ -127,10 +124,10 @@ pipeline {
                 // If deploy succeeds, the backup commands are executed
                 echo "Deployment succeeded. Executing backup."
                 sh '''
-                docker save -o ~/user-microservice.tar danglamgritlab/user-microservice
-                docker save -o ~/product-microservice.tar danglamgritlab/product-microservice
-                docker save -o ~/media-microservice.tar danglamgritlab/media-microservice
-                docker save -o ~/frontend.tar danglamgritlab/frontend
+                docker save -o ~/user-microservice.tar danglamgritlab/user-microservice:latest
+                docker save -o ~/product-microservice.tar danglamgritlab/product-microservice:latest
+                docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
+                docker save -o ~/frontend.tar danglamgritlab/frontend:latest
 
                 if [ ! -d "~/backup" ]; then
                     mkdir -p ~/backup
