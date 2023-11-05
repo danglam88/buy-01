@@ -179,39 +179,6 @@ See full details at: ${env.BUILD_URL}
 Best regards,
 Gritlab Jenkins
 """
-    }
-}
-
-        changed {
-            script {
-                if (currentBuild.resultIsBetterOrEqualTo('SUCCESS') && currentBuild.previousBuild.resultIsWorseOrEqualTo('FAILURE')) {
-                    // If deploy recovers from failure, the backup commands are executed
-                    echo "Deployment recovered. Executing backup."
-                    sh '''
-                    docker save -o ~/user-microservice.tar danglamgritlab/user-microservice
-                    docker save -o ~/product-microservice.tar danglamgritlab/product-microservice
-                    docker save -o ~/media-microservice.tar danglamgritlab/media-microservice
-                    docker save -o ~/frontend.tar danglamgritlab/frontend
-
-                    if [ ! -d "~/backup" ]; then
-                        mkdir -p ~/backup
-                    fi
-
-                    mv ~/*.tar ~/backup/
-                    '''
-
-                    mail to: "${predefinedEmails}",
-                        subject: "Jenkins Pipeline RECOVERED: ${currentBuild.fullDisplayName}",
-                        body: """Hello,
-
-The Jenkins Pipeline ${currentBuild.fullDisplayName} has recovered from failure.
-
-See full details at: ${env.BUILD_URL}
-
-Best regards,
-Gritlab Jenkins
-"""
-                }
             }
         }
     }
