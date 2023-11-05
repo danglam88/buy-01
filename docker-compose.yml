@@ -45,7 +45,6 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
-    restart: unless-stopped
     ports:
       - "9092:9092"
     networks:
@@ -60,7 +59,6 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    restart: unless-stopped
     ports:
       - "2181:2181"
     networks:
