@@ -22,11 +22,10 @@ export class ProductDashboardComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService
     ) {
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+     // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       // Handle product creation and get seller's products again
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
-          console.log("Product Created")
           this.getSellerProducts();
         }
       });

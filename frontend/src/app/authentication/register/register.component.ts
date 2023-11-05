@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { RegistratonService } from '../../services/registraton.service'
 import { Router } from '@angular/router';
+import { ValidationService } from 'src/app/services/validation.service';
 
 @Component({
   selector: 'app-register',
@@ -12,22 +13,26 @@ import { Router } from '@angular/router';
 
 export class RegisterComponent implements OnInit {
   imgPlaceholder = '../../assets/images/placeholder.png';
-
   previewUrl: string | ArrayBuffer | null = null;
   selectedFile: File;
   userInfo: any = {};
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
+  toastrConfig: any = {};
 
   constructor(
     private builder: FormBuilder, 
     private toastr: ToastrService,
     private regService: RegistratonService,
+    private validationService: ValidationService,
     private router: Router) {
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right'; 
+      this.toastrConfig = this.toastr.toastrConfig;
+    this.toastrConfig.positionClass = 'toast-bottom-right';
      }
 
-  ngOnInit() {}
+  ngOnInit() {
+   //this.toastr.toastrConfig.positionClass = 'toast-bottom-right'; // Set toastr position
+  }
 
   ngAfterViewInit() {
     // Set focus on the name input element when the component initializes
@@ -70,7 +75,7 @@ export class RegisterComponent implements OnInit {
   // File upload
   onFileSelected(event: any) {
     const file = event.target.files[0];
-    if (this.isImageFile(file) && this.isFileSizeValid(file)) {
+    if (this.validationService.isImageFile(file) && this.validationService.isFileSizeValid(file)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
@@ -152,14 +157,4 @@ export class RegisterComponent implements OnInit {
       }
     }
   }
-
-  isImageFile(file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    return allowedTypes.includes(file.type);
-  }
-
-  isFileSizeValid(file: File): boolean {
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-    return file.size <= maxSizeInBytes;
-  }  
 }

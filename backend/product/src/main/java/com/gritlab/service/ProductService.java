@@ -54,7 +54,7 @@ public class ProductService {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                throw new InvalidParamException("File must be image");
+                throw new InvalidParamException("File must be an image");
             }
         } catch (IOException ex) {
             throw new InvalidParamException("Failed to upload file");
@@ -84,7 +84,7 @@ public class ProductService {
         return extension;
     }
 
-    private boolean isValidExtension(String extension) {
+    public boolean isValidExtension(String extension) {
         for (String allowedExtension : allowedExtensions) {
             if (allowedExtension.equals(extension)) {
                 return true;

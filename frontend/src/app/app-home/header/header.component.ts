@@ -5,16 +5,24 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service'
 import { CreateProductComponent } from '../create-product/create-product.component';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
+
 export class HeaderComponent {
   currentRoute: string;
-  isLoggedIn = this.authService.loggedIn;
+  //is user logged in
+  // get isLoggedIn(): boolean {
+  //   return this.authService.loggedIn;
+  // }
+  //is token expired
   tokenEx: boolean;
+  routerSubscription: Subscription;
+
 
   constructor(
     private router: Router, 
@@ -24,13 +32,18 @@ export class HeaderComponent {
     private toastr: ToastrService,
     ) 
     {
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.currentRoute = event.url;
-      }
-    });    
+      this.routerSubscription = this.router.events.subscribe((event: any) => {
+        if (event instanceof NavigationEnd) {
+          this.currentRoute = event.url;
+        }
+      });   
   }
 
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
 
   get role() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -52,6 +65,7 @@ export class HeaderComponent {
     this.router.navigate(['login']);
   }
 
+  // Throws user out if token is expired or corrupted
   throwOut(): void {
     if (!this.tokenEx) {
       this.toastr.error('Data corrupted. Log-in again.', 'Illegal Operation');
@@ -66,4 +80,5 @@ export class HeaderComponent {
     });
  }
 
+ 
 }

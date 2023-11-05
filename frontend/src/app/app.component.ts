@@ -7,14 +7,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements DoCheck {
-  title = 'buy-01-frontend';
+  title = 'Buy-01';
   isToolbarVisible: boolean = false;
+
   constructor(private router: Router) {}
 
   ngDoCheck() {
     let currenturl = this.router.url;
+    // console.log(this.isToolbarVisible);
     if (currenturl == '/login' || currenturl == '/register') {
       this.isToolbarVisible = true;
+      // console.log(this.isToolbarVisible);
     } else {
       this.isToolbarVisible = false;
     }

@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { UserService } from 'src/app/services/user.service';
+import { ValidationService } from 'src/app/services/validation.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -31,7 +32,8 @@ export class UserDashboardComponent implements OnInit {
     private toastr: ToastrService,
     private builder: FormBuilder,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private validationService: ValidationService 
   ) {
     this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
@@ -227,7 +229,7 @@ export class UserDashboardComponent implements OnInit {
   onFileSelected(event: any) {
     this.editProfileField('avatar');
     const file = event.target.files[0];
-    if (this.isImageFile(file) && this.isFileSizeValid(file)) {
+    if (this.validationService.isImageFile(file) && this.validationService.isFileSizeValid(file)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target.result;
@@ -319,15 +321,5 @@ export class UserDashboardComponent implements OnInit {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: mimeString });
-  }
-
-  isImageFile(file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    return allowedTypes.includes(file.type);
-  }
-
-  isFileSizeValid(file: File): boolean {
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-    return file.size <= maxSizeInBytes;
   }
 }

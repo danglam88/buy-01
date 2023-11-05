@@ -21,16 +21,14 @@ export class ProductListingComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService
     ) {
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+     // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
-          console.log("Product created")
           this.getAllProducts();
         }
       });
     }
   
-
   ngOnInit(): void {
     // Get all products and display them
     this.getAllProducts();

@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class AuthenticationService {
   constructor(private httpClient: HttpClient) { }
-
+  
   authenticate(user: any): Observable<object> {
     return this.httpClient.post(`${environment.authUrl}`, user);
   }

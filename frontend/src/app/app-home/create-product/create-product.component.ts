@@ -3,8 +3,8 @@ import { FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
-import { MediaService } from 'src/app/services/media.service';
 import { Router } from '@angular/router';
+import { ValidationService } from 'src/app/services/validation.service';  
 
 @Component({
   selector: 'app-create-product',
@@ -24,12 +24,12 @@ export class CreateProductComponent implements OnInit {
     private builder: FormBuilder,
     private toastr: ToastrService,
     private productService: ProductService,
-    private mediaService: MediaService,
+    private validationService: ValidationService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
     private router: Router,
   ) {
-    this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
   ngOnInit() {}
@@ -50,7 +50,7 @@ export class CreateProductComponent implements OnInit {
         Validators.required,
         Validators.pattern(/^\d+(\.\d+)?$/),
         Validators.max(999999999.99),
-        this.greaterThanZeroValidator(), // Custom validator for price
+        this.validationService.greaterThanZeroValidator(), // Custom validator for price
       ],
     ],
     quantity: [
@@ -59,7 +59,7 @@ export class CreateProductComponent implements OnInit {
         Validators.required,
         Validators.pattern(/^[0-9]+$/),
         Validators.max(999999999),
-        this.greaterThanZeroValidator(), // Custom validator for quantity
+        this.validationService.greaterThanZeroValidator(), 
       ],
     ],
     description: [
@@ -138,9 +138,9 @@ export class CreateProductComponent implements OnInit {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         // Check the file type (allow only images)
-        if (this.isImageFile(file)) {
+        if (this.validationService.isImageFile(file)) {
           // Check the file size (limit to 2MB)
-          if (this.isFileSizeValid(file)) {
+          if (this.validationService.isFileSizeValid(file)) {
             this.displaySelectedImage(file);
             this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
           } else {
@@ -176,25 +176,5 @@ export class CreateProductComponent implements OnInit {
   // Close the modal
   closeModal(): void {
     this.dialogRef.close();
-  }
-
-  greaterThanZeroValidator(): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const value = parseFloat(control.value);
-      if (isNaN(value) || value <= 0) {
-        return { greaterThanZero: true };
-      }
-      return null;
-    };
-  }
-
-  isImageFile(file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    return allowedTypes.includes(file.type);
-  }
-
-  isFileSizeValid(file: File): boolean {
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-    return file.size <= maxSizeInBytes;
   }
 }
