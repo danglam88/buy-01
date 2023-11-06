@@ -15,7 +15,7 @@ pipeline {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
                         script {
-                            env.PATH = "~/.npm-global/bin:${env.PATH}"
+                            env.PATH = "/home/jenkins/.npm-global/bin:${env.PATH}"
                         }
                         sh '''
                         cd frontend
