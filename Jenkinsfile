@@ -18,7 +18,7 @@ pipeline {
                         export TERM=xterm
                         cd frontend
                         npm install
-                        xvfb-run --version
+                        which xvfb-run
                         xvfb-run xclock
                         xvfb-run --auto-servernum ng test --watch=false --browsers ChromeHeadless
                         '''
