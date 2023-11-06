@@ -19,7 +19,7 @@ pipeline {
                         cd frontend
                         npm install
                         which xvfb-run
-                        xvfb-run ng test --watch=false --browsers ChromeHeadless
+                        xvfb-run -a ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
                 }
