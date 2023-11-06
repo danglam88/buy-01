@@ -20,7 +20,7 @@ pipeline {
                         npm install
                         which xvfb-run
                         xvfb-run xclock
-                        xvfb-run --auto-servernum ng test --watch=false --browsers ChromeHeadless
+                        xvfb-run ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
                 }
