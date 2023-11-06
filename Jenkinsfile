@@ -118,7 +118,7 @@ pipeline {
             echo "The pipeline has completed execution."
         }
 
-        success {
+        /*success {
             script {
                 // If deploy succeeds, the backup commands are executed
                 echo "Deployment succeeded. Executing backup."
@@ -188,6 +188,6 @@ Best regards,
 Gritlab Jenkins
 """
             }
-        }
+        }*/
     }
 }
