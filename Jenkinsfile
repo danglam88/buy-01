@@ -18,7 +18,7 @@ pipeline {
                         export TERM=xterm
                         cd frontend
                         npm install
-                        ng test --watch=false --browsers ChromeHeadless
+                        xvfb-run --auto-servernum ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
                 }
