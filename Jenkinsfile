@@ -15,8 +15,8 @@ pipeline {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
                         sh '''
+                        export TERM=xterm
                         cd frontend
-                        echo $PATH
                         npm install
                         ng test --watch=false --browsers ChromeHeadless
                         '''
