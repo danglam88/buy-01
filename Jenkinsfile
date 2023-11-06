@@ -17,6 +17,7 @@ pipeline {
                         sh '''
                         cd frontend
                         npm install
+                        if [ -z "$TERM" ]; then export TERM=xterm; fi
                         ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
