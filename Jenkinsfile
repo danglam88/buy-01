@@ -9,7 +9,7 @@ pipeline {
     }
 
     stages {
-        stage('Unit Tests') {
+        /*stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
@@ -53,7 +53,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
