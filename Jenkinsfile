@@ -15,11 +15,10 @@ pipeline {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
                         sh '''
-                        export TERM=xterm
                         cd frontend
                         npm install
                         which xvfb-run
-                        xvfb-run -a ng test --watch=false --browsers ChromeHeadless
+                        xvfb-run ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
                 }
