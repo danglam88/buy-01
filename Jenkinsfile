@@ -15,7 +15,7 @@ pipeline {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
                         script {
-                            env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
+                            env.PATH = "~/.npm-global/bin:${env.PATH}"
                         }
                         sh '''
                         cd frontend
