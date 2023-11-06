@@ -90,7 +90,9 @@ pipeline {
                 script {
                     // Execute the deploy commands
                     sh '''
-                    docker-compose down --remove-orphans
+                    if [ "$(docker ps -aq)" != "" ]; then
+                        docker rm -f $(docker ps -aq)
+                    fi
                     docker system prune -a -f
 
                     rm -rf ~/*.tar
@@ -148,7 +150,9 @@ Gritlab Jenkins
                 // If deploy fails, the rollback commands are executed
                 echo "Deployment failed. Executing rollback."
                 sh '''
-                docker-compose down --remove-orphans
+                if [ "$(docker ps -aq)" != "" ]; then
+                    docker rm -f $(docker ps -aq)
+                fi
                 docker system prune -a -f
 
                 rm -rf ~/*.tar
