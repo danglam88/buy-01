@@ -16,9 +16,7 @@ pipeline {
                     steps {
                         sh '''
                         cd frontend
-                        echo "Checking the IP address of the build agent"
-                        IP_ADDR=$(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d'/' -f1)
-                        echo "Build agent IP address is: $IP_ADDR"
+                        echo $PATH
                         npm install
                         ng test --watch=false --browsers ChromeHeadless
                         '''
