@@ -17,8 +17,7 @@ pipeline {
                         sh '''
                         cd frontend
                         npm install
-                        if [ -z "$TERM" ]; then export TERM=xterm; fi
-                        xvfb-run -a ng test --watch=false --browsers ChromeHeadless
+                        ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
                 }
