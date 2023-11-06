@@ -40,6 +40,7 @@ import { MediaService } from './services/media.service';
 import { ProductService } from './services/product.service';
 import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
+import { ValidationService } from './services/validation.service';
 
 @NgModule({
   declarations: [
@@ -79,7 +80,7 @@ import { EncryptionService } from 'src/app/services/encryption.service';
     }),
    
   ],
-  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService, EncryptionService],
+  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService, EncryptionService, ValidationService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
