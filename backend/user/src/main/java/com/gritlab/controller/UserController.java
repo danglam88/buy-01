@@ -2,11 +2,9 @@ package com.gritlab.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gritlab.model.RegRequest;
 import com.gritlab.model.UserRequest;
 import com.gritlab.service.UserService;
 import com.gritlab.model.User;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +42,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/avatar/{userId}")
-    public ResponseEntity<?> getAvatarById(@PathVariable String userId, Authentication authentication) {
+    public ResponseEntity<ByteArrayResource> getAvatarById(@PathVariable String userId, Authentication authentication) {
         User user = userService.authorizeUser(authentication, userId);
 
         // Create a ByteArrayResource from the file content

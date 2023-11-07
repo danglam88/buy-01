@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <name>buy01-app</name>
-  <url>https://www.example.com</url>
+  <url>https://164.92.252.125:4200/</url>
     <modules>
       <module>user</module>
       <module>product</module>

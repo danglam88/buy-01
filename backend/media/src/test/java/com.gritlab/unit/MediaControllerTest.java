@@ -1,7 +1,6 @@
 package com.gritlab.unit;
 
 import com.gritlab.controller.MediaController;
-import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.Media;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.MediaService;
