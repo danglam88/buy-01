@@ -77,7 +77,7 @@ public class MediaServiceTest {
     }
 
     @Test
-    void addMediaWhenMediaNotBelongToUser_thenThrowEx() throws IOException, InterruptedException {
+    void addMediaWhenMediaDoesNotBelongToUser_thenThrowEx() throws IOException, InterruptedException {
 
         String productId = "product-id-1";
         String userId = "user-id-1";
@@ -129,7 +129,7 @@ public class MediaServiceTest {
     }
 
     @Test
-    void deleteMediaWhenProductNotExist_thenThrowEx() throws IOException, InterruptedException {
+    void deleteMediaWhenProductDoesNotExist_thenThrowEx() throws IOException, InterruptedException {
 
         String productId = "product-id-1";
         String userId = "user-id-1";
@@ -140,7 +140,7 @@ public class MediaServiceTest {
     }
 
     @Test
-    void deleteMediaWhenMediaNotBelongToUser_thenThrowEx() throws IOException, InterruptedException {
+    void deleteMediaWhenMediaDoesNotBelongToUser_thenThrowEx() throws IOException, InterruptedException {
 
         String productId = "product-id-1";
         String userId = "user-id-1";

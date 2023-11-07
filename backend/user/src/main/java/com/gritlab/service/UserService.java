@@ -4,7 +4,6 @@ import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.*;
 import com.gritlab.repository.UserRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,9 +24,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
-
-    @Autowired
-    private JwtService jwtService;
 
     @Autowired
     private UserRepository userRepository;
@@ -133,7 +129,7 @@ public class UserService {
 
         try {
             if (!ImageFileTypeChecker.isImage(file)) {
-                throw new InvalidParamException("File must be image");
+                throw new InvalidParamException("File must be an image");
             }
         } catch (IOException ex) {
             throw new InvalidParamException("Failed to upload file");
@@ -175,25 +171,13 @@ public class UserService {
         return extension;
     }
 
-    private boolean isValidExtension(String extension) {
+    public boolean isValidExtension(String extension) {
         for (String allowedExtension : allowedExtensions) {
             if (allowedExtension.equals(extension)) {
                 return true;
             }
         }
         return false;
-    }
-
-    public boolean validEmail(String email) {
-        return !email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
-    }
-
-    public boolean validPassword(String password) {
-        return !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$");
-    }
-
-    public List<UserDTO> getAllUserDTOs() {
-        return convertToDtos(userRepository.findAll());
     }
 
     public boolean findUserById(String userId) {
@@ -231,7 +215,7 @@ public class UserService {
     }
 
     public User authorizeUser(Authentication authentication, String userId) {
-        if (userId != null && !this.findUserById(userId)) {
+        if (userId != null && !findUserById(userId)) {
             throw new NoSuchElementException("User not found");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

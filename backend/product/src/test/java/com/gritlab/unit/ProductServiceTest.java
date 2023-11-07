@@ -141,7 +141,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void updateProductWhenProductIsNotExists_thenThrowAnError() {
+    void updateProductWhenProductDoesNotExist_thenThrowAnError() {
 
         Product request = new Product(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
@@ -158,7 +158,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void updateProductWhenProductIsNotBelongToUser_thenThrowAnError() {
+    void updateProductWhenProductDoesNotBelongToUser_thenThrowAnError() {
 
         Product request = new Product(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
@@ -177,7 +177,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void deleteProductWhenProductIsNotExists_thenThrowAnError() {
+    void deleteProductWhenProductDoesNotExist_thenThrowAnError() {
 
         String userID = "user-id-1";
         String productID = "product-id-1";
@@ -191,7 +191,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void deleteProductWhenProductIsNotBelongToUser_thenThrowAnError() {
+    void deleteProductWhenProductDoesNotBelongToUser_thenThrowAnError() {
         String userID = "user-id-1";
         String productID = "product-id-1";
 
@@ -215,4 +215,3 @@ public class ProductServiceTest {
         assertFalse(productService.isValidExtension("exe"));
     }
 }
-
