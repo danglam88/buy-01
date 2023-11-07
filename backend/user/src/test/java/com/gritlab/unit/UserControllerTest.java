@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,14 +48,20 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserInfo() throws JsonProcessingException {
-        User authorizedUser = mock(User.class);
+        // Create a sample User id
+        String userId = "user-id1";
+
+        User authorizedUser = new User(userId, "Test Name", "test@mail.com",
+                "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
+
         when(userService.authorizeUser(authentication, null)).thenReturn(authorizedUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Mock the userService's getUserById method data
-        UserDTO userDTO = new UserDTO("user-id1", "Test Name", "test@mail.com",
+        // Mock the userService's getUserInfo method data
+        UserDTO userDTO = new UserDTO(userId, "Test Name", "test@mail.com",
                 "Test1@", "SELLER", "avatar.png", "avatar".getBytes());
+
         when(userService.convertToDto(authorizedUser)).thenReturn(userDTO);
 
         // Call the controller method
@@ -74,7 +79,9 @@ public class UserControllerTest {
         // Create a sample User id
         String userId = "user-id1";
 
-        User authorizedUser = mock(User.class);
+        User authorizedUser = new User(userId, "Test Name", "test@mail.com",
+                "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
+
         when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
 
         // Act
@@ -95,7 +102,9 @@ public class UserControllerTest {
         // Create a sample User id
         String userId = "user-id1";
 
-        User authorizedUser = mock(User.class);
+        User authorizedUser = new User(userId, "Test Name", "test@mail.com",
+                "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
+
         when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -123,7 +132,9 @@ public class UserControllerTest {
         // Create a sample User id
         String userId = "user-id1";
 
-        User authorizedUser = mock(User.class);
+        User authorizedUser = new User(userId, "Test Name", "test@mail.com",
+                "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
+
         when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
 
         // Request params
@@ -153,11 +164,12 @@ public class UserControllerTest {
 
     @Test
     public void deleteUserWhenValidInput_thenReturns200() throws Exception {
-
         // Create a sample User id
         String userId = "user-id1";
 
-        User authorizedUser = mock(User.class);
+        User authorizedUser = new User(userId, "Test Name", "test@mail.com",
+                "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
+
         when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
 
         // Call the controller method
