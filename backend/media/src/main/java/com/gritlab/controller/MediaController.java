@@ -66,7 +66,7 @@ public class MediaController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteMedia(@PathVariable String id,
+    public ResponseEntity<Void> deleteMedia(@PathVariable String id,
                                                Authentication authentication) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

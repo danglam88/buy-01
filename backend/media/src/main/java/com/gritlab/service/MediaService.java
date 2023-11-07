@@ -32,8 +32,9 @@ public class MediaService {
     private final ProductCheckService productCheckService;
 
     @Autowired
-    public MediaService(ProductCheckService kafkaService) {
+    public MediaService(ProductCheckService kafkaService, MediaRepository mediaRepository) {
         this.productCheckService = kafkaService;
+        this.mediaRepository = mediaRepository;
     }
 
     public Optional<Media> getMedia(String id) {
