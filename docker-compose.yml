@@ -3,39 +3,33 @@ services:
 
   user-microservice:
     image: danglamgritlab/user-microservice:latest
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://user-mongodb:27017/userdb
     ports:
       - "8443:8443"
     networks:
       - buy01-network
     depends_on:
       - kafka
-      - user-mongodb
+      - mongodb
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://product-mongodb:27017/productdb
     ports:
       - "8444:8444"
     networks:
       - buy01-network
     depends_on:
       - kafka
-      - product-mongodb
+      - mongodb
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://media-mongodb:27017/mediadb
     ports:
       - "8445:8445"
     networks:
       - buy01-network
     depends_on:
       - kafka
-      - media-mongodb
+      - mongodb
 
   frontend:
     image: danglamgritlab/frontend:latest
@@ -44,29 +38,12 @@ services:
     networks:
       - buy01-network
 
-  user-mongodb:
+  mongodb:
     image: mongo:latest
-    container_name: user-mongodb
     ports:
       - "27017:27017"
-    volumes:
-      - user-mongo-volume:/data/db
-
-  product-mongodb:
-    image: mongo:latest
-    container_name: product-mongodb
-    ports:
-      - "27018:27017"
-    volumes:
-      - product-mongo-volume:/data/db
-
-  media-mongodb:
-    image: mongo:latest
-    container_name: media-mongodb
-    ports:
-      - "27019:27017"
-    volumes:
-      - media-mongo-volume:/data/db
+    networks:
+      - buy01-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -91,11 +68,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-
-volumes:
-  user-mongo-volume:
-  product-mongo-volume:
-  media-mongo-volume:
 
 networks:
   buy01-network:
