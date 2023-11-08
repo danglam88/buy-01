@@ -61,7 +61,7 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
-                    docker system prune -a -f
+                    docker system prune -a -f --volumes
 
                     cd backend
 
@@ -82,7 +82,7 @@ pipeline {
                     docker tag frontend danglamgritlab/frontend:latest
                     docker push danglamgritlab/frontend:latest
 
-                    docker system prune -a -f
+                    docker system prune -a -f --volumes
                     '''
                 }
             }
@@ -97,7 +97,7 @@ pipeline {
                     if [ "$(docker ps -aq)" != "" ]; then
                         docker rm -f $(docker ps -aq)
                     fi
-                    docker system prune -a -f
+                    docker system prune -a -f --volumes
 
                     rm -rf ~/*.tar
 
@@ -157,7 +157,7 @@ Gritlab Jenkins
                 if [ "$(docker ps -aq)" != "" ]; then
                     docker rm -f $(docker ps -aq)
                 fi
-                docker system prune -a -f
+                docker system prune -a -f --volumes
 
                 rm -rf ~/*.tar
                 cp ~/backup/*.tar ~/
