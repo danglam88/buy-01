@@ -61,6 +61,12 @@ public class MediaService {
 
         checkFile(file);
 
+        Optional<List<Media>> mediaOptional = mediaRepository.findByProductId(productId);
+
+        if (mediaOptional.isPresent() && mediaOptional.get().size() >= 5) {
+            throw new InvalidParamException("Product can have at most 5 images");
+        }
+
         try {
             byte[] imageData = file.getBytes();
 
