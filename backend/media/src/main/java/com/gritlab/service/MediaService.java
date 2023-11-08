@@ -9,7 +9,6 @@ import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +23,6 @@ public class MediaService {
 
     @Autowired
     private MediaRepository mediaRepository;
-
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private final ProductCheckService productCheckService;

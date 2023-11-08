@@ -1,6 +1,5 @@
 package com.gritlab.component;
 
-import com.gritlab.exception.UnauthorizedException;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.JwtService;
 import jakarta.servlet.FilterChain;
