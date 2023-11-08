@@ -9,7 +9,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - user-mongodb
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
@@ -19,7 +19,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - product-mongodb
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
@@ -29,7 +29,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - mongodb
+      - media-mongodb
 
   frontend:
     image: danglamgritlab/frontend:latest
@@ -38,10 +38,24 @@ services:
     networks:
       - buy01-network
 
-  mongodb:
+  user-mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
+    networks:
+      - buy01-network
+
+  product-mongodb:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    networks:
+      - buy01-network
+
+  media-mongodb:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
     networks:
       - buy01-network
 
