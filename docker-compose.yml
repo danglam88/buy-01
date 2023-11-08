@@ -10,7 +10,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - user-mongodb
+      - mongodb
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
@@ -21,7 +21,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - product-mongodb
+      - mongodb
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
@@ -32,7 +32,7 @@ services:
       - buy01-network
     depends_on:
       - kafka
-      - media-mongodb
+      - mongodb
 
   frontend:
     image: danglamgritlab/frontend:latest
@@ -42,32 +42,12 @@ services:
     networks:
       - buy01-network
 
-  user-mongodb:
+  mongodb:
     image: mongo:latest
     ports:
-      - "27018:27017"
+      - "27017:27017"
     networks:
       - buy01-network
-    volumes:
-      - user-db-volume:/data/db
-
-  product-mongodb:
-    image: mongo:latest
-    ports:
-      - "27019:27017"
-    networks:
-      - buy01-network
-    volumes:
-      - product-db-volume:/data/db
-
-  media-mongodb:
-    image: mongo:latest
-    ports:
-      - "27020:27017"
-    networks:
-      - buy01-network
-    volumes:
-      - media-db-volume:/data/db
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -96,8 +76,3 @@ services:
 networks:
   buy01-network:
     driver: bridge
-
-volumes:
-  user-db-volume:
-  product-db-volume:
-  media-db-volume:
