@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
+    private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg", "txt"};
 
     @Autowired
     private ProductRepository productRepository;
