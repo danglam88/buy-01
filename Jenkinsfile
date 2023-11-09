@@ -8,6 +8,13 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')  // Set a timeout of 30 minutes for the entire pipeline
     }
 
+    environment {
+        DOCKER_USER_MICROSERVICE_IMAGE = "danglamgritlab/user-microservice:latest"
+        DOCKER_PRODUCT_MICROSERVICE_IMAGE = "danglamgritlab/product-microservice:latest"
+        DOCKER_MEDIA_MICROSERVICE_IMAGE = "danglamgritlab/media-microservice:latest"
+        DOCKER_FRONTEND_IMAGE = "danglamgritlab/frontend:latest"
+    }
+
     stages {
         stage('Unit Tests') {
             parallel {
@@ -67,21 +74,21 @@ pipeline {
                     cd backend
 
                     docker build -t user-microservice -f user/Dockerfile .
-                    docker tag user-microservice danglamgritlab/user-microservice:latest
-                    docker push danglamgritlab/user-microservice:latest
+                    docker tag user-microservice ${env.DOCKER_USER_MICROSERVICE_IMAGE}
+                    docker push ${env.DOCKER_USER_MICROSERVICE_IMAGE}
 
                     docker build -t product-microservice -f product/Dockerfile .
-                    docker tag product-microservice danglamgritlab/product-microservice:latest
-                    docker push danglamgritlab/product-microservice:latest
+                    docker tag product-microservice ${env.DOCKER_PRODUCT_MICROSERVICE_IMAGE}
+                    docker push ${env.DOCKER_PRODUCT_MICROSERVICE_IMAGE}
 
                     docker build -t media-microservice -f media/Dockerfile .
-                    docker tag media-microservice danglamgritlab/media-microservice:latest
-                    docker push danglamgritlab/media-microservice:latest
+                    docker tag media-microservice ${env.DOCKER_MEDIA_MICROSERVICE_IMAGE}
+                    docker push ${env.DOCKER_MEDIA_MICROSERVICE_IMAGE}
 
                     cd ../frontend
                     docker build -t frontend .
-                    docker tag frontend danglamgritlab/frontend:latest
-                    docker push danglamgritlab/frontend:latest
+                    docker tag frontend ${env.DOCKER_FRONTEND_IMAGE}
+                    docker push ${env.DOCKER_FRONTEND_IMAGE}
 
                     docker system prune -a -f
                     docker volume ls
@@ -102,10 +109,10 @@ pipeline {
                     fi
                     docker system prune -a -f
 
-                    docker pull danglamgritlab/user-microservice:latest
-                    docker pull danglamgritlab/product-microservice:latest
-                    docker pull danglamgritlab/media-microservice:latest
-                    docker pull danglamgritlab/frontend:latest
+                    docker pull ${env.DOCKER_USER_MICROSERVICE_IMAGE}
+                    docker pull ${env.DOCKER_PRODUCT_MICROSERVICE_IMAGE}
+                    docker pull ${env.DOCKER_MEDIA_MICROSERVICE_IMAGE}
+                    docker pull ${env.DOCKER_FRONTEND_IMAGE}
 
                     docker-compose up -d
 
@@ -130,10 +137,10 @@ pipeline {
                 echo "Deployment succeeded. Executing backup."
                 sh '''
                 docker volume ls
-                docker save -o /tmp/user-microservice.tar danglamgritlab/user-microservice:latest
-                docker save -o /tmp/product-microservice.tar danglamgritlab/product-microservice:latest
-                docker save -o /tmp/media-microservice.tar danglamgritlab/media-microservice:latest
-                docker save -o /tmp/frontend.tar danglamgritlab/frontend:latest
+                docker save -o ~/user-microservice.tar ${env.DOCKER_USER_MICROSERVICE_IMAGE}
+                docker save -o ~/product-microservice.tar ${env.DOCKER_PRODUCT_MICROSERVICE_IMAGE}
+                docker save -o ~/media-microservice.tar ${env.DOCKER_MEDIA_MICROSERVICE_IMAGE}
+                docker save -o ~/frontend.tar ${env.DOCKER_FRONTEND_IMAGE}
 
                 docker volume ls
                 '''
@@ -163,10 +170,10 @@ Gritlab Jenkins
                 fi
                 docker system prune -a -f
 
-                docker load -i /tmp/user-microservice.tar
-                docker load -i /tmp/product-microservice.tar
-                docker load -i /tmp/media-microservice.tar
-                docker load -i /tmp/frontend.tar
+                docker load -i ~/user-microservice.tar
+                docker load -i ~/product-microservice.tar
+                docker load -i ~/media-microservice.tar
+                docker load -i ~/frontend.tar
 
                 docker-compose up -d
                 docker volume ls
