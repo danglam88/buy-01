@@ -40,6 +40,6 @@ public class RegController {
                 .path("/users/{userId}")
                 .buildAndExpand(createdAccount.getId())
                 .toUri();
-        return ResponseEntity.created(locationOfNewUser).build();
+        return ResponseEntity.ok().build();
     }
 }
