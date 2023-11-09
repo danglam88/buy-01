@@ -94,27 +94,36 @@ An example of a valid form-data object for creating a new user is:
 }
 ```
 
+## CI/CD Pipeline (using Jenkins)
+
+The whole process of the project has been automated using Jenkins (accessible at http://164.90.178.137:8080). The process consists of the following stages:
+
+-  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
+-  Unit Tests: the unit-tests (consisting of frontend-tests and backend-tests for each and every microservice) are performed at the build-server.
+   +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
+-  Build: once all the unit-tests have been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server.
+   +  If all the builds are passed, the produced Docker images will then be pushed to a Docker Hub and are ready to be deployed.
+   +  If any of the buids has been failed, the Post Actions stage will be triggered (the Deploy stage will be marked as failed in this case).
+-  Deploy: once all the frontend and backend Docker images are available in the Docker Hub, they will be pulled to the deploy-server (at 164.92.252.125) and the deployment starts.
+   +  Other neccessary Docker images such as Zookeeper, Kafka and MongoDB are also pulled to the deploy-server.
+   +  A separate Docker container is configured for each of the Docker images.
+-  Post Actions:
+   +  If the deployment is passed, all the Docker containers are started and all the Docker images for frontend and backend are saved into a backup directory on the deploy-server. A success email will also be sent to all the team members.
+   +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. A failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
+
+The application is then accessible via https://164.92.252.125:4200
+
 ## Installation
 
 To install the project, clone the repository to your local machine.
 
 ```bash
-git clone https://01.gritlab.ax/git/danglam/buy-01.git
+git clone https://github.com/danglam88/buy-01.git
 ```
-
-Make sure you have Docker Desktop installed and configured properly on your machine.
-
-You can download Docker Desktop [here](https://www.docker.com/products/docker-desktop/).
 
 ## Usage
 
-To run the project, navigate to the project root directory and then run the command.
-
-```bash
-docker-compose up -d
-```
-
-This will start the server at `http://localhost:4200/` and the above-mentioned APIs are ready for use.
+To run the project, navigate to the project root directory, make some changes, then push them to the main branch of the project repository. The CI/CD pipeline will be triggered (using Webhooks in Github) after that. Finally, the application is accessible at https://164.92.252.125:4200 after the pipeline process has been completed.
 
 Postman is a great tool for testing RESTful APIs. You can download it [here](https://www.postman.com/downloads/).
 
@@ -132,4 +141,3 @@ Contributions are welcome. Please open an issue or submit a pull request if you 
 - [Ashley] (https://github.com/hgwtra)
 - [Iuliia] (https://github.com/ManWhoSoldTheW0rld)
 - [Nafi] (https://github.com/NafiRanta)
-

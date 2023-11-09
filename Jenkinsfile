@@ -61,6 +61,7 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
+                    docker volume ls
                     docker system prune -a -f
 
                     cd backend
@@ -83,6 +84,7 @@ pipeline {
                     docker push danglamgritlab/frontend:latest
 
                     docker system prune -a -f
+                    docker volume ls
                     '''
                 }
             }
@@ -94,6 +96,7 @@ pipeline {
                 script {
                     // Execute the deploy commands
                     sh '''
+                    docker volume ls
                     if [ "$(docker ps -aq)" != "" ]; then
                         docker rm -f $(docker ps -aq)
                     fi
@@ -107,6 +110,11 @@ pipeline {
                     docker pull danglamgritlab/frontend:latest
 
                     docker-compose up -d
+
+                    if [ "$(docker ps -q | wc -l)" != "9" ]; then
+                        exit 1
+                    fi
+                    docker volume ls
                     '''
                 }
             }
@@ -123,6 +131,7 @@ pipeline {
                 // If deploy succeeds, the backup commands are executed
                 echo "Deployment succeeded. Executing backup."
                 sh '''
+                docker volume ls
                 docker save -o ~/user-microservice.tar danglamgritlab/user-microservice:latest
                 docker save -o ~/product-microservice.tar danglamgritlab/product-microservice:latest
                 docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
@@ -133,6 +142,7 @@ pipeline {
                 fi
 
                 mv ~/*.tar ~/backup/
+                docker volume ls
                 '''
 
                 mail to: "${predefinedEmails}",
@@ -154,6 +164,7 @@ Gritlab Jenkins
                 // If deploy fails, the rollback commands are executed
                 echo "Deployment failed. Executing rollback."
                 sh '''
+                docker volume ls
                 if [ "$(docker ps -aq)" != "" ]; then
                     docker rm -f $(docker ps -aq)
                 fi
@@ -168,6 +179,7 @@ Gritlab Jenkins
                 docker load -i ~/frontend.tar
 
                 docker-compose up -d
+                docker volume ls
                 '''
 
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->
