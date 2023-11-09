@@ -107,6 +107,10 @@ pipeline {
                     docker pull danglamgritlab/frontend:latest
 
                     docker-compose up -d
+
+                    if [ "$(docker ps -q | wc -l)" != "9" ]; then
+                        exit 1
+                    fi
                     '''
                 }
             }
