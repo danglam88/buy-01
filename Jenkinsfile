@@ -102,6 +102,8 @@ pipeline {
                     fi
                     docker system prune -a -f
 
+                    rm -rf ~/*.tar
+
                     docker pull danglamgritlab/user-microservice:latest
                     docker pull danglamgritlab/product-microservice:latest
                     docker pull danglamgritlab/media-microservice:latest
@@ -135,6 +137,11 @@ pipeline {
                 docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
                 docker save -o ~/frontend.tar danglamgritlab/frontend:latest
 
+                if [ ! -d "~/backup" ]; then
+                    mkdir -p ~/backup
+                fi
+
+                mv ~/*.tar ~/backup/
                 docker volume ls
                 '''
 
@@ -162,6 +169,9 @@ Gritlab Jenkins
                     docker rm -f $(docker ps -aq)
                 fi
                 docker system prune -a -f
+
+                rm -rf ~/*.tar
+                cp ~/backup/*.tar ~/
 
                 docker load -i ~/user-microservice.tar
                 docker load -i ~/product-microservice.tar
