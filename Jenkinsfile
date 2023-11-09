@@ -130,10 +130,10 @@ pipeline {
                 echo "Deployment succeeded. Executing backup."
                 sh '''
                 docker volume ls
-                docker save -o /tmp/user-microservice.tar danglamgritlab/user-microservice
-                docker save -o /tmp/product-microservice.tar danglamgritlab/product-microservice
-                docker save -o /tmp/media-microservice.tar danglamgritlab/media-microservice
-                docker save -o /tmp/frontend.tar danglamgritlab/frontend
+                docker save -o /tmp/user-microservice.tar danglamgritlab/user-microservice:latest
+                docker save -o /tmp/product-microservice.tar danglamgritlab/product-microservice:latest
+                docker save -o /tmp/media-microservice.tar danglamgritlab/media-microservice:latest
+                docker save -o /tmp/frontend.tar danglamgritlab/frontend:latest
 
                 docker volume ls
                 '''
