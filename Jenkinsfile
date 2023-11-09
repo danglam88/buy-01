@@ -61,6 +61,7 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
+                    exit 1
                     docker system prune -a -f
 
                     cd backend
