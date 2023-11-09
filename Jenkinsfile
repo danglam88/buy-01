@@ -80,8 +80,8 @@ pipeline {
 
                     cd ../frontend
                     docker build -t frontend .
-                    docker tag frontend ${env.DOCKER_FRONTEND_IMAGE}
-                    docker push ${env.DOCKER_FRONTEND_IMAGE}
+                    docker tag frontend danglamgritlab/frontend:latest
+                    docker push danglamgritlab/frontend:latest
 
                     docker system prune -a -f
                     docker volume ls
@@ -105,7 +105,7 @@ pipeline {
                     docker pull danglamgritlab/user-microservice:latest
                     docker pull danglamgritlab/product-microservice:latest
                     docker pull danglamgritlab/media-microservice:latest
-                    docker pull ${env.DOCKER_FRONTEND_IMAGE}
+                    docker pull danglamgritlab/frontend:latest
 
                     docker-compose up -d
 
@@ -133,7 +133,7 @@ pipeline {
                 docker save -o ~/user-microservice.tar danglamgritlab/user-microservice:latest
                 docker save -o ~/product-microservice.tar danglamgritlab/product-microservice:latest
                 docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
-                docker save -o ~/frontend.tar ${env.DOCKER_FRONTEND_IMAGE}
+                docker save -o ~/frontend.tar danglamgritlab/frontend:latest
 
                 docker volume ls
                 '''
