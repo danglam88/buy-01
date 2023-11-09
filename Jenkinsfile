@@ -43,7 +43,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('User-Microservice Tests') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
@@ -60,6 +60,7 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
+                    docker volume ls
                     docker system prune -a -f
 
                     cd backend
@@ -82,6 +83,7 @@ pipeline {
                     docker push danglamgritlab/frontend:latest
 
                     docker system prune -a -f
+                    docker volume ls
                     '''
                 }
             }
