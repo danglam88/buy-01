@@ -9,48 +9,49 @@ pipeline {
     }
 
     stages {
-        stage('Frontend Tests') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-            steps {
-                script {
-                    env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
+        stage('Unit Tests') {
+            parallel {
+                stage('Frontend Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        script {
+                            env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
+                        }
+                        sh '''
+                        cd frontend
+                        echo $PATH
+                        npm install
+                        ng test --watch=false --browsers ChromeHeadless
+                        '''
+                    }
                 }
-                sh '''
-                cd frontend
-                echo $PATH
-                npm install
-                ng test --watch=false --browsers ChromeHeadless
-                '''
-            }
-        }
-
-        stage('Media-Microservice Tests') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-            steps {
-                sh '''
-                cd backend/media
-                mvn test
-                '''
-            }
-        }
-
-        stage('Product-Microservice Tests') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-            steps {
-                sh '''
-                cd backend/product
-                mvn test
-                '''
-            }
-        }
-
-        stage('User-Microservice Tests') {
-            agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-            steps {
-                sh '''
-                cd backend/user
-                mvn test
-                '''
+                stage('Media-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/media
+                        mvn test
+                        '''
+                    }
+                }
+                stage('Product-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/product
+                        mvn test
+                        '''
+                    }
+                }
+                stage('User-Microservice Tests') {
+                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    steps {
+                        sh '''
+                        cd backend/user
+                        mvn test
+                        '''
+                    }
+                }
             }
         }
 
@@ -101,8 +102,6 @@ pipeline {
                     fi
                     docker system prune -a -f
 
-                    rm -rf ~/*.tar
-
                     docker pull danglamgritlab/user-microservice:latest
                     docker pull danglamgritlab/product-microservice:latest
                     docker pull danglamgritlab/media-microservice:latest
@@ -131,16 +130,15 @@ pipeline {
                 echo "Deployment succeeded. Executing backup."
                 sh '''
                 docker volume ls
-                docker save -o ~/user-microservice.tar danglamgritlab/user-microservice:latest
-                docker save -o ~/product-microservice.tar danglamgritlab/product-microservice:latest
-                docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
-                docker save -o ~/frontend.tar danglamgritlab/frontend:latest
-
-                if [ ! -d "~/backup" ]; then
-                    mkdir -p ~/backup
+                if [ ! -d "/tmp/backup" ]; then
+                    mkdir -p /tmp/backup
                 fi
 
-                mv ~/*.tar ~/backup/
+                docker save -o /tmp/backup/user-microservice.tar danglamgritlab/user-microservice:latest
+                docker save -o /tmp/backup/product-microservice.tar danglamgritlab/product-microservice:latest
+                docker save -o /tmp/backup/media-microservice.tar danglamgritlab/media-microservice:latest
+                docker save -o /tmp/backup/frontend.tar danglamgritlab/frontend:latest
+
                 docker volume ls
                 '''
 
@@ -169,13 +167,10 @@ Gritlab Jenkins
                 fi
                 docker system prune -a -f
 
-                rm -rf ~/*.tar
-                cp ~/backup/*.tar ~/
-
-                docker load -i ~/user-microservice.tar
-                docker load -i ~/product-microservice.tar
-                docker load -i ~/media-microservice.tar
-                docker load -i ~/frontend.tar
+                docker load -i /tmp/backup/user-microservice.tar
+                docker load -i /tmp/backup/product-microservice.tar
+                docker load -i /tmp/backup/media-microservice.tar
+                docker load -i /tmp/backup/frontend.tar
 
                 docker-compose up -d
                 docker volume ls

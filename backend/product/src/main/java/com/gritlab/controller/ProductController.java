@@ -69,7 +69,7 @@ public class ProductController {
                 .buildAndExpand(newProduct.getId())
                 .toUri();
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(locationOfNewProduct).build();
     }
 
     @PutMapping("/{id}")
