@@ -130,14 +130,10 @@ pipeline {
                 echo "Deployment succeeded. Executing backup."
                 sh '''
                 docker volume ls
-                if [ ! -d "/tmp/backup" ]; then
-                    mkdir -p /tmp/backup
-                fi
-
-                docker save -o /tmp/backup/user-microservice.tar danglamgritlab/user-microservice:latest
-                docker save -o /tmp/backup/product-microservice.tar danglamgritlab/product-microservice:latest
-                docker save -o /tmp/backup/media-microservice.tar danglamgritlab/media-microservice:latest
-                docker save -o /tmp/backup/frontend.tar danglamgritlab/frontend:latest
+                docker save -o /tmp/user-microservice.tar danglamgritlab/user-microservice:latest
+                docker save -o /tmp/product-microservice.tar danglamgritlab/product-microservice:latest
+                docker save -o /tmp/media-microservice.tar danglamgritlab/media-microservice:latest
+                docker save -o /tmp/frontend.tar danglamgritlab/frontend:latest
 
                 docker volume ls
                 '''
@@ -167,10 +163,10 @@ Gritlab Jenkins
                 fi
                 docker system prune -a -f
 
-                docker load -i /tmp/backup/user-microservice.tar
-                docker load -i /tmp/backup/product-microservice.tar
-                docker load -i /tmp/backup/media-microservice.tar
-                docker load -i /tmp/backup/frontend.tar
+                docker load -i /tmp/user-microservice.tar
+                docker load -i /tmp/product-microservice.tar
+                docker load -i /tmp/media-microservice.tar
+                docker load -i /tmp/frontend.tar
 
                 docker-compose up -d
                 docker volume ls
