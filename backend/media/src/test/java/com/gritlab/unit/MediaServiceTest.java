@@ -207,7 +207,7 @@ public class MediaServiceTest {
         assertEquals("", ext);
     }
 
-    public void createMockImage(String filePath) {
+    public void createMockImage(String filePath) throws IOException {
         BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
         // Set the entire image to white
@@ -217,10 +217,6 @@ public class MediaServiceTest {
             }
         }
 
-        try {
-            ImageIO.write(image, "jpg", new File(filePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ImageIO.write(image, "jpg", new File(filePath));
     }
 }

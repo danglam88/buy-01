@@ -8,6 +8,13 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')  // Set a timeout of 30 minutes for the entire pipeline
     }
 
+    environment {
+        USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
+        PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
+        MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
+        FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
+    }
+
     stages {
         stage('Unit Tests') {
             parallel {
@@ -19,7 +26,6 @@ pipeline {
                         }
                         sh '''
                         cd frontend
-                        echo $PATH
                         npm install
                         ng test --watch=false --browsers ChromeHeadless
                         '''
@@ -61,30 +67,28 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
-                    docker volume ls
                     docker system prune -a -f
 
                     cd backend
 
                     docker build -t user-microservice -f user/Dockerfile .
-                    docker tag user-microservice danglamgritlab/user-microservice:latest
-                    docker push danglamgritlab/user-microservice:latest
+                    docker tag user-microservice $USER_MICROSERVICE_IMAGE
+                    docker push $USER_MICROSERVICE_IMAGE
 
                     docker build -t product-microservice -f product/Dockerfile .
-                    docker tag product-microservice danglamgritlab/product-microservice:latest
-                    docker push danglamgritlab/product-microservice:latest
+                    docker tag product-microservice $PRODUCT_MICROSERVICE_IMAGE
+                    docker push $PRODUCT_MICROSERVICE_IMAGE
 
                     docker build -t media-microservice -f media/Dockerfile .
-                    docker tag media-microservice danglamgritlab/media-microservice:latest
-                    docker push danglamgritlab/media-microservice:latest
+                    docker tag media-microservice $MEDIA_MICROSERVICE_IMAGE
+                    docker push $MEDIA_MICROSERVICE_IMAGE
 
                     cd ../frontend
                     docker build -t frontend .
-                    docker tag frontend danglamgritlab/frontend:latest
-                    docker push danglamgritlab/frontend:latest
+                    docker tag frontend $FRONTEND_IMAGE
+                    docker push $FRONTEND_IMAGE
 
                     docker system prune -a -f
-                    docker volume ls
                     '''
                 }
             }
@@ -96,7 +100,6 @@ pipeline {
                 script {
                     // Execute the deploy commands
                     sh '''
-                    docker volume ls
                     if [ "$(docker ps -aq)" != "" ]; then
                         docker rm -f $(docker ps -aq)
                     fi
@@ -104,17 +107,16 @@ pipeline {
 
                     rm -rf ~/*.tar
 
-                    docker pull danglamgritlab/user-microservice:latest
-                    docker pull danglamgritlab/product-microservice:latest
-                    docker pull danglamgritlab/media-microservice:latest
-                    docker pull danglamgritlab/frontend:latest
+                    docker pull $USER_MICROSERVICE_IMAGE
+                    docker pull $PRODUCT_MICROSERVICE_IMAGE
+                    docker pull $MEDIA_MICROSERVICE_IMAGE
+                    docker pull $FRONTEND_IMAGE
 
                     docker-compose up -d
 
                     if [ "$(docker ps -q | wc -l)" != "9" ]; then
                         exit 1
                     fi
-                    docker volume ls
                     '''
                 }
             }
@@ -131,18 +133,16 @@ pipeline {
                 // If deploy succeeds, the backup commands are executed
                 echo "Deployment succeeded. Executing backup."
                 sh '''
-                docker volume ls
-                docker save -o ~/user-microservice.tar danglamgritlab/user-microservice:latest
-                docker save -o ~/product-microservice.tar danglamgritlab/product-microservice:latest
-                docker save -o ~/media-microservice.tar danglamgritlab/media-microservice:latest
-                docker save -o ~/frontend.tar danglamgritlab/frontend:latest
+                docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
+                docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
+                docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
+                docker save -o ~/frontend.tar $FRONTEND_IMAGE
 
                 if [ ! -d "~/backup" ]; then
                     mkdir -p ~/backup
                 fi
 
                 mv ~/*.tar ~/backup/
-                docker volume ls
                 '''
 
                 mail to: "${predefinedEmails}",
@@ -164,7 +164,6 @@ Gritlab Jenkins
                 // If deploy fails, the rollback commands are executed
                 echo "Deployment failed. Executing rollback."
                 sh '''
-                docker volume ls
                 if [ "$(docker ps -aq)" != "" ]; then
                     docker rm -f $(docker ps -aq)
                 fi
@@ -179,7 +178,6 @@ Gritlab Jenkins
                 docker load -i ~/frontend.tar
 
                 docker-compose up -d
-                docker volume ls
                 '''
 
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->

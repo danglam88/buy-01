@@ -117,7 +117,6 @@ public class MediaService {
             }
         } catch (InterruptedException e) {
             // Handle exceptions
-            e.printStackTrace();
         }
         return false;
     }
