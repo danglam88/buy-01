@@ -41,7 +41,7 @@ services:
   user-mongodb:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "27018:27017"
     networks:
       - buy01-network
     volumes:
@@ -50,7 +50,7 @@ services:
   product-mongodb:
     image: mongo:latest
     ports:
-      - "27018:27017"
+      - "27019:27017"
     networks:
       - buy01-network
     volumes:
@@ -59,7 +59,7 @@ services:
   media-mongodb:
     image: mongo:latest
     ports:
-      - "27019:27017"
+      - "27020:27017"
     networks:
       - buy01-network
     volumes:
