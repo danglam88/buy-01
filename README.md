@@ -3,7 +3,8 @@
 ## Table of Contents
 - [Description](#description)
 - [Front-end Specifications](#front-end-specifications)
-- [Back-end Specifications](#back-endspecifications)
+- [Back-end Specifications](#back-end-specifications)
+- [CI/CD Pipeline (using Jenkins)](#cicd-pipeline-using-jenkins)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
@@ -12,7 +13,7 @@
 
 ## Description
 
-This is a Java project that developes and end-to-end e-commerce platform with Spring Boot microservices and Angular. The platplorms supports user registration (either as a client or a seller), authentication, product CRUD functionality exclusively for sellers, and media management for product images.
+This is a Java project that develops and end-to-end e-commerce platform with Spring Boot microservices and Angular. The platplorms supports user registration (either as a client or a seller), authentication, product CRUD functionality exclusively for sellers, and media management for product images.
 
 * Role-based functionalities: A user can either register as a Seller or a Client.
 - Seller: Can access the home page with product listings view. Sellers have the ability to create products and manage their products. They also have the ability to view and update their own profile.
@@ -27,7 +28,7 @@ This is a Java project that developes and end-to-end e-commerce platform with Sp
 
 ## Back-end Specifications
 
-The list of RESTful APIs to perform CRUD operations on Users (https://localhost:8443), Products (https://localhost:8444) and Media (https://localhost:8445) are:
+The list of REST APIs to perform CRUD operations on Users (https://164.92.252.125:8443), Products (https://164.92.252.125:8444) and Media (https://164.92.252.125:8445) are:
 
 - POST `/auth` - Authenticate a user by their username (email) and password then return a 7-day valid token to them (accessible without authentication)
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)
@@ -103,9 +104,9 @@ The whole process of the project has been automated using Jenkins (accessible at
    +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
 -  Build: once all the unit-tests have been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server.
    +  If all the builds are passed, the produced Docker images will then be pushed to a Docker Hub and are ready to be deployed.
-   +  If any of the buids has been failed, the Post Actions stage will be triggered (the Deploy stage will be marked as failed in this case).
+   +  If any of the builds has been failed, the Post Actions stage will be triggered (the Deploy stage will be marked as failed in this case).
 -  Deploy: once all the frontend and backend Docker images are available in the Docker Hub, they will be pulled to the deploy-server (at 164.92.252.125) and the deployment starts.
-   +  Other neccessary Docker images such as Zookeeper, Kafka and MongoDB are also pulled to the deploy-server.
+   +  Other necessary Docker images such as Zookeeper, Kafka and MongoDB are also pulled to the deploy-server.
    +  A separate Docker container is configured for each of the Docker images.
 -  Post Actions:
    +  If the deployment is passed, all the Docker containers are started and all the Docker images for frontend and backend are saved into a backup directory on the deploy-server. A success email will also be sent to all the team members.
@@ -125,7 +126,7 @@ git clone git@github.com:danglam88/buy-01.git
 
 To run the project, navigate to the project root directory, make some changes, then push them to the main branch of the project repository. The CI/CD pipeline will be triggered (using Webhooks in Github) after that. Finally, the application is accessible at https://164.92.252.125:4200 after the pipeline process has been completed.
 
-Postman is a great tool for testing RESTful APIs. You can download it [here](https://www.postman.com/downloads/).
+Postman is a great tool for testing REST APIs. You can download it [here](https://www.postman.com/downloads/).
 
 ## License
 
@@ -141,4 +142,3 @@ Contributions are welcome. Please open an issue or submit a pull request if you 
 - [Ashley] (https://github.com/hgwtra)
 - [Iuliia] (https://github.com/ManWhoSoldTheW0rld)
 - [Nafi] (https://github.com/NafiRanta)
-
