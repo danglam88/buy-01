@@ -118,7 +118,7 @@ The application is then accessible via https://164.92.252.125:4200
 To install the project, clone the repository to your local machine.
 
 ```bash
-git clone https://github.com/danglam88/buy-01.git
+git clone git@github.com:danglam88/buy-01.git
 ```
 
 ## Usage
@@ -141,3 +141,4 @@ Contributions are welcome. Please open an issue or submit a pull request if you 
 - [Ashley] (https://github.com/hgwtra)
 - [Iuliia] (https://github.com/ManWhoSoldTheW0rld)
 - [Nafi] (https://github.com/NafiRanta)
+
