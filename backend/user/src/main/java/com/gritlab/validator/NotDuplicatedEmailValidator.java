@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class NotDuplicatedEmailValidator implements ConstraintValidator<NotDuplicatedEmail, String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotDuplicatedEmailValidator.class);
+    private static final Logger log = LoggerFactory.getLogger(NotDuplicatedEmailValidator.class);
 
     @Autowired
     private UserService userService;
@@ -22,7 +22,7 @@ public class NotDuplicatedEmailValidator implements ConstraintValidator<NotDupli
     @Override
     public void initialize(NotDuplicatedEmail constraintAnnotation) {
         // Logging the initialization of the validator
-        LOGGER.info("Initializing NotDuplicatedEmailValidator");
+        log.info("Initializing NotDuplicatedEmailValidator");
         // No specific setup required at this point
     }
 

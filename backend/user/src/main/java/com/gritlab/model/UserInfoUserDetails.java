@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class UserInfoUserDetails implements UserDetails {
 
@@ -23,16 +22,16 @@ public class UserInfoUserDetails implements UserDetails {
         this.username = user.getEmail();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(user.getRole().toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                .map(roleStr -> (GrantedAuthority) new SimpleGrantedAuthority(roleStr))
+                .toList();
     }
 
     public UserInfoUserDetails(String username, String id, String role) {
         this.username = username;
         this.id = id;
         this.authorities = Arrays.stream(role.split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                .map(roleStr -> (GrantedAuthority) new SimpleGrantedAuthority(roleStr))
+                .toList();
     }
 
     @Override
