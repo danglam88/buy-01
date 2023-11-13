@@ -8,7 +8,6 @@ import com.gritlab.service.UserInfoUserDetailsService;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,17 +51,25 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
 
-    @Autowired
-    private CorsFilter corsFilter;
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter();
+    }
 
-    @Autowired
-    private RateLimitFilter rateLimitFilter;
+    @Bean
+    public RateLimitFilter rateLimitFilter() {
+        return new RateLimitFilter();
+    }
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    @Bean
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter();
+    }
 
-    @Autowired
-    private ExceptionFilter exceptionFilter;
+    @Bean
+    public ExceptionFilter exceptionFilter() {
+        return new ExceptionFilter();
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -70,7 +77,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CorsFilter corsFilter,
+                                                   RateLimitFilter rateLimitFilter,
+                                                   JwtAuthFilter jwtAuthFilter,
+                                                   ExceptionFilter exceptionFilter) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)

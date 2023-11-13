@@ -14,7 +14,7 @@ import java.io.IOException;
 public class ForbiddenExceptionHandler {
 
     @ExceptionHandler({ForbiddenException.class, JsonProcessingException.class, IOException.class})
-    public ResponseEntity<?> handleForbiddenException(Exception ex) throws Exception {
+    public ResponseEntity<Response> handleForbiddenException(Exception ex) throws Exception {
         if (ex instanceof ForbiddenException || ex instanceof JsonProcessingException || ex instanceof IOException) {
             Response errorResponse = new Response(ex.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);

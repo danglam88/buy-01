@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class UserServiceTest {
+class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
@@ -49,7 +49,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void checkFileWhenInvalidFileType_thenThrowEx() throws IOException {
+    void checkFileWhenInvalidFileTypeThenThrowEx() throws IOException {
 
         MultipartFile mockFile1 = mock(MultipartFile.class);
 
@@ -63,35 +63,35 @@ public class UserServiceTest {
     }
 
     @Test
-    void getExtensionWhenValidFileName_thenReturnExtension() {
+    void getExtensionWhenValidFileNameThenReturnExtension() {
         String ext = userService.getExtension("mockFile1.jpg");
         assertEquals("jpg", ext);
     }
 
     @Test
-    void getExtensionWhenInvalidFileName_thenReturnEmptyString() {
+    void getExtensionWhenInvalidFileNameThenReturnEmptyString() {
         String ext = userService.getExtension("mockFile1");
         assertEquals("", ext);
     }
 
     @Test
-    void isValidExtension_WhenValid_thenReturnTrue() {
+    void isValidExtensionWhenValidThenReturnTrue() {
         assertTrue(userService.isValidExtension("jpg"));
     }
 
     @Test
-    void isValidExtension_WhenInvalid_thenReturnFalse() {
+    void isValidExtensionWhenInvalidThenReturnFalse() {
         assertFalse(userService.isValidExtension("exe"));
     }
 
     @Test
-    void getImageTypeWhenValidExtension_thenReturnImageType() {
+    void getImageTypeWhenValidExtensionThenReturnImageType() {
         MediaType type = userService.getImageType("mockFile1.png");
         assertEquals(MediaType.IMAGE_PNG, type);
     }
 
     @Test
-    void createAccountWhenValidData_thenReturnsUser() throws IOException {
+    void createAccountWhenValidDataThenReturnsUser() throws IOException {
         // Request params
         RegRequest regRequest = new RegRequest("Test Name",
                 "test@mail.com", "Test1@", "SELLER");
@@ -103,17 +103,17 @@ public class UserServiceTest {
         // Act
         User result = userService.createAccount(regRequest, null);
 
-        assertEquals(result.getName(), regRequest.getName());
-        assertEquals(result.getEmail(), regRequest.getEmail());
-        assertEquals(result.getPassword(), passwordEncoder.encode(
-                regRequest.getPassword() + result.getId()));
-        assertEquals(result.getRole().toString(), regRequest.getRole());
-        assertEquals(result.getAvatar(), null);
-        assertEquals(result.getAvatarData(), null);
+        assertEquals(regRequest.getName(), result.getName());
+        assertEquals(regRequest.getEmail(), result.getEmail());
+        assertEquals(passwordEncoder.encode(
+                regRequest.getPassword() + result.getId()), result.getPassword());
+        assertEquals(regRequest.getRole(), result.getRole().toString());
+        assertEquals(null, result.getAvatar());
+        assertEquals(null, result.getAvatarData());
     }
 
     @Test
-    void updateUserWhenRequestIsValid_thenReturnsUser() {
+    void updateUserWhenRequestIsValidThenReturnsUser() {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -133,17 +133,17 @@ public class UserServiceTest {
         // Act
         User result = userService.updateUser(userId, userRequest, null);
 
-        assertEquals(result.getName(), userRequest.getName());
-        assertEquals(result.getEmail(), userRequest.getEmail());
-        assertEquals(result.getPassword(), passwordEncoder.encode(
-                userRequest.getPassword() + userId));
-        assertEquals(result.getRole().toString(), userRequest.getRole());
-        assertEquals(result.getAvatar(), null);
-        assertEquals(result.getAvatarData(), null);
+        assertEquals(userRequest.getName(), result.getName());
+        assertEquals(userRequest.getEmail(), result.getEmail());
+        assertEquals(passwordEncoder.encode(
+                userRequest.getPassword() + userId), result.getPassword());
+        assertEquals(userRequest.getRole(), result.getRole().toString());
+        assertEquals(null, result.getAvatar());
+        assertEquals(null, result.getAvatarData());
     }
 
     @Test
-    void authorizeUserWhenValidData_thenReturnsUser() {
+    void authorizeUserWhenValidDataThenReturnsUser() {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -160,17 +160,17 @@ public class UserServiceTest {
 
         // Act
         User result = userService.authorizeUser(authentication, userId);
-        assertEquals(result.getId(), userId);
-        assertEquals(result.getName(), user.getName());
-        assertEquals(result.getEmail(), user.getEmail());
-        assertEquals(result.getPassword(), user.getPassword());
-        assertEquals(result.getRole(), user.getRole());
-        assertEquals(result.getAvatar(), user.getAvatar());
-        assertEquals(result.getAvatarData(), user.getAvatarData());
+        assertEquals(userId, result.getId());
+        assertEquals(user.getName(), result.getName());
+        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(user.getPassword(), result.getPassword());
+        assertEquals(user.getRole(), result.getRole());
+        assertEquals(user.getAvatar(), result.getAvatar());
+        assertEquals(user.getAvatarData(), result.getAvatarData());
     }
 
     @Test
-    void authorizeUserWhenNotFound_thenThrowEx() {
+    void authorizeUserWhenNotFoundThenThrowEx() {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -184,7 +184,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void authorizeUserWhenSomeoneElse_thenThrowEx() {
+    void authorizeUserWhenSomeoneElseThenThrowEx() {
         // Create a sample User id
         String userId = "user-id1";
 

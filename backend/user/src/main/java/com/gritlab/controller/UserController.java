@@ -1,5 +1,6 @@
 package com.gritlab.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gritlab.model.UserRequest;
@@ -33,7 +34,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/userInfo")
-    public ResponseEntity<?> getUserInfo(Authentication authentication) throws JsonProcessingException {
+    public ResponseEntity<JsonNode> getUserInfo(Authentication authentication) throws JsonProcessingException {
         User user = userService.authorizeUser(authentication, null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
@@ -58,7 +59,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable String userId, Authentication authentication)
+    public ResponseEntity<JsonNode> getUserById(@PathVariable String userId, Authentication authentication)
             throws JsonProcessingException {
         User user = userService.authorizeUser(authentication, userId);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -68,7 +69,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @PutMapping("/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable String userId,
+    public ResponseEntity<Void> updateUser(@PathVariable String userId,
             @Valid @ModelAttribute("request") UserRequest request,
             BindingResult result,
             @RequestPart(value = "file", required = false) MultipartFile file,
@@ -89,7 +90,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable String userId, Authentication authentication) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId, Authentication authentication) {
         userService.authorizeUser(authentication, userId);
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();

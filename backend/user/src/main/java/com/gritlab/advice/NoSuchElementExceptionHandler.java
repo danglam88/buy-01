@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 public class NoSuchElementExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<?> handleNoSuchElementException(NoSuchElementException ex) {
+    public ResponseEntity<Void> handleNoSuchElementException(NoSuchElementException ex) {
         return ResponseEntity.notFound().build();
     }
 }

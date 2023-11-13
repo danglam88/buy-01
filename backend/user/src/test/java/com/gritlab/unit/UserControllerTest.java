@@ -1,6 +1,7 @@
 package com.gritlab.unit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.controller.UserController;
 import com.gritlab.model.*;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class UserControllerTest {
+class UserControllerTest {
 
     private UserController userController;
 
@@ -47,7 +48,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserInfo() throws JsonProcessingException {
+    void testGetUserInfo() throws JsonProcessingException {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -65,7 +66,7 @@ public class UserControllerTest {
         when(userService.convertToDto(authorizedUser)).thenReturn(userDTO);
 
         // Call the controller method
-        ResponseEntity<?> response = userController.getUserInfo(authentication);
+        ResponseEntity<JsonNode> response = userController.getUserInfo(authentication);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
@@ -75,7 +76,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAvatarById() throws IOException {
+    void testGetAvatarById() throws IOException {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -98,7 +99,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserById() throws JsonProcessingException {
+    void testGetUserById() throws JsonProcessingException {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -115,7 +116,7 @@ public class UserControllerTest {
         when(userService.convertToDto(authorizedUser)).thenReturn(userDTO);
 
         // Call the controller method
-        ResponseEntity<?> response = userController.getUserById(userId, authentication);
+        ResponseEntity<JsonNode> response = userController.getUserById(userId, authentication);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
@@ -125,7 +126,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateUserWhenValidInput_thenReturns200() throws MethodArgumentNotValidException {
+    void updateUserWhenValidInputThenReturns200() throws MethodArgumentNotValidException {
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
@@ -152,7 +153,7 @@ public class UserControllerTest {
         when(userService.updateUser(userId, userRequest, file)).thenReturn(updatedUser);
 
         // Call the controller method
-        ResponseEntity<?> responseEntity = userController.updateUser(userId, userRequest,
+        ResponseEntity<Void> responseEntity = userController.updateUser(userId, userRequest,
                 bindingResult, file, ucb, authentication);
 
         // Assertions
@@ -163,7 +164,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void deleteUserWhenValidInput_thenReturns200() throws Exception {
+    void deleteUserWhenValidInputThenReturns200() throws Exception {
         // Create a sample User id
         String userId = "user-id1";
 
@@ -173,7 +174,7 @@ public class UserControllerTest {
         when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
 
         // Call the controller method
-        ResponseEntity<?> responseEntity = userController.deleteUser(userId, authentication);
+        ResponseEntity<Void> responseEntity = userController.deleteUser(userId, authentication);
 
         // Assertions
         assertNotNull(responseEntity);

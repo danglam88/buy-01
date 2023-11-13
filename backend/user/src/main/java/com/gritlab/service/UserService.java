@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Validated
 public class UserService {
 
+    private static final String UPLOAD_FILE_ERROR_MESSAGE = "Failed to upload file";
+
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
 
     @Autowired
@@ -97,7 +99,7 @@ public class UserService {
                     regRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            throw new InvalidParamException("Failed to upload file");
+            throw new InvalidParamException(UPLOAD_FILE_ERROR_MESSAGE);
         }
     }
 
@@ -117,7 +119,7 @@ public class UserService {
                     userRequest.getRole().trim().toUpperCase(), file.getOriginalFilename(), file.getBytes());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            throw new InvalidParamException("Failed to upload file");
+            throw new InvalidParamException(UPLOAD_FILE_ERROR_MESSAGE);
         }
     }
 
@@ -132,7 +134,7 @@ public class UserService {
                 throw new InvalidParamException("File must be an image");
             }
         } catch (IOException ex) {
-            throw new InvalidParamException("Failed to upload file");
+            throw new InvalidParamException(UPLOAD_FILE_ERROR_MESSAGE);
         }
 
         if (file.getSize() > 2 * 1024 * 1024) {
