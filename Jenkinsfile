@@ -1,9 +1,5 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def shouldRunStage(String branchName) {
-    return branchName == 'sonarqube'
-}
-
 pipeline {
     agent any // We define the specific agents within each stage
 
@@ -13,8 +9,6 @@ pipeline {
     }
 
     environment {
-        // This will be assigned once we run the Git command
-        CURRENT_BRANCH = ''
         USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
@@ -22,21 +16,11 @@ pipeline {
     }
 
     stages {
-        stage('Set Branch Name') {
-            steps {
-                script {
-                    env.CURRENT_BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-                }
-            }
-        }
-
         stage('Unit Tests') {
-            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             parallel {
                 stage('Frontend Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         script {
                             env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                         }
@@ -50,7 +34,6 @@ pipeline {
                 stage('Media-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/media
                         mvn test
@@ -60,7 +43,6 @@ pipeline {
                 stage('Product-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/product
                         mvn test
@@ -70,7 +52,6 @@ pipeline {
                 stage('User-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
-                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/user
                         mvn test
@@ -81,10 +62,8 @@ pipeline {
         }
 
         stage('Build') {
-            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
-                echo "Running on branch ${env.CURRENT_BRANCH}"
                 script {
                     // Execute the build commands
                     sh '''
@@ -116,10 +95,8 @@ pipeline {
         }
         
         stage('Deploy') {
-            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
-                echo "Running on branch ${env.CURRENT_BRANCH}"
                 script {
                     // Execute the deploy commands
                     sh '''
@@ -153,25 +130,24 @@ pipeline {
 
         success {
             script {
-                if (shouldRunStage()) {
-                    // If deploy succeeds, the backup commands are executed
-                    echo "Deployment succeeded. Executing backup."
-                    sh '''
-                    docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
-                    docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
-                    docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
-                    docker save -o ~/frontend.tar $FRONTEND_IMAGE
+                // If deploy succeeds, the backup commands are executed
+                echo "Deployment succeeded. Executing backup."
+                sh '''
+                docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
+                docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
+                docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
+                docker save -o ~/frontend.tar $FRONTEND_IMAGE
 
-                    if [ ! -d "~/backup" ]; then
-                        mkdir -p ~/backup
-                    fi
+                if [ ! -d "~/backup" ]; then
+                    mkdir -p ~/backup
+                fi
 
-                    mv ~/*.tar ~/backup/
-                    '''
+                mv ~/*.tar ~/backup/
+                '''
 
-                    mail to: "${predefinedEmails}",
-                    subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
-                    body: """Hello,
+                mail to: "${predefinedEmails}",
+                        subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
+                        body: """Hello,
 
 The Jenkins Pipeline ${currentBuild.fullDisplayName} has succeeded.
 
@@ -180,39 +156,37 @@ See full details at: ${env.BUILD_URL}
 Best regards,
 Gritlab Jenkins
 """
-                }
             }
         }
 
         failure {
             script {
-                if (shouldRunStage()) {
-                    // If deploy fails, the rollback commands are executed
-                    echo "Deployment failed. Executing rollback."
-                    sh '''
-                    if [ "$(docker ps -aq)" != "" ]; then
-                        docker rm -f $(docker ps -aq)
-                    fi
-                    docker system prune -a -f
+                // If deploy fails, the rollback commands are executed
+                echo "Deployment failed. Executing rollback."
+                sh '''
+                if [ "$(docker ps -aq)" != "" ]; then
+                    docker rm -f $(docker ps -aq)
+                fi
+                docker system prune -a -f
 
-                    rm -rf ~/*.tar
-                    cp ~/backup/*.tar ~/
+                rm -rf ~/*.tar
+                cp ~/backup/*.tar ~/
 
-                    docker load -i ~/user-microservice.tar
-                    docker load -i ~/product-microservice.tar
-                    docker load -i ~/media-microservice.tar
-                    docker load -i ~/frontend.tar
+                docker load -i ~/user-microservice.tar
+                docker load -i ~/product-microservice.tar
+                docker load -i ~/media-microservice.tar
+                docker load -i ~/frontend.tar
 
-                    docker-compose up -d
-                    '''
+                docker-compose up -d
+                '''
 
-                    def culprits = currentBuild.changeSets.collectMany { changeSet ->
-                        changeSet.items.collect { it.author.fullName }
-                    }.join(', ')
+                def culprits = currentBuild.changeSets.collectMany { changeSet ->
+                    changeSet.items.collect { it.author.fullName }
+                }.join(', ')
         
-                    def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
+                def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
         
-                    mail to: recipient,
+                mail to: recipient,
                     subject: "Jenkins Pipeline FAILURE: ${currentBuild.fullDisplayName}",
                     body: """Hello,
 
@@ -223,7 +197,6 @@ See full details at: ${env.BUILD_URL}
 Best regards,
 Gritlab Jenkins
 """
-                }
             }
         }
     }
