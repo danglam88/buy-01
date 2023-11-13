@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.controller.ProductController;
 import com.gritlab.model.Product;
+import com.gritlab.model.ProductDTO;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,7 +111,7 @@ public class ProductControllerTest {
     public void createProductWhenValidInput_thenReturns201() throws MethodArgumentNotValidException {
 
         // Request params
-        Product product = new Product(
+        ProductDTO product = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null
         );
         BindingResult bindingResult = mock(BindingResult.class);
@@ -149,7 +150,7 @@ public class ProductControllerTest {
         when(userDetails.getId()).thenReturn("id-1");
 
         // Create a sample Product object
-        Product updatedProduct = new Product(null, "Updated Product", "Updated product desc",  10.0, 1, null);
+        ProductDTO updatedProduct = new ProductDTO(null, "Updated Product", "Updated product desc",  10.0, 1, null);
         String productId = "product-id-1";
 
         // Call the controller method

@@ -7,6 +7,7 @@ import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
+import com.gritlab.model.ProductDTO;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +46,7 @@ public class ProductServiceTest {
     @Test
     void addProductWhenValidData_thenReturnsProduct() throws IOException {
         // Arrange
-        Product request = new Product(
+        ProductDTO request = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
 
         List<MultipartFile> files = new ArrayList<>();
@@ -68,7 +69,7 @@ public class ProductServiceTest {
     @Test
     void addProductWhenTooManyFiles_thenThrowEx() throws IOException {
         // Arrange
-        Product request = new Product(
+        ProductDTO request = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
 
         List<MultipartFile> files = new ArrayList<>();
@@ -121,7 +122,7 @@ public class ProductServiceTest {
     @Test
     void updateProductWhenRequestIsValid_thenNothing() {
 
-        Product request = new Product(
+        ProductDTO request = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
 
         String userID = "user-id-1";
@@ -143,7 +144,7 @@ public class ProductServiceTest {
     @Test
     void updateProductWhenProductDoesNotExist_thenThrowAnError() {
 
-        Product request = new Product(
+        ProductDTO request = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
 
         String userID = "user-id-1";
@@ -160,7 +161,7 @@ public class ProductServiceTest {
     @Test
     void updateProductWhenProductDoesNotBelongToUser_thenThrowAnError() {
 
-        Product request = new Product(
+        ProductDTO request = new ProductDTO(
                 null, "Product Name", "Product Desc", 10.0, 1, null);
 
         String userID = "user-id-1";

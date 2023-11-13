@@ -3,6 +3,7 @@ package com.gritlab.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.model.Product;
+import com.gritlab.model.ProductDTO;
 import com.gritlab.model.UserDetails;
 import com.gritlab.service.ProductService;
 import jakarta.validation.Valid;
@@ -52,7 +53,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") Product request,
+    public ResponseEntity<String> createProduct(@Valid @ModelAttribute("request") ProductDTO request,
                                                 BindingResult result,
                                                 @RequestPart("files") List<MultipartFile> files,
                                                 Authentication authentication,
@@ -75,7 +76,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateProduct(
             @PathVariable String id,
-            @Valid @RequestBody Product updatedData,
+            @Valid @RequestBody ProductDTO updatedData,
             Authentication authentication) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

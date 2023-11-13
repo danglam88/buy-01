@@ -4,6 +4,7 @@ import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
+import com.gritlab.model.ProductDTO;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +94,7 @@ public class ProductService {
         return false;
     }
 
-    public Product addProduct(Product request, List<MultipartFile> files, String userId) {
+    public Product addProduct(ProductDTO request, List<MultipartFile> files, String userId) {
 
         if (files.size() > 5) {
             throw new InvalidParamException("Maximum 5 files allowed");
@@ -127,7 +128,7 @@ public class ProductService {
         return newProduct;
     }
 
-    public void updateProduct(String id, Product data, String userId) throws NoSuchElementException {
+    public void updateProduct(String id, ProductDTO data, String userId) throws NoSuchElementException {
 
         if (productRepository.existsById(id)) {
             if (productRepository.existsByUserIdAndId(userId, id)) {
