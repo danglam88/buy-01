@@ -15,7 +15,6 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class BadRequestExceptionHandler {
@@ -44,7 +43,7 @@ public class BadRequestExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .map(error -> error.getDefaultMessage())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -69,7 +68,7 @@ public class BadRequestExceptionHandler {
     public List<String> handleConstraintViolationException(ConstraintViolationException ex) {
         return ex.getConstraintViolations().stream()
                 .map(violation -> violation.getMessage())
-                .collect(Collectors.toList());
+                .toList();
     }
 }
 

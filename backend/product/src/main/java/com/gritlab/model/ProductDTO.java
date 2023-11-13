@@ -1,21 +1,16 @@
 package com.gritlab.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDTO {
-    @Id
-    private String id;
-
     @NotNull(message = "Name is required")
     @Pattern(regexp = "^(?!\\s*$).+", message = "Name cannot be empty or contain only spaces")
     @Size(max = 50, min = 1, message = "Name cannot exceed 50 characters")
@@ -35,7 +30,4 @@ public class ProductDTO {
     @Min(value = 1, message = "Quantity must be greater than 0")
     @Max(value = 999999999, message = "Quantity must be less than 999999999")
     private Integer quantity;
-
-    @JsonIgnore
-    private String userId;
 }

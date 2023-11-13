@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class ProductServiceTest {
+class ProductServiceTest {
 
     @InjectMocks
     private ProductService productService;
@@ -46,8 +46,7 @@ public class ProductServiceTest {
     @Test
     void addProductWhenValidData_thenReturnsProduct() throws IOException {
         // Arrange
-        ProductDTO request = new ProductDTO(
-                null, "Product Name", "Product Desc", 10.0, 1, null);
+        ProductDTO request = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
 
         List<MultipartFile> files = new ArrayList<>();
         String userId = "user123";
@@ -69,8 +68,7 @@ public class ProductServiceTest {
     @Test
     void addProductWhenTooManyFiles_thenThrowEx() throws IOException {
         // Arrange
-        ProductDTO request = new ProductDTO(
-                null, "Product Name", "Product Desc", 10.0, 1, null);
+        ProductDTO request = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
 
         List<MultipartFile> files = new ArrayList<>();
         String userId = "user123";
@@ -122,8 +120,7 @@ public class ProductServiceTest {
     @Test
     void updateProductWhenRequestIsValid_thenNothing() {
 
-        ProductDTO request = new ProductDTO(
-                null, "Product Name", "Product Desc", 10.0, 1, null);
+        ProductDTO request = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
 
         String userID = "user-id-1";
         String productID = "product-id-1";
@@ -138,14 +135,13 @@ public class ProductServiceTest {
 
         when(productRepository.findByUserIdAndId(userID, productID)).thenReturn(product);
 
-        productService.updateProduct(productID, request, userID);
+        assertDoesNotThrow(() -> productService.updateProduct(productID, request, userID));
     }
 
     @Test
     void updateProductWhenProductDoesNotExist_thenThrowAnError() {
 
-        ProductDTO request = new ProductDTO(
-                null, "Product Name", "Product Desc", 10.0, 1, null);
+        ProductDTO request = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
 
         String userID = "user-id-1";
         String productID = "product-id-1";
@@ -161,8 +157,7 @@ public class ProductServiceTest {
     @Test
     void updateProductWhenProductDoesNotBelongToUser_thenThrowAnError() {
 
-        ProductDTO request = new ProductDTO(
-                null, "Product Name", "Product Desc", 10.0, 1, null);
+        ProductDTO request = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
 
         String userID = "user-id-1";
         String productID = "product-id-1";

@@ -1,13 +1,13 @@
 package com.gritlab.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.model.Product;
 import com.gritlab.model.ProductDTO;
-import com.gritlab.model.UserDetails;
+import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.ProductService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.ResponseEntity;
@@ -23,29 +23,32 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@AllArgsConstructor
 public class ProductController {
 
-    @Autowired
     private ProductService productService;
 
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
     @GetMapping()
-    public ResponseEntity<?> findAll() throws JsonProcessingException {
+    public ResponseEntity<JsonNode> findAll() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String productsNoUserId = objectMapper.writeValueAsString(productService.findAll());
         return ResponseEntity.ok(objectMapper.readTree(productsNoUserId));
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<?> findBySellerId(Authentication authentication) throws JsonProcessingException {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public ResponseEntity<JsonNode> findBySellerId(Authentication authentication) throws JsonProcessingException {
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         ObjectMapper objectMapper = new ObjectMapper();
         String productsNoUserId = objectMapper.writeValueAsString(productService.findBySellerId(userDetails.getId()));
         return ResponseEntity.ok(objectMapper.readTree(productsNoUserId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable String id) throws JsonProcessingException {
+    public ResponseEntity<JsonNode> findById(@PathVariable String id) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Product product = productService.getProduct(id).orElseThrow();
         String productNoUserId = objectMapper.writeValueAsString(product);
@@ -62,7 +65,7 @@ public class ProductController {
             throw new MethodArgumentNotValidException((MethodParameter) null, result);
         }
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         Product newProduct = productService.addProduct(request, files, userDetails.getId());
 
         URI locationOfNewProduct = ucb
@@ -79,7 +82,7 @@ public class ProductController {
             @Valid @RequestBody ProductDTO updatedData,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         productService.updateProduct(id, updatedData, userDetails.getId());
 
         return ResponseEntity.ok().build();
@@ -90,7 +93,7 @@ public class ProductController {
             @PathVariable String id,
             Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         productService.deleteProduct(id, userDetails.getId());
         return ResponseEntity.ok().build();
     }
