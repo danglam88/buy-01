@@ -1,9 +1,8 @@
 package com.gritlab.controller;
 
 import com.gritlab.model.Media;
-import com.gritlab.model.UserDetails;
+import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.MediaService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -14,18 +13,22 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/media")
-@AllArgsConstructor
 public class MediaController {
 
+    private final MediaService mediaService;
+
     @Autowired
-    private MediaService mediaService;
+    public MediaController(MediaService mediaService) {
+        this.mediaService = mediaService;
+    }
 
     @GetMapping("product/{id}")
-    public ResponseEntity<?> findByProductId(@PathVariable String id) {
+    public ResponseEntity<List<String>> findByProductId(@PathVariable String id) {
 
         return ResponseEntity.ok().body(mediaService.getByProductId(id));
     }
@@ -54,7 +57,7 @@ public class MediaController {
                                              Authentication authentication,
                                              UriComponentsBuilder ucb) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         Media newProduct = mediaService.addMedia(file, productId, userDetails.getId());
 
         URI locationOfMedia = ucb
@@ -69,7 +72,7 @@ public class MediaController {
     public ResponseEntity<Void> deleteMedia(@PathVariable String id,
                                                Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
 
         mediaService.deleteMedia(id, userDetails.getId());
         return ResponseEntity.ok().build();

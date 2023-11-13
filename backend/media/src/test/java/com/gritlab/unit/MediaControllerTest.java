@@ -2,7 +2,7 @@ package com.gritlab.unit;
 
 import com.gritlab.controller.MediaController;
 import com.gritlab.model.Media;
-import com.gritlab.model.UserDetails;
+import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.MediaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MediaControllerTest {
+class MediaControllerTest {
 
     private MediaController mediaController;
 
@@ -44,7 +44,7 @@ public class MediaControllerTest {
     }
 
     @Test
-    public void testFindById() throws IOException {
+    void testFindById() throws IOException {
         // Arrange
         String mediaId = "media-id-1";
         String productId = "product-id-1";
@@ -67,7 +67,7 @@ public class MediaControllerTest {
     }
 
     @Test
-    public void testFindByIdNotFound() {
+    void testFindByIdNotFound() {
         // Arrange
         String mediaId = "nonExistentMediaId";
 
@@ -79,11 +79,11 @@ public class MediaControllerTest {
     }
 
     @Test
-    public void uploadFileWhenValidInput_thenReturns200() throws Exception {
+    void uploadFileWhenValidInput_thenReturns200() throws Exception {
 
         String userId = "id-1";
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn(userId);
 
@@ -107,10 +107,10 @@ public class MediaControllerTest {
     }
 
     @Test
-    public void deleteMediaWhenValidInput_thenReturns200() throws Exception {
+    void deleteMediaWhenValidInput_thenReturns200() throws Exception {
 
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("id-1");
 

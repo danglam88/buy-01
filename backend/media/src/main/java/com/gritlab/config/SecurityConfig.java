@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,20 +58,14 @@ public class SecurityConfig {
     @Value("${spring.kafka.consumer.max-partition-fetch-bytes}")
     private String maxPartitionFetchBytes;
 
-    @Autowired
-    private CorsFilter corsFilter;
-
-    @Autowired
-    private JwtAuthFilter authFilter;
-
-    @Autowired
-    private ExceptionFilter exceptionFilter;
-
-    @Autowired
-    private RateLimitFilter rateLimitFilter;
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            CorsFilter corsFilter,
+            ExceptionFilter exceptionFilter,
+            RateLimitFilter rateLimitFilter,
+            JwtAuthFilter authFilter
+    ) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)

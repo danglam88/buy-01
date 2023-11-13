@@ -29,15 +29,13 @@ public class ProductCheckService {
     }
 
     public void sendRequest(String correlationId, String payload) {
-        System.out.println("Sending data :" + correlationId  + ", payload: "+  payload);
         kafkaTemplate.send("CHECK_PRODUCT_REQUEST", correlationId, payload);
     }
 
     @KafkaListener(topics = "CHECK_PRODUCT_RESPONSE")
-    public void listen(ConsumerRecord<String, String> record) {
-        String correlationId = record.key();
-        String response = record.value();
-        System.out.println("Receiving data :" + correlationId  + ", "+  response);
+    public void listen(ConsumerRecord<String, String> consumerRecord) {
+        String correlationId = consumerRecord.key();
+        String response = consumerRecord.value();
         responseMap.put(correlationId, response);
     }
 

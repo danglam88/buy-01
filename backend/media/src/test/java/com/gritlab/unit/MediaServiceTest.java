@@ -29,13 +29,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MediaServiceTest {
+class MediaServiceTest {
 
     @InjectMocks
     private MediaService mediaService;
@@ -59,7 +58,7 @@ public class MediaServiceTest {
     }
 
     @Test
-    public void testGetByProductId() {
+    void testGetByProductId() {
         // Arrange
         String productId = "yourProductId";
         List<Media> mediaList = new ArrayList<>();
@@ -125,7 +124,7 @@ public class MediaServiceTest {
             return invocation.getArgument(0);
         });
 
-        mediaService.addMedia(multipartFile, productId, userId);
+        assertDoesNotThrow(() -> mediaService.addMedia(multipartFile, productId, userId));
     }
 
     @Test
@@ -172,7 +171,7 @@ public class MediaServiceTest {
         });
         when(mediaRepository.findById(any(String.class))).thenAnswer(invocation ->  Optional.of(new Media()));
 
-        mediaService.deleteMedia(productId, userId);
+        assertDoesNotThrow(() ->mediaService.deleteMedia(productId, userId));
     }
 
     @Test
@@ -207,7 +206,7 @@ public class MediaServiceTest {
         assertEquals("", ext);
     }
 
-    public void createMockImage(String filePath) throws IOException {
+    void createMockImage(String filePath) throws IOException {
         BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
         // Set the entire image to white
