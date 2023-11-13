@@ -1,7 +1,7 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def shouldRunStage() {
-    return env.BRANCH_NAME == 'sonarqube'
+def shouldRunStage(String branchName) {
+    return branchName == 'sonarqube'
 }
 
 pipeline {
@@ -13,7 +13,8 @@ pipeline {
     }
 
     environment {
-        BRANCH_NAME = 'sonarqube'
+        // This will be assigned once we run the Git command
+        CURRENT_BRANCH = ''
         USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
@@ -21,12 +22,21 @@ pipeline {
     }
 
     stages {
+        stage('Set Branch Name') {
+            steps {
+                script {
+                    env.CURRENT_BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                }
+            }
+        }
+
         stage('Unit Tests') {
-            when { expression { shouldRunStage() } }
+            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             parallel {
                 stage('Frontend Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
+                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         script {
                             env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                         }
@@ -40,6 +50,7 @@ pipeline {
                 stage('Media-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
+                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/media
                         mvn test
@@ -49,6 +60,7 @@ pipeline {
                 stage('Product-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
+                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/product
                         mvn test
@@ -58,6 +70,7 @@ pipeline {
                 stage('User-Microservice Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
                     steps {
+                        echo "Running on branch ${env.CURRENT_BRANCH}"
                         sh '''
                         cd backend/user
                         mvn test
@@ -68,9 +81,10 @@ pipeline {
         }
 
         stage('Build') {
-            when { expression { shouldRunStage() } }
+            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
+                echo "Running on branch ${env.CURRENT_BRANCH}"
                 script {
                     // Execute the build commands
                     sh '''
@@ -102,9 +116,10 @@ pipeline {
         }
         
         stage('Deploy') {
-            when { expression { shouldRunStage() } }
+            when { expression { shouldRunStage(env.CURRENT_BRANCH) } }
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
+                echo "Running on branch ${env.CURRENT_BRANCH}"
                 script {
                     // Execute the deploy commands
                     sh '''
