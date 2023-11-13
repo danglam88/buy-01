@@ -1,5 +1,9 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
+def shouldRunStage() {
+    return env.BRANCH_NAME == 'sonarqube'
+}
+
 pipeline {
     agent any // We define the specific agents within each stage
 
@@ -9,6 +13,7 @@ pipeline {
     }
 
     environment {
+        BRANCH_NAME = 'sonarqube'
         USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
@@ -17,6 +22,7 @@ pipeline {
 
     stages {
         stage('Unit Tests') {
+            when { expression { shouldRunStage() } }
             parallel {
                 stage('Frontend Tests') {
                     agent { label 'build-agent' } // This stage will be executed on the 'build' agent
@@ -62,6 +68,7 @@ pipeline {
         }
 
         stage('Build') {
+            when { expression { shouldRunStage() } }
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
                 script {
@@ -95,6 +102,7 @@ pipeline {
         }
         
         stage('Deploy') {
+            when { expression { shouldRunStage() } }
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
                 script {
@@ -130,24 +138,25 @@ pipeline {
 
         success {
             script {
-                // If deploy succeeds, the backup commands are executed
-                echo "Deployment succeeded. Executing backup."
-                sh '''
-                docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
-                docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
-                docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
-                docker save -o ~/frontend.tar $FRONTEND_IMAGE
+                if (shouldRunStage()) {
+                    // If deploy succeeds, the backup commands are executed
+                    echo "Deployment succeeded. Executing backup."
+                    sh '''
+                    docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
+                    docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
+                    docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
+                    docker save -o ~/frontend.tar $FRONTEND_IMAGE
 
-                if [ ! -d "~/backup" ]; then
-                    mkdir -p ~/backup
-                fi
+                    if [ ! -d "~/backup" ]; then
+                        mkdir -p ~/backup
+                    fi
 
-                mv ~/*.tar ~/backup/
-                '''
+                    mv ~/*.tar ~/backup/
+                    '''
 
-                mail to: "${predefinedEmails}",
-                        subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
-                        body: """Hello,
+                    mail to: "${predefinedEmails}",
+                    subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
+                    body: """Hello,
 
 The Jenkins Pipeline ${currentBuild.fullDisplayName} has succeeded.
 
@@ -156,37 +165,39 @@ See full details at: ${env.BUILD_URL}
 Best regards,
 Gritlab Jenkins
 """
+                }
             }
         }
 
         failure {
             script {
-                // If deploy fails, the rollback commands are executed
-                echo "Deployment failed. Executing rollback."
-                sh '''
-                if [ "$(docker ps -aq)" != "" ]; then
-                    docker rm -f $(docker ps -aq)
-                fi
-                docker system prune -a -f
+                if (shouldRunStage()) {
+                    // If deploy fails, the rollback commands are executed
+                    echo "Deployment failed. Executing rollback."
+                    sh '''
+                    if [ "$(docker ps -aq)" != "" ]; then
+                        docker rm -f $(docker ps -aq)
+                    fi
+                    docker system prune -a -f
 
-                rm -rf ~/*.tar
-                cp ~/backup/*.tar ~/
+                    rm -rf ~/*.tar
+                    cp ~/backup/*.tar ~/
 
-                docker load -i ~/user-microservice.tar
-                docker load -i ~/product-microservice.tar
-                docker load -i ~/media-microservice.tar
-                docker load -i ~/frontend.tar
+                    docker load -i ~/user-microservice.tar
+                    docker load -i ~/product-microservice.tar
+                    docker load -i ~/media-microservice.tar
+                    docker load -i ~/frontend.tar
 
-                docker-compose up -d
-                '''
+                    docker-compose up -d
+                    '''
 
-                def culprits = currentBuild.changeSets.collectMany { changeSet ->
-                    changeSet.items.collect { it.author.fullName }
-                }.join(', ')
+                    def culprits = currentBuild.changeSets.collectMany { changeSet ->
+                        changeSet.items.collect { it.author.fullName }
+                    }.join(', ')
         
-                def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
+                    def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
         
-                mail to: recipient,
+                    mail to: recipient,
                     subject: "Jenkins Pipeline FAILURE: ${currentBuild.fullDisplayName}",
                     body: """Hello,
 
@@ -197,6 +208,7 @@ See full details at: ${env.BUILD_URL}
 Best regards,
 Gritlab Jenkins
 """
+                }
             }
         }
     }
