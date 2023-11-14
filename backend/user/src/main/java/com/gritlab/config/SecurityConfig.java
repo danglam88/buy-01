@@ -52,26 +52,6 @@ public class SecurityConfig {
     private String valueSerializer;
 
     @Bean
-    public CorsFilter corsFilter() {
-        return new CorsFilter();
-    }
-
-    @Bean
-    public RateLimitFilter rateLimitFilter() {
-        return new RateLimitFilter();
-    }
-
-    @Bean
-    public JwtAuthFilter jwtAuthFilter() {
-        return new JwtAuthFilter();
-    }
-
-    @Bean
-    public ExceptionFilter exceptionFilter() {
-        return new ExceptionFilter();
-    }
-
-    @Bean
     public UserDetailsService userDetailsService() {
         return new UserInfoUserDetailsService();
     }
