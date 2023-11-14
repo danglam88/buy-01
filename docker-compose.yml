@@ -46,6 +46,9 @@ services:
       - buy01-network
     volumes:
       - user-mongo-volume:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rootUser
+      MONGO_INITDB_ROOT_PASSWORD: userDbRootPass
 
   product-mongodb:
     image: mongo:latest
@@ -55,6 +58,9 @@ services:
       - buy01-network
     volumes:
       - product-mongo-volume:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rootProduct
+      MONGO_INITDB_ROOT_PASSWORD: productDbRootPass
 
   media-mongodb:
     image: mongo:latest
@@ -64,6 +70,9 @@ services:
       - buy01-network
     volumes:
       - media-mongo-volume:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rootMedia
+      MONGO_INITDB_ROOT_PASSWORD: mediaDbRootPass
 
   kafka:
     image: confluentinc/cp-kafka:latest
