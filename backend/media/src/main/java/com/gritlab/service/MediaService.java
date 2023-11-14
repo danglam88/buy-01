@@ -12,6 +12,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -21,10 +24,10 @@ public class MediaService {
 
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
 
-    @Autowired
+    private static final Logger LOGGER = Logger.getLogger(MediaService.class.getName());
+
     private MediaRepository mediaRepository;
 
-    @Autowired
     private final ProductCheckService productCheckService;
 
     @Autowired
@@ -108,15 +111,13 @@ public class MediaService {
         try {
             String response = productCheckService.waitForResponse(requestPayload, 3000);
             if (response != null) {
-                // Handle the response
-                System.out.println("Received response: " + response);
                 return response.equals("valid");
-            } else {
-                // Handle the timeout
-                System.out.println("Timeout: No response received within the specified time.");
             }
         } catch (InterruptedException e) {
-            // Handle exceptions
+
+            Thread.currentThread().interrupt();
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage());
+            return false;
         }
         return false;
     }
@@ -128,7 +129,6 @@ public class MediaService {
 
     @KafkaListener(topics = "BINARY_DATA", groupId = "binary-consumer-group", containerFactory = "binaryDataKafkaListenerContainerFactory")
     public void binaryData(BinaryData binaryData) {
-        System.out.println("Received binary data: " + binaryData);
         Media media = Media.builder()
                 .imageData(Base64.getDecoder().decode(binaryData.getFileContentBase64()))
                 .imagePath(binaryData.getPath())

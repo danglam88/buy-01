@@ -6,6 +6,9 @@ import java.io.IOException;
 
 public class ImageFileTypeChecker {
 
+    private ImageFileTypeChecker() {
+        throw new IllegalStateException("Utility class");
+    }
     public static boolean isImage(MultipartFile file) throws IOException {
         Tika tika = new Tika();
         String detectedType = tika.detect(file.getInputStream());

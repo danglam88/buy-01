@@ -35,7 +35,7 @@ public class AuthController {
 
     @PermitAll
     @PostMapping
-    public ResponseEntity<?> authenticateAndGetToken(@RequestBody @Valid AuthRequest authRequest)
+    public ResponseEntity<AuthResponse> authenticateAndGetToken(@RequestBody @Valid AuthRequest authRequest)
             throws BadCredentialsException {
 
             Optional<User> user = userRepository.findByEmail(authRequest.getUsername().toLowerCase());

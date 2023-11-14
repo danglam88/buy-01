@@ -9,7 +9,6 @@ import com.gritlab.serializer.BinaryDataSerializer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,20 +46,16 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.max-request-size}")
     private String maxRequestSize;
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
-
-    @Autowired
-    private CorsFilter corsFilter;
-
-    @Autowired
-    private ExceptionFilter exceptionFilter;
-
-    @Autowired
-    private RateLimitFilter rateLimitFilter;
+    private static final String PRODUCTS = "/products";
+    private static final String SELLER = "SELLER";
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthFilter jwtAuthFilter,
+            CorsFilter corsFilter,
+            ExceptionFilter exceptionFilter,
+            RateLimitFilter rateLimitFilter) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -73,9 +68,9 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(HttpMethod.OPTIONS)
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/products").hasAnyAuthority("SELLER")
-                                        .requestMatchers(HttpMethod.PUT, "/products").hasAnyAuthority("SELLER")
-                                        .requestMatchers(HttpMethod.DELETE, "/products").hasAnyAuthority("SELLER")
+                                        .requestMatchers(HttpMethod.POST, PRODUCTS).hasAnyAuthority(SELLER)
+                                        .requestMatchers(HttpMethod.PUT, PRODUCTS).hasAnyAuthority(SELLER)
+                                        .requestMatchers(HttpMethod.DELETE, PRODUCTS).hasAnyAuthority(SELLER)
                                         .anyRequest()
                                         .authenticated())
                 .build();

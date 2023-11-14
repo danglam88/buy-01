@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RegControllerTest {
+class RegControllerTest {
 
     private RegController regController;
 
@@ -40,7 +40,7 @@ public class RegControllerTest {
     }
 
     @Test
-    public void testRegisterNewAccountWhenValidInput_thenReturns201() throws MethodArgumentNotValidException {
+    void testRegisterNewAccountWhenValidInputThenReturns201() throws MethodArgumentNotValidException {
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
@@ -59,7 +59,7 @@ public class RegControllerTest {
         when(userService.createAccount(regRequest, file)).thenReturn(newUser);
 
         // Call the controller method
-        ResponseEntity<?> responseEntity = regController.registerNewAccount(regRequest, bindingResult, file, ucb);
+        ResponseEntity<Void> responseEntity = regController.registerNewAccount(regRequest, bindingResult, file, ucb);
 
         // Assertions
         assertNotNull(responseEntity);

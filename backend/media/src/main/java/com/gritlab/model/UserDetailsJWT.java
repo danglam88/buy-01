@@ -2,26 +2,26 @@ package com.gritlab.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
+public class UserDetailsJWT implements UserDetails {
 
     private String username;
 
     private String id;
 
-    private List<GrantedAuthority> authorities;
+    private List<SimpleGrantedAuthority> authorities;
 
-    public UserDetails(String username, String id, String role) {
+    public UserDetailsJWT(String username, String id, String role) {
         this.username = username;
         this.id = id;
         this.authorities = Arrays.stream(role.split(","))
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

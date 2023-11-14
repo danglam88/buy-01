@@ -27,7 +27,7 @@ public class RegController {
 
     @PermitAll
     @PostMapping
-    public ResponseEntity<?> registerNewAccount(@Valid @ModelAttribute("request") RegRequest request,
+    public ResponseEntity<Void> registerNewAccount(@Valid @ModelAttribute("request") RegRequest request,
                                                 BindingResult result,
                                                 @RequestPart(value = "file", required = false) MultipartFile file,
                                                 UriComponentsBuilder ucb) throws MethodArgumentNotValidException {

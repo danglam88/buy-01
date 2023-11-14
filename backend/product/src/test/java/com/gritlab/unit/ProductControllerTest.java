@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.controller.ProductController;
 import com.gritlab.model.Product;
-import com.gritlab.model.UserDetails;
+import com.gritlab.model.ProductDTO;
+import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ProductControllerTest {
+class ProductControllerTest {
 
     private ProductController productController;
 
@@ -47,7 +48,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testFindAll() throws JsonProcessingException {
+   void testFindAll() throws JsonProcessingException {
         // Arrange
         List<Product> products = createMockProducts(3);
         Mockito.when(productService.findAll()).thenReturn(products);
@@ -64,10 +65,10 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testFindBySellerId() throws JsonProcessingException {
+    void testFindBySellerId() throws JsonProcessingException {
 
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("user-id-1");
 
@@ -89,7 +90,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testFindById() throws JsonProcessingException {
+    void testFindById() throws JsonProcessingException {
         // Arrange
         String productId = "product-id-1";
         Product product = createMockProducts(1).get(0);
@@ -107,17 +108,15 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void createProductWhenValidInput_thenReturns201() throws MethodArgumentNotValidException {
+    void createProductWhenValidInput_thenReturns201() throws MethodArgumentNotValidException {
 
         // Request params
-        Product product = new Product(
-                null, "Product Name", "Product Desc", 10.0, 1, null
-        );
+        ProductDTO product = new ProductDTO("Product Name", "Product Desc", 10.0, 1);
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("id-1");
 
@@ -141,15 +140,15 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductWhenValidInput_thenReturns200() throws Exception {
+    void updateProductWhenValidInput_thenReturns200() throws Exception {
 
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("id-1");
 
         // Create a sample Product object
-        Product updatedProduct = new Product(null, "Updated Product", "Updated product desc",  10.0, 1, null);
+        ProductDTO updatedProduct = new ProductDTO("Updated Product", "Updated product desc",  10.0, 1);
         String productId = "product-id-1";
 
         // Call the controller method
@@ -162,10 +161,10 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void deleteProductWhenValidInput_thenReturns200() throws Exception {
+    void deleteProductWhenValidInput_thenReturns200() throws Exception {
 
-        // Mock UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
+        // Mock UserDetailsJWT
+        UserDetailsJWT userDetails = mock(UserDetailsJWT.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("id-1");
 
@@ -181,7 +180,7 @@ public class ProductControllerTest {
         assertEquals(200, responseEntity.getStatusCodeValue());
     }
 
-    private List<Product> createMockProducts(int length) {
+    List<Product> createMockProducts(int length) {
         List<Product> list = new ArrayList<>();
 
         for (int i = 1; i <= length; i++) {

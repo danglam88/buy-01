@@ -1,6 +1,6 @@
 package com.gritlab.component;
 
-import com.gritlab.model.UserDetails;
+import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,8 +21,12 @@ import java.util.NoSuchElementException;
 @Order(3)
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    JwtAuthFilter(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -38,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String userRole = jwtService.extractUserRole(token);
 
             if (!jwtService.isTokenExpired(token) && username != null && userId != null && userRole != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = new UserDetails(username, userId, userRole);
+                UserDetailsJWT userDetails = new UserDetailsJWT(username, userId, userRole);
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails,

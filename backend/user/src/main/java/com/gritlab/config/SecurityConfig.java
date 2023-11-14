@@ -8,7 +8,6 @@ import com.gritlab.service.UserInfoUserDetailsService;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,25 +51,17 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
 
-    @Autowired
-    private CorsFilter corsFilter;
-
-    @Autowired
-    private RateLimitFilter rateLimitFilter;
-
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
-
-    @Autowired
-    private ExceptionFilter exceptionFilter;
-
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserInfoUserDetailsService();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CorsFilter corsFilter,
+                                                   RateLimitFilter rateLimitFilter,
+                                                   JwtAuthFilter jwtAuthFilter,
+                                                   ExceptionFilter exceptionFilter) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
