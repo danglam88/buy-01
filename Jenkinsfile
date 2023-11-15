@@ -42,12 +42,8 @@ pipeline {
 
                         // Print the credentials to the console
                         echo "USER_DB_USERNAME: ${USER_DB_USERNAME}"
-                        echo "USER_DB_PASSWORD: ${USER_DB_PASSWORD}"
                         echo "PRODUCT_DB_USERNAME: ${PRODUCT_DB_USERNAME}"
-                        echo "PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}"
                         echo "MEDIA_DB_USERNAME: ${MEDIA_DB_USERNAME}"
-                        echo "MEDIA_DB_PASSWORD: ${MEDIA_DB_PASSWORD}"
-                        echo "JWT_SECRET_VALUE: ${JWT_SECRET_VALUE}"
                     }
                 }
             }
