@@ -35,13 +35,21 @@ pipeline {
                     ]) {
                         // Set the temporary credentials to the environment variables
                         env.USER_DB_USERNAME = TEMP_USER_DB_USERNAME
+                        echo "Debug: USER_DB_USERNAME = ${env.USER_DB_USERNAME}"
                         env.USER_DB_PASSWORD = TEMP_USER_DB_PASSWORD
+                        echo "Debug: USER_DB_PASSWORD = ${env.USER_DB_PASSWORD}"
                         env.PRODUCT_DB_USERNAME = TEMP_PRODUCT_DB_USERNAME
+                        echo "Debug: PRODUCT_DB_USERNAME = ${env.PRODUCT_DB_USERNAME}"
                         env.PRODUCT_DB_PASSWORD = TEMP_PRODUCT_DB_PASSWORD
+                        echo "Debug: PRODUCT_DB_PASSWORD = ${env.PRODUCT_DB_PASSWORD}"
                         env.MEDIA_DB_USERNAME = TEMP_MEDIA_DB_USERNAME
+                        echo "Debug: MEDIA_DB_USERNAME = ${env.MEDIA_DB_USERNAME}"
                         env.MEDIA_DB_PASSWORD = TEMP_MEDIA_DB_PASSWORD
+                        echo "Debug: MEDIA_DB_PASSWORD = ${env.MEDIA_DB_PASSWORD}"
                         env.JWT_SECRET_KEY = TEMP_JWT_SECRET_KEY
+                        echo "Debug: JWT_SECRET_KEY = ${env.JWT_SECRET_KEY}"
                         env.JWT_SECRET_VALUE = TEMP_JWT_SECRET_VALUE
+                        echo "Debug: JWT_SECRET_VALUE = ${env.JWT_SECRET_VALUE}"
                     }
                 }
             }
