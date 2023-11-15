@@ -19,7 +19,6 @@ pipeline {
         PRODUCT_DB_PASSWORD = ''
         MEDIA_DB_USERNAME = ''
         MEDIA_DB_PASSWORD = ''
-        JWT_SECRET_KEY = ''
         JWT_SECRET_VALUE = ''
     }
 
@@ -28,28 +27,27 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'TEMP_USER_DB_USERNAME', passwordVariable: 'TEMP_USER_DB_PASSWORD'),
-                        usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'TEMP_PRODUCT_DB_USERNAME', passwordVariable: 'TEMP_PRODUCT_DB_PASSWORD'),
-                        usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'TEMP_MEDIA_DB_USERNAME', passwordVariable: 'TEMP_MEDIA_DB_PASSWORD'),
-                        usernamePassword(credentialsId: 'jwt-secret-creds', usernameVariable: 'TEMP_JWT_SECRET_KEY', passwordVariable: 'TEMP_JWT_SECRET_VALUE')
+                        usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'USER_DB_USERNAME', passwordVariable: 'USER_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
+                        string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
-                        // Set the temporary credentials to the environment variables
-                        env.USER_DB_USERNAME = TEMP_USER_DB_USERNAME
-                        echo "Debug: USER_DB_USERNAME = ${env.USER_DB_USERNAME}"
-                        env.USER_DB_PASSWORD = TEMP_USER_DB_PASSWORD
-                        echo "Debug: USER_DB_PASSWORD = ${env.USER_DB_PASSWORD}"
-                        env.PRODUCT_DB_USERNAME = TEMP_PRODUCT_DB_USERNAME
-                        echo "Debug: PRODUCT_DB_USERNAME = ${env.PRODUCT_DB_USERNAME}"
-                        env.PRODUCT_DB_PASSWORD = TEMP_PRODUCT_DB_PASSWORD
-                        echo "Debug: PRODUCT_DB_PASSWORD = ${env.PRODUCT_DB_PASSWORD}"
-                        env.MEDIA_DB_USERNAME = TEMP_MEDIA_DB_USERNAME
-                        echo "Debug: MEDIA_DB_USERNAME = ${env.MEDIA_DB_USERNAME}"
-                        env.MEDIA_DB_PASSWORD = TEMP_MEDIA_DB_PASSWORD
-                        echo "Debug: MEDIA_DB_PASSWORD = ${env.MEDIA_DB_PASSWORD}"
-                        env.JWT_SECRET_KEY = TEMP_JWT_SECRET_KEY
-                        echo "Debug: JWT_SECRET_KEY = ${env.JWT_SECRET_KEY}"
-                        env.JWT_SECRET_VALUE = TEMP_JWT_SECRET_VALUE
-                        echo "Debug: JWT_SECRET_VALUE = ${env.JWT_SECRET_VALUE}"
+                        env.USER_DB_USERNAME = USER_DB_USERNAME
+                        env.USER_DB_PASSWORD = USER_DB_PASSWORD
+                        env.PRODUCT_DB_USERNAME = PRODUCT_DB_USERNAME
+                        env.PRODUCT_DB_PASSWORD = PRODUCT_DB_PASSWORD
+                        env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
+                        env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
+                        env.JWT_SECRET_VALUE = JWT_SECRET
+
+                        // Print the credentials to the console
+                        echo "USER_DB_USERNAME: ${USER_DB_USERNAME}"
+                        echo "USER_DB_PASSWORD: ${USER_DB_PASSWORD}"
+                        echo "PRODUCT_DB_USERNAME: ${PRODUCT_DB_USERNAME}"
+                        echo "PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}"
+                        echo "MEDIA_DB_USERNAME: ${MEDIA_DB_USERNAME}"
+                        echo "MEDIA_DB_PASSWORD: ${MEDIA_DB_PASSWORD}"
+                        echo "JWT_SECRET_VALUE: ${JWT_SECRET_VALUE}"
                     }
                 }
             }
