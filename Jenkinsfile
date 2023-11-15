@@ -107,10 +107,16 @@ pipeline {
 
                     rm -rf ~/*.tar
 
+                    echo "Testing images before pull"
+                    docker images
+
                     docker pull $USER_MICROSERVICE_IMAGE
                     docker pull $PRODUCT_MICROSERVICE_IMAGE
                     docker pull $MEDIA_MICROSERVICE_IMAGE
                     docker pull $FRONTEND_IMAGE
+
+                    echo "Testing images after pull"
+                    docker images
 
                     docker-compose up -d
 
