@@ -107,18 +107,12 @@ pipeline {
 
                     rm -rf ~/*.tar
 
-                    echo "Testing images before pull"
-                    docker images
-
                     docker pull $USER_MICROSERVICE_IMAGE
                     docker pull $PRODUCT_MICROSERVICE_IMAGE
                     docker pull $MEDIA_MICROSERVICE_IMAGE
                     docker pull $FRONTEND_IMAGE
 
-                    echo "Testing images after pull"
-                    docker images
-
-                    docker-compose up -d
+                    docker-compose --env-file ~/config.env up -d
 
                     if [ "$(docker ps -q | wc -l)" != "9" ]; then
                         exit 1
@@ -183,7 +177,7 @@ Gritlab Jenkins
                 docker load -i ~/media-microservice.tar
                 docker load -i ~/frontend.tar
 
-                docker-compose up -d
+                docker-compose --env-file ~/config.env up -d
                 '''
 
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->
