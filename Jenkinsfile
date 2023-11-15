@@ -13,13 +13,6 @@ pipeline {
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
         FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
-        USER_DB_USERNAME = ''
-        USER_DB_PASSWORD = ''
-        PRODUCT_DB_USERNAME = ''
-        PRODUCT_DB_PASSWORD = ''
-        MEDIA_DB_USERNAME = ''
-        MEDIA_DB_PASSWORD = ''
-        JWT_SECRET_VALUE = ''
     }
 
     stages {
@@ -39,6 +32,11 @@ pipeline {
                         env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
+
+                        // Print the credentials to the console
+                        echo "USER_DB_USERNAME: ${USER_DB_USERNAME}"
+                        echo "PRODUCT_DB_USERNAME: ${PRODUCT_DB_USERNAME}"
+                        echo "MEDIA_DB_USERNAME: ${MEDIA_DB_USERNAME}"
                     }
                 }
             }
@@ -95,11 +93,14 @@ pipeline {
                 script {
                     // Execute the build commands
                     sh '''
+                    echo $USER_DB_USERNAME
+                    echo $PRODUCT_DB_USERNAME
+                    echo $MEDIA_DB_USERNAME
+
                     docker system prune -a -f
 
                     cd backend
 
-                    echo $USER_DB_USERNAME
                     docker build -t user-microservice -f user/Dockerfile \
                         --build-arg USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME \
                         --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
@@ -108,7 +109,6 @@ pipeline {
                     docker tag user-microservice $USER_MICROSERVICE_IMAGE
                     docker push $USER_MICROSERVICE_IMAGE
 
-                    echo $PRODUCT_DB_USERNAME
                     docker build -t product-microservice -f product/Dockerfile \
                         --build-arg PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME \
                         --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
@@ -117,7 +117,6 @@ pipeline {
                     docker tag product-microservice $PRODUCT_MICROSERVICE_IMAGE
                     docker push $PRODUCT_MICROSERVICE_IMAGE
 
-                    echo $MEDIA_DB_USERNAME
                     docker build -t media-microservice -f media/Dockerfile \
                         --build-arg MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME \
                         --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
@@ -143,6 +142,13 @@ pipeline {
                 script {
                     // Execute the deploy commands
                     sh '''
+                    export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
+                    export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
+                    export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
+                    export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
+                    export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
+                    export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
+
                     if [ "$(docker ps -aq)" != "" ]; then
                         docker rm -f $(docker ps -aq)
                     fi
@@ -158,9 +164,6 @@ pipeline {
                     echo $USER_DB_USERNAME
                     echo $PRODUCT_DB_USERNAME
                     echo $MEDIA_DB_USERNAME
-                    USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
-                    PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
-                    MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
                     docker-compose up -d
 
                     if [ "$(docker ps -q | wc -l)" != "9" ]; then
@@ -213,6 +216,13 @@ Gritlab Jenkins
                 // If deploy fails, the rollback commands are executed
                 echo "Deployment failed. Executing rollback."
                 sh '''
+                export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
+                export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
+                export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
+                export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
+                export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
+                export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
+
                 if [ "$(docker ps -aq)" != "" ]; then
                     docker rm -f $(docker ps -aq)
                 fi
@@ -229,9 +239,6 @@ Gritlab Jenkins
                 echo $USER_DB_USERNAME
                 echo $PRODUCT_DB_USERNAME
                 echo $MEDIA_DB_USERNAME
-                USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
-                PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
-                MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
                 docker-compose up -d
                 '''
 
