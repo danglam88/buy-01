@@ -13,9 +13,40 @@ pipeline {
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
         FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
+        USER_DB_USERNAME = ''
+        USER_DB_PASSWORD = ''
+        PRODUCT_DB_USERNAME = ''
+        PRODUCT_DB_PASSWORD = ''
+        MEDIA_DB_USERNAME = ''
+        MEDIA_DB_PASSWORD = ''
+        JWT_SECRET_KEY = ''
+        JWT_SECRET_VALUE = ''
     }
 
     stages {
+        stage('Setup Credentials') {
+            steps {
+                script {
+                    withCredentials([
+                        usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'TEMP_USER_DB_USERNAME', passwordVariable: 'TEMP_USER_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'TEMP_PRODUCT_DB_USERNAME', passwordVariable: 'TEMP_PRODUCT_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'TEMP_MEDIA_DB_USERNAME', passwordVariable: 'TEMP_MEDIA_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'jwt-secret-creds', usernameVariable: 'TEMP_JWT_SECRET_KEY', passwordVariable: 'TEMP_JWT_SECRET_VALUE')
+                    ]) {
+                        // Set the temporary credentials to the environment variables
+                        env.USER_DB_USERNAME = TEMP_USER_DB_USERNAME
+                        env.USER_DB_PASSWORD = TEMP_USER_DB_PASSWORD
+                        env.PRODUCT_DB_USERNAME = TEMP_PRODUCT_DB_USERNAME
+                        env.PRODUCT_DB_PASSWORD = TEMP_PRODUCT_DB_PASSWORD
+                        env.MEDIA_DB_USERNAME = TEMP_MEDIA_DB_USERNAME
+                        env.MEDIA_DB_PASSWORD = TEMP_MEDIA_DB_PASSWORD
+                        env.JWT_SECRET_KEY = TEMP_JWT_SECRET_KEY
+                        env.JWT_SECRET_VALUE = TEMP_JWT_SECRET_VALUE
+                    }
+                }
+            }
+        }
+
         stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
@@ -71,15 +102,27 @@ pipeline {
 
                     cd backend
 
-                    docker build -t user-microservice -f user/Dockerfile .
+                    docker build -t user-microservice -f user/Dockerfile \
+                        --build-arg USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME \
+                        --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
+                        --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
+                        .
                     docker tag user-microservice $USER_MICROSERVICE_IMAGE
                     docker push $USER_MICROSERVICE_IMAGE
 
-                    docker build -t product-microservice -f product/Dockerfile .
+                    docker build -t product-microservice -f product/Dockerfile \
+                        --build-arg PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME \
+                        --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
+                        --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
+                        .
                     docker tag product-microservice $PRODUCT_MICROSERVICE_IMAGE
                     docker push $PRODUCT_MICROSERVICE_IMAGE
 
-                    docker build -t media-microservice -f media/Dockerfile .
+                    docker build -t media-microservice -f media/Dockerfile \
+                        --build-arg MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME \
+                        --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
+                        --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
+                        .
                     docker tag media-microservice $MEDIA_MICROSERVICE_IMAGE
                     docker push $MEDIA_MICROSERVICE_IMAGE
 
@@ -112,7 +155,10 @@ pipeline {
                     docker pull $MEDIA_MICROSERVICE_IMAGE
                     docker pull $FRONTEND_IMAGE
 
-                    docker-compose --env-file ~/config.env up -d
+                    USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
+                    PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
+                    MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
+                    docker-compose up -d
 
                     if [ "$(docker ps -q | wc -l)" != "9" ]; then
                         exit 1
@@ -177,7 +223,10 @@ Gritlab Jenkins
                 docker load -i ~/media-microservice.tar
                 docker load -i ~/frontend.tar
 
-                docker-compose --env-file ~/config.env up -d
+                USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
+                PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
+                MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
+                docker-compose up -d
                 '''
 
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->

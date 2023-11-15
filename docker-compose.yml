@@ -51,8 +51,8 @@ services:
     volumes:
       - user-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USER_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_USER_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${USER_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${USER_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
 
   product-mongodb:
@@ -64,8 +64,8 @@ services:
     volumes:
       - product-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_PRODUCT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PRODUCT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${PRODUCT_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${PRODUCT_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
 
   media-mongodb:
@@ -77,8 +77,8 @@ services:
     volumes:
       - media-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_MEDIA_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_MEDIA_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MEDIA_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MEDIA_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
 
   kafka:
