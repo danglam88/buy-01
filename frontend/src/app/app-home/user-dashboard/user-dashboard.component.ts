@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { UserService } from 'src/app/services/user.service';
+import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class UserDashboardComponent implements OnInit {
   constructor(
     private userService: UserService,
     private toastr: ToastrService,
+    private errorService: ErrorService,
     private builder: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -85,9 +87,8 @@ export class UserDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.log(error);
-        if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Session expired. Log-in again.');
-          this.router.navigate(['../login']);
+        if (this.errorService.isAuthError(error.status)) {
+          this.errorService.handleSessionExpiration();
         }
       },
       complete: () => {
@@ -108,9 +109,8 @@ export class UserDashboardComponent implements OnInit {
         reader.readAsDataURL(result);
       },
       error: (error) => {
-        if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Session expired. Log-in again.');
-          this.router.navigate(['../login']);
+        if (this.errorService.isAuthError(error.status)) {
+          this.errorService.handleSessionExpiration();
         } 
       },
     });
@@ -206,9 +206,8 @@ export class UserDashboardComponent implements OnInit {
             } else {
               this.toastr.error('Something went wrong');
             }
-          } else if (error.status == 401 || error.status == 403) {
-            this.toastr.error('Session expired. Log-in again.');
-            this.router.navigate(['../login']);
+          } else if (this.errorService.isAuthError(error.status)) {
+            this.errorService.handleSessionExpiration();
           } 
         },
         complete: () => {
@@ -297,9 +296,8 @@ export class UserDashboardComponent implements OnInit {
           },
           error: (error) => {
             console.log(error);
-            if (error.status == 401 || error.status == 403) {
-              this.toastr.error('Session expired. Log-in again.');
-              this.router.navigate(['../login']);
+            if (this.errorService.isAuthError(error.status)) {
+              this.errorService.handleSessionExpiration();
             } 
           },
           complete: () => {

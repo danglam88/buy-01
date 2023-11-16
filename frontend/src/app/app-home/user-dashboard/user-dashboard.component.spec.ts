@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { UserDashboardComponent } from './user-dashboard.component';
 import { UserService } from 'src/app/services/user.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -7,16 +7,19 @@ import { HeaderComponent } from '../header/header.component';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { FooterComponent } from '../footer/footer.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { of } from 'rxjs';
+import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
+import { throwError  } from 'rxjs';
 
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
   let fixture: ComponentFixture<UserDashboardComponent>;
   let validationService: ValidationService;
+  let errorService: ErrorService;
+  let userService: UserService;
 
   beforeEach(() => {
-    let userService: UserService;
+    
     TestBed.configureTestingModule({
       declarations: [UserDashboardComponent, 
                     HeaderComponent,
@@ -25,18 +28,62 @@ describe('UserDashboardComponent', () => {
                 ToastrModule.forRoot(), 
                 AngularMaterialModule,
                 ReactiveFormsModule], 
-      providers: [UserService, ValidationService],
+      providers: [UserService, ValidationService, ErrorService],
     });
     fixture = TestBed.createComponent(UserDashboardComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
     validationService = TestBed.inject(ValidationService);
+    errorService  = TestBed.inject(ErrorService);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should get user info',  fakeAsync(() => {
+    spyOn(userService, 'getUserInfo').and.callThrough();
+    component.getUserInfo();
+    tick();
+    expect(userService.getUserInfo).toHaveBeenCalled();
+  }));
+
+  it('should handle 403 error when getting user info',  fakeAsync(() => {
+    
+    const errorResponse = {
+      status: 403,
+      error: 'Forbidden',
+    };
+    spyOn(userService, 'getUserInfo').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.getUserInfo();
+    tick();
+    
+    expect(userService.getUserInfo).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle 401 error when getting user info',  fakeAsync(() => {
+    
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+    spyOn(userService, 'getUserInfo').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.getUserInfo();
+    tick();
+    
+    expect(userService.getUserInfo).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
 
   it('should update user name', () => {
     const updatedName = 'Ashley'; 

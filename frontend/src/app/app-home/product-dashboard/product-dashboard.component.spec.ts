@@ -1,11 +1,8 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpTestingController } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { of, throwError } from 'rxjs';
-import { Router } from '@angular/router';
 
 import { ProductDashboardComponent } from './product-dashboard.component';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -14,24 +11,26 @@ import { FooterComponent } from '../footer/footer.component';
 import { ProductComponent } from '../product-listing/product/product.component';
 
 import { ProductService } from 'src/app/services/product.service';
-import { ToastrService } from 'ngx-toastr';
 import { ValidationService } from 'src/app/services/validation.service';
+import { ErrorService } from 'src/app/services/error.service';
+import { ToastrService } from 'ngx-toastr';
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; 
 
 class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
+  error(message: string) {
+    // Do nothing in the stub
+  }
+  success(message: string) {
+    // Do nothing in the stub
+  }
 }
 
 describe('ProductDashboardComponent', () => {
   let component: ProductDashboardComponent;
   let fixture: ComponentFixture<ProductDashboardComponent>;
   let productService: ProductService;
-  let httpTestingController: HttpTestingController;
-  let validationService: ValidationService;
-  let toastrService: ToastrService;
-  let router: Router;
+  let errorService: ErrorService;
 
     // Create a mock MatDialogRef
     const mockDialogRef = {
@@ -50,12 +49,12 @@ describe('ProductDashboardComponent', () => {
       providers: [
         ProductService,
         ValidationService,
-        { provide: ToastrService, useClass: ToastrServiceStub },
+        ErrorService,
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
-        { provide: MAT_DIALOG_DATA, useValue: {} }
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       imports: [
-        RouterTestingModule, 
         HttpClientTestingModule,
         AngularMaterialModule,
         BrowserAnimationsModule
@@ -65,10 +64,7 @@ describe('ProductDashboardComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
-    validationService = TestBed.inject(ValidationService);
-    httpTestingController = TestBed.inject(HttpTestingController);
-    toastrService = TestBed.inject(ToastrService);
-    router = TestBed.inject(Router);
+    errorService = TestBed.inject(ErrorService);
    });
 
   it('should create', () => {
@@ -147,7 +143,7 @@ describe('ProductDashboardComponent', () => {
     expect(component.getSellerProducts).toHaveBeenCalled();
   });
 
-  it('should handle error with status 403 or 401 for getSellerProducts', fakeAsync(() => {
+  it('should handle error with status 403 for getSellerProducts', fakeAsync(() => {
     spyOn(component, 'getSellerProducts').and.callThrough();
   
     const errorResponse = {
@@ -156,8 +152,8 @@ describe('ProductDashboardComponent', () => {
     };
 
     spyOn(productService, 'getSellerProductsInfo').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
    
     component.getSellerProducts();
@@ -165,7 +161,29 @@ describe('ProductDashboardComponent', () => {
 
     expect(component.getSellerProducts).toHaveBeenCalled();
     expect(productService.getSellerProductsInfo).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle error with status 401 for getSellerProducts', fakeAsync(() => {
+    spyOn(component, 'getSellerProducts').and.callThrough();
+  
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+
+    spyOn(productService, 'getSellerProductsInfo').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+   
+    component.getSellerProducts();
+    tick();
+
+    expect(component.getSellerProducts).toHaveBeenCalled();
+    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 });

@@ -125,14 +125,12 @@ margin: 32px;
   align-items: center;
   height: 100vh;
   width: 150px;
-  height: 50px;
+  /*height: 50px;*/
   cursor: pointer;
-  display: flex;
-  background: red;
+  background-color: red;
   border: none;
   border-radius: 10px;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-  background: #e62222;
 }
 
 .editImages-button, .addImages-button, .cancel-button, .upload-button, .save-button{

@@ -16,7 +16,7 @@
                     <mat-icon>chevron_left</mat-icon>
                     </button>
                     <div class="image-container">
-                        <img [src]="currentImage?.url" class="slider-image">
+                        <img [src]="currentImage?.url" class="slider-image" alt="Current image">
                     <a
                         class="remove-image" 
                         *ngIf="editingField === 'deleteImages' && userRole === 'SELLER' && product?.editable === true && noOfImages > 1"
@@ -37,7 +37,7 @@
                             <app-image-slider [images]="selectedFiles" (imageRemoved)="onImageRemoved($event)"></app-image-slider>
                         </div>
                         <div *ngIf="selectedFiles.length === 0">
-                            <img [src]="previewUrl ? previewUrl : imgPlaceholder" class="preview-image">
+                            <img [src]="previewUrl ? previewUrl : imgPlaceholder" class="preview-image" alt="Preview image or Imageplaceholder">
         
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                 <!--Desc-->
                 <div class="product-detail-desc">
                     <div class="product-detail-desc-heading" style="padding: 5px 0px;border-bottom: #ccc 2px solid">
-                        <div style="margin-top: 8x;"class="product-value">
+                        <div style="margin-top: 8px;"class="product-value">
                             <h2>Product Description</h2>
                         </div>
                         <div class="product-button">

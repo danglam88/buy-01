@@ -17,6 +17,7 @@ import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from 'src/app/services/validation.service';
+import { ErrorService } from 'src/app/services/error.service';
 
 
 class ToastrServiceStub {
@@ -29,8 +30,8 @@ describe('ProductDetailComponent', () => {
   let fixture: ComponentFixture<ProductDetailComponent>;
   let productService: ProductService;
   let mediaService: MediaService;
-  let validationService: ValidationService;
   let encryptionService: EncryptionService;
+  let errorService: ErrorService;
   let router: Router;
   let matDialog: MatDialog;
   let matDialogRef: MatDialogRef<any>;
@@ -49,7 +50,7 @@ describe('ProductDetailComponent', () => {
       quantity: 10,
     };
 
-    matDialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+   
     matDialog = jasmine.createSpyObj('MatDialog', ['open']);
        
     TestBed.configureTestingModule({
@@ -58,6 +59,7 @@ describe('ProductDetailComponent', () => {
         ProductService,
         EncryptionService,
         MediaService,
+        ErrorService,
         ValidationService,
         { provide: ToastrService, useClass: ToastrServiceStub },
         { provide: MatDialogRef, useValue: mockDialogRef },
@@ -79,9 +81,9 @@ describe('ProductDetailComponent', () => {
     matDialogRef = TestBed.inject(MatDialogRef);
     productService = TestBed.inject(ProductService);
     mediaService = TestBed.inject(MediaService);
-    validationService = TestBed.inject(ValidationService);
     router = TestBed.inject(Router);
     toastrService = TestBed.inject(ToastrService);
+    errorService = TestBed.inject(ErrorService);
     encryptionService = TestBed.inject(EncryptionService);
     fixture.detectChanges();
  
@@ -134,7 +136,7 @@ describe('ProductDetailComponent', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = productService.token;
   
@@ -159,12 +161,12 @@ describe('ProductDetailComponent', () => {
         const blob = new Blob([mockImages[mediaId]], { type: 'image/jpeg' });
         return of(blob); 
     });
-  
-    component.getProductImages('productId');
+    const productId = '1';
+    component.getProductImages(productId);
   
     tick();
   
-    expect(component.getProductImages).toHaveBeenCalled();
+    expect(component.getProductImages).toHaveBeenCalledWith(productId);
     expect(component.productImages).toEqual(mockImages);
   }));
   
@@ -188,7 +190,7 @@ describe('ProductDetailComponent', () => {
   
    component.updateField(fieldName);
   
-    expect(component.updateField).toHaveBeenCalled();
+    expect(component.updateField).toHaveBeenCalledWith(fieldName);
     expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
     expect(component.editingField).toBeNull();
   });
@@ -213,7 +215,7 @@ describe('ProductDetailComponent', () => {
   
    component.updateField(fieldName);
   
-    expect(component.updateField).toHaveBeenCalled();
+    expect(component.updateField).toHaveBeenCalledWith(fieldName);
     expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
     expect(component.editingField).toBeNull();
   });
@@ -238,7 +240,7 @@ describe('ProductDetailComponent', () => {
   
    component.updateField(fieldName);
   
-    expect(component.updateField).toHaveBeenCalled();
+    expect(component.updateField).toHaveBeenCalledWith(fieldName);
     expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
     expect(component.editingField).toBeNull();
   });
@@ -263,12 +265,12 @@ describe('ProductDetailComponent', () => {
   
    component.updateField(fieldName);
   
-    expect(component.updateField).toHaveBeenCalled();
+    expect(component.updateField).toHaveBeenCalledWith(fieldName);
     expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
     expect(component.editingField).toBeNull();
   });
 
-  it('should handle error with status 403 or 401 for updateField()', fakeAsync(() => {
+  it('should handle error with status 403 updateField()', fakeAsync(() => {
     const fieldName = 'name';
     const fieldValue = 'New Product Name';
     spyOn(component, 'updateField').and.callThrough();
@@ -289,18 +291,53 @@ describe('ProductDetailComponent', () => {
     };
 
     spyOn(productService, 'updateProduct').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
 
     component.updateField(fieldName);
     tick();
 
     expect(component.updateField).toHaveBeenCalled();
-    expect(productService.updateProduct).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
+
+  it('should handle error with status 401 updateField()', fakeAsync(() => {
+    const fieldName = 'name';
+    const fieldValue = 'New Product Name';
+    spyOn(component, 'updateField').and.callThrough();
+  
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+
+    component.productDetailForm.controls[fieldName].setValue(fieldValue);
+    component.product = {  
+      id: '1',
+      name: fieldName,
+      description: 'Mock Product 1 description',
+      price: 100,
+      quantity: 10,
+      editable: true
+    };
+
+    spyOn(productService, 'updateProduct').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+
+    component.updateField(fieldName);
+    tick();
+
+    expect(component.updateField).toHaveBeenCalled();
+    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
 
   it('delete image when user confirmed', fakeAsync(() => {
     const mockCurrentImage = { mediaId: '123' }; 
@@ -343,7 +380,7 @@ describe('ProductDetailComponent', () => {
     expect(matDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
       data: { confirmationText: 'Delete this image?' },
     });
-    expect(mediaService.deleteMedia).not.toHaveBeenCalled();
+    expect(mediaService.deleteMedia).not.toHaveBeenCalledWith(mockCurrentImage.mediaId);
     expect(component.getProductImages).not.toHaveBeenCalled();
     expect(mediaService.productMediaDeleted.emit).not.toHaveBeenCalled();
   }));
@@ -360,8 +397,8 @@ describe('ProductDetailComponent', () => {
     };
     spyOn(matDialog, 'open').and.returnValue(dialogRef);  
     spyOn(mediaService, 'deleteMedia').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.deleteImage(mockCurrentImage);
     tick();
@@ -369,10 +406,10 @@ describe('ProductDetailComponent', () => {
     expect(matDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
       data: { confirmationText: 'Delete this image?' },
     });
-    expect(component.deleteImage).toHaveBeenCalled();
-    expect(mediaService.deleteMedia).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(component.deleteImage).toHaveBeenCalledWith(mockCurrentImage);
+    expect(mediaService.deleteMedia).toHaveBeenCalledWith(mockCurrentImage.mediaId);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
   it('should delete product when confirmed', fakeAsync(() => {
@@ -414,7 +451,7 @@ describe('ProductDetailComponent', () => {
     expect(productService.productDeleted.emit).not.toHaveBeenCalledWith(true);
   }));
 
-  it('should handle error with status 403 or 401 for deleteProduct', fakeAsync(() => {
+  it('should handle error with status 403 for deleteProduct', fakeAsync(() => {
     spyOn(component, 'deleteProduct').and.callThrough();
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
     dialogRef.afterClosed.and.returnValue(of(true)); 
@@ -426,8 +463,9 @@ describe('ProductDetailComponent', () => {
     };
 
     spyOn(productService, 'deleteProduct').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
 
     component.deleteProduct();
     tick();
@@ -436,8 +474,34 @@ describe('ProductDetailComponent', () => {
       data: { confirmationText: 'Delete this product?' },
     });
     expect(productService.deleteProduct).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle error with status 401 for deleteProduct', fakeAsync(() => {
+    spyOn(component, 'deleteProduct').and.callThrough();
+    const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+    dialogRef.afterClosed.and.returnValue(of(true)); 
+
+    spyOn(matDialog, 'open').and.returnValue(dialogRef);
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+
+    spyOn(productService, 'deleteProduct').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.deleteProduct();
+    tick();
+
+    expect(matDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
+      data: { confirmationText: 'Delete this product?' },
+    });
+    expect(productService.deleteProduct).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
   it('should save the selected files when the image limit is not exceeded', () => {
@@ -489,13 +553,14 @@ describe('ProductDetailComponent', () => {
     formData.append('file', selectedFiles[index].file);
   
     spyOn(mediaService, 'uploadMedia').and.returnValue(of({ success: true }));
-    spyOn(component, 'getProductImages');
+    spyOn(component, 'getProductImages').and.callThrough();
   
     component.selectedFiles = selectedFiles;
     component.saveEachSelectedFile(productId, index);
+
     tick();
   
-    expect(mediaService.uploadMedia).toHaveBeenCalled();
+    expect(mediaService.uploadMedia).toHaveBeenCalledWith(formData);
     expect(component.getProductImages).toHaveBeenCalled();
   }));
 
@@ -518,8 +583,8 @@ describe('ProductDetailComponent', () => {
     };
 
     spyOn(mediaService, 'uploadMedia').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.selectedFiles = selectedFiles;
     component.saveEachSelectedFile(productId, index);
@@ -527,8 +592,40 @@ describe('ProductDetailComponent', () => {
 
     expect(component.saveEachSelectedFile).toHaveBeenCalled();
     expect(mediaService.uploadMedia).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle error with status 401 for saveEachSelectedFile()', fakeAsync(() => {
+    spyOn(component, 'saveEachSelectedFile').and.callThrough();
+    const productId = '1';
+    const index = 0;
+  
+    const selectedFiles = [{
+      file: new File([], 'image1.jpg'),
+      url: 'image1.jpg',
+    }];
+    const formData = new FormData();
+    formData.append('productId', productId);
+    formData.append('file', selectedFiles[index].file);
+
+    const errorResponse = {
+      status: 401,
+      error: 'Unuthorized',
+    };
+
+    spyOn(mediaService, 'uploadMedia').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.selectedFiles = selectedFiles;
+    component.saveEachSelectedFile(productId, index);
+    tick();
+
+    expect(component.saveEachSelectedFile).toHaveBeenCalled();
+    expect(mediaService.uploadMedia).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
   it('should initialize currentIndex to 0', () => {

@@ -10,6 +10,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from 'src/app/services/product.service';
+import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
 
 import { ProductListingComponent } from './product-listing.component';
@@ -26,9 +27,10 @@ describe('ProductListingComponent', () => {
   let component: ProductListingComponent;
   let fixture: ComponentFixture<ProductListingComponent>;
   let productService: ProductService;
-  let validationService: ValidationService;
+  let errorService: ErrorService;
   let toastrService: ToastrService;
   let router: Router;
+  let validationService: ValidationService;
 
   const mockDialogRef = {
     open: jasmine.createSpy('open')
@@ -45,6 +47,7 @@ describe('ProductListingComponent', () => {
       ],
       providers: [
         ProductService,
+        ErrorService,
         ValidationService,
         { provide: ToastrService, useClass: ToastrServiceStub },
         { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
@@ -61,8 +64,9 @@ describe('ProductListingComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
-    validationService = TestBed.inject(ValidationService);
+    errorService = TestBed.inject(ErrorService);
     toastrService = TestBed.inject(ToastrService);
+    validationService = TestBed.inject(ValidationService);
     router = TestBed.inject(Router);
   });
 
@@ -74,7 +78,7 @@ describe('ProductListingComponent', () => {
     spyOn(component, 'getAllProducts');
     const productCreatedEventSpy = spyOn(productService.productCreated, 'subscribe');
 
-    productCreatedEventSpy.and.callThrough(); // Just pass the callback through
+    productCreatedEventSpy.and.callThrough(); 
 
     productService.productCreated.emit(true);
 
@@ -102,7 +106,7 @@ describe('ProductListingComponent', () => {
     expect(component.products).toEqual(mockProducts);
   }));
 
-  it('should handle error with status 403 or 401 for getAllProducts()', fakeAsync(() => {
+  it('should handle error with status 403 for getAllProducts()', fakeAsync(() => {
     spyOn(component, 'getAllProducts').and.callThrough();
     const errorResponse = {
       status: 403,
@@ -110,16 +114,36 @@ describe('ProductListingComponent', () => {
     };
 
     spyOn(productService, 'getAllProductsInfo').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.getAllProducts();
     tick();
 
     expect(component.getAllProducts).toHaveBeenCalled();
     expect(productService.getAllProductsInfo).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle error with status 401 for getAllProducts()', fakeAsync(() => {
+    spyOn(component, 'getAllProducts').and.callThrough();
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+
+    spyOn(productService, 'getAllProductsInfo').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.getAllProducts();
+    tick();
+
+    expect(component.getAllProducts).toHaveBeenCalled();
+    expect(productService.getAllProductsInfo).toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
   it('should open product detail', () => {

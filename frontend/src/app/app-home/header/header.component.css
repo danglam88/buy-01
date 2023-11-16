@@ -58,13 +58,11 @@ a:hover {
 .site-navigation ul{
   margin-right: 120px !important;
 }
-.site-navigation li {
-  margin: 0;
-  padding: 0;
-}
 
 .site-navigation li {
   display: inline-block;
+  margin: 0;
+  padding: 0;
   margin: 1.4em 1em 1em 2em;
 }
 

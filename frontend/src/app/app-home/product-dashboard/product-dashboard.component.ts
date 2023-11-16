@@ -3,8 +3,7 @@ import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { ErrorService } from 'src/app/services/error.service';
 
 
 @Component({
@@ -19,8 +18,7 @@ export class ProductDashboardComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private dialog: MatDialog,
-    private router: Router,
-    private toastr: ToastrService
+    private errorService: ErrorService
     ) {
      // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       // Handle product creation and get seller's products again
@@ -53,9 +51,8 @@ export class ProductDashboardComponent implements OnInit {
         });
       },
       error: (error) => {
-        if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Session expired. Log-in again.');
-          this.router.navigate(['../login']);
+        if (this.errorService.isAuthError(error.status)) {
+          this.errorService.handleSessionExpiration();
         }
       },
     });

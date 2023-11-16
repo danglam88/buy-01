@@ -10,6 +10,8 @@ import { ProductService } from 'src/app/services/product.service';
 import { MediaService } from 'src/app/services/media.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from 'src/app/services/validation.service';
+import { ErrorService } from 'src/app/services/error.service';
+
 import { Product } from '../../Models/Product';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
@@ -41,6 +43,7 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private mediaService: MediaService,
     private validationService: ValidationService,
+    private errorService: ErrorService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<ProductDetailComponent>,
     private builder: FormBuilder,
@@ -144,10 +147,9 @@ export class ProductDetailComponent implements OnInit {
                 reader.readAsDataURL(image); 
               },
               error: (error) => {
-                if (error.status === 401 || error.status === 403) {
-                  this.toastr.error('Session expired. Log-in again.');
+                if (this.errorService.isAuthError(error.status)) {
+                  this.errorService.handleSessionExpiration();
                   this.dialogRef.close();
-                  this.router.navigate(['../login']);
                 }
               }
             });
@@ -175,10 +177,9 @@ export class ProductDetailComponent implements OnInit {
         this.editingField = null;
       },
       error: (error) => {
-        if (error.status === 401 || error.status === 403) {
-          this.toastr.error('Session expired. Log-in again.');
+        if (this.errorService.isAuthError(error.status)) {
+          this.errorService.handleSessionExpiration();
           this.dialogRef.close();
-          this.router.navigate(['../login']);
         } else if (error.status === 400) {
           if (error.error.message) {
             this.toastr.error(error.error.message);
@@ -216,10 +217,9 @@ export class ProductDetailComponent implements OnInit {
             },
             error: (error) => {
               console.log(error);
-              if (error.status === 401 || error.status === 403) {
-                this.toastr.error('Session expired. Log-in again.');
+              if (this.errorService.isAuthError(error.status)) {
+                this.errorService.handleSessionExpiration();
                 this.dialogRef.close();
-                this.router.navigate(['../login']);
               }
             },
             complete: () => {
@@ -259,10 +259,9 @@ export class ProductDetailComponent implements OnInit {
             this.productService.productDeleted.emit(true);
           },
           error: (error) => {
-            if (error.status === 401 || error.status === 403) {
-              this.toastr.error('Session expired. Log-in again.');
+            if (this.errorService.isAuthError(error.status)) {
+              this.errorService.handleSessionExpiration();
               this.dialogRef.close();
-              this.router.navigate(['../login']);
             } else if (error.status === 400) {
               if (error.error.message) {
                 this.toastr.error(error.error.message);
@@ -277,9 +276,6 @@ export class ProductDetailComponent implements OnInit {
               }
             }
           },
-          complete: () => {
-            // console.log('Product deleted');
-          }
         });
         this.toastr.success('Product deleted');
         this.dialogRef.close();
@@ -419,10 +415,9 @@ export class ProductDetailComponent implements OnInit {
             } else {
               this.toastr.error('Something went wrong');
             }
-          } else if (error.status === 403) {
-            this.toastr.error('Session expired. Log-in again.');
+          } else if (this.errorService.isAuthError(error.status)) {
+            this.errorService.handleSessionExpiration();
             this.dialogRef.close();
-            this.router.navigate(['../login']);
           }
           console.log(error);
           this.previewUrl = null;

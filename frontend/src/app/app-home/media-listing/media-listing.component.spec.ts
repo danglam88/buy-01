@@ -1,5 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -11,8 +10,12 @@ import { MediaComponent } from './media/media.component';
 import { of, throwError } from 'rxjs';
 
 class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
+  error(message: string) {
+    // Do nothing in the stub
+  }
+  success(message: string) {
+    // Do nothing in the stub
+  }
 }
 
 describe('MediaListingComponent', () => {

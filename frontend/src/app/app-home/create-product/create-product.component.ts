@@ -3,7 +3,6 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
-import { Router } from '@angular/router';
 import { ValidationService } from 'src/app/services/validation.service';  
 import { ErrorService } from 'src/app/services/error.service';
 
@@ -29,7 +28,6 @@ export class CreateProductComponent implements OnInit {
     private errorService: ErrorService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
-    private router: Router,
   ) {
     //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
@@ -133,11 +131,12 @@ export class CreateProductComponent implements OnInit {
   // Handles the image selection from file input and displays the selected image to previewUrl
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
-    if (this.selectedFiles.length + files.length > 5) {
+    // Convert FileList to an array
+    const filesArray: File[] = Array.from(files);
+    if (this.selectedFiles.length + filesArray.length > 5) {
       this.toastr.error('You can only add a maximum of 5 images.');
-    } else if (files.length > 0) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    } else if (filesArray.length > 0) {
+      for (const file of filesArray) {
         // Check the file type (allow only images)
         if (this.validationService.isImageFile(file)) {
           // Check the file size (limit to 2MB)
@@ -145,15 +144,15 @@ export class CreateProductComponent implements OnInit {
             this.displaySelectedImage(file);
             this.selectedFiles.push({ file, url: URL.createObjectURL(file) });
           } else {
-            this.toastr.error('Cannot upload '+ file.name + '. File size exceeds the limit (2MB). Please select a smaller image.');
+            this.toastr.error(`Cannot upload ${file.name}. File size exceeds the limit (2MB). Please select a smaller image.`);
           }
         } else {
-          this.toastr.error('Cannot upload '+ file.name + '. Invalid file type. Please select an image (e.g., JPEG, PNG, GIF).');
+          this.toastr.error(`Cannot upload ${file.name}. Invalid file type. Please select an image (e.g., JPEG, PNG, GIF).`);
         }
       }
     }
   }
-
+  
   displaySelectedImage(file: File) {
     const reader = new FileReader();
     reader.onload = (e) => {
