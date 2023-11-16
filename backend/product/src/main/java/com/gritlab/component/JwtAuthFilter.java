@@ -17,9 +17,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 @Order(3)
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Autowired
     private JwtService jwtService;
@@ -38,7 +43,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String userId = jwtService.extractUserID(token);
                 String userRole = jwtService.extractUserRole(token);
 
-                if (!jwtService.isTokenExpired(token) && username != null && userId != null && userRole != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (Boolean.TRUE.equals(!jwtService.isTokenExpired(token)
+                        && username != null && userId != null && userRole != null)
+                        && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetailsJWT userDetails = new UserDetailsJWT(username, userId, userRole);
 
                     UsernamePasswordAuthenticationToken authToken =
@@ -48,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+                log.warn(ex.getMessage());
             }
         }
 

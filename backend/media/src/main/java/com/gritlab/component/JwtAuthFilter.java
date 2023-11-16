@@ -17,16 +17,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 @Order(3)
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Autowired
-    JwtAuthFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
+    private JwtService jwtService;
 
     @Override
     protected void doFilterInternal(
@@ -37,18 +38,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String username = jwtService.extractUsername(token);
-            String userId = jwtService.extractUserID(token);
-            String userRole = jwtService.extractUserRole(token);
+            try {
+                String username = jwtService.extractUsername(token);
+                String userId = jwtService.extractUserID(token);
+                String userRole = jwtService.extractUserRole(token);
 
-            if (!jwtService.isTokenExpired(token) && username != null && userId != null && userRole != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetailsJWT userDetails = new UserDetailsJWT(username, userId, userRole);
+                if (Boolean.TRUE.equals(!jwtService.isTokenExpired(token)
+                        && username != null && userId != null && userRole != null)
+                        && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetailsJWT userDetails = new UserDetailsJWT(username, userId, userRole);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails,
+                                    null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (Exception ex) {
+                log.warn(ex.getMessage());
             }
         }
 

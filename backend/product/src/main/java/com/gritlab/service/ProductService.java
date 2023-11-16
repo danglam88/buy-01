@@ -176,8 +176,6 @@ public class ProductService {
     @KafkaListener(topics = "CHECK_PRODUCT_REQUEST", groupId = "my-consumer-group")
     public void checkProductRequest(String message) {
 
-        System.out.println(message);
-
         String[] params = message.split(",");
         if (params.length == 2) {
             String productId = params[0];

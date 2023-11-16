@@ -84,6 +84,11 @@ public class UserService {
                 .avatar(userDTO.getAvatar())
                 .avatarData(userDTO.getAvatarData())
                 .build();
+
+        if (emailExists(userDTO.getEmail())) {
+            throw new InvalidParamException("Email already exists");
+        }
+
         return userRepository.save(convertFromDto(userDTO));
     }
 
