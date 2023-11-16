@@ -24,6 +24,16 @@ RUN mvn -f ./product/pom.xml clean package -DskipTests
 # Stage 2: Create the final image
 FROM openjdk:17-slim
 
+# Accept build arguments
+ARG PRODUCT_DB_CREDENTIALS_USERNAME
+ARG PRODUCT_DB_CREDENTIALS_PASSWORD
+ARG JWT_SECRET
+
+# Set arguments as environment variables for runtime
+ENV PRODUCT_DB_CREDENTIALS_USERNAME=${PRODUCT_DB_CREDENTIALS_USERNAME}
+ENV PRODUCT_DB_CREDENTIALS_PASSWORD=${PRODUCT_DB_CREDENTIALS_PASSWORD}
+ENV JWT_SECRET=${JWT_SECRET}
+
 WORKDIR /app
 
 # Copy only the built artifact from the builder stage
