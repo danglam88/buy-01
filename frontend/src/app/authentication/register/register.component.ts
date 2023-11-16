@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
+import { Component, ViewChild, ElementRef  } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { RegistratonService } from '../../services/registraton.service'
@@ -11,7 +11,7 @@ import { ValidationService } from 'src/app/services/validation.service';
   styleUrls: ['./register.component.css']
 })
 
-export class RegisterComponent implements OnInit {
+export class RegisterComponent  {
   imgPlaceholder = '../../assets/images/placeholder.png';
   previewUrl: string | ArrayBuffer | null = null;
   selectedFile: File;
@@ -29,10 +29,6 @@ export class RegisterComponent implements OnInit {
       this.toastrConfig = this.toastr.toastrConfig;
     this.toastrConfig.positionClass = 'toast-bottom-right';
      }
-
-  ngOnInit() {
-   //this.toastr.toastrConfig.positionClass = 'toast-bottom-right'; // Set toastr position
-  }
 
   ngAfterViewInit() {
     // Set focus on the name input element when the component initializes

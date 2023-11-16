@@ -2,8 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegistratonService } from '../../services/registraton.service';
-import { ToastrService } from 'ngx-toastr';
-import { ToastrModule } from 'ngx-toastr';
+import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ValidationService } from 'src/app/services/validation.service';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
@@ -71,11 +70,5 @@ describe('RegisterComponent', () => {
     component.register();
     expect(toastrService.error).toHaveBeenCalledWith('Please select a role');
   });
-
-  // it('should not allow registration with invalid form data', () => {
-  //   spyOn(component.registerform.in);
-  //   component.register();
-  //   expect(toastrService.error).toHaveBeenCalledWith('Please enter a valid name (maximum 50 characters)');
-  // });
 
 });

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
@@ -23,8 +22,6 @@ describe('MediaListingComponent', () => {
   let fixture: ComponentFixture<MediaListingComponent>;
   let mediaService: MediaService;
   let errorService: ErrorService;
-  let router: Router;
-  let toastrService: ToastrService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,9 +40,7 @@ describe('MediaListingComponent', () => {
     fixture = TestBed.createComponent(MediaListingComponent);
     component = fixture.componentInstance;
     mediaService = TestBed.inject(MediaService);
-    toastrService = TestBed.inject(ToastrService);
     errorService = TestBed.inject(ErrorService);
-    router = TestBed.inject(Router);
 
     fixture.detectChanges();
   });

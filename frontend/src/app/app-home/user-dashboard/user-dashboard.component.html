@@ -11,7 +11,7 @@
     <!-- Profile Picture -->
     <div class="profile-image">
       <div>
-        <img [src]="previewUrl ? previewUrl : avatar">
+        <img [src]="previewUrl ? previewUrl : avatar" alt="Preview image or User avatar">
       </div>
       <div>
         <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput>

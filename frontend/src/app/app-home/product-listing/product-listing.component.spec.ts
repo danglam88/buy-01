@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { Router } from '@angular/router';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -28,9 +27,6 @@ describe('ProductListingComponent', () => {
   let fixture: ComponentFixture<ProductListingComponent>;
   let productService: ProductService;
   let errorService: ErrorService;
-  let toastrService: ToastrService;
-  let router: Router;
-  let validationService: ValidationService;
 
   const mockDialogRef = {
     open: jasmine.createSpy('open')
@@ -65,9 +61,6 @@ describe('ProductListingComponent', () => {
     fixture.detectChanges();
     productService = TestBed.inject(ProductService);
     errorService = TestBed.inject(ErrorService);
-    toastrService = TestBed.inject(ToastrService);
-    validationService = TestBed.inject(ValidationService);
-    router = TestBed.inject(Router);
   });
 
   it('should create', () => {

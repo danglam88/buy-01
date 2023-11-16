@@ -11,7 +11,6 @@ import { ValidationService } from 'src/app/services/validation.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of, throwError  } from 'rxjs';
-import { Router } from '@angular/router';
 
 class ToastrServiceStub {
   error(message: string) {
@@ -28,7 +27,6 @@ describe('CreateProductComponent', () => {
   let productService: ProductService;
   let toastrService: ToastrService;
   let errorService: ErrorService;
-  let router: Router;
 
   // Create a mock MatDialogRef
   const mockDialogRef = {
@@ -61,7 +59,6 @@ describe('CreateProductComponent', () => {
     productService = TestBed.inject(ProductService);
     toastrService = TestBed.inject(ToastrService);
     errorService = TestBed.inject(ErrorService);
-    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 

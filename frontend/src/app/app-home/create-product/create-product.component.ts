@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -11,7 +11,7 @@ import { ErrorService } from 'src/app/services/error.service';
   templateUrl: './create-product.component.html',
   styleUrls: ['./create-product.component.css'],
 })
-export class CreateProductComponent implements OnInit {
+export class CreateProductComponent {
   productInfo: any = {};
   mediaInfo: any = {};
   previewUrl: string | ArrayBuffer | null = null;
@@ -29,10 +29,9 @@ export class CreateProductComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
   ) {
-    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
   }
 
-  ngOnInit() {}
+  
 
   // Creates a product form with validation
   createProductForm = this.builder.group({

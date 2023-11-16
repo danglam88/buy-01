@@ -34,7 +34,6 @@ describe('ProductDetailComponent', () => {
   let errorService: ErrorService;
   let router: Router;
   let matDialog: MatDialog;
-  let matDialogRef: MatDialogRef<any>;
   let toastrService: ToastrService;
   let anchorElement: DebugElement;
   const mockDialogRef = {
@@ -78,7 +77,6 @@ describe('ProductDetailComponent', () => {
     component = fixture.componentInstance;
     component.productImages = ["data:image/jpeg;base64,/1", "data:image/jpeg;base64,/2"];
     matDialog = TestBed.inject(MatDialog);
-    matDialogRef = TestBed.inject(MatDialogRef);
     productService = TestBed.inject(ProductService);
     mediaService = TestBed.inject(MediaService);
     router = TestBed.inject(Router);

@@ -50,8 +50,8 @@ export class LogInComponent  implements OnInit{
           if (error.error.message) {
             this.toastr.error(error.error.message);
           } else if (error.error) {
-            for (let i = 0; i < error.error.length; i++) {
-              this.toastr.error(error.error[i]);
+            for (const errorMessage of error.error) {
+              this.toastr.error(errorMessage);
             }
           } else {
             this.toastr.error('Something went wrong');

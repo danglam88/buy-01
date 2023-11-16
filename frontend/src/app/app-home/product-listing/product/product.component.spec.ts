@@ -6,7 +6,6 @@ import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ProductComponent } from './product.component';
 import { MediaListingComponent } from '../../media-listing/media-listing.component';
 import { MediaComponent } from '../../media-listing/media/media.component';
-import { Product } from 'src/app/Models/Product';
 
 describe('ProductComponent', () => {
   let component: ProductComponent;

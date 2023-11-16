@@ -50,15 +50,12 @@ mat-card {
   margin: 22px;
 }
 
-
-
 img {
   max-width: 100%;
   max-height: 200px; 
   display: block;
   margin-top: 10px;
 }
-
 
 .field-form-button {
   margin-top: -30px !important;
@@ -134,11 +131,6 @@ body {
 	padding: 0 2rem;
 }
 
-img {
-	max-width: 100%;
-	display: block;
-}
-
 
 input {
 	appearance: none;
@@ -184,7 +176,6 @@ input {
   justify-content: space-between;
   width: 100%;
   position: relative;
-  padding-top: 1.5rem;
   border: 0;
   z-index: 1;
   background-color: transparent;

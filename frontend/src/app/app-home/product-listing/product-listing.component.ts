@@ -19,7 +19,6 @@ export class ProductListingComponent implements OnInit {
     private productService: ProductService,
     private errorService: ErrorService,
     ) {
-     // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
           this.getAllProducts();

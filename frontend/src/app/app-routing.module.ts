@@ -2,13 +2,11 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { LogInComponent } from './authentication/log-in/log-in.component';
 import { RegisterComponent } from './authentication/register/register.component';
-import  { AppHomeComponent } from './app-home/app-home.component';
 import { ProductDashboardComponent } from './app-home/product-dashboard/product-dashboard.component';
 import { UserDashboardComponent } from './app-home/user-dashboard/user-dashboard.component';
 import { AuthenticateGuard } from './guard/authenticate.guard';
 import { ErrorsComponent } from './errors/errors.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
-import { CreateProductComponent } from './app-home/create-product/create-product.component';
 
 const routes: Routes = [
 

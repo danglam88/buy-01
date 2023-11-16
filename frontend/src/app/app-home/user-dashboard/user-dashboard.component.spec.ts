@@ -14,7 +14,6 @@ import { throwError  } from 'rxjs';
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
   let fixture: ComponentFixture<UserDashboardComponent>;
-  let validationService: ValidationService;
   let errorService: ErrorService;
   let userService: UserService;
 
@@ -34,7 +33,6 @@ describe('UserDashboardComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
-    validationService = TestBed.inject(ValidationService);
     errorService  = TestBed.inject(ErrorService);
   });
 

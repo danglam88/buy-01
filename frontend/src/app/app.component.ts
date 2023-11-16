@@ -14,10 +14,8 @@ export class AppComponent implements DoCheck {
 
   ngDoCheck() {
     let currenturl = this.router.url;
-    // console.log(this.isToolbarVisible);
     if (currenturl == '/login' || currenturl == '/register') {
       this.isToolbarVisible = true;
-      // console.log(this.isToolbarVisible);
     } else {
       this.isToolbarVisible = false;
     }
