@@ -179,7 +179,7 @@ pipeline {
 
                             docker-compose up -d
 
-                            if [ "$(docker ps -q | wc -l)" != "9" ]; then
+                            if [ "$(docker ps -q | wc -l)" != "10" ]; then
                                 exit 1
                             fi
 
