@@ -154,36 +154,79 @@ pipeline {
                         [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD]
                     ]
-                    
-                    // Use maskPasswords with named arguments
-                    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-                        // Execute the deploy commands
-                        sh '''
-                        export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
-                        export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
-                        export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
-                        export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
-                        export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
-                        export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
 
-                        if [ "$(docker ps -aq)" != "" ]; then
-                            docker rm -f $(docker ps -aq)
-                        fi
-                        docker system prune -a -f
+                    try {
+                        // Use maskPasswords with named arguments
+                        maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
+                            // Execute the deploy commands
+                            sh '''
+                            export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
+                            export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
+                            export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
+                            export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
+                            export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
+                            export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
 
-                        rm -rf ~/*.tar
+                            if [ "$(docker ps -aq)" != "" ]; then
+                                docker rm -f $(docker ps -aq)
+                            fi
+                            docker system prune -a -f
 
-                        docker pull $USER_MICROSERVICE_IMAGE
-                        docker pull $PRODUCT_MICROSERVICE_IMAGE
-                        docker pull $MEDIA_MICROSERVICE_IMAGE
-                        docker pull $FRONTEND_IMAGE
+                            docker pull $USER_MICROSERVICE_IMAGE
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE
+                            docker pull $MEDIA_MICROSERVICE_IMAGE
+                            docker pull $FRONTEND_IMAGE
 
-                        docker-compose up -d
+                            docker-compose up -d
 
-                        if [ "$(docker ps -q | wc -l)" != "9" ]; then
-                            exit 1
-                        fi
-                        '''
+                            if [ "$(docker ps -q | wc -l)" != "9" ]; then
+                                exit 1
+                            fi
+
+                            docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
+                            docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
+                            docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
+                            docker save -o ~/frontend.tar $FRONTEND_IMAGE
+
+                            if [ ! -d "~/backup" ]; then
+                                mkdir -p ~/backup
+                            fi
+
+                            mv ~/*.tar ~/backup/
+                            '''
+                        }
+                    } catch (err) {
+                        // Use maskPasswords with named arguments
+                        maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
+                            // If deploy fails, the rollback commands are executed
+                            sh '''
+                            echo "Deployment failed. Executing rollback."
+                            
+                            export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
+                            export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
+                            export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
+                            export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
+                            export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
+                            export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
+
+                            if [ "$(docker ps -aq)" != "" ]; then
+                                docker rm -f $(docker ps -aq)
+                            fi
+                            docker system prune -a -f
+
+                            cp ~/backup/*.tar ~/
+
+                            docker load -i ~/user-microservice.tar
+                            docker load -i ~/product-microservice.tar
+                            docker load -i ~/media-microservice.tar
+                            docker load -i ~/frontend.tar
+
+                            docker-compose up -d
+                            '''
+                        }
+
+                        // Re-throw the error so that the pipeline fails
+                        throw err
                     }
                 }
             }
@@ -197,24 +240,9 @@ pipeline {
 
         success {
             script {
-                // If deploy succeeds, the backup commands are executed
-                echo "Deployment succeeded. Executing backup."
-                sh '''
-                docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
-                docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
-                docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
-                docker save -o ~/frontend.tar $FRONTEND_IMAGE
-
-                if [ ! -d "~/backup" ]; then
-                    mkdir -p ~/backup
-                fi
-
-                mv ~/*.tar ~/backup/
-                '''
-
                 mail to: "${predefinedEmails}",
-                        subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
-                        body: """Hello,
+                    subject: "Jenkins Pipeline SUCCESS: ${currentBuild.fullDisplayName}",
+                    body: """Hello,
 
 The Jenkins Pipeline ${currentBuild.fullDisplayName} has succeeded.
 
@@ -228,45 +256,6 @@ Gritlab Jenkins
 
         failure {
             script {
-                // Define the variables to be masked
-                def maskVars = [
-                    [var: 'USER_DB_USERNAME', password: env.USER_DB_USERNAME],
-                    [var: 'USER_DB_PASSWORD', password: env.USER_DB_PASSWORD],
-                    [var: 'PRODUCT_DB_USERNAME', password: env.PRODUCT_DB_USERNAME],
-                    [var: 'PRODUCT_DB_PASSWORD', password: env.PRODUCT_DB_PASSWORD],
-                    [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
-                    [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD]
-                ]
-                    
-                // Use maskPasswords with named arguments
-                maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-                    // If deploy fails, the rollback commands are executed
-                    echo "Deployment failed. Executing rollback."
-                    sh '''
-                    export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
-                    export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
-                    export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
-                    export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
-                    export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
-                    export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
-
-                    if [ "$(docker ps -aq)" != "" ]; then
-                        docker rm -f $(docker ps -aq)
-                    fi
-                    docker system prune -a -f
-
-                    rm -rf ~/*.tar
-                    cp ~/backup/*.tar ~/
-
-                    docker load -i ~/user-microservice.tar
-                    docker load -i ~/product-microservice.tar
-                    docker load -i ~/media-microservice.tar
-                    docker load -i ~/frontend.tar
-
-                    docker-compose up -d
-                    '''
-                }
-
                 def culprits = currentBuild.changeSets.collectMany { changeSet ->
                     changeSet.items.collect { it.author.fullName }
                 }.join(', ')
