@@ -1,10 +1,11 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from 'src/app/services/product.service';
 import { Router } from '@angular/router';
 import { ValidationService } from 'src/app/services/validation.service';  
+import { ErrorService } from 'src/app/services/error.service';
 
 @Component({
   selector: 'app-create-product',
@@ -25,6 +26,7 @@ export class CreateProductComponent implements OnInit {
     private toastr: ToastrService,
     private productService: ProductService,
     private validationService: ValidationService,
+    private errorService: ErrorService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
     private router: Router,
@@ -76,8 +78,8 @@ export class CreateProductComponent implements OnInit {
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       const formData = new FormData();
-      for (let index = 0; index < this.selectedFiles.length; index++) {
-        const file = this.selectedFiles[index].file;
+      for (const selectedFile of this.selectedFiles) {
+        const file = selectedFile.file;
         formData.append('files', file);
       }
       formData.append('name', this.createProductForm.controls.name.value.replace(/\s+/g, ' ').trim());
@@ -102,10 +104,9 @@ export class CreateProductComponent implements OnInit {
             } else {
               this.toastr.error('Something went wrong');
             }
-          } else if (error.status === 403 || error.status === 401){  
-            this.toastr.error('Session expired. Log-in again.');
+          } else if (this.errorService.isAuthError(error.status)){  
+            this.errorService.handleSessionExpiration();
             this.closeModal();
-            this.router.navigate(['../login']);
           }
         },
         complete: () => {

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MediaService } from 'src/app/services/media.service';
 import { ToastrService } from 'ngx-toastr';
+import { ErrorService } from 'src/app/services/error.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -15,6 +16,7 @@ export class MediaListingComponent implements OnInit {
   constructor(
     private mediaService: MediaService, 
     private toastr: ToastrService,
+    private errorService: ErrorService,
     private router: Router
   ) { 
      // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
@@ -44,17 +46,15 @@ export class MediaListingComponent implements OnInit {
             reader.readAsDataURL(mediaResult); 
             },
             error: (error) => {
-              if (error.status == 401 || error.status == 403) {
-                this.toastr.error('Session expired. Log-in again.');
-                this.router.navigate(['../login']);
+              if (this.errorService.isAuthError(error.status)) {
+                this.errorService.handleSessionExpiration();
               }
             },
           });
         },
         error: (error) => {
-          if (error.status == 401 || error.status == 403) {
-            this.toastr.error('Session expired. Log-in again.');
-            this.router.navigate(['../login']);
+          if (this.errorService.isAuthError(error.status)) {
+            this.errorService.handleSessionExpiration();
           }
         },
       });

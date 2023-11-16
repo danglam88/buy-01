@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MediaService } from 'src/app/services/media.service';
+import { ErrorService } from 'src/app/services/error.service';
 import { MediaListingComponent } from './media-listing.component';
 import { MediaComponent } from './media/media.component';
 import { of, throwError } from 'rxjs';
@@ -18,6 +19,7 @@ describe('MediaListingComponent', () => {
   let component: MediaListingComponent;
   let fixture: ComponentFixture<MediaListingComponent>;
   let mediaService: MediaService;
+  let errorService: ErrorService;
   let router: Router;
   let toastrService: ToastrService;
 
@@ -39,6 +41,7 @@ describe('MediaListingComponent', () => {
     component = fixture.componentInstance;
     mediaService = TestBed.inject(MediaService);
     toastrService = TestBed.inject(ToastrService);
+    errorService = TestBed.inject(ErrorService);
     router = TestBed.inject(Router);
 
     fixture.detectChanges();
@@ -62,7 +65,7 @@ describe('MediaListingComponent', () => {
     expect(mediaService.getImageByMediaId).toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401 for getImageByProductId', fakeAsync(() => {
+  it('should handle error with status 403 for getImageByProductId', fakeAsync(() => {
     spyOn(component, 'getProductMedia').and.callThrough();
   
     const errorResponse = {
@@ -72,45 +75,45 @@ describe('MediaListingComponent', () => {
 
     spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
     spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.productId = '123';
     component.getProductMedia(component.productId);
     tick(250);
 
     expect(component.getProductMedia).toHaveBeenCalled();
-    expect(mediaService.getImageByProductId).toHaveBeenCalled();
+    expect(mediaService.getImageByProductId).toHaveBeenCalledWith(component.productId);
     expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401 for getImageByProductId', fakeAsync(() => {
+  it('should handle error with status 401 for getImageByProductId', fakeAsync(() => {
     spyOn(component, 'getProductMedia').and.callThrough();
   
     const errorResponse = {
-      status: 403,
-      error: 'Forbidden',
+      status: 401,
+      error: 'Unauthorized',
     };
 
-    spyOn(mediaService, 'getImageByProductId').and.returnValue(of({ success: true }));
+    spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
     spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.productId = '123';
     component.getProductMedia(component.productId);
     tick(250);
 
     expect(component.getProductMedia).toHaveBeenCalled();
-    expect(mediaService.getImageByProductId).toHaveBeenCalled();
-    expect(mediaService.getImageByMediaId).toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(mediaService.getImageByProductId).toHaveBeenCalledWith(component.productId);
+    expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401 for getImageByMediaId', fakeAsync(() => {
+  it('should handle error with status 403 for getImageByMediaId', fakeAsync(() => {
     spyOn(component, 'getProductMedia').and.callThrough();
   
     const errorResponse = {
@@ -120,8 +123,8 @@ describe('MediaListingComponent', () => {
 
     spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
     spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
-    spyOn(toastrService, 'error');
-    spyOn(router, 'navigate');
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
 
     component.productId = '123';
     component.getProductMedia(component.productId);
@@ -129,9 +132,33 @@ describe('MediaListingComponent', () => {
 
     expect(component.getProductMedia).toHaveBeenCalled();
     expect(mediaService.getImageByProductId).toHaveBeenCalled();
-    expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
-    expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
+    expect(mediaService.getImageByMediaId).not.toHaveBeenCalledWith(component.getProductMedia);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+  }));
+
+  it('should handle error with status 401 for getImageByMediaId', fakeAsync(() => {
+    spyOn(component, 'getProductMedia').and.callThrough();
+  
+    const errorResponse = {
+      status: 401,
+      error: 'Unauthorized',
+    };
+
+    spyOn(mediaService, 'getImageByProductId').and.returnValue(throwError(errorResponse));
+    spyOn(mediaService, 'getImageByMediaId').and.returnValue(throwError(errorResponse));
+    spyOn(errorService, 'isAuthError').and.returnValue(true); 
+    spyOn(errorService, 'handleSessionExpiration');
+
+    component.productId = '123';
+    component.getProductMedia(component.productId);
+    tick(250);
+
+    expect(component.getProductMedia).toHaveBeenCalled();
+    expect(mediaService.getImageByProductId).toHaveBeenCalled();
+    expect(mediaService.getImageByMediaId).not.toHaveBeenCalledWith(component.getProductMedia);
+    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
+    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
   }));
   
   it('should call getProductMedia() when deleteProduct is emitted', () => {

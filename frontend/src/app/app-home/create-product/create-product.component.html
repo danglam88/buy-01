@@ -13,7 +13,7 @@
                     <app-image-slider [images]="selectedFiles" (imageRemoved)="onImageRemoved($event)"></app-image-slider>
                 </div>
                 <div *ngIf="selectedFiles.length === 0">
-                    <img [src]="previewUrl ? previewUrl : imgPlaceholder" class="preview-image">
+                    <img [src]="previewUrl ? previewUrl : imgPlaceholder" class="preview-image" alt="Preview or placeholder image">
                 </div>
                 <div class="requirement-info">
                     JPG, PNG, GIF.
