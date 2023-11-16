@@ -10,6 +10,7 @@ services:
     depends_on:
       - kafka
       - user-mongodb
+    restart: unless-stopped
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
@@ -20,6 +21,7 @@ services:
     depends_on:
       - kafka
       - product-mongodb
+    restart: unless-stopped
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
@@ -30,6 +32,7 @@ services:
     depends_on:
       - kafka
       - media-mongodb
+    restart: unless-stopped
 
   frontend:
     image: danglamgritlab/frontend:latest
@@ -37,6 +40,7 @@ services:
       - "4200:4200"
     networks:
       - buy01-network
+    restart: unless-stopped
 
   user-mongodb:
     image: mongo:latest
@@ -47,8 +51,9 @@ services:
     volumes:
       - user-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: rootUser
-      MONGO_INITDB_ROOT_PASSWORD: userDbRootPass
+      MONGO_INITDB_ROOT_USERNAME: ${USER_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${USER_DB_CREDENTIALS_PASSWORD}
+    restart: unless-stopped
 
   product-mongodb:
     image: mongo:latest
@@ -59,8 +64,9 @@ services:
     volumes:
       - product-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: rootProduct
-      MONGO_INITDB_ROOT_PASSWORD: productDbRootPass
+      MONGO_INITDB_ROOT_USERNAME: ${PRODUCT_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${PRODUCT_DB_CREDENTIALS_PASSWORD}
+    restart: unless-stopped
 
   media-mongodb:
     image: mongo:latest
@@ -71,8 +77,9 @@ services:
     volumes:
       - media-mongo-volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: rootMedia
-      MONGO_INITDB_ROOT_PASSWORD: mediaDbRootPass
+      MONGO_INITDB_ROOT_USERNAME: ${MEDIA_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MEDIA_DB_CREDENTIALS_PASSWORD}
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -87,6 +94,7 @@ services:
       KAFKA_MESSAGE_MAX_BYTES: '10000000'
     depends_on:
       - zookeeper
+    restart: unless-stopped
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -97,6 +105,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
 
 volumes:
   user-mongo-volume:
