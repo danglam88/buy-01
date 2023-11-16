@@ -86,7 +86,8 @@ pipeline {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
                 script {
-                    maskPasswords([ 
+                    // Define the variables to be masked
+                    def maskVars = [
                         [var: 'USER_DB_USERNAME', password: env.USER_DB_USERNAME],
                         [var: 'USER_DB_PASSWORD', password: env.USER_DB_PASSWORD],
                         [var: 'PRODUCT_DB_USERNAME', password: env.PRODUCT_DB_USERNAME],
@@ -94,7 +95,10 @@ pipeline {
                         [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD],
                         [var: 'JWT_SECRET_VALUE', password: env.JWT_SECRET_VALUE]
-                    ]) {
+                    ]
+
+                    // Use maskPasswords with named arguments
+                    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                         // Execute the build commands
                         sh '''
                         docker system prune -a -f
@@ -141,14 +145,18 @@ pipeline {
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
             steps {
                 script {
-                    maskPasswords([ 
+                    // Define the variables to be masked
+                    def maskVars = [
                         [var: 'USER_DB_USERNAME', password: env.USER_DB_USERNAME],
                         [var: 'USER_DB_PASSWORD', password: env.USER_DB_PASSWORD],
                         [var: 'PRODUCT_DB_USERNAME', password: env.PRODUCT_DB_USERNAME],
                         [var: 'PRODUCT_DB_PASSWORD', password: env.PRODUCT_DB_PASSWORD],
                         [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD]
-                    ]) {
+                    ]
+                    
+                    // Use maskPasswords with named arguments
+                    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                         // Execute the deploy commands
                         sh '''
                         export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
@@ -220,14 +228,18 @@ Gritlab Jenkins
 
         failure {
             script {
-                maskPasswords([ 
+                // Define the variables to be masked
+                def maskVars = [
                     [var: 'USER_DB_USERNAME', password: env.USER_DB_USERNAME],
                     [var: 'USER_DB_PASSWORD', password: env.USER_DB_PASSWORD],
                     [var: 'PRODUCT_DB_USERNAME', password: env.PRODUCT_DB_USERNAME],
                     [var: 'PRODUCT_DB_PASSWORD', password: env.PRODUCT_DB_PASSWORD],
                     [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
                     [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD]
-                ]) {
+                ]
+                    
+                // Use maskPasswords with named arguments
+                maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                     // If deploy fails, the rollback commands are executed
                     echo "Deployment failed. Executing rollback."
                     sh '''
