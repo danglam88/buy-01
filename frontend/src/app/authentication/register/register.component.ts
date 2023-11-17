@@ -1,9 +1,10 @@
 import { Component, ViewChild, ElementRef  } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { RegistratonService } from '../../services/registraton.service'
+import { RegistrationService } from '../../services/registration.service'
 import { Router } from '@angular/router';
 import { ValidationService } from 'src/app/services/validation.service';
+import { ErrorService } from 'src/app/services/error.service';
 
 @Component({
   selector: 'app-register',
@@ -23,8 +24,9 @@ export class RegisterComponent  {
   constructor(
     private builder: FormBuilder, 
     private toastr: ToastrService,
-    private regService: RegistratonService,
+    private registrationService: RegistrationService,
     private validationService: ValidationService,
+    private errorService: ErrorService,
     private router: Router) {
       this.toastrConfig = this.toastr.toastrConfig;
     this.toastrConfig.positionClass = 'toast-bottom-right';
@@ -104,23 +106,12 @@ export class RegisterComponent  {
       formData.append('password', this.registerform.value.password);
       formData.append('role', this.registerform.value.role);
       
-      this.regService.register(formData).subscribe({
+      this.registrationService.register(formData).subscribe({
         next: (result) => {
         },
         error: (error) => {
-          console.log(error);
-          if (error.status == 400) {
-            if (error.error.message) {
-              this.toastr.error(error.error.message);
-            } else if (error.error) {
-              if (error.error[0]) {
-                this.toastr.error(error.error[0]);
-              } else {
-                this.toastr.error(error.error);
-              }
-            } else {
-              this.toastr.error('Something went wrong');
-            }
+          if (this.errorService.is400Error(error.status)) {
+          this.errorService.handleBadRequestError(error);
           } 
         },
         complete: () => {
@@ -152,5 +143,5 @@ export class RegisterComponent  {
         this.register();
       }
     }
-  }
+  } 
 }

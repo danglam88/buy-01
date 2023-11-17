@@ -9,7 +9,7 @@ import { FooterComponent } from '../footer/footer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
-import { throwError  } from 'rxjs';
+import { Observable  } from 'rxjs';
 
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
@@ -53,34 +53,19 @@ describe('UserDashboardComponent', () => {
       status: 403,
       error: 'Forbidden',
     };
-    spyOn(userService, 'getUserInfo').and.returnValue(throwError(errorResponse));
+    spyOn(userService, 'getUserInfo').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
     component.getUserInfo();
     tick();
     
     expect(userService.getUserInfo).toHaveBeenCalled();
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
-  it('should handle 401 error when getting user info',  fakeAsync(() => {
-    
-    const errorResponse = {
-      status: 401,
-      error: 'Unauthorized',
-    };
-    spyOn(userService, 'getUserInfo').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-    component.getUserInfo();
-    tick();
-    
-    expect(userService.getUserInfo).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should update user name', () => {

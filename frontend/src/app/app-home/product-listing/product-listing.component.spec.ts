@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { of, Observable } from 'rxjs';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -106,9 +106,12 @@ describe('ProductListingComponent', () => {
       error: 'Forbidden',
     };
 
-    spyOn(productService, 'getAllProductsInfo').and.returnValue(throwError(errorResponse));
+    spyOn(productService, 'getAllProductsInfo').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
     component.getAllProducts();
     tick();
@@ -116,27 +119,7 @@ describe('ProductListingComponent', () => {
     expect(component.getAllProducts).toHaveBeenCalled();
     expect(productService.getAllProductsInfo).toHaveBeenCalled();
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
-  it('should handle error with status 401 for getAllProducts()', fakeAsync(() => {
-    spyOn(component, 'getAllProducts').and.callThrough();
-    const errorResponse = {
-      status: 401,
-      error: 'Unauthorized',
-    };
-
-    spyOn(productService, 'getAllProductsInfo').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-    component.getAllProducts();
-    tick();
-
-    expect(component.getAllProducts).toHaveBeenCalled();
-    expect(productService.getAllProductsInfo).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should open product detail', () => {

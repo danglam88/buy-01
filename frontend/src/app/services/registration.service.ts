@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class RegistratonService {
+export class RegistrationService {
   constructor(private httpClient: HttpClient) { }
 
   register(user: any): Observable<object> {

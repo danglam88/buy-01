@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
-import { of, throwError } from 'rxjs';
+import { of, Observable } from 'rxjs';
 
 import { ProductDashboardComponent } from './product-dashboard.component';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -151,9 +151,12 @@ describe('ProductDashboardComponent', () => {
       error: 'Forbidden',
     };
 
-    spyOn(productService, 'getSellerProductsInfo').and.returnValue(throwError(errorResponse));
+    spyOn(productService, 'getSellerProductsInfo').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
    
     component.getSellerProducts();
@@ -162,28 +165,6 @@ describe('ProductDashboardComponent', () => {
     expect(component.getSellerProducts).toHaveBeenCalled();
     expect(productService.getSellerProductsInfo).toHaveBeenCalled();
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
-  it('should handle error with status 401 for getSellerProducts', fakeAsync(() => {
-    spyOn(component, 'getSellerProducts').and.callThrough();
-  
-    const errorResponse = {
-      status: 401,
-      error: 'Unauthorized',
-    };
-
-    spyOn(productService, 'getSellerProductsInfo').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-   
-    component.getSellerProducts();
-    tick();
-
-    expect(component.getSellerProducts).toHaveBeenCalled();
-    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 });

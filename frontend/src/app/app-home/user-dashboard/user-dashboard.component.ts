@@ -88,7 +88,7 @@ export class UserDashboardComponent implements OnInit {
       error: (error) => {
         console.log(error);
         if (this.errorService.isAuthError(error.status)) {
-          this.errorService.handleSessionExpiration();
+          this.errorService.handleSessionExpirationError();
         }
       },
       complete: () => {
@@ -110,7 +110,7 @@ export class UserDashboardComponent implements OnInit {
       },
       error: (error) => {
         if (this.errorService.isAuthError(error.status)) {
-          this.errorService.handleSessionExpiration();
+          this.errorService.handleSessionExpirationError();
         } 
       },
     });
@@ -194,20 +194,10 @@ export class UserDashboardComponent implements OnInit {
         },
         error: (error) => {
           console.log(error);
-          if (error.status == 400) {
-            if (error.error.message) {
-              this.toastr.error(error.error.message);
-            } else if (error.error) {
-              if (error.error[0]) {
-                this.toastr.error(error.error[0]);
-              } else {
-                this.toastr.error(error.error);
-              }
-            } else {
-              this.toastr.error('Something went wrong');
-            }
+          if (this.errorService.is400Error(error.status)) {
+            this.errorService.handleBadRequestError(error);
           } else if (this.errorService.isAuthError(error.status)) {
-            this.errorService.handleSessionExpiration();
+            this.errorService.handleSessionExpirationError();
           } 
         },
         complete: () => {
@@ -297,7 +287,7 @@ export class UserDashboardComponent implements OnInit {
           error: (error) => {
             console.log(error);
             if (this.errorService.isAuthError(error.status)) {
-              this.errorService.handleSessionExpiration();
+              this.errorService.handleSessionExpirationError();
             } 
           },
           complete: () => {

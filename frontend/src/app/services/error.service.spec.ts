@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { ErrorService } from './error.service';
-import { Router } from '@angular/router';
 
 class ToastrServiceStub {
   error(message: string) {
@@ -15,7 +14,6 @@ class ToastrServiceStub {
 describe('ErrorService', () => {
   let toastrService: ToastrService;
   let errorService: ErrorService;
-  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -27,10 +25,62 @@ describe('ErrorService', () => {
     });
    
     errorService = TestBed.inject(ErrorService);
-    router = TestBed.inject(Router);
   });
 
   it('should be created', () => {
     expect(errorService).toBeTruthy();
   });
+
+  it('should handle session expiration error', () => {
+    spyOn(errorService['toastr'], 'error');
+    spyOn(errorService['router'], 'navigate');
+
+    errorService.handleSessionExpirationError();
+
+    expect(errorService['toastr'].error).toHaveBeenCalledWith('Session expired. Log-in again.');
+    expect(errorService['router'].navigate).toHaveBeenCalledWith(['../login']);
+  });
+
+  it('should handle bad request error with specific error messages', () => {
+    spyOn(errorService['toastr'], 'error');
+
+    const error = {
+      status: 400,
+      error: {
+        message: 'Bad request error message',
+      },
+    };
+
+    errorService.handleBadRequestError(error);
+
+    expect(errorService['toastr'].error).toHaveBeenCalledWith('Bad request error message');
+  });
+
+  it('should handle bad request error with array of error messages', () => {
+    spyOn(errorService['toastr'], 'error');
+
+    const error = {
+      status: 400,
+      error: ['Error message 1', 'Error message 2'],
+    };
+
+    errorService.handleBadRequestError(error);
+
+    expect(errorService['toastr'].error).toHaveBeenCalledWith('Error message 1');
+  });
+
+  it('should handle bad request error with generic message', () => {
+    spyOn(errorService['toastr'], 'error');
+
+    const error = {
+      status: 400,
+      error: {},
+    };
+
+    errorService.handleBadRequestError(error);
+
+    expect(errorService['toastr'].error).toHaveBeenCalledWith('Something went wrong');
+  });
 });
+
+

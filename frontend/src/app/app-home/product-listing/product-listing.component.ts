@@ -38,7 +38,7 @@ export class ProductListingComponent implements OnInit {
       },
       error: (error) => {
         if (this.errorService.isAuthError(error.status)) {
-          this.errorService.handleSessionExpiration();
+          this.errorService.handleSessionExpirationError();
         }
       },
       complete: () => {

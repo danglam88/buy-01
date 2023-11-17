@@ -1,19 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { RegistratonService } from './registraton.service';
+import { RegistrationService } from './registration.service';
 
-describe('RegistratonService', () => {
-  let service: RegistratonService;
+describe('RegistrationService', () => {
+  let registrationService: RegistrationService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [RegistratonService],
+      providers: [RegistrationService],
     });
 
-    service = TestBed.inject(RegistratonService);
+    registrationService = TestBed.inject(RegistrationService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -22,13 +22,13 @@ describe('RegistratonService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(registrationService).toBeTruthy();
   });
 
   it('should register a user', () => {
     const mockUser = { /* Provide mock user data here */ };
 
-    service.register(mockUser).subscribe((data) => {
+    registrationService.register(mockUser).subscribe((data) => {
       expect(data).toEqual(mockUser);
     });
 

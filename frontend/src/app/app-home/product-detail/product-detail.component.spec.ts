@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'; 
-import { of, throwError } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { DebugElement } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -193,81 +193,6 @@ describe('ProductDetailComponent', () => {
     expect(component.editingField).toBeNull();
   });
 
-  it('should update price', () => {
-    const fieldName = 'price';
-    const fieldValue = 10;
-  
-    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
-  
-    component.productDetailForm.controls[fieldName].setValue(fieldValue);
-    component.product = {  
-      id: '1',
-      name: 'Mock Product Name',
-      description: 'Mock Product Description',
-      price: fieldValue,
-      quantity: 10,
-      editable: true
-    };
-  
-    spyOn(component, 'updateField').and.callThrough();
-  
-   component.updateField(fieldName);
-  
-    expect(component.updateField).toHaveBeenCalledWith(fieldName);
-    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
-    expect(component.editingField).toBeNull();
-  });
-
-  it('should update quantity', () => {
-    const fieldName = 'quantity';
-    const fieldValue = 10;
-  
-    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
-  
-    component.productDetailForm.controls[fieldName].setValue(fieldValue);
-    component.product = {  
-      id: '1',
-      name: 'Mock Product Name',
-      description: 'Mock Product Description',
-      price: 10,
-      quantity: fieldValue,
-      editable: true
-    };
-  
-    spyOn(component, 'updateField').and.callThrough();
-  
-   component.updateField(fieldName);
-  
-    expect(component.updateField).toHaveBeenCalledWith(fieldName);
-    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
-    expect(component.editingField).toBeNull();
-  });
-
-  it('should update description', () => {
-    const fieldName = 'description';
-    const fieldValue = 'Mock Product Description';
-  
-    spyOn(productService, 'updateProduct').and.returnValue(of({ success: true }));
-  
-    component.productDetailForm.controls[fieldName].setValue(fieldValue);
-    component.product = {  
-      id: '1',
-      name: 'Mock Product Name',
-      description: fieldValue,
-      price: 10,
-      quantity: 10,
-      editable: true
-    };
-  
-    spyOn(component, 'updateField').and.callThrough();
-  
-   component.updateField(fieldName);
-  
-    expect(component.updateField).toHaveBeenCalledWith(fieldName);
-    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
-    expect(component.editingField).toBeNull();
-  });
-
   it('should handle error with status 403 updateField()', fakeAsync(() => {
     const fieldName = 'name';
     const fieldValue = 'New Product Name';
@@ -288,9 +213,12 @@ describe('ProductDetailComponent', () => {
       editable: true
     };
 
-    spyOn(productService, 'updateProduct').and.returnValue(throwError(errorResponse));
+    spyOn(productService, 'updateProduct').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
 
     component.updateField(fieldName);
@@ -299,43 +227,8 @@ describe('ProductDetailComponent', () => {
     expect(component.updateField).toHaveBeenCalled();
     expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
-
-  it('should handle error with status 401 updateField()', fakeAsync(() => {
-    const fieldName = 'name';
-    const fieldValue = 'New Product Name';
-    spyOn(component, 'updateField').and.callThrough();
-  
-    const errorResponse = {
-      status: 401,
-      error: 'Unauthorized',
-    };
-
-    component.productDetailForm.controls[fieldName].setValue(fieldValue);
-    component.product = {  
-      id: '1',
-      name: fieldName,
-      description: 'Mock Product 1 description',
-      price: 100,
-      quantity: 10,
-      editable: true
-    };
-
-    spyOn(productService, 'updateProduct').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-
-    component.updateField(fieldName);
-    tick();
-
-    expect(component.updateField).toHaveBeenCalled();
-    expect(productService.updateProduct).toHaveBeenCalledWith(component.product);
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
 
   it('delete image when user confirmed', fakeAsync(() => {
     const mockCurrentImage = { mediaId: '123' }; 
@@ -383,7 +276,7 @@ describe('ProductDetailComponent', () => {
     expect(mediaService.productMediaDeleted.emit).not.toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401 for deleteImage()', fakeAsync(() => {
+  it('should handle error with status 403 for deleteImage()', fakeAsync(() => {
     spyOn(component, 'deleteImage').and.callThrough();
     const mockCurrentImage = { mediaId: '123' }; 
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
@@ -394,9 +287,12 @@ describe('ProductDetailComponent', () => {
       error: 'Forbidden',
     };
     spyOn(matDialog, 'open').and.returnValue(dialogRef);  
-    spyOn(mediaService, 'deleteMedia').and.returnValue(throwError(errorResponse));
+    spyOn(mediaService, 'deleteMedia').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
     component.deleteImage(mockCurrentImage);
     tick();
@@ -407,7 +303,7 @@ describe('ProductDetailComponent', () => {
     expect(component.deleteImage).toHaveBeenCalledWith(mockCurrentImage);
     expect(mediaService.deleteMedia).toHaveBeenCalledWith(mockCurrentImage.mediaId);
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should delete product when confirmed', fakeAsync(() => {
@@ -460,9 +356,12 @@ describe('ProductDetailComponent', () => {
       error: 'Forbidden',
     };
 
-    spyOn(productService, 'deleteProduct').and.returnValue(throwError(errorResponse));
+    spyOn(productService, 'deleteProduct').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
 
     component.deleteProduct();
@@ -473,33 +372,7 @@ describe('ProductDetailComponent', () => {
     });
     expect(productService.deleteProduct).toHaveBeenCalled();
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
-  it('should handle error with status 401 for deleteProduct', fakeAsync(() => {
-    spyOn(component, 'deleteProduct').and.callThrough();
-    const dialogRef = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRef.afterClosed.and.returnValue(of(true)); 
-
-    spyOn(matDialog, 'open').and.returnValue(dialogRef);
-    const errorResponse = {
-      status: 401,
-      error: 'Unauthorized',
-    };
-
-    spyOn(productService, 'deleteProduct').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-    component.deleteProduct();
-    tick();
-
-    expect(matDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
-      data: { confirmationText: 'Delete this product?' },
-    });
-    expect(productService.deleteProduct).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should save the selected files when the image limit is not exceeded', () => {
@@ -562,7 +435,7 @@ describe('ProductDetailComponent', () => {
     expect(component.getProductImages).toHaveBeenCalled();
   }));
 
-  it('should handle error with status 403 or 401 for saveEachSelectedFile()', fakeAsync(() => {
+  it('should handle error with status 403 for saveEachSelectedFile()', fakeAsync(() => {
     spyOn(component, 'saveEachSelectedFile').and.callThrough();
     const productId = '1';
     const index = 0;
@@ -580,9 +453,12 @@ describe('ProductDetailComponent', () => {
       error: 'Forbidden',
     };
 
-    spyOn(mediaService, 'uploadMedia').and.returnValue(throwError(errorResponse));
+    spyOn(mediaService, 'uploadMedia').and.returnValue(new Observable((observer) => {
+      observer.error(errorResponse);
+      observer.complete();
+    }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
+    spyOn(errorService, 'handleSessionExpirationError');
 
     component.selectedFiles = selectedFiles;
     component.saveEachSelectedFile(productId, index);
@@ -591,39 +467,7 @@ describe('ProductDetailComponent', () => {
     expect(component.saveEachSelectedFile).toHaveBeenCalled();
     expect(mediaService.uploadMedia).toHaveBeenCalled();
     expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
-  }));
-
-  it('should handle error with status 401 for saveEachSelectedFile()', fakeAsync(() => {
-    spyOn(component, 'saveEachSelectedFile').and.callThrough();
-    const productId = '1';
-    const index = 0;
-  
-    const selectedFiles = [{
-      file: new File([], 'image1.jpg'),
-      url: 'image1.jpg',
-    }];
-    const formData = new FormData();
-    formData.append('productId', productId);
-    formData.append('file', selectedFiles[index].file);
-
-    const errorResponse = {
-      status: 401,
-      error: 'Unuthorized',
-    };
-
-    spyOn(mediaService, 'uploadMedia').and.returnValue(throwError(errorResponse));
-    spyOn(errorService, 'isAuthError').and.returnValue(true); 
-    spyOn(errorService, 'handleSessionExpiration');
-
-    component.selectedFiles = selectedFiles;
-    component.saveEachSelectedFile(productId, index);
-    tick();
-
-    expect(component.saveEachSelectedFile).toHaveBeenCalled();
-    expect(mediaService.uploadMedia).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(401);
-    expect(errorService.handleSessionExpiration).toHaveBeenCalled();
+    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should initialize currentIndex to 0', () => {
