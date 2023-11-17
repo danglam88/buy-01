@@ -108,9 +108,11 @@ The whole process of the project has been automated using Jenkins (accessible at
 -  Deploy: once all the frontend and backend Docker images are available in the Docker Hub, they will be pulled to the deploy-server (at 164.92.252.125) and the deployment starts.
    +  Other necessary Docker images such as Zookeeper, Kafka and MongoDB are also pulled to the deploy-server.
    +  A separate Docker container is configured for each of the Docker images.
+   +  If the deployment is passed, all the Docker containers are started and all the Docker images for frontend and backend are saved into a backup directory on the deploy-server. 
+   +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. 
 -  Post Actions:
-   +  If the deployment is passed, all the Docker containers are started and all the Docker images for frontend and backend are saved into a backup directory on the deploy-server. A success email will also be sent to all the team members.
-   +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. A failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
+   +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
+  
 
 The application is then accessible via https://164.92.252.125:4200
 
