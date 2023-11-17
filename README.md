@@ -1,5 +1,5 @@
 # Java Buy-01 Project
-kek
+
 ## Table of Contents
 - [Description](#description)
 - [Front-end Specifications](#front-end-specifications)

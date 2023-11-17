@@ -136,7 +136,7 @@ export class RegisterComponent implements OnInit {
       if (this.registerform.controls.name.status == "INVALID") {
         this.toastr.error('Please enter a valid name (maximum 50 characters)');
       } else if (this.registerform.controls.email.status == "INVALID") {
-        this.toastr.error('Please enter a valid email format');
+        this.toastr.error('Please enter a valid email');
       } else if (this.registerform.controls.password.status == "INVALID") {
         this.toastr.error('Please enter a valid password (from 6 to 50 characters) which contains at least one uppercase letter, one lowercase letter, one digit and one special character (@$!%*?&)');
       } else if (this.registerform.controls.role.status == "INVALID") {
