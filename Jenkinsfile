@@ -277,4 +277,3 @@ Gritlab Jenkins
         }
     }
 }
-
