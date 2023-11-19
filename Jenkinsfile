@@ -5,7 +5,7 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
         sh """
         cd ${directory}
-        mvn clean package sonar:sonar -Dsonar.login=\$SONARQUBE_TOKEN_VALUE
+        mvn clean package sonar:sonar -Dsonar.host.url=http://139.59.159.95:9000 -Dsonar.login=\$SONARQUBE_TOKEN_VALUE
         """
     }
     echo "Static Analysis Completed for ${microserviceName}"
