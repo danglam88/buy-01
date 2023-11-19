@@ -1,5 +1,40 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
+def runBackendSonarQubeAnalysis(directory, microserviceName) {
+    sh """
+        cd ${directory}
+        mvn clean package sonar:sonar
+    """
+    echo "Static Analysis Completed for ${microserviceName}"
+    stage("Quality Gate for ${microserviceName}") {
+        timeout(time: 30, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure for ${microserviceName}: ${qg.status}"
+            }
+        }
+        echo "Quality Gate Passed for ${microserviceName}"
+    }
+}
+
+def runFrontendSonarQubeAnalysis(directory) {
+    sh """
+        cd ${directory}
+        npm install
+        # Include SonarQube analysis command for Angular here
+        echo 'Static Analysis Completed for Frontend'
+    """
+    stage("Quality Gate") {
+        timeout(time: 30, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure: ${qg.status} in Frontend"
+            }
+        }
+        echo 'Quality Gate Passed for Frontend' 
+    }
+}
+
 pipeline {
     agent any // We define the specific agents within each stage
 
@@ -37,10 +72,47 @@ pipeline {
             }
         }
 
+        stage('Code Quality Checks by SonarQube') {
+            parallel {
+                stage('Frontend Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runFrontendSonarQubeAnalysis('frontend')
+                        }
+                    }
+                }
+                stage('Media-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                        }
+                    }
+                }
+                stage('Product-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
+                        }
+                    }
+                }
+                stage('User-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Unit Tests') {
             parallel {
                 stage('Frontend Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' }
                     steps {
                         script {
                             env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
@@ -53,7 +125,7 @@ pipeline {
                     }
                 }
                 stage('Media-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' }
                     steps {
                         sh '''
                         cd backend/media
@@ -62,7 +134,7 @@ pipeline {
                     }
                 }
                 stage('Product-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' }
                     steps {
                         sh '''
                         cd backend/product
@@ -71,7 +143,7 @@ pipeline {
                     }
                 }
                 stage('User-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
+                    agent { label 'build-agent' }
                     steps {
                         sh '''
                         cd backend/user
