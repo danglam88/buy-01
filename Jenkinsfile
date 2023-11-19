@@ -3,10 +3,10 @@ def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanov
 def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
     // Use maskPasswords with named arguments
     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-        sh '''
-        cd $directory
-        mvn clean package sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN_VALUE
-        '''
+        sh """
+        cd ${directory}
+        mvn clean package sonar:sonar -Dsonar.login=\$SONARQUBE_TOKEN_VALUE
+        """
     }
     echo "Static Analysis Completed for ${microserviceName}"
 
@@ -24,11 +24,11 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
 def runFrontendSonarQubeAnalysis(maskVars) {
     // Use maskPasswords with named arguments
     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-        sh '''
+        sh """
         cd frontend
         npm install
         # Include SonarQube analysis command for Angular here
-        '''
+        """
     }
     echo "Static Analysis Completed for Frontend"
 
