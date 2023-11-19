@@ -1,14 +1,15 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
-    // Use maskPasswords with named arguments
-    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-        sh """
-        cd ${directory}
-        mvn -X clean package sonar:sonar -Dsonar.login=\$SONARQUBE_TOKEN_VALUE
-        """
+    stage("Static Analysis for ${microserviceName}") {
+        withSonarQubeEnv('SonarQube Server') {
+            sh """
+            cd ${directory}
+            mvn clean package sonar:sonar
+            """
+        }
+        echo "Static Analysis Completed for ${microserviceName}"
     }
-    echo "Static Analysis Completed for ${microserviceName}"
 
     stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
