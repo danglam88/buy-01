@@ -4,8 +4,8 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
     // Use maskPasswords with named arguments
     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
         sh '''
-            cd ${directory}
-            mvn clean package sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN_VALUE
+        cd $directory
+        mvn clean package sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN_VALUE
         '''
     }
     echo "Static Analysis Completed for ${microserviceName}"
@@ -21,13 +21,13 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
     }
 }
 
-def runFrontendSonarQubeAnalysis(directory, maskVars) {
+def runFrontendSonarQubeAnalysis(maskVars) {
     // Use maskPasswords with named arguments
     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
         sh '''
-            cd ${directory}
-            npm install
-            # Include SonarQube analysis command for Angular here
+        cd frontend
+        npm install
+        # Include SonarQube analysis command for Angular here
         '''
     }
     echo "Static Analysis Completed for Frontend"
@@ -77,6 +77,7 @@ pipeline {
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.SONARQUBE_TOKEN_VALUE = SONARQUBE_TOKEN
+                        env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
                 }
             }
@@ -92,7 +93,7 @@ pipeline {
                             def maskVars = [
                                 [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
                             ]
-                            runFrontendSonarQubeAnalysis('frontend', maskVars)
+                            runFrontendSonarQubeAnalysis(maskVars)
                         }
                     }
                 }
@@ -140,9 +141,6 @@ pipeline {
                 stage('Frontend Tests') {
                     agent { label 'build-agent' }
                     steps {
-                        script {
-                            env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
-                        }
                         sh '''
                         cd frontend
                         npm install
