@@ -16,19 +16,15 @@ export class ProductListingComponent implements OnInit {
   selectedProduct: Product;
   products$: Observable<any>;
   
-  constructor(
+  constructor( 
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
-    ) {
-    }
+    ) {}
   
   ngOnInit(): void {
-    this.productService.productCreated$.subscribe((productCreated) => {
-      if (productCreated) {
-        this.getAllProducts();
-      }
-    });
+    this.productService.productCreated$.subscribe(() => this.getAllProducts());
+    this.productService.productDeleted$.subscribe(() => this.getAllProducts());
     this.getAllProducts();
   }
 

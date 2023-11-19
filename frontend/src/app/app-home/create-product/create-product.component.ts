@@ -12,8 +12,6 @@ import { ErrorService } from 'src/app/services/error.service';
   styleUrls: ['./create-product.component.css'],
 })
 export class CreateProductComponent {
-  productInfo: any = {};
-  mediaInfo: any = {};
   previewUrl: string | ArrayBuffer | null = null;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   selectedFiles: Array<{ file: File, url: string }> = [];
@@ -30,8 +28,6 @@ export class CreateProductComponent {
     public dialogRef: MatDialogRef<CreateProductComponent>, 
   ) {
   }
-
-  
 
   // Creates a product form with validation
   createProductForm = this.builder.group({
@@ -87,7 +83,6 @@ export class CreateProductComponent {
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
           this.productService.notifyProductCreated();
-          //this.productService.productCreated.emit(true);
         },
         error: (error) => {
           if (this.errorService.is400Error(error.status)) {

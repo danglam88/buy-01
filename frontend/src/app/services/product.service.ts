@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
@@ -9,15 +9,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ProductService {
-  private allProductsInfoUrl="http://localhost:8081/products";
-  private sellerProductsInfoUrl="http://localhost:8081/products/seller";
-  private createProductUrl="http://localhost:8081/products";
-  private updateProductUrl="http://localhost:8081/products/";
-  private deleteProductUrl="http://localhost:8081/products/";
-  //productDeleted = new EventEmitter<any>();
   private productCreatedSubject = new BehaviorSubject<boolean>(false);
   private productDeletedSubject = new BehaviorSubject<boolean>(false);
-
   productCreated$: Observable<boolean> = this.productCreatedSubject.asObservable();
   productDeleted$: Observable<boolean> = this.productDeletedSubject.asObservable();
   
@@ -25,9 +18,7 @@ export class ProductService {
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,
     private router: Router,
-    ) {
-
-  }
+    ) {}
 
   get token() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -71,7 +62,6 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-
     return this.httpClient.put(`${environment.productUrl}/` + product.id, product, { headers });
   }
 
@@ -80,7 +70,6 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-
     return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
   }
 

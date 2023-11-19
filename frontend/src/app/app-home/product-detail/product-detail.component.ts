@@ -21,6 +21,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
+
   editingField: string | null = null;
   productImages: any = {};
   mediaID: any = {};
@@ -55,22 +56,13 @@ export class ProductDetailComponent implements OnInit {
     //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
     // Handles product media updates and get product images again from media service
-    this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
-      if (productMediaUpdated) {
-        this.productImages = {};
-        this.getProductImages(this.product.id);
+    this.mediaService.productMediaUpdated.subscribe(() => {
         this.currentIndexOfImageSlider = this.noOfImages;
-      }
     });
 
-    // Handles product media deletion and get product images again from media service
-    this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
-      if (productMediaDeleted) {
-        this.productImages = {};
-        this.getProductImages(this.product.id);
-        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
-          this.currentIndexOfImageSlider = 0;
-        }
+    this.mediaService.productMediaDeleted$.subscribe(() => {
+      if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+        this.currentIndexOfImageSlider = 0;
       }
     });
   }
@@ -133,6 +125,7 @@ export class ProductDetailComponent implements OnInit {
 
    // Get product images from media service, save to productImages and display in image slider
   getProductImages(productId: string){
+    console.log("getProductImages called")
     this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         for (const key in result) {
@@ -200,9 +193,9 @@ export class ProductDetailComponent implements OnInit {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
+              this.mediaService.notifyProductImageDeleted();
               this.getProductImages(this.product.id);
               this.toastr.success('Image deleted');
-              this.mediaService.productMediaDeleted.emit(true);
             },
             error: (error) => {
               console.log(error);
