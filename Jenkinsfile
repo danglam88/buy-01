@@ -1,11 +1,15 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def runBackendSonarQubeAnalysis(directory, microserviceName) {
-    sh """
-        cd ${directory}
-        mvn clean package sonar:sonar
-    """
+def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
+    // Use maskPasswords with named arguments
+    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
+        sh '''
+            cd ${directory}
+            mvn clean package sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN_VALUE
+        '''
+    }
     echo "Static Analysis Completed for ${microserviceName}"
+
     stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
             def qg = waitForQualityGate()
@@ -17,21 +21,25 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
     }
 }
 
-def runFrontendSonarQubeAnalysis(directory) {
-    sh """
-        cd ${directory}
-        npm install
-        # Include SonarQube analysis command for Angular here
-        echo 'Static Analysis Completed for Frontend'
-    """
-    stage("Quality Gate") {
+def runFrontendSonarQubeAnalysis(directory, maskVars) {
+    // Use maskPasswords with named arguments
+    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
+        sh '''
+            cd ${directory}
+            npm install
+            # Include SonarQube analysis command for Angular here
+        '''
+    }
+    echo "Static Analysis Completed for Frontend"
+
+    stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
             def qg = waitForQualityGate()
             if (qg.status != 'OK') {
-                error "Pipeline aborted due to quality gate failure: ${qg.status} in Frontend"
+                error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
             }
         }
-        echo 'Quality Gate Passed for Frontend' 
+        echo "Quality Gate Passed for Frontend"
     }
 }
 
@@ -58,7 +66,8 @@ pipeline {
                         usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'USER_DB_USERNAME', passwordVariable: 'USER_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
-                        string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
+                        string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'sonarqube-creds', variable: 'SONARQUBE_TOKEN')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
                         env.USER_DB_PASSWORD = USER_DB_PASSWORD
@@ -67,18 +76,23 @@ pipeline {
                         env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
+                        env.SONARQUBE_TOKEN_VALUE = SONARQUBE_TOKEN
                     }
                 }
             }
         }
 
-        stage('Code Quality Checks by SonarQube') {
+        stage('Code Quality Checks') {
             parallel {
                 stage('Frontend Code Quality') {
                     agent { label 'build-agent' }
                     steps {
                         script {
-                            runFrontendSonarQubeAnalysis('frontend')
+                            // Define the variables to be masked
+                            def maskVars = [
+                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
+                            ]
+                            runFrontendSonarQubeAnalysis('frontend', maskVars)
                         }
                     }
                 }
@@ -86,7 +100,11 @@ pipeline {
                     agent { label 'build-agent' }
                     steps {
                         script {
-                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                            // Define the variables to be masked
+                            def maskVars = [
+                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
+                            ]
+                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice', maskVars)
                         }
                     }
                 }
@@ -94,7 +112,11 @@ pipeline {
                     agent { label 'build-agent' }
                     steps {
                         script {
-                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
+                            // Define the variables to be masked
+                            def maskVars = [
+                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
+                            ]
+                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice', maskVars)
                         }
                     }
                 }
@@ -102,7 +124,11 @@ pipeline {
                     agent { label 'build-agent' }
                     steps {
                         script {
-                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                            // Define the variables to be masked
+                            def maskVars = [
+                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
+                            ]
+                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice', maskVars)
                         }
                     }
                 }
