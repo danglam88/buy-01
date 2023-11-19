@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegistrationService } from 'src/app/services/registration.service';
@@ -7,14 +7,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ValidationService } from 'src/app/services/validation.service';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ErrorService } from 'src/app/services/error.service';
-import { of, Observable  } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
   let toastrService: ToastrService;
-  let errorService: ErrorService;
-  let registrationService: RegistrationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -36,8 +33,6 @@ describe('RegisterComponent', () => {
      fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     toastrService = TestBed.inject(ToastrService); 
-    errorService = TestBed.inject(ErrorService);
-    registrationService = TestBed.inject(RegistrationService);
     spyOn(toastrService, 'error'); 
     fixture.detectChanges();
   });
