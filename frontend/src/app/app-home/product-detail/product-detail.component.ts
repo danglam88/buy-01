@@ -245,7 +245,7 @@ export class ProductDetailComponent implements OnInit {
         console.log('Product deleted');
         this.productService.deleteProduct(this.product).subscribe({
           next: (result) => {
-            this.productService.productDeleted.emit(true);
+            this.productService.notifyProductDeleted();
           },
           error: (error) => {
             if (this.errorService.isAuthError(error.status)) {

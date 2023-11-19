@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-listing',
@@ -12,39 +14,34 @@ import { ErrorService } from 'src/app/services/error.service';
 })
 export class ProductListingComponent implements OnInit {
   selectedProduct: Product;
-  products: any = [];
-
+  products$: Observable<any>;
+  
   constructor(
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
     ) {
-      this.productService.productCreated.subscribe((productCreated) => {
-        if (productCreated) {
-          this.getAllProducts();
-        }
-      });
     }
   
   ngOnInit(): void {
-    // Get all products and display them
+    this.productService.productCreated$.subscribe((productCreated) => {
+      if (productCreated) {
+        this.getAllProducts();
+      }
+    });
     this.getAllProducts();
   }
 
   getAllProducts(){
-    this.productService?.getAllProductsInfo().subscribe({
-      next: (result) => {
-        this.products = result;
-      },
-      error: (error) => {
+    this.products$ = this.productService.getAllProductsInfo().pipe(
+      catchError((error) => {
         if (this.errorService.isAuthError(error.status)) {
           this.errorService.handleSessionExpirationError();
         }
-      },
-      complete: () => {
-        console.log("All products retrieved");
-      }
-    });
+        // Return an empty observable or default value to avoid breaking the chain
+        return of([]);
+      })
+    );
   }
 
   // Open productDetail modal

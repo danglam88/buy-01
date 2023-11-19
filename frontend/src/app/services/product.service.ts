@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
@@ -14,8 +14,13 @@ export class ProductService {
   private createProductUrl="http://localhost:8081/products";
   private updateProductUrl="http://localhost:8081/products/";
   private deleteProductUrl="http://localhost:8081/products/";
-  productCreated = new EventEmitter<any>();
-  productDeleted = new EventEmitter<any>();
+  //productDeleted = new EventEmitter<any>();
+  private productCreatedSubject = new BehaviorSubject<boolean>(false);
+  private productDeletedSubject = new BehaviorSubject<boolean>(false);
+
+  productCreated$: Observable<boolean> = this.productCreatedSubject.asObservable();
+  productDeleted$: Observable<boolean> = this.productDeletedSubject.asObservable();
+  
 
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,
@@ -77,6 +82,14 @@ export class ProductService {
     }
 
     return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
+  }
+
+  notifyProductCreated() {
+    this.productCreatedSubject.next(true);
+  }
+
+  notifyProductDeleted() {
+    this.productDeletedSubject.next(true);
   }
 
 }

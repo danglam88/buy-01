@@ -86,7 +86,8 @@ export class CreateProductComponent {
 
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          this.productService.productCreated.emit(true);
+          this.productService.notifyProductCreated();
+          //this.productService.productCreated.emit(true);
         },
         error: (error) => {
           if (this.errorService.is400Error(error.status)) {

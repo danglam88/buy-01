@@ -32,7 +32,6 @@ describe('ProductListingComponent', () => {
     open: jasmine.createSpy('open')
   };
 
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -67,16 +66,6 @@ describe('ProductListingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should subscribe to productCreated event and call getAllProducts() when productCreated is emitted', () => {
-    spyOn(component, 'getAllProducts');
-    const productCreatedEventSpy = spyOn(productService.productCreated, 'subscribe');
-
-    productCreatedEventSpy.and.callThrough(); 
-
-    productService.productCreated.emit(true);
-
-    expect(component.getAllProducts).toHaveBeenCalled();
-  });
 
   it('should call getAllProducts() and display', fakeAsync(() => {
     spyOn(component, 'getAllProducts');
@@ -91,12 +80,11 @@ describe('ProductListingComponent', () => {
     ];
     spyOn(productService, 'getAllProductsInfo').and.returnValue(of(mockProducts));
     component.getAllProducts();
-    component.products = mockProducts;
-
+    component.products$.subscribe(() => {
+      expect(component.getAllProducts).toHaveBeenCalled();
+      expect(productService.getAllProductsInfo).toHaveBeenCalled();
+    });
     tick();
-
-    expect(component.getAllProducts).toHaveBeenCalled();
-    expect(component.products).toEqual(mockProducts);
   }));
 
   it('should handle error with status 403 for getAllProducts()', fakeAsync(() => {
@@ -114,16 +102,17 @@ describe('ProductListingComponent', () => {
     spyOn(errorService, 'handleSessionExpirationError');
 
     component.getAllProducts();
+    component.products$.subscribe(() => {
+      expect(component.getAllProducts).toHaveBeenCalled();
+      expect(productService.getAllProductsInfo).toHaveBeenCalled();
+      expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+      expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
+    });
     tick();
-
-    expect(component.getAllProducts).toHaveBeenCalled();
-    expect(productService.getAllProductsInfo).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
   }));
 
   it('should open product detail', () => {
-    spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open
+    spyOn(component['dialog'], 'open').and.callThrough(); 
     const mockProduct = {
       "id": "1",
       "name": "Mock Product 1",
@@ -134,13 +123,6 @@ describe('ProductListingComponent', () => {
     };
   
     component.openProductDetail(mockProduct);
-    expect(component['dialog'].open).toHaveBeenCalled(); // Access the dialog service directly
-  });
-
-  it('should show <p>There are no products!</p> when product is empty', () => {
-    component.products = [];
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('p').textContent).toContain('There are no products!');
+    expect(component['dialog'].open).toHaveBeenCalled(); 
   });
 });

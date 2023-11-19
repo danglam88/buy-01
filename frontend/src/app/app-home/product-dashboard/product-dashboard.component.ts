@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 
 @Component({
@@ -13,7 +15,7 @@ import { ErrorService } from 'src/app/services/error.service';
 })
 export class ProductDashboardComponent implements OnInit {
   selectedProduct: Product;
-  sellerProducts: any = [];
+  sellerProducts$: Observable<any>;
   
   constructor(
     private productService: ProductService,
@@ -22,42 +24,41 @@ export class ProductDashboardComponent implements OnInit {
     ) {
      // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
       // Handle product creation and get seller's products again
-      this.productService.productCreated.subscribe((productCreated) => {
+     /* this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
           this.getSellerProducts();
         }
-      });
-
+      });*/
+   
       // Handle product deletion and get the seller's products again
-      this.productService.productDeleted.subscribe((deleteCreated) => {
-        if (deleteCreated) {
-          this.getSellerProducts();
-        }
-      });
+    
     }
   
   ngOnInit(): void {
+    this.productService.productCreated$.subscribe(() => this.getSellerProducts());
+    this.productService.productDeleted$.subscribe(() => this.getSellerProducts());
     this.getSellerProducts();
   }
 
   // Get all of the seller products
-  getSellerProducts(){
-    this.productService.getSellerProductsInfo().subscribe({
-      next: (result) => {
-        this.sellerProducts = result;
-        // loop through the products and add an editable property
-        this.sellerProducts.forEach((product) => {
-          product.editable = true;
-        });
-      },
-      error: (error) => {
+  getSellerProducts(): void {
+    this.sellerProducts$ = this.productService.getSellerProductsInfo().pipe(
+      map((result: any) => {
+        if (Array.isArray(result)) {
+          return result.map(product => ({ ...product, editable: true }));
+        } else {
+          return [];
+        }
+      }),
+      catchError((error) => {
         if (this.errorService.isAuthError(error.status)) {
           this.errorService.handleSessionExpirationError();
         }
-      },
-    });
+     
+        return of([]);
+      })
+    );
   }
-
   // Opens product detail modal
   openProductDetail(productData: Product): void {
      this.dialog.open(ProductDetailComponent, {
