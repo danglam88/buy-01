@@ -112,7 +112,6 @@ The whole process of the project has been automated using Jenkins (accessible at
    +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. 
 -  Post Actions:
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
-  
 
 The application is then accessible via https://164.92.252.125:4200
 

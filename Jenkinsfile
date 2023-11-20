@@ -21,7 +21,7 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
 }
 
 def runFrontendSonarQubeAnalysis() {
-    stage("Static Analysis for Frontend") {
+    stage("Quality Gate for Frontend") {
         withSonarQubeEnv('SonarQube Server') {
             sh """
             cd frontend
@@ -30,15 +30,11 @@ def runFrontendSonarQubeAnalysis() {
             """
         }
         echo "Static Analysis Completed for Frontend"
-    }
-    
-    stage("Quality Gate for Frontend") {
-        withSonarQubeEnv('SonarQube Server') {
-            timeout(time: 30, unit: 'MINUTES') {
-                def qg = waitForQualityGate()
-                if (qg.status != 'OK') {
-                    error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
-                }
+
+        timeout(time: 30, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
             }
         }
         echo "Quality Gate Passed for Frontend"
