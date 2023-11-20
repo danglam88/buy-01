@@ -23,15 +23,16 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
 }
 
 def runFrontendSonarQubeAnalysis(maskVars) {
-    // Use maskPasswords with named arguments
-    maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
-        sh """
-        cd frontend
-        npm install
-        # Include SonarQube analysis command for Angular here
-        """
+    stage("Static Analysis for Frontend") {
+        withSonarQubeEnv('SonarQube Server') {
+            sh """
+            cd frontend
+            npm install
+            # Include SonarQube analysis command for Angular here
+            """
+        }
+        echo "Static Analysis Completed for Frontend"
     }
-    echo "Static Analysis Completed for Frontend"
 
     stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
