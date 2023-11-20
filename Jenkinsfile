@@ -89,7 +89,7 @@ pipeline {
             }
         }
 
-        /*stage('Media-Microservice Code Quality') {
+        stage('Media-Microservice Code Quality') {
             agent { label 'build-agent' }
             steps {
                 script {
@@ -114,7 +114,7 @@ pipeline {
                     runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
                 }
             }
-        }*/
+        }
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
