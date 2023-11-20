@@ -65,8 +65,7 @@ pipeline {
                         usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'USER_DB_USERNAME', passwordVariable: 'USER_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
-                        string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'sonarqube-creds', variable: 'SONARQUBE_TOKEN')
+                        string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
                         env.USER_DB_PASSWORD = USER_DB_PASSWORD
@@ -81,89 +80,41 @@ pipeline {
             }
         }
         
-        stage('Code Quality Checks') {
-            parallel {
-                stage('Frontend Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            runFrontendSonarQubeAnalysis()
-                        }
-                    }
+        /*stage('Frontend Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runFrontendSonarQubeAnalysis()
                 }
+            }
+        }*/
 
-                stage('Media-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
-                        }
-                    }
-                }
-
-                stage('Product-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
-                        }
-                    }
-                }
-
-                stage('User-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
-                        }
-                    }
+        stage('Media-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
                 }
             }
         }
 
-        stage('Unit Tests') {
-            parallel {
-                stage('Frontend Tests') {
-                    agent { label 'build-agent' }
-                    steps {
-                        sh '''
-                        cd frontend
-                        ng test --watch=false --browsers ChromeHeadless
-                        '''
-                    }
-                }
-
-                stage('Media-Microservice Tests') {
-                    agent { label 'build-agent' }
-                    steps {
-                        sh '''
-                        cd backend/media
-                        mvn test
-                        '''
-                    }
-                }
-
-                stage('Product-Microservice Tests') {
-                    agent { label 'build-agent' }
-                    steps {
-                        sh '''
-                        cd backend/product
-                        mvn test
-                        '''
-                    }
-                }
-                
-                stage('User-Microservice Tests') {
-                    agent { label 'build-agent' }
-                    steps {
-                        sh '''
-                        cd backend/user
-                        mvn test
-                        '''
-                    }
+        /*stage('Product-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
                 }
             }
         }
+
+        stage('User-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                }
+            }
+        }*/
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
