@@ -79,6 +79,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Cache node_modules') {
+            steps {
+                // Check if node_modules cache exists
+                cache(restore: true, path: 'node_modules', id: 'node_modules_cache')
+            }
+        }
         
         stage('Frontend Code Quality') {
             agent { label 'build-agent' }
@@ -89,7 +96,14 @@ pipeline {
             }
         }
 
-        stage('Media-Microservice Code Quality') {
+        stage('Post-Frontend Code Quality') {
+            steps {
+                // Save node_modules to cache after frontend code quality
+                cache(save: true, path: 'node_modules', id: 'node_modules_cache')
+            }
+        }
+
+        /*stage('Media-Microservice Code Quality') {
             agent { label 'build-agent' }
             steps {
                 script {
@@ -114,7 +128,7 @@ pipeline {
                     runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
                 }
             }
-        }
+        }*/
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
