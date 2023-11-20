@@ -1,10 +1,10 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def runBackendSonarQubeAnalysis(directory, microserviceName) {
+def runBackendSonarQubeAnalysis(directory, microserviceName, sonarProjectKey) {
     withSonarQubeEnv('SonarQube Server') {
         sh """
         cd ${directory}
-        mvn clean package sonar:sonar
+        mvn clean package sonar:sonar -Dsonar.projectKey=${sonarProjectKey}
         """
     }
     echo "Static Analysis Completed for ${microserviceName}"
@@ -18,12 +18,12 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
     echo "Quality Gate Passed for ${microserviceName}"
 }
 
-def runFrontendSonarQubeAnalysis() {
+def runFrontendSonarQubeAnalysis(sonarProjectKey) {
     withSonarQubeEnv('SonarQube Server') {
         sh """
         cd frontend
         npm install
-        sonar-scanner
+        sonar-scanner -Dsonar.projectKey=${sonarProjectKey}
         """
     }
     echo "Static Analysis Completed for Frontend"
@@ -79,7 +79,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice', 'user-microservice-project')
                 }
             }
         }
@@ -88,7 +88,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
+                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice', 'product-microservice-project')
                 }
             }
         }
@@ -97,7 +97,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice', 'media-microservice-project')
                 }
             }
         }
@@ -106,7 +106,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runFrontendSonarQubeAnalysis()
+                    runFrontendSonarQubeAnalysis('frontend-project')
                 }
             }
         }
