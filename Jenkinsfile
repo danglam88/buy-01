@@ -1,15 +1,13 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
-    stage("Static Analysis for ${microserviceName}") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd ${directory}
-            mvn clean package sonar:sonar
-            """
-        }
-        echo "Static Analysis Completed for ${microserviceName}"
+def runBackendSonarQubeAnalysis(directory, microserviceName) {
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd ${directory}
+        mvn clean package sonar:sonar
+        """
     }
+    echo "Static Analysis Completed for ${microserviceName}"
 
     stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
@@ -22,18 +20,16 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, maskVars) {
     }
 }
 
-def runFrontendSonarQubeAnalysis(maskVars) {
-    stage("Static Analysis for Frontend") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd frontend
-            npm install
-            ng test --watch=false --code-coverage
-            sonar-scanner
-            """
-        }
-        echo "Static Analysis Completed for Frontend"
+def runFrontendSonarQubeAnalysis() {
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd frontend
+        npm install
+        ng test --watch=false --code-coverage --browsers ChromeHeadless
+        sonar-scanner
+        """
     }
+    echo "Static Analysis Completed for Frontend"
 
     stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
@@ -79,62 +75,44 @@ pipeline {
                         env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
-                        env.SONARQUBE_TOKEN_VALUE = SONARQUBE_TOKEN
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
                 }
             }
         }
 
-        stage('Code Quality Checks') {
-            parallel {
-                stage('Frontend Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            // Define the variables to be masked
-                            def maskVars = [
-                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
-                            ]
-                            runFrontendSonarQubeAnalysis(maskVars)
-                        }
-                    }
+        stage('Frontend Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runFrontendSonarQubeAnalysis()
                 }
-                stage('Media-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            // Define the variables to be masked
-                            def maskVars = [
-                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
-                            ]
-                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice', maskVars)
-                        }
-                    }
+            }
+        }
+
+        stage('Media-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
                 }
-                stage('Product-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            // Define the variables to be masked
-                            def maskVars = [
-                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
-                            ]
-                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice', maskVars)
-                        }
-                    }
+            }
+        }
+
+        stage('Product-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
                 }
-                stage('User-Microservice Code Quality') {
-                    agent { label 'build-agent' }
-                    steps {
-                        script {
-                            // Define the variables to be masked
-                            def maskVars = [
-                                [var: 'SONARQUBE_TOKEN_VALUE', password: env.SONARQUBE_TOKEN_VALUE]
-                            ]
-                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice', maskVars)
-                        }
-                    }
+            }
+        }
+
+        stage('User-Microservice Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
                 }
             }
         }
