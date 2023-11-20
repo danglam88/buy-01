@@ -28,7 +28,8 @@ def runFrontendSonarQubeAnalysis(maskVars) {
             sh """
             cd frontend
             npm install
-            # Include SonarQube analysis command for Angular here
+            ng test --watch=false --code-coverage
+            sonar-scanner
             """
         }
         echo "Static Analysis Completed for Frontend"
@@ -145,7 +146,6 @@ pipeline {
                     steps {
                         sh '''
                         cd frontend
-                        npm install
                         ng test --watch=false --browsers ChromeHeadless
                         '''
                     }
