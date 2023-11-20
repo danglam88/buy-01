@@ -1,15 +1,15 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 def runBackendSonarQubeAnalysis(directory, microserviceName) {
-    stage("Static Analysis for ${microserviceName}") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd ${directory}
-            mvn clean package sonar:sonar
-            """
-        }
-        echo "Static Analysis Completed for ${microserviceName}"
+    //stage("Static Analysis for ${microserviceName}") {
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd ${directory}
+        mvn clean package sonar:sonar
+        """
     }
+    echo "Static Analysis Completed for ${microserviceName}"
+    //}
 
     stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
@@ -23,17 +23,17 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
 }
 
 def runFrontendSonarQubeAnalysis() {
-    stage("Static Analysis for Frontend") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd frontend
-            npm install
-            ng test --watch=false --code-coverage --browsers ChromeHeadless
-            sonar-scanner
-            """
-        }
-        echo "Static Analysis Completed for Frontend"
+    //stage("Static Analysis for Frontend") {
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd frontend
+        npm install
+        ng test --watch=false --code-coverage
+        sonar-scanner
+        """
     }
+    echo "Static Analysis Completed for Frontend"
+    //}
 
     stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
@@ -84,39 +84,40 @@ pipeline {
                 }
             }
         }
-
-        stage('Frontend Code Quality') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    runFrontendSonarQubeAnalysis()
+        
+        stage('Code Quality Checks') {
+            parallel {
+                stage('Frontend Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runFrontendSonarQubeAnalysis()
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Media-Microservice Code Quality') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                stage('Media-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Product-Microservice Code Quality') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
+                stage('Product-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice')
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('User-Microservice Code Quality') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                stage('User-Microservice Code Quality') {
+                    agent { label 'build-agent' }
+                    steps {
+                        script {
+                            runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                        }
+                    }
                 }
             }
         }
