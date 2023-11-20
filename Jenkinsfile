@@ -1,15 +1,15 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 def runBackendSonarQubeAnalysis(directory, microserviceName) {
-    //stage("Static Analysis for ${microserviceName}") {
-    withSonarQubeEnv('SonarQube Server') {
-        sh """
-        cd ${directory}
-        mvn clean package sonar:sonar
-        """
+    stage("Static Analysis for ${microserviceName}") {
+        withSonarQubeEnv('SonarQube Server') {
+            sh """
+            cd ${directory}
+            mvn clean package sonar:sonar
+            """
+        }
+        echo "Static Analysis Completed for ${microserviceName}"
     }
-    echo "Static Analysis Completed for ${microserviceName}"
-    //}
 
     stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
@@ -23,17 +23,17 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
 }
 
 def runFrontendSonarQubeAnalysis() {
-    //stage("Static Analysis for Frontend") {
-    withSonarQubeEnv('SonarQube Server') {
-        sh """
-        cd frontend
-        npm install
-        ng test --watch=false --code-coverage
-        sonar-scanner
-        """
+    stage("Static Analysis for Frontend") {
+        withSonarQubeEnv('SonarQube Server') {
+            sh """
+            cd frontend
+            npm install
+            ng test --watch=false --code-coverage
+            sonar-scanner
+            """
+        }
+        echo "Static Analysis Completed for Frontend"
     }
-    echo "Static Analysis Completed for Frontend"
-    //}
 
     stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
