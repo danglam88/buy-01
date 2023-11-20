@@ -1,7 +1,7 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 def runBackendSonarQubeAnalysis(directory, microserviceName) {
-    stage("Static Analysis for ${microserviceName}") {
+    stage("Quality Gate for ${microserviceName}") {
         withSonarQubeEnv('SonarQube Server') {
             sh """
             cd ${directory}
@@ -9,9 +9,7 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
             """
         }
         echo "Static Analysis Completed for ${microserviceName}"
-    }
 
-    stage("Quality Gate for ${microserviceName}") {
         timeout(time: 30, unit: 'MINUTES') {
             def qg = waitForQualityGate()
             if (qg.status != 'OK') {
@@ -23,7 +21,7 @@ def runBackendSonarQubeAnalysis(directory, microserviceName) {
 }
 
 def runFrontendSonarQubeAnalysis() {
-    stage("Static Analysis for Frontend") {
+    stage("Quality Gate for Frontend") {
         withSonarQubeEnv('SonarQube Server') {
             sh """
             cd frontend
@@ -33,9 +31,7 @@ def runFrontendSonarQubeAnalysis() {
             """
         }
         echo "Static Analysis Completed for Frontend"
-    }
 
-    stage("Quality Gate for Frontend") {
         timeout(time: 30, unit: 'MINUTES') {
             def qg = waitForQualityGate()
             if (qg.status != 'OK') {
