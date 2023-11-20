@@ -33,10 +33,12 @@ def runFrontendSonarQubeAnalysis() {
     }
     
     stage("Quality Gate for Frontend") {
-        timeout(time: 30, unit: 'MINUTES') {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-                error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
+        withSonarQubeEnv('SonarQube Server') {
+            timeout(time: 30, unit: 'MINUTES') {
+                def qg = waitForQualityGate()
+                if (qg.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
+                }
             }
         }
         echo "Quality Gate Passed for Frontend"
