@@ -80,14 +80,14 @@ pipeline {
             }
         }
         
-        /*stage('Frontend Code Quality') {
+        stage('Frontend Code Quality') {
             agent { label 'build-agent' }
             steps {
                 script {
                     runFrontendSonarQubeAnalysis()
                 }
             }
-        }*/
+        }
 
         stage('Media-Microservice Code Quality') {
             agent { label 'build-agent' }
