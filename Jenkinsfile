@@ -1,44 +1,40 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
 def runBackendSonarQubeAnalysis(directory, microserviceName) {
-    stage("Quality Gate for ${microserviceName}") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd ${directory}
-            mvn clean package sonar:sonar
-            """
-        }
-        echo "Static Analysis Completed for ${microserviceName}"
-
-        timeout(time: 30, unit: 'MINUTES') {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-                error "Pipeline aborted due to quality gate failure for ${microserviceName}: ${qg.status}"
-            }
-        }
-        echo "Quality Gate Passed for ${microserviceName}"
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd ${directory}
+        mvn clean package sonar:sonar
+        """
     }
+    echo "Static Analysis Completed for ${microserviceName}"
+
+    timeout(time: 30, unit: 'MINUTES') {
+        def qg = waitForQualityGate()
+        if (qg.status != 'OK') {
+            error "Pipeline aborted due to quality gate failure for ${microserviceName}: ${qg.status}"
+        }
+    }
+    echo "Quality Gate Passed for ${microserviceName}"
 }
 
 def runFrontendSonarQubeAnalysis() {
-    stage("Quality Gate for Frontend") {
-        withSonarQubeEnv('SonarQube Server') {
-            sh """
-            cd frontend
-            npm install
-            sonar-scanner
-            """
-        }
-        echo "Static Analysis Completed for Frontend"
-
-        timeout(time: 30, unit: 'MINUTES') {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-                error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
-            }
-        }
-        echo "Quality Gate Passed for Frontend"
+    withSonarQubeEnv('SonarQube Server') {
+        sh """
+        cd frontend
+        npm install
+        sonar-scanner
+        """
     }
+    echo "Static Analysis Completed for Frontend"
+
+    timeout(time: 30, unit: 'MINUTES') {
+        def qg = waitForQualityGate()
+        if (qg.status != 'OK') {
+            error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
+        }
+    }
+    echo "Quality Gate Passed for Frontend"
 }
 
 pipeline {
@@ -78,21 +74,12 @@ pipeline {
                 }
             }
         }
-        
-        stage('Frontend Code Quality') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    runFrontendSonarQubeAnalysis()
-                }
-            }
-        }
 
-        /*stage('Media-Microservice Code Quality') {
+        stage('User-Microservice Code Quality') {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
+                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
                 }
             }
         }
@@ -106,14 +93,23 @@ pipeline {
             }
         }
 
-        stage('User-Microservice Code Quality') {
+        stage('Media-Microservice Code Quality') {
             agent { label 'build-agent' }
             steps {
                 script {
-                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice')
+                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice')
                 }
             }
-        }*/
+        }
+        
+        stage('Frontend Code Quality') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    runFrontendSonarQubeAnalysis()
+                }
+            }
+        }
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
