@@ -95,6 +95,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Media-Microservice Code Quality') {
                     agent { label 'build-agent' }
                     steps {
@@ -103,6 +104,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Product-Microservice Code Quality') {
                     agent { label 'build-agent' }
                     steps {
@@ -111,6 +113,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('User-Microservice Code Quality') {
                     agent { label 'build-agent' }
                     steps {
@@ -133,6 +136,7 @@ pipeline {
                         '''
                     }
                 }
+
                 stage('Media-Microservice Tests') {
                     agent { label 'build-agent' }
                     steps {
@@ -142,6 +146,7 @@ pipeline {
                         '''
                     }
                 }
+
                 stage('Product-Microservice Tests') {
                     agent { label 'build-agent' }
                     steps {
@@ -151,6 +156,7 @@ pipeline {
                         '''
                     }
                 }
+                
                 stage('User-Microservice Tests') {
                     agent { label 'build-agent' }
                     steps {
