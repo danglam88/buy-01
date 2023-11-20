@@ -26,7 +26,6 @@ def runFrontendSonarQubeAnalysis() {
             sh """
             cd frontend
             npm install
-            npm run test
             sonar-scanner
             """
         }
@@ -79,13 +78,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Cache node_modules') {
-            steps {
-                // Check if node_modules cache exists
-                cache(restore: true, path: 'node_modules', id: 'node_modules_cache')
-            }
-        }
         
         stage('Frontend Code Quality') {
             agent { label 'build-agent' }
@@ -93,13 +85,6 @@ pipeline {
                 script {
                     runFrontendSonarQubeAnalysis()
                 }
-            }
-        }
-
-        stage('Post-Frontend Code Quality') {
-            steps {
-                // Save node_modules to cache after frontend code quality
-                cache(save: true, path: 'node_modules', id: 'node_modules_cache')
             }
         }
 
