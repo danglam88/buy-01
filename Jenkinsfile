@@ -26,7 +26,7 @@ def runFrontendSonarQubeAnalysis() {
             sh """
             cd frontend
             npm install
-            ng test --watch=false --code-coverage
+            ng test --watch=false --code-coverage --browsers=ChromeHeadlessNoSandbox
             sonar-scanner
             """
         }
