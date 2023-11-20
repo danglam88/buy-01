@@ -31,8 +31,6 @@ def runFrontendSonarQubeAnalysis() {
         }
         echo "Static Analysis Completed for Frontend"
 
-        sleep 60
-
         timeout(time: 30, unit: 'MINUTES') {
             def qg = waitForQualityGate()
             if (qg.status != 'OK') {
