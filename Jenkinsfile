@@ -135,6 +135,7 @@ pipeline {
                     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                         // Execute the build commands
                         sh '''
+                        exit 1
                         docker system prune -a -f
 
                         cd backend
