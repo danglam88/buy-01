@@ -54,7 +54,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/user
-                    mvn clean package sonar:sonar
+                    mvn clean verify sonar:sonar
                     """
                 }
                 echo "SonarQube analysis for User-Microservice has been completed."
@@ -77,7 +77,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/product
-                    mvn clean package sonar:sonar
+                    mvn clean verify sonar:sonar
                     """
                 }
                 echo "SonarQube analysis for Product-Microservice has been completed."
@@ -100,7 +100,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/media
-                    mvn clean package sonar:sonar
+                    mvn clean verify sonar:sonar
                     """
                 }
                 echo "SonarQube analysis for Media-Microservice has been completed."
