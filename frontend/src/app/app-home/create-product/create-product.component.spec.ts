@@ -10,7 +10,6 @@ import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { of  } from 'rxjs';
 
 describe('CreateProductComponent', () => {
   let component: CreateProductComponent;
@@ -60,29 +59,6 @@ describe('CreateProductComponent', () => {
   it('should create product form', () => {
     expect(component.createProductForm).toBeTruthy();
   });
-
-/*  it('should call createProduct and handle success', fakeAsync(() => {
-    // Arrange
-
-    productService.createProduct.and.returnValue(of({ success: true }));
-    component.createProductForm.controls.name.setValue('Valid Name');
-    component.createProductForm.controls.price.setValue('10.00');
-    component.createProductForm.controls.quantity.setValue('10');
-    component.createProductForm.controls.description.setValue('Valid description');
-    component.selectedFiles.push({
-      file: new File([], 'image.jpg'),
-      url: 'test-url',
-    });
-
-    // Act
-    component.createProduct();
-    tick();
-
-    // Assert
-    expect(productService.createProduct).toHaveBeenCalled();
-    expect(toastrService.success).toHaveBeenCalledWith('Product created successfully.');
-    expect(component.closeModal).toHaveBeenCalled(); 
-  }));*/
 
 
   it('should show error message when name in form is invalid', fakeAsync(() => {
