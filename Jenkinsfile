@@ -1,46 +1,5 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
 
-def runBackendSonarQubeAnalysis(directory, microserviceName, sonarProjectKey) {
-    withSonarQubeEnv('SonarQube Server') {
-        sh """
-        cd ${directory}
-        mvn clean package sonar:sonar -Dsonar.projectKey=${sonarProjectKey}
-        """
-    }
-    echo "Static Analysis Completed for ${microserviceName}"
-
-    timeout(time: 30, unit: 'MINUTES') {
-        def qg = waitForQualityGate()
-        if (qg.status != 'OK') {
-            error "Pipeline aborted due to quality gate failure for ${microserviceName}: ${qg.status}"
-        }
-    }
-    echo "Quality Gate Passed for ${microserviceName}"
-
-    sh 'find . -name "report-task.txt" -exec rm {} +'
-}
-
-def runFrontendSonarQubeAnalysis(sonarProjectKey) {
-    withSonarQubeEnv('SonarQube Server') {
-        sh """
-        cd frontend
-        npm install
-        sonar-scanner -Dsonar.projectKey=${sonarProjectKey}
-        """
-    }
-    echo "Static Analysis Completed for Frontend"
-
-    timeout(time: 30, unit: 'MINUTES') {
-        def qg = waitForQualityGate()
-        if (qg.status != 'OK') {
-            error "Pipeline aborted due to quality gate failure for Frontend: ${qg.status}"
-        }
-    }
-    echo "Quality Gate Passed for Frontend"
-
-    sh 'find . -name "report-task.txt" -exec rm {} +'
-}
-
 pipeline {
     agent any // We define the specific agents within each stage
 
@@ -82,12 +41,14 @@ pipeline {
         stage('SonarQube analysis for User-Microservice') {
             agent { label 'build-agent' }
             steps {
+                echo "SonarQube analysis for User-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/user
                     mvn clean package sonar:sonar
                     """
                 }
+                echo "SonarQube analysis for User-Microservice has been completed."
             }
         }
 
@@ -95,18 +56,21 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                echo "Quality Gate for User-Microservice has been completed."
             }
         }
 
         stage('SonarQube analysis for Product-Microservice') {
             agent { label 'build-agent' }
             steps {
+                echo "SonarQube analysis for Product-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/product
                     mvn clean package sonar:sonar
                     """
                 }
+                echo "SonarQube analysis for Product-Microservice has been completed."
             }
         }
 
@@ -114,18 +78,21 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                echo "Quality Gate for Product-Microservice has been completed."
             }
         }
 
         stage('SonarQube analysis for Media-Microservice') {
             agent { label 'build-agent' }
             steps {
+                echo "SonarQube analysis for Media-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/media
                     mvn clean package sonar:sonar
                     """
                 }
+                echo "SonarQube analysis for Media-Microservice has been completed."
             }
         }
 
@@ -133,12 +100,14 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                echo "Quality Gate for Media-Microservice has been completed."
             }
         }
 
         stage('SonarQube analysis for Frontend') {
             agent { label 'build-agent' }
             steps {
+                echo "SonarQube analysis for Frontend has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd frontend
@@ -146,6 +115,7 @@ pipeline {
                     sonar-scanner
                     """
                 }
+                echo "SonarQube analysis for Frontend has been completed."
             }
         }
 
@@ -153,6 +123,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                echo "Quality Gate for Frontend has been completed."
             }
         }
 
