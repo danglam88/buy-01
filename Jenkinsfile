@@ -38,6 +38,15 @@ pipeline {
             }
         }
 
+        stage('Clean Workspace') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh 'find . -name "report-task.txt" -exec rm {} +'
+                }
+            }
+        }
+
         stage('SonarQube analysis for User-Microservice') {
             agent { label 'build-agent' }
             steps {
@@ -56,6 +65,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for User-Microservice has been completed."
             }
         }
@@ -78,6 +88,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for Product-Microservice has been completed."
             }
         }
@@ -100,6 +111,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for Media-Microservice has been completed."
             }
         }
@@ -123,6 +135,7 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for Frontend has been completed."
             }
         }
