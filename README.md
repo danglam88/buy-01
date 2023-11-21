@@ -5,6 +5,7 @@
 - [Front-end Specifications](#front-end-specifications)
 - [Back-end Specifications](#back-end-specifications)
 - [CI/CD Pipeline (using Jenkins)](#cicd-pipeline-using-jenkins)
+- [Dashboard URLs](#dashboard-urls)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
