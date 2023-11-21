@@ -25,6 +25,8 @@ RUN npx ng build
 
 # Use official nginx image as the base image
 FROM nginx:alpine
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
 
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/dist/buy-01 /usr/share/nginx/html
@@ -46,6 +48,9 @@ COPY nginx.conf /etc/nginx/conf.d
 
 # Expose SSL port
 EXPOSE 443
+
+# Run nginx as non-root user
+USER nonroot
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
