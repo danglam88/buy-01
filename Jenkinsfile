@@ -79,48 +79,80 @@ pipeline {
             }
         }
 
-        stage('Clean Workspace') {
+        stage('SonarQube analysis for User-Microservice') {
             agent { label 'build-agent' }
             steps {
-                script {
-                    sh 'find . -name "report-task.txt" -exec rm {} +'
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/user
+                    mvn clean package sonar:sonar
+                    """
                 }
             }
         }
 
-        stage('User-Microservice Code Quality') {
+        stage("Quality Gate for User-Microservice") {
             agent { label 'build-agent' }
             steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/user', 'User-Microservice', 'user-microservice-project')
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
+        stage('SonarQube analysis for Product-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/product
+                    mvn clean package sonar:sonar
+                    """
                 }
             }
         }
 
-        stage('Product-Microservice Code Quality') {
+        stage("Quality Gate for Product-Microservice") {
             agent { label 'build-agent' }
             steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/product', 'Product-Microservice', 'product-microservice-project')
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
+        stage('SonarQube analysis for Media-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/media
+                    mvn clean package sonar:sonar
+                    """
                 }
             }
         }
 
-        stage('Media-Microservice Code Quality') {
+        stage("Quality Gate for Media-Microservice") {
             agent { label 'build-agent' }
             steps {
-                script {
-                    runBackendSonarQubeAnalysis('backend/media', 'Media-Microservice', 'media-microservice-project')
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
+        stage('SonarQube analysis for Frontend') {
+            agent { label 'build-agent' }
+            steps {
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd frontend
+                    npm install
+                    sonar-scanner
+                    """
                 }
             }
         }
-        
-        stage('Frontend Code Quality') {
+
+        stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
-                script {
-                    runFrontendSonarQubeAnalysis('frontend-project')
-                }
+                waitForQualityGate abortPipeline: true
             }
         }
 
