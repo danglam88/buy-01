@@ -124,6 +124,16 @@ pipeline {
             }
         }
 
+        stage('Frontend Unit Tests') {
+            agent { label 'build-agent' }
+            steps {
+                sh '''
+                cd frontend
+                ng test --watch=false --browsers ChromeHeadless
+                '''
+            }
+        }
+
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
