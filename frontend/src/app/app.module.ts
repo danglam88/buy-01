@@ -41,6 +41,7 @@ import { ProductService } from './services/product.service';
 import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from './services/validation.service';
+import { ErrorService } from './services/error.service';
 
 @NgModule({
   declarations: [
@@ -80,7 +81,15 @@ import { ValidationService } from './services/validation.service';
     }),
    
   ],
-  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService, EncryptionService, ValidationService],
+  providers: [
+    AuthenticateGuard, 
+    AuthenticationService, 
+    EncryptionService, 
+    ErrorService,
+    MediaService, 
+    ProductService, 
+    UserService, 
+    ValidationService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

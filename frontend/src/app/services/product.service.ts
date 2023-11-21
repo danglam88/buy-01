@@ -9,11 +9,6 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ProductService {
-  private allProductsInfoUrl="http://localhost:8081/products";
-  private sellerProductsInfoUrl="http://localhost:8081/products/seller";
-  private createProductUrl="http://localhost:8081/products";
-  private updateProductUrl="http://localhost:8081/products/";
-  private deleteProductUrl="http://localhost:8081/products/";
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
 
