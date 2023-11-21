@@ -100,7 +100,13 @@ An example of a valid form-data object for creating a new user is:
 The whole process of the project has been automated using Jenkins (accessible at http://164.90.178.137:8080). The process consists of the following stages:
 
 -  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
--  Unit Tests: the unit-tests (consisting of frontend-tests and backend-tests for each and every microservice) are performed at the build-server.
+-  Setup Credentials: all MongoDB credentials and JWT secret are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
+-  Clean Workspace: all old quality-check report-tasks are removed from the workspace.
+-  SonarQube Analysis: this stage is performed for each and every backend microservice as well as frontend.
+   +  If any of the analyses has been failed, the Post Actions stage will be triggered (Quality Gate, Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
+-  Quality Gate: this stage is performed for each and every backend microservice as well as frontend.
+   +  If any of the quality-gates has been failed, the Post Actions stage will be triggered (Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
+-  Frontend Unit Tests: the unit-tests for frontend are performed at the build-server.
    +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
 -  Build: once all the unit-tests have been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server.
    +  If all the builds are passed, the produced Docker images will then be pushed to a Docker Hub and are ready to be deployed.
@@ -112,6 +118,8 @@ The whole process of the project has been automated using Jenkins (accessible at
    +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. 
 -  Post Actions:
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
+
+The SonarQube Server is accessible via http://209.38.204.141:9000
 
 The application is then accessible via https://164.92.252.125:4200
 

@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis for User-Microservice') {
+        stage('SonarQube Analysis for User-Microservice') {
             agent { label 'build-agent' }
             steps {
                 echo "SonarQube analysis for User-Microservice has been started."
@@ -70,7 +70,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis for Product-Microservice') {
+        stage('SonarQube Analysis for Product-Microservice') {
             agent { label 'build-agent' }
             steps {
                 echo "SonarQube analysis for Product-Microservice has been started."
@@ -93,7 +93,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis for Media-Microservice') {
+        stage('SonarQube Analysis for Media-Microservice') {
             agent { label 'build-agent' }
             steps {
                 echo "SonarQube analysis for Media-Microservice has been started."
@@ -116,7 +116,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis for Frontend') {
+        stage('SonarQube Analysis for Frontend') {
             agent { label 'build-agent' }
             steps {
                 echo "SonarQube analysis for Frontend has been started."
