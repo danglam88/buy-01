@@ -97,7 +97,7 @@ An example of a valid form-data object for creating a new user is:
 
 ## CI/CD Pipeline (using Jenkins)
 
-The whole process of the project has been automated using Jenkins (accessible at http://164.90.178.137:8080). The process consists of the following stages:
+The whole process of the project has been automated using Jenkins. The process consists of the following stages:
 
 -  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
 -  Setup Credentials: all MongoDB credentials and JWT secret are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
@@ -119,9 +119,13 @@ The whole process of the project has been automated using Jenkins (accessible at
 -  Post Actions:
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
 
-The SonarQube Server is accessible via http://209.38.204.141:9000
+## Dashboard URLs
 
-The application is then accessible via https://164.92.252.125:4200
+Jenkins: http://164.90.178.137:8080
+
+SonarQube Server: http://209.38.204.141:9000
+
+Application: https://164.92.252.125:4200
 
 ## Installation
 
