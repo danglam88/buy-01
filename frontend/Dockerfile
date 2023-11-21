@@ -7,7 +7,9 @@ FROM node:16-alpine as build
 WORKDIR /app
 
 # Copy the codebase into the image
-COPY . .
+COPY src src
+COPY nginx.conf ./
+COPY *.json ./
 
 # Remove the existing node_modules and dist folders
 RUN rm -rf node_modules dist
@@ -16,7 +18,7 @@ RUN rm -rf node_modules dist
 RUN npm cache clean --force
 
 # Install all the dependencies
-RUN npm install
+RUN npm install --ignore-scripts
 
 # Generate the build of the application using npx to call local ng
 RUN npx ng build
@@ -38,7 +40,7 @@ COPY src/assets/cert/164.92.252.125.pem /etc/nginx
 COPY src/assets/cert/164.92.252.125-key.pem /etc/nginx
 RUN chmod 600 /etc/nginx/164.92.252.125-key.pem
 RUN chmod 644 /etc/nginx/164.92.252.125.pem
-RUN chown -R nginx:nginx /etc/nginx/164.92.252.125.pem /etc/nginx/164.92.252.125-key.pem
+RUN chown -R nonroot:nonroot /etc/nginx/164.92.252.125.pem /etc/nginx/164.92.252.125-key.pem
 
 # Remove the default Nginx configuration file
 RUN rm /etc/nginx/conf.d/default.conf
