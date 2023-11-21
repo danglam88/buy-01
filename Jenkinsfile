@@ -16,6 +16,8 @@ def runBackendSonarQubeAnalysis(directory, microserviceName, sonarProjectKey) {
         }
     }
     echo "Quality Gate Passed for ${microserviceName}"
+
+    sh 'find . -name "report-task.txt" -exec rm {} +'
 }
 
 def runFrontendSonarQubeAnalysis(sonarProjectKey) {
@@ -35,6 +37,8 @@ def runFrontendSonarQubeAnalysis(sonarProjectKey) {
         }
     }
     echo "Quality Gate Passed for Frontend"
+
+    sh 'find . -name "report-task.txt" -exec rm {} +'
 }
 
 pipeline {
@@ -71,6 +75,15 @@ pipeline {
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
+                }
+            }
+        }
+
+        stage('Clean Workspace') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh 'find . -name "report-task.txt" -exec rm {} +'
                 }
             }
         }
