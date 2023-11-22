@@ -152,7 +152,7 @@ Contributions are welcome. Please open an issue or submit a pull request if you 
 
 ## Authors
 
-- [Danglam] (https://github.com/danglam88)
-- [Ashley] (https://github.com/hgwtra)
-- [Iuliia] (https://github.com/ManWhoSoldTheW0rld)
-- [Nafi] (https://github.com/NafiRanta)
+- [Danglam](https://github.com/danglam88)
+- [Ashley](https://github.com/hgwtra)
+- [Iuliia](https://github.com/ManWhoSoldTheW0rld)
+- [Nafi](https://github.com/NafiRanta)
