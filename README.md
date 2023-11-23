@@ -1,5 +1,4 @@
 # Java Buy-01 Project
-# test
 
 ## Table of Contents
 - [Description](#description)
