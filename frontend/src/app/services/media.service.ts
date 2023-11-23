@@ -10,6 +10,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 })
 export class MediaService {
   productMediaUpdated = new EventEmitter<any>();
+  productMediaDeleted = new EventEmitter<any>();
 
   private productMediaDeletedSubject = new BehaviorSubject<boolean>(false);
   productMediaDeleted$: Observable<boolean> = this.productMediaDeletedSubject.asObservable();

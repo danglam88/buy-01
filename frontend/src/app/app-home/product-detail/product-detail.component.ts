@@ -119,14 +119,21 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
-
-    this.getProductImages(this.product.id);
+   this.getProductImages();
+  
+  
   }
 
    // Get product images from media service, save to productImages and display in image slider
-  getProductImages(productId: string){
-    console.log("getProductImages called")
-    this.mediaService.getImageByProductId(productId).subscribe({
+  getProductImages(){
+    for (const key in this.product.productMedia){
+      if (this.product.productMedia.hasOwnProperty(key)) {
+        this.productImages[key] = { data: this.product.productMedia[key].imageData, mediaId: this.product.productMedia[key].mediaId };
+      }
+       
+  }
+  this.noOfImages = this.product.productMedia.length;
+    /*this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
@@ -153,7 +160,7 @@ export class ProductDetailComponent implements OnInit {
       error: (error) => {
         console.log(error);
       }
-    });
+    });*/
   }
 
   // Update the product based on which field is being edited
@@ -194,7 +201,7 @@ export class ProductDetailComponent implements OnInit {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
               this.mediaService.notifyProductImageDeleted();
-              this.getProductImages(this.product.id);
+              this.getProductImages();
               this.toastr.success('Image deleted');
             },
             error: (error) => {
@@ -238,7 +245,7 @@ export class ProductDetailComponent implements OnInit {
         console.log('Product deleted');
         this.productService.deleteProduct(this.product).subscribe({
           next: (result) => {
-            this.productService.notifyProductDeleted();
+            this.productService.productDeleted.emit(true);
           },
           error: (error) => {
             if (this.errorService.isAuthError(error.status)) {
@@ -368,7 +375,7 @@ export class ProductDetailComponent implements OnInit {
   
       this.mediaService.uploadMedia(formData).subscribe({
         next: (result) => {;
-          this.getProductImages(this.product.id);
+          this.getProductImages();
           this.saveEachSelectedFile(productId, index + 1);
           this.selectedFiles = [];
           this.previewUrl = null;

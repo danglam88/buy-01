@@ -3,15 +3,15 @@
 
   <div class="page-container">
     <mat-paginator class="page"
-      [length]="(products$ | async)?.length"
+      [length]="(allProducts$ | async)?.length"
       [pageSize]="21"
       [pageSizeOptions]="[7, 14, 21]"
       aria-label="Select page"
       #paginator>
     </mat-paginator>
   </div>
-  <p *ngIf="(products$ | async)?.length == 0">There are no products!</p>
-  <ng-container *ngIf="(products$ | async) as products">
+  <p *ngIf="(allProducts$ | async)?.length == 0">There are no products!</p>
+  <ng-container *ngIf="(allProducts$ | async) as products">
     <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
       <app-product  
         [product]="product" 

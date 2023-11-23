@@ -8,5 +8,4 @@ import { Product } from '../../../Models/Product';
 })
 export class ProductComponent {
   @Input() product:Product;
-
 }

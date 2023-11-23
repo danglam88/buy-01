@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
@@ -9,12 +9,11 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ProductService {
-  private productCreatedSubject = new BehaviorSubject<boolean>(false);
-  private productDeletedSubject = new BehaviorSubject<boolean>(false);
-  productCreated$: Observable<boolean> = this.productCreatedSubject.asObservable();
-  productDeleted$: Observable<boolean> = this.productDeletedSubject.asObservable();
   
-
+  productCreated = new EventEmitter<any>();
+  productDeleted = new EventEmitter<any>();
+  
+  
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,
     private router: Router,
@@ -72,13 +71,4 @@ export class ProductService {
     }
     return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
   }
-
-  notifyProductCreated() {
-    this.productCreatedSubject.next(true);
-  }
-
-  notifyProductDeleted() {
-    this.productDeletedSubject.next(true);
-  }
-
 }

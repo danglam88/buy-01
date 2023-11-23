@@ -24,13 +24,34 @@ export class ProductDashboardComponent implements OnInit {
     ) {}
   
   ngOnInit(): void {
-    this.productService.productCreated$.subscribe(() => this.getSellerProducts());
-    this.productService.productDeleted$.subscribe(() => this.getSellerProducts());
     this.getSellerProducts();
+
+    this.productService.productCreated.subscribe((productCreated) => {
+      if (productCreated) {
+        this.getSellerProducts();
+        this.sellerProducts$.subscribe((products) => {
+          console.log('Seller product List after product created:', products);
+        });
+      }
+    });
+
+    this.productService.productDeleted.subscribe((productDeleted) => {
+      if (productDeleted) {
+        this.getSellerProducts();
+        this.sellerProducts$.subscribe((products) => {
+          console.log('Seller product List after product deleted:', products);
+        });
+      }
+    });
+    
+    this.sellerProducts$.subscribe((products) => {
+      console.log('Seller product List:', products);
+    });
   }
 
   // Get all of the seller products
   getSellerProducts(): void {
+    console.log("getSellerProducts")
     this.sellerProducts$ = this.productService.getSellerProductsInfo().pipe(
       map((result: any) => {
         if (Array.isArray(result)) {
