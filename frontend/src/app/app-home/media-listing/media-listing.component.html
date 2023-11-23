@@ -1,6 +1,6 @@
 
-<app-media 
-    [mediaImageData] = "mediaImageData"
-    [product]="product">
-    [mediaArray]="mediaArray"
-</app-media>       
+<div *ngIf="mediaImageData$ | async as mediaImageData">
+    <app-media 
+        [mediaImageData] = "mediaImageData">
+    </app-media>    
+  </div>

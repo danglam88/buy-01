@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
+import { MediaService } from 'src/app/services/media.service';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -20,6 +21,7 @@ export class ProductListingComponent implements OnInit {
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
+    private mediaService: MediaService,
     ) {
       
     }
@@ -30,9 +32,6 @@ export class ProductListingComponent implements OnInit {
     this.productService.productCreated.subscribe((productCreated) => {
       if (productCreated) {
         this.getAllProducts();
-        this.allProducts$.subscribe((products) => {
-          console.log('Product List after product created:', products);
-        });
       }
     });
 

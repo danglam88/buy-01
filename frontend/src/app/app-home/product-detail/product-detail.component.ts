@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Inject, ViewChild, ElementRef, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators  } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -13,6 +13,8 @@ import { ErrorService } from 'src/app/services/error.service';
 
 import { Product } from '../../Models/Product';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { Observable, catchError, forkJoin, of, switchMap } from 'rxjs';
+import { Media } from 'src/app/Models/Media';
 
 @Component({
   selector: 'product-detail',
@@ -21,6 +23,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
+  @Output() mediaArray$: Observable<Media[]>;
 
   editingField: string | null = null;
   productImages: any = {};
@@ -107,58 +110,68 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
-   this.getProductImages();  
+    this.getProductImages();  
 
-    // Handles product media updates and get product images again from media service
-    this.mediaService.mediaUpload.subscribe(() => {
+      // Handles product media updates and get product images again from media service
+      this.mediaService.mediaUpload.subscribe(() => {
+        this.getProductImages();
+        this.currentIndexOfImageSlider = this.noOfImages;
+    });
+
+    this.mediaService.mediaDeleted.subscribe(() => {
       this.getProductImages();
-      this.currentIndexOfImageSlider = this.noOfImages;
-  });
-
-  this.mediaService.mediaDeleted.subscribe(() => {
-    this.getProductImages();
-    if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
-      this.currentIndexOfImageSlider = 0;
-    }
-  });
+      if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+        this.currentIndexOfImageSlider = 0;
+      }
+    });
   }
 
-   // Get product images from media service, save to productImages and display in image slider
-  getProductImages(){
-    for (const key in this.product.productMedia){
-      if (this.product.productMedia.hasOwnProperty(key)) {
-        this.productImages[key] = { data: this.product.productMedia[key].imageData, mediaId: this.product.productMedia[key].mediaId };
-      }  
-    }
-    this.noOfImages = this.product.productMedia.length;
-    /*this.mediaService.getImageByProductId(productId).subscribe({
-      next: (result) => {
-        for (const key in result) {
-          if (result.hasOwnProperty(key)) {
-            this.mediaService.getImageByMediaId(result[key]).subscribe({
-              next: (image) => {
+  getProductImages(): void {
+    this.getMediaArray(this.product.id);
+    this.mediaArray$.subscribe((result) => {
+      //  this.productImages[key] = { data: this.product.productMedia[key].imageData, mediaId: this.product.productMedia[key].mediaId };
+      for (const key in result) {
+        if (result.hasOwnProperty(key)) {
+          this.productImages[key] = { data: result[key].imageData, mediaId: result[key].mediaId };
+        }  
+      }
+      this.noOfImages = result.length;
+    });
+  }
+
+  getMediaArray(productId:string): void{
+    this.mediaArray$ = this.mediaService
+    .getImageByProductId(productId)
+    .pipe(
+      switchMap((result) => {
+        const mediaObservables = Object.keys(result).map((key) =>
+          this.mediaService.getImageByMediaId(result[key]).pipe(
+            switchMap((image) => {
+              return new Observable<Media>((observer) => {
                 const reader = new FileReader();
                 reader.onload = () => {
-                  this.productImages[key] = { data: reader.result, mediaId: result[key] };
+                  const media: Media = {
+                    productId: productId,
+                    mediaId: result[key],
+                    imageData: reader.result,
+                  };
+                  observer.next(media);
+                  observer.complete();
                 };
-                reader.readAsDataURL(image); 
-              },
-              error: (error) => {
-                if (this.errorService.isAuthError(error.status)) {
-                  this.errorService.handleSessionExpirationError();
-                  this.dialogRef.close();
-                }
+                reader.readAsDataURL(image);
+              });
+            }),
+            catchError((error) => {
+              if (this.errorService.isAuthError(error.status)) {
+                this.errorService.handleSessionExpirationError();
               }
-            });
-          }
-        }
-        const objectLength = Object.keys(result).length;
-        this.noOfImages = objectLength;
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });*/
+              return of(null);
+            })
+          )
+        );
+        return forkJoin(mediaObservables);
+      })
+    );
   }
 
   // Update the product based on which field is being edited
