@@ -53,18 +53,6 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
   ) {
     this.product = data.product; // get product details from product-listing component
-    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
-
-    // Handles product media updates and get product images again from media service
-    this.mediaService.productMediaUpdated.subscribe(() => {
-        this.currentIndexOfImageSlider = this.noOfImages;
-    });
-
-    this.mediaService.productMediaDeleted$.subscribe(() => {
-      if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
-        this.currentIndexOfImageSlider = 0;
-      }
-    });
   }
 
   get userRole() : string {
@@ -119,9 +107,20 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
-   this.getProductImages();
-  
-  
+   this.getProductImages();  
+
+    // Handles product media updates and get product images again from media service
+    this.mediaService.mediaUpload.subscribe(() => {
+      this.getProductImages();
+      this.currentIndexOfImageSlider = this.noOfImages;
+  });
+
+  this.mediaService.mediaDeleted.subscribe(() => {
+    this.getProductImages();
+    if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+      this.currentIndexOfImageSlider = 0;
+    }
+  });
   }
 
    // Get product images from media service, save to productImages and display in image slider
@@ -129,10 +128,9 @@ export class ProductDetailComponent implements OnInit {
     for (const key in this.product.productMedia){
       if (this.product.productMedia.hasOwnProperty(key)) {
         this.productImages[key] = { data: this.product.productMedia[key].imageData, mediaId: this.product.productMedia[key].mediaId };
-      }
-       
-  }
-  this.noOfImages = this.product.productMedia.length;
+      }  
+    }
+    this.noOfImages = this.product.productMedia.length;
     /*this.mediaService.getImageByProductId(productId).subscribe({
       next: (result) => {
         for (const key in result) {
@@ -200,8 +198,8 @@ export class ProductDetailComponent implements OnInit {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
-              this.mediaService.notifyProductImageDeleted();
-              this.getProductImages();
+              this.mediaService.mediaDeleted.emit(true);
+             // this.getProductImages();
               this.toastr.success('Image deleted');
             },
             error: (error) => {
@@ -228,7 +226,7 @@ export class ProductDetailComponent implements OnInit {
       this.toastr.error('Image Limit Exceeded: You can only add a maximum of 5 images');
     } else {
       this.saveEachSelectedFile(this.product.id, 0)
-      this.mediaService.productMediaUpdated.emit(true);
+      this.mediaService.mediaUpload.emit(true);
     }
   }
 

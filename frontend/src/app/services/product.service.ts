@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
@@ -9,10 +9,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ProductService {
-  
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
-  
   
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,

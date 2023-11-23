@@ -9,16 +9,9 @@ import { Observable, BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class MediaService {
-  productMediaUpdated = new EventEmitter<any>();
-  productMediaDeleted = new EventEmitter<any>();
+  mediaUpload = new EventEmitter<any>();
+  mediaDeleted = new EventEmitter<any>();
 
-  private productMediaDeletedSubject = new BehaviorSubject<boolean>(false);
-  productMediaDeleted$: Observable<boolean> = this.productMediaDeletedSubject.asObservable();
-
-
-  /*private productMediaUploadSubject = new BehaviorSubject<boolean>(false);
-  productMediaUpdload$: Observable<boolean> = this.productMediaUploadSubject.asObservable();
-  */
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService, 
@@ -71,13 +64,4 @@ export class MediaService {
     }
     return this.httpClient.delete(`${environment.mediaUrl}/` + mediaId, { headers });
   }
-
-  notifyProductImageDeleted(){
-    this.productMediaDeletedSubject.next(true);
-  }
-
-/* notifyProductImageUpload(){
-    this.productMediaUploadSubject.next(true);
- }*/
-
 }

@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Media } from 'src/app/Models/Media';
 import { Product } from 'src/app/Models/Product';
 
@@ -13,7 +14,7 @@ export class MediaComponent implements OnInit {
   @Input() product: Product;
   
   ngOnInit(): void {
-
+    console.log("Product in media component:", this.product)
   }
   
 }

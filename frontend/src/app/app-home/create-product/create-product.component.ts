@@ -82,8 +82,6 @@ export class CreateProductComponent {
 
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          console.log("createProduct", result)
-          //this.productService.notifyProductCreated();   
           this.productService.productCreated.emit(true);     
         },
         error: (error) => {
