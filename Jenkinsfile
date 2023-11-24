@@ -169,7 +169,7 @@ pipeline {
                     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                         // Execute the build commands
                         sh '''
-                        docker system prune -a -f
+                        docker system prune -a -f --volumes
 
                         cd backend
 
@@ -202,7 +202,7 @@ pipeline {
                         docker tag frontend $FRONTEND_IMAGE
                         docker push $FRONTEND_IMAGE
 
-                        docker system prune -a -f
+                        docker system prune -a -f --volumes
                         '''
                     }
                 }
@@ -238,7 +238,7 @@ pipeline {
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker rm -f $(docker ps -aq)
                             fi
-                            docker system prune -a -f
+                            docker system prune -a -f --volumes
 
                             docker pull $USER_MICROSERVICE_IMAGE
                             docker pull $PRODUCT_MICROSERVICE_IMAGE
@@ -280,7 +280,7 @@ pipeline {
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker rm -f $(docker ps -aq)
                             fi
-                            docker system prune -a -f
+                            docker system prune -a -f --volumes
 
                             cp ~/backup/*.tar ~/
 

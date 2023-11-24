@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+
+  user-microservice:
+    image: user-microservice
+    container_name: user-microservice-container
+    ports:
+      - "8080:8080"
+    networks:
+      - buy01-network
+    depends_on:
+      - kafka
+      - mongodb
+    restart: unless-stopped
+
+  product-microservice:
+    image: product-microservice
+    container_name: product-microservice-container
+    ports:
+      - "8081:8081"
+    networks:
+      - buy01-network
+    depends_on:
+      - kafka
+      - mongodb
+    restart: unless-stopped
+
+  media-microservice:
+    image: media-microservice
+    container_name: media-microservice-container
+    ports:
+      - "8082:8082"
+    networks:
+      - buy01-network
+    depends_on:
+      - kafka
+      - mongodb
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-container
+    ports:
+      - "27021:27017"
+    networks:
+      - buy01-network
+    volumes:
+      - mongo-volume:/data/db
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-container
+    ports:
+      - "9092:9092"
+    networks:
+      - buy01-network
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_MESSAGE_MAX_BYTES: '10000000'
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-container
+    ports:
+      - "2181:2181"
+    networks:
+      - buy01-network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
+
+volumes:
+  mongo-volume:
+    external: true
+
+networks:
+  buy01-network:
+    driver: bridge
