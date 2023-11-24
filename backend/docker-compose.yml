@@ -41,7 +41,7 @@ services:
     image: mongo:latest
     container_name: mongodb-container
     ports:
-      - "27017:27017"
+      - "27021:27017"
     networks:
       - buy01-network
     volumes:
