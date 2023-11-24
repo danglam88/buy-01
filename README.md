@@ -96,6 +96,198 @@ An example of a valid form-data object for creating a new user is:
 }
 ```
 
+## Endpoints for buy-02
+
+### For positions in the cart:
+
+### POST  `/order/position` 
+ for add position from product listing of other pages with json body:
+ ```json
+{
+    "productId": "XXX",
+    "quantity": 1
+}
+```
+
+and response :
+ - HTTP STATUS 400 
+ ```json
+{
+  "error": "Decrease quantity",
+}
+```
+- HTTP STATUS 201 with empty body
+
+### PUT  `/order/position/{positionID}` 
+with empty body for update quantity in a cart page and response:
+- HTTP STATUS 200 with empty body
+- HTTP STATUS 400
+ ```json
+{
+  "error": "Decrease quantity"
+}
+```
+
+### DELETE  `/order/position/{positionID}` 
+with empty body for delete position in a cart page and response:
+- HTTP STATUS 200 with empty body
+
+
+### GET  `/order/positions`
+for getting current cart positions for cart page with empty body and response :
+ ```json
+[
+   {
+      "position_id": "XXX",
+      "product" : {
+         "product_id" : "XXX",
+        "name": "Name of Product",
+        "description": "Description of Product",
+        "price": 100.0,
+        "quantity": 5
+      },
+      "quantity" : 3,
+      "position_price" : "XXXX"
+   }
+]
+```
+
+### For orders:
+
+### POST  `/order`
+for create an order with json body:
+ ```json
+{   
+    "payment_code": "CASH",
+    "zip_code": "XXX",
+    "city" : "XXX",
+    "address" : "XXX"
+}
+```
+
+and response:
+- HTTP STATUS 400 with body:
+ ```json
+{
+  "error": "Invalid zip code"
+}
+```
+- HTTP STATUS 200 with body:
+ ```json
+{
+  "order_id": "XXX"
+}
+```
+
+### PUT  `/order/{order_id}`
+for update order info (with the same body as for POST and the same response scenarios)
+
+### DELETE  `/order/{order_id}`
+for delete order (in order history in remove scenario for client) with response:
+- HTTP STATUS 200 with empty body
+
+## GET `/order/{order_id}`
+info about the order with no request body and response body:
+ ```json
+{
+   "order_id" : "XXX",
+   "status_code" : "CREATED",
+   "positions" : [
+      {
+         "position_id": "XXX",
+         "product" : {
+            "product_id" : "XXX",
+            "name": "Name of Product",
+            "description": "Description of Product",
+            "price": 100.0,
+            "quantity": 5
+         },
+         "quantity" : 3,
+         "position_price" : "XXXX"
+      }
+   ],
+   "payment_code": "CASH",
+   "zip_code": "XXX",
+   "city" : "XXX",
+   "address" : "XXX"
+}
+```
+
+## GET `/order/seller` and GET `/order/client`
+info about seller's orders for seller and client order history for client with no request body and response body:
+ ```json
+[
+   {
+      "order_id" : "XXX",
+      "status_code" : "CREATED",
+      "positions" : [
+         {
+            "position_id": "XXX",
+            "product" : {
+               "product_id" : "XXX",
+               "name": "Name of Product",
+               "description": "Description of Product",
+               "price": 100.0,
+               "quantity": 5
+            },
+            "quantity" : 3,
+            "position_price" : "XXXX"
+         }
+      ],
+      "payment_code": "CASH",
+      "zip_code": "XXX",
+      "city" : "XXX",
+      "address" : "XXX"
+   }
+]
+```
+
+
+### Order Microservice database:
+
+Table Order Position:
+ - User ID
+ - Position Id
+- Order id
+- Product Id
+- Quantity
+- Position Price (Quantity * Product Price)
+
+Table Order :
+- User ID
+- Order ID
+- Status Code (enum, see below)
+- Payment Method Code (enum of method, let’s start from cash only)
+ Delivery Info (up to us, it is gonna be in the frontend form as well in the order section)
+ Could be:
+- Zip Code
+- City
+- State
+- Address
+- Phone number
+
+Order Status codes:
+- 1 Created
+- 2 Packing
+- 3 Delivering
+- 4 Delivered
+- 5 Cancelled
+
+Additional check (1):
+When user removes an order, status must be 5
+When user cancel - 1 or 2
+When user redo - any status
+
+
+Additional check (2):
+When user adds to cart and removes from - increase and decrease quantity from product table
+
+User actions from listing to create order
+1 Add to cart from listing
+2 Go to cart page (with info about cart positions)
+3 Go to order page (with info about payment method and delivery info)
+4 Go to created order page info (with positions, order info and order status)
+
 ## CI/CD Pipeline (using Jenkins)
 
 The whole process of the project has been automated using Jenkins. The process consists of the following stages:
