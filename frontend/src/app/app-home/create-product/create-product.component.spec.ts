@@ -150,4 +150,12 @@ describe('CreateProductComponent', () => {
     expect(previewImage).toBeTruthy();
     expect(previewImage.getAttribute('src')).toContain('uploadPhoto.jpg');
   });
+
+
+  it('should disable the "Create Product" button when isCreatingProduct is true', () => {
+    component.isCreatingProduct = true;
+    fixture.detectChanges();
+    const createProductButton = fixture.nativeElement.querySelector('.create-button');
+    expect(createProductButton.disabled).toBeTruthy();
+  });
 });
