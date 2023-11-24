@@ -24,16 +24,6 @@ RUN mvn -f ./media/pom.xml clean package -DskipTests
 # Stage 2: Create the final image
 FROM openjdk:17-slim
 
-# Accept build arguments
-ARG MEDIA_DB_CREDENTIALS_USERNAME
-ARG MEDIA_DB_CREDENTIALS_PASSWORD
-ARG JWT_SECRET
-
-# Set arguments as environment variables for runtime
-ENV MEDIA_DB_CREDENTIALS_USERNAME=${MEDIA_DB_CREDENTIALS_USERNAME}
-ENV MEDIA_DB_CREDENTIALS_PASSWORD=${MEDIA_DB_CREDENTIALS_PASSWORD}
-ENV JWT_SECRET=${JWT_SECRET}
-
 WORKDIR /app
 
 # Copy only the built artifact from the builder stage
