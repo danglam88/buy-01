@@ -113,18 +113,24 @@ and response :
  - HTTP STATUS 400 
  ```json
 {
-  "error": "Decrease quantity",
+  "message": "Decrease quantity",
 }
 ```
 - HTTP STATUS 201 with empty body
 
 ### PUT  `/order/position/{positionID}` 
-with empty body for update quantity in a cart page and response:
+ for update quantity in a cart page with body 
+  ```json
+{
+    "quantity": 1
+}
+```
+ and response:
 - HTTP STATUS 200 with empty body
 - HTTP STATUS 400
  ```json
 {
-  "error": "Decrease quantity"
+  "message": "Decrease quantity"
 }
 ```
 
@@ -169,7 +175,7 @@ and response:
 - HTTP STATUS 400 with body:
  ```json
 {
-  "error": "Invalid zip code"
+  "message": "Invalid zip code"
 }
 ```
 - HTTP STATUS 200 with body:
