@@ -76,7 +76,7 @@
                         </mat-form-field>
                     </div>                
                 </div>
-                <button class="create-button" (click)="createProduct()">Create Product</button>
+                <button class="create-button" (click)="createProduct()" [disabled]="isCreatingProduct">Create Product</button>
             </div>
         </form>
     </mat-dialog-content>

@@ -17,6 +17,7 @@ export class RegisterComponent  {
   previewUrl: string | ArrayBuffer | null = null;
   selectedFile: File;
   userInfo: any = {};
+  isRegistering = false;
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
   toastrConfig: any = {};
@@ -99,6 +100,7 @@ export class RegisterComponent  {
   // Register user
   register() {
     if (this.registerform.valid) {
+      this.isRegistering = true;
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('name', this.registerform.value.name.replace(/\s+/g, ' ').trim());
