@@ -31,8 +31,10 @@ export class ProductDetailComponent implements OnInit {
   isAddingImages = false;
   isDeletingImages = false;
   isEditingImages = false;
+  isAddingToCart = false;
   currentIndexOfImageSlider = 0;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
+  selectedQuantity = 1; 
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('priceInput') priceInput: ElementRef;
   @ViewChild('quantityInput') quantityInput: ElementRef;
@@ -402,6 +404,35 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  //TODO: Adding Product Quantity? Must start with 1 and max than the quantity the product has
+  //Add products to cart
+  addToCart() {
+    this.isAddingToCart = true;
+    if (this.product){
+      console.log(this.product)
+    }
+  }
+
+  // Call addProductToCart when adding a product to the cart
+  // addToCart(productId: number): void {
+  //   console.log(productId);
+  //   this. productService.addProductToCart(productId).subscribe({
+  //     next: (result) => {
+  //       console.log('Added to cart successfully');
+  //     },
+  //     error: (error) => {
+  //       console.log('Error adding product to cart: ' + error)
+  //     }
+  //   })
+  // }
+
+  decrementQuantity() {
+    this.selectedQuantity = Math.max(1, this.selectedQuantity - 1);
+  }
+
+  incrementQuantity() {
+    this.selectedQuantity = Math.min(this.product.quantity, this.selectedQuantity + 1);
+  }
   // Close modal
   closeModal(): void {
     this.dialogRef.close();

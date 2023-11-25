@@ -11,6 +11,7 @@ export const environment = {
     avatarUserUrl: `${userBaseUrl}/users/avatar/`,
     productUrl: `${productBaseUrl}/products`,
     sellerProductUrl: `${productBaseUrl}/products/seller`,
+    addToCartUrl: `${productBaseUrl}/order/position`,
     mediaUrl: `${mediaBaseUrl}/media`,
     productMediaUrl: `${mediaBaseUrl}/media/product/`,
 };

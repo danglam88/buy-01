@@ -15,13 +15,9 @@ import { Subscription } from 'rxjs';
 
 export class HeaderComponent {
   currentRoute: string;
-  //is user logged in
-  // get isLoggedIn(): boolean {
-  //   return this.authService.loggedIn;
-  // }
-  //is token expired
   tokenEx: boolean;
   routerSubscription: Subscription;
+  cartItems = 0;
 
 
   constructor(
