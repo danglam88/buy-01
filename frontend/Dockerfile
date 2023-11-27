@@ -29,6 +29,9 @@ RUN npx ng build
 # Use official nginx image as the base image
 FROM nginx:alpine
 
+# Install curl for health checking
+RUN apk --no-cache add curl
+
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/dist/buy-01 /usr/share/nginx/html
 RUN rm -rf /usr/share/nginx/html/assets/cert
@@ -52,3 +55,7 @@ EXPOSE 443
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
+
+# Health check to verify nginx is serving content
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -k -f https://localhost:443 || exit 1
