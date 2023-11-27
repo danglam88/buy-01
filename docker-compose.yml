@@ -12,6 +12,11 @@ services:
       - kafka
       - user-mongodb
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8443/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
@@ -24,6 +29,11 @@ services:
       - kafka
       - product-mongodb
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8444/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
@@ -36,6 +46,11 @@ services:
       - kafka
       - media-mongodb
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8445/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     image: danglamgritlab/frontend:latest
@@ -45,6 +60,11 @@ services:
     networks:
       - buy01-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:4200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   user-mongodb:
     image: mongo:latest
@@ -59,6 +79,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${USER_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${USER_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   product-mongodb:
     image: mongo:latest
@@ -73,6 +98,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${PRODUCT_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${PRODUCT_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   media-mongodb:
     image: mongo:latest
@@ -87,6 +117,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MEDIA_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MEDIA_DB_CREDENTIALS_PASSWORD}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -103,6 +138,11 @@ services:
     depends_on:
       - zookeeper
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server=localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -115,6 +155,11 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   user-mongo-volume:
