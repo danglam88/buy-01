@@ -46,5 +46,5 @@ COPY --from=builder /app/media/target/media.jar ./
 CMD ["java", "-jar", "media.jar"]
 
 # Health check using Spring Boot Actuator
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=30s \
   CMD curl -k -f https://localhost:8445/actuator/health || exit 1

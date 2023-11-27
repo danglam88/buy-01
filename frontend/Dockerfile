@@ -57,5 +57,5 @@ EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
 
 # Health check to verify nginx is serving content
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=30s \
   CMD curl -k -f https://localhost:443 || exit 1
