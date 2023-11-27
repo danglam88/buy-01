@@ -113,17 +113,22 @@ export class ProductDetailComponent implements OnInit {
     this.getProductImages();  
 
       // Handles product media updates and get product images again from media service
+      
+    if (this.mediaService.mediaUpload) {
       this.mediaService.mediaUpload.subscribe(() => {
         this.getProductImages();
         this.currentIndexOfImageSlider = this.noOfImages;
-    });
+      });
+    } 
 
-    this.mediaService.mediaDeleted.subscribe(() => {
-      this.getProductImages();
-      if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
-        this.currentIndexOfImageSlider = 0;
-      }
-    });
+    if (this.mediaService.mediaDeleted) {
+      this.mediaService.mediaDeleted.subscribe(() => {
+        this.getProductImages();
+        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+          this.currentIndexOfImageSlider = 0;
+        }
+      });
+    }
   }
 
   getProductImages(): void {
