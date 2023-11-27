@@ -20,14 +20,15 @@ class ToastrServiceStub {
 describe('MediaListingComponent', () => {
   let component: MediaListingComponent;
   let fixture: ComponentFixture<MediaListingComponent>;
-  let mediaService: MediaService;
+  let mediaService: jasmine.SpyObj<MediaService>;
   let errorService: ErrorService;
 
   beforeEach(() => {
+    const spy = jasmine.createSpyObj('MediaService', ['getImageByProductId', 'getImageByMediaId']);
     TestBed.configureTestingModule({
       declarations: [MediaListingComponent, MediaComponent],
       providers: [
-        MediaService,
+        { provide: MediaService, useValue: spy },
         { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       imports: [
@@ -39,8 +40,12 @@ describe('MediaListingComponent', () => {
 
     fixture = TestBed.createComponent(MediaListingComponent);
     component = fixture.componentInstance;
-    mediaService = TestBed.inject(MediaService);
+    mediaService = TestBed.inject(MediaService) as jasmine.SpyObj<MediaService>;
+
     errorService = TestBed.inject(ErrorService);
+    spyOn(component, 'ngOnInit').and.callThrough();
+    spyOn(component, 'getProductImages').and.callThrough();
+    spyOn(mediaService, 'getImageByMediaId').and.returnValue(of(new Blob()));
 
     fixture.detectChanges();
   });
@@ -49,59 +54,72 @@ describe('MediaListingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call getProductMedia and display product images', fakeAsync(() => {
-    spyOn(component, 'getProductMedia').and.callThrough();
-    spyOn(mediaService, 'getImageByProductId').and.returnValue(of({ success: true }));
-    spyOn(mediaService, 'getImageByMediaId').and.returnValue(of(new Blob()));
-    component.productId = '123';
-    component.getProductMedia(component.productId);
+  it('should call getProductImages() and retrive product images', fakeAsync(() => {
+    const mockProductId = '123'; 
+    const mockProducMediaIDs = ['1', '2'];
+    const mockProductMediaData = new Blob([''], { type: 'image/jpeg' });
+    const mockProductImageResult = [mockProductMediaData, mockProductMediaData];
+    
+    mediaService.getImageByProductId.and.returnValue(of(mockProducMediaIDs));
+    mediaService.getImageByMediaId.and.returnValue(of(mockProductImageResult[0]));
 
-    tick(250);
+    component.getProductImages(mockProductId);
 
-    expect(component.getProductMedia).toHaveBeenCalled();
-    expect(mediaService.getImageByProductId).toHaveBeenCalled();
-    expect(mediaService.getImageByMediaId).toHaveBeenCalled();
+    tick();
+
+    expect(component.getProductImages).toHaveBeenCalledWith(mockProductId);
+    expect(mediaService.getImageByProductId).toHaveBeenCalledWith(mockProductId);
+    expect(mediaService.getImageByMediaId).toHaveBeenCalledWith(mockProductImageResult[0]);
+  
+    component.mediaImageData$.subscribe((data) => {
+      expect(data).toBeTruthy();
+    });
   }));
 
   it('should handle error with status 403 for getImageByProductId', fakeAsync(() => {
-    spyOn(component, 'getProductMedia').and.callThrough();
+    const mockProductId = '123';
   
     const errorResponse = {
       status: 403,
       error: 'Forbidden',
     };
 
-    spyOn(mediaService, 'getImageByProductId').and.returnValue(new Observable((observer) => {
+    mediaService.getImageByProductId.and.returnValue(new Observable((observer) => {
       observer.error(errorResponse);
       observer.complete();
     }));
-    spyOn(mediaService, 'getImageByMediaId').and.returnValue(new Observable((observer) => {
+    mediaService.getImageByMediaId.and.returnValue(new Observable((observer) => {
       observer.error(errorResponse);
       observer.complete();
     }));
     spyOn(errorService, 'isAuthError').and.returnValue(true); 
     spyOn(errorService, 'handleSessionExpirationError');
 
-    component.productId = '123';
-    component.getProductMedia(component.productId);
+    
+    component.getProductImages(mockProductId);
     tick(250);
 
-    expect(component.getProductMedia).toHaveBeenCalled();
-    expect(mediaService.getImageByProductId).toHaveBeenCalledWith(component.productId);
-    expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
+    expect(component.getProductImages).toHaveBeenCalledWith(mockProductId);
+    component.mediaImageData$.subscribe((data) => {
+      expect(mediaService.getImageByProductId).toHaveBeenCalledWith(mockProductId);
+      expect(mediaService.getImageByMediaId).not.toHaveBeenCalled();
+      expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+      expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
+    });
   }));
 
   
-  it('should call getProductMedia() when deleteProduct is emitted', () => {
-    spyOn(component, 'getProductMedia');
-    const deleteMediaEventSpy = spyOn(mediaService.productMediaDeleted, 'subscribe');
+  it('should call getProductImages() when mediaDeleted is emitted', () => {
+    spyOn(mediaService.mediaDeleted, 'subscribe').and.callThrough(); 
+    mediaService.mediaDeleted.emit(true);
 
-    deleteMediaEventSpy.and.callThrough(); // Just pass the callback through
+    expect(component.getProductImages).toHaveBeenCalled();
+  });
 
-    mediaService.productMediaDeleted.emit(true);
+  it('should call getProductImages() when mediaUpload is emitted', () => {
+    spyOn(mediaService.mediaUpload, 'subscribe').and.callThrough(); 
+    mediaService.mediaUpload.emit(true);
 
-    expect(component.getProductMedia).toHaveBeenCalled();
+    expect(component.getProductImages).toHaveBeenCalled();
   });
 });

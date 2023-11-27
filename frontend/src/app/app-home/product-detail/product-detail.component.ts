@@ -129,7 +129,6 @@ export class ProductDetailComponent implements OnInit {
   getProductImages(): void {
     this.getMediaArray(this.product.id);
     this.mediaArray$.subscribe((result) => {
-      //  this.productImages[key] = { data: this.product.productMedia[key].imageData, mediaId: this.product.productMedia[key].mediaId };
       for (const key in result) {
         if (result.hasOwnProperty(key)) {
           this.productImages[key] = { data: result[key].imageData, mediaId: result[key].mediaId };
@@ -140,13 +139,13 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getMediaArray(productId:string): void{
-    this.mediaArray$ = this.mediaService
-    .getImageByProductId(productId)
-    .pipe(
+    this.mediaArray$ = this.mediaService.getImageByProductId(productId).pipe(
       switchMap((result) => {
+        console.log("product detail getImageByProductId result: ", result);
         const mediaObservables = Object.keys(result).map((key) =>
           this.mediaService.getImageByMediaId(result[key]).pipe(
             switchMap((image) => {
+              console.log("product detail getImageByMediaId image: ", image)
               return new Observable<Media>((observer) => {
                 const reader = new FileReader();
                 reader.onload = () => {

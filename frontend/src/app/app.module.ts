@@ -41,6 +41,7 @@ import { ProductService } from './services/product.service';
 import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from './services/validation.service';
+import { SearchComponent } from './app-home/search/search.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +64,8 @@ import { ValidationService } from './services/validation.service';
     ImageSliderComponent,
     MediaListingComponent,
     MediaComponent,
-    HighlightDirective
+    HighlightDirective,
+    SearchComponent
   ],
   imports: [
     BrowserModule,

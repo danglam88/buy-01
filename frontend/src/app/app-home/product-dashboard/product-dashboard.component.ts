@@ -43,15 +43,10 @@ export class ProductDashboardComponent implements OnInit {
         });
       }
     });
-    
-    this.sellerProducts$.subscribe((products) => {
-      console.log('Seller product List:', products);
-    });
   }
 
   // Get all of the seller products
   getSellerProducts(): void {
-    console.log("getSellerProducts")
     this.sellerProducts$ = this.productService.getSellerProductsInfo().pipe(
       map((result: any) => {
         if (Array.isArray(result)) {

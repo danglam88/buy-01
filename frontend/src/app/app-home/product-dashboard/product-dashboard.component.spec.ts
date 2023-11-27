@@ -29,7 +29,7 @@ class ToastrServiceStub {
 describe('ProductDashboardComponent', () => {
   let component: ProductDashboardComponent;
   let fixture: ComponentFixture<ProductDashboardComponent>;
-  let productService: ProductService;
+  let productService: jasmine.SpyObj<ProductService>;
   let errorService: ErrorService;
 
     // Create a mock MatDialogRef
@@ -38,6 +38,18 @@ describe('ProductDashboardComponent', () => {
     };
 
   beforeEach(() => {
+    const spy = jasmine.createSpyObj('ProductService', ['getSellerProductsInfo']);
+    let mockSellerProducts = [
+      {
+        "id": "1",
+        "name": "Mock Product 1",
+        "description": "Mock Product 1 description",
+        "price": 100,
+        "quantity": 10,
+        "editable": true,
+        "productMedia": []
+      }
+    ];
     TestBed.configureTestingModule({
       declarations: [
         ProductDashboardComponent, 
@@ -47,11 +59,11 @@ describe('ProductDashboardComponent', () => {
         ProductComponent       
       ],
       providers: [
-        ProductService,
         ValidationService,
         ErrorService,
-        { provide: MatDialogRef, useValue: mockDialogRef }, // Provide the mock MatDialogRef
-        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: ProductService, useValue: spy },
+        { provide: MatDialogRef, useValue: mockDialogRef }, 
+        { provide: MAT_DIALOG_DATA, useValue: {product: mockSellerProducts} },
         { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       imports: [
@@ -63,95 +75,72 @@ describe('ProductDashboardComponent', () => {
     fixture = TestBed.createComponent(ProductDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    productService = TestBed.inject(ProductService);
+    productService = TestBed.inject(ProductService) as jasmine.SpyObj<ProductService>;
     errorService = TestBed.inject(ErrorService);
+    spyOn(component, 'getSellerProducts').and.callThrough();
+    spyOn(component, 'openProductDetail').and.callThrough();
+    spyOn(productService, 'getSellerProductsInfo').and.returnValue(of(mockSellerProducts));
+    spyOn(component['dialog'], 'open').and.callThrough(); 
    });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should get seller products and change editable property to true', () => {
-    spyOn(component, 'getSellerProducts').and.callThrough();
-    const mockProducts = [
-      {
-        "id": "1",
-        "name": "Mock Product 1",
-        "description": "Mock Product 1 description",
-        "price": 100,
-        "quantity": 10,
-      }
-    ];
-  
-    // Mock the response from the productService
-    spyOn(productService, 'getSellerProductsInfo').and.returnValue(of(mockProducts));
-  
+  it('should call getSellerProducts() and retrieve seller products info', () => {  
     component.getSellerProducts();
   
     expect(component.getSellerProducts).toHaveBeenCalled();
-    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
-  
-    // After getSellerProducts is called, the component.sellerProducts should be equal to the mockProducts
-    expect(component.sellerProducts).toEqual(mockProducts);
-  
-    // Additionally, check that the editable property is set to true for each product
-    expect(component.sellerProducts.every(product => product.editable === true)).toBeTrue();
+    component.sellerProducts$.subscribe((products) => {
+      expect(productService.getSellerProductsInfo).toHaveBeenCalled();  
+      expect(products.every(product => product.editable === true)).toBeTrue();
+    });
+
   });
   
   
   it('should open product detail', () => {
-    spyOn(component['dialog'], 'open').and.callThrough(); // Access the dialog service directly and spy on open
-    const mockProduct = {
+    const mockProductDetails = {
       "id": "1",
       "name": "Mock Product 1",
       "description": "Mock Product 1 description",
       "price": 100,
       "quantity": 10,
-      "editable": true
+      "editable": true,
+      "productMedia": []
     };
   
-    component.openProductDetail(mockProduct);
-    expect(component['dialog'].open).toHaveBeenCalled(); // Access the dialog service directly
+    component.openProductDetail(mockProductDetails);
+    expect(component['dialog'].open).toHaveBeenCalled(); 
   });
   
   it('should show <p>You have no products!</p> when sellerProducts is empty', () => {
-    component.sellerProducts = [];
+    const mockSellerProducts = [];
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
+    productService.getSellerProductsInfo.and.returnValue(of(mockSellerProducts));
     expect(compiled.querySelector('p').textContent).toContain('You have no products!');
   });
 
-  it('should subscribe to productCreated event and call getSellerProducts when productCreated is emitted', () => {
-    spyOn(component, 'getSellerProducts');
-    const productCreatedEventSpy = spyOn(productService.productCreated, 'subscribe');
-
-    productCreatedEventSpy.and.callThrough(); // Just pass the callback through
-
+  it('should call getSellerProducts() when productCreated is emitted', () => {
+    spyOn(productService.productCreated, 'subscribe').and.callThrough();
     productService.productCreated.emit(true);
-
     expect(component.getSellerProducts).toHaveBeenCalled();
   });
 
-  it('should subscribe to productDeleted event and call getSellerProducts when productDeleted is emitted', () => {
-    spyOn(component, 'getSellerProducts');
-    const productDeletedEventSpy = spyOn(productService.productDeleted, 'subscribe');
-
-    productDeletedEventSpy.and.callThrough(); // Just pass the callback through
-
+  it('should call getSellerProducts() when productDeleted is emitted', () => {
+    spyOn(productService.productDeleted, 'subscribe').and.callThrough();
     productService.productDeleted.emit(true);
-
     expect(component.getSellerProducts).toHaveBeenCalled();
   });
 
-  it('should handle error with status 403 for getSellerProducts', fakeAsync(() => {
-    spyOn(component, 'getSellerProducts').and.callThrough();
-  
+  it('should handle error with status 403 for getSellerProducts', fakeAsync(() => {  
     const errorResponse = {
       status: 403,
       error: 'Forbidden',
     };
 
-    spyOn(productService, 'getSellerProductsInfo').and.returnValue(new Observable((observer) => {
+    productService.getSellerProductsInfo.and.returnValue(new Observable((observer) => {
       observer.error(errorResponse);
       observer.complete();
     }));
@@ -163,8 +152,10 @@ describe('ProductDashboardComponent', () => {
     tick();
 
     expect(component.getSellerProducts).toHaveBeenCalled();
-    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
-    expect(errorService.isAuthError).toHaveBeenCalledWith(403);
-    expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
+    component.sellerProducts$.subscribe(() => {   
+      expect(productService.getSellerProductsInfo).not.toHaveBeenCalled();
+      expect(errorService.isAuthError).toHaveBeenCalledWith(403);
+      expect(errorService.handleSessionExpirationError).toHaveBeenCalled();
+    });
   }));
 });

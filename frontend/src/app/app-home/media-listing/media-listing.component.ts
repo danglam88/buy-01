@@ -34,7 +34,8 @@ export class MediaListingComponent implements OnInit {
       }
     });
   }  
-
+  
+  // Get all product images
   getProductImages(productId: string): void {
     this.mediaImageData$ = this.mediaService.getImageByProductId(productId).pipe(
       switchMap((result) => {
