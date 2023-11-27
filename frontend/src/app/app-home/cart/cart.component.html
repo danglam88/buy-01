@@ -3,11 +3,30 @@
 
 <section class="shoppingcart-container">
     <!-- IF THERE IS NO PRODUCTS -->
-    <div *ngIf="products.length === 0" class="empty-product">
+    <!-- <div *ngIf="products.length === 0" class="empty-product">
         <h1>There are no products in your cart.</h1>
         <button routerLink="../home">Shopping now</button>
-      </div>
+      </div> -->
+      <ul>
+        <li *ngFor="let cartItem of cart.items">
+            <div>
+              {{cartItem.product.name}}
+            </div>
+            <select #quantitySelect (change)="changeQuantity(cartItem, quantitySelect.value)">
+              <option>1</option> <option>1</option> 
+              <option>2</option> 
+              <option>3</option> 
+              <option>4</option> 
 
+              <!-- loop here to max quantity -->
+            </select>
+            <div>
+              {{cartItem.price | currency}}
+            </div>
+
+        </li>
+      </ul>
+    
 </section>
 
   <!-- Product List -->

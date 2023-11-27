@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Inject, ViewChild, ElementRef, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators  } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { ErrorService } from 'src/app/services/error.service';
 
 import { Product } from '../../Models/Product';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { CartService } from 'src/app/services/cart.service';
 
 @Component({
   selector: 'product-detail',
@@ -21,6 +22,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
+  @Output() productAdded = new EventEmitter();
   editingField: string | null = null;
   productImages: any = {};
   mediaID: any = {};
@@ -53,6 +55,7 @@ export class ProductDetailComponent implements OnInit {
     private dialog: MatDialog,
     private encryptionService: EncryptionService, 
     private router: Router,
+    private cartService: CartService,
   ) {
     this.product = data.product; // get product details from product-listing component
     //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
@@ -410,26 +413,13 @@ export class ProductDetailComponent implements OnInit {
   addToCart() {
     this.isAddingToCart = true;
     if (this.product){
-      console.log(this.product)
+      this.cartService.addToCart(this.product);
     }
 
     if (this.product.quantity === 0) {
       this.noProductsAvailble = true;
     }
   }
-
-  // Call addProductToCart when adding a product to the cart
-  // addToCart(productId: number): void {
-  //   console.log(productId);
-  //   this. productService.addProductToCart(productId).subscribe({
-  //     next: (result) => {
-  //       console.log('Added to cart successfully');
-  //     },
-  //     error: (error) => {
-  //       console.log('Error adding product to cart: ' + error)
-  //     }
-  //   })
-  // }
 
   decrementQuantity() {
     this.selectedQuantity = Math.max(1, this.selectedQuantity - 1);

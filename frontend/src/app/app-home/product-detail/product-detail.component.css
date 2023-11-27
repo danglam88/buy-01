@@ -314,6 +314,15 @@ right: -11px;
   background:#016dcb;
 }
 
+
+.fa-check{
+  background:gray;
+}
+
+#addedToCart {
+  background:gray;
+}
+
 .addtocart{
   margin-top: 35px;
   display:block;

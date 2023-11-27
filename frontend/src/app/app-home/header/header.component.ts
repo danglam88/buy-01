@@ -6,6 +6,7 @@ import { EncryptionService } from 'src/app/services/encryption.service'
 import { CreateProductComponent } from '../create-product/create-product.component';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
+import { CartService } from 'src/app/services/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -18,6 +19,7 @@ export class HeaderComponent {
   tokenEx: boolean;
   routerSubscription: Subscription;
   cartItems = 0;
+  cartItemsSubscription: Subscription;
 
 
   constructor(
@@ -26,6 +28,7 @@ export class HeaderComponent {
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private toastr: ToastrService,
+    private cartService: CartService
     ) 
     {
       this.routerSubscription = this.router.events.subscribe((event: any) => {
@@ -35,10 +38,16 @@ export class HeaderComponent {
       });   
   }
 
+  ngOnInit() {
+    this.getCartItemsNumber();
+    this.subscribeToCartItemsChanges();
+  }
+
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+    this.cartItemsSubscription.unsubscribe();
   }
 
   get role() : string {
@@ -70,6 +79,16 @@ export class HeaderComponent {
    
   }
 
+  getCartItemsNumber() {
+    this.cartItems = this.cartService.getNumberOfCartItems();
+  }
+
+  private subscribeToCartItemsChanges(): void {
+    this.cartItemsSubscription = this.cartService.getCartItemsObservable().subscribe((count: number) => {
+      this.cartItems = count;
+    });
+  }
+  
   // Opens create product modal
   openCreateProduct(): void {
     this.dialog.open(CreateProductComponent, {
