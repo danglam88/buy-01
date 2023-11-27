@@ -371,7 +371,7 @@ i{
     outline: none;
 }
 
-i:hover, button:hover {
+i:hover, a:hover {
     background-color: transparent;
 }
 

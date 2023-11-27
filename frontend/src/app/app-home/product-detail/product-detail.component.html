@@ -148,7 +148,7 @@
                     </button>
                 </div>
                 <!-- QUANTITY AND ADD TO CART FEATURE -->
-                <div class="addToCartDiv">
+                <div class="addToCartDiv" *ngIf="!noProductsAvailble">
                     <div class="d-flex flex-row justify-content-between align-items-center mt-4 rounded" id="quantity-box">
                         <div class="d-flex flex-row align-self-center product_data"  id="qty_select">
                             <input type="hidden" value=" 1 " class="prod_id">

@@ -32,6 +32,7 @@ export class ProductDetailComponent implements OnInit {
   isDeletingImages = false;
   isEditingImages = false;
   isAddingToCart = false;
+  noProductsAvailble = false;
   currentIndexOfImageSlider = 0;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   selectedQuantity = 1; 
@@ -410,6 +411,10 @@ export class ProductDetailComponent implements OnInit {
     this.isAddingToCart = true;
     if (this.product){
       console.log(this.product)
+    }
+
+    if (this.product.quantity === 0) {
+      this.noProductsAvailble = true;
     }
   }
 
