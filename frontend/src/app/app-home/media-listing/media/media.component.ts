@@ -6,6 +6,6 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./media.component.css']
 })
 export class MediaComponent {
-  @Input() mediaImageData: any;
+ @Input() mediaImageData: any;
   
 }

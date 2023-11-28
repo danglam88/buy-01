@@ -8,5 +8,13 @@ import { Product } from '../../../Models/Product';
 })
 export class ProductComponent {
   @Input() product:Product;
+  @Input() searchText: string[];
 
+  shouldShowProduct(product: any): boolean {
+    if (this.searchText?.length === 0) {
+      return true;
+    }
+
+    return this.searchText?.some(term => product.name.toLowerCase().includes(term.toLowerCase()));
+  }
 }

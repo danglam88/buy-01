@@ -1,9 +1,11 @@
-<div class="product--item" appHighlight>
-      <div class="product--image">
-        <app-media-listing [productId]="product.id"></app-media-listing>
-      </div>
-      <div class="product--price">
-          €{{product.price}}
-      </div>
-      <div class="product--name">{{product.name}}</div>
+<div class="product--item" appHighlight *ngIf="shouldShowProduct(product)"> 
+    <div class="product--image">
+      <app-media-listing 
+      [product]="product">
+    </app-media-listing>
+    </div>
+    <div class="product--price">
+        €{{product.price}}
+    </div>
+    <div class="product--name">{{product.name}}</div>
 </div>

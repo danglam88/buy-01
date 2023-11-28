@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
@@ -11,13 +11,11 @@ import { environment } from '../../environments/environment';
 export class ProductService {
   productCreated = new EventEmitter<any>();
   productDeleted = new EventEmitter<any>();
-
+  
   constructor(private httpClient: HttpClient,
     private encryptionService: EncryptionService,
     private router: Router,
-    ) {
-
-  }
+    ) {}
 
   get token() : string {
     const encryptedSecret = sessionStorage.getItem('srt');
@@ -61,7 +59,6 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-
     return this.httpClient.put(`${environment.productUrl}/` + product.id, product, { headers });
   }
 
@@ -70,8 +67,6 @@ export class ProductService {
     if (this.token) {
       headers = headers.set('Authorization', `Bearer ${this.token}`);
     }
-
     return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
   }
-
 }

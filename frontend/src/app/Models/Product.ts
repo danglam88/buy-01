@@ -1,3 +1,5 @@
+import { Media } from "./Media";
+
 export class Product {
     id: string; 
     name:string; 
@@ -5,5 +7,5 @@ export class Product {
     price: number;
     quantity: number;
     editable: boolean;
+    productMedia: Media[];
 }
-
