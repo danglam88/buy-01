@@ -15,7 +15,7 @@ import { catchError } from 'rxjs/operators';
 export class ProductListingComponent implements OnInit {
   allProducts$: Observable<any>;
   @Input() product: Product;
-  @Input() searchText: string = "";
+  @Input() searchText: string[] = [];
 
   constructor( 
     private dialog: MatDialog, 
@@ -60,7 +60,16 @@ export class ProductListingComponent implements OnInit {
 
   // creating reference of productListComponent 
  
-  setSearchText(value: string){
+  setSearchText(value: string[]){
      this.searchText = value;
+  }
+  
+  
+  selectedFilterRadioButton: string = "all";
+
+  onFilterChanged(value: string){
+    console.log("value" + value)
+    this.selectedFilterRadioButton = value;
+    console.log("onFilterChanged called" + this.selectedFilterRadioButton)
   }
 }

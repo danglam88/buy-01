@@ -5,6 +5,7 @@
 - [Front-end Specifications](#front-end-specifications)
 - [Back-end Specifications](#back-end-specifications)
 - [CI/CD Pipeline (using Jenkins)](#cicd-pipeline-using-jenkins)
+- [Dashboard URLs](#dashboard-urls)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
@@ -95,12 +96,198 @@ An example of a valid form-data object for creating a new user is:
 }
 ```
 
+## Endpoints for buy-02
+
+### For positions in the cart:
+
+### POST  `/order/position` 
+ for add position from product listing of other pages with json body:
+ ```json
+{
+    "productId": "XXX",
+    "quantity": 1
+}
+```
+
+and response :
+ - HTTP STATUS 400 
+ ```json
+{
+  "message": "Decrease quantity",
+}
+```
+- HTTP STATUS 201 with empty body
+
+### PUT  `/order/position/{positionID}` 
+ for update quantity in a cart page with body 
+  ```json
+{
+    "quantity": 1
+}
+```
+ and response:
+- HTTP STATUS 200 with empty body
+- HTTP STATUS 400
+ ```json
+{
+  "message": "Decrease quantity"
+}
+```
+
+### DELETE  `/order/position/{positionID}` 
+with empty body for delete position in a cart page and response:
+- HTTP STATUS 200 with empty body
+
+
+### GET  `/order/positions`
+for getting current cart positions for cart page with empty body and response :
+ ```json
+[
+   {
+      "position_id": "XXX",
+      "product" : {
+         "product_id" : "XXX",
+        "name": "Name of Product",
+        "description": "Description of Product",
+        "price": 100.0,
+        "quantity": 5
+      },
+      "quantity" : 3,
+      "position_price" : "XXXX"
+   }
+]
+```
+
+### For orders:
+
+### POST  `/order`
+for create an order with json body:
+ ```json
+{   
+    "payment_code": "CASH"
+}
+```
+
+and response:
+- HTTP STATUS 400 with body:
+ ```json
+{
+  "message": "Invalid payment code"
+}
+```
+- HTTP STATUS 200 with body:
+ ```json
+{
+  "order_id": "XXX"
+}
+```
+
+### PUT  `/order/{order_id}`
+for update order info (with the same body as for POST and the same response scenarios)
+
+### DELETE  `/order/{order_id}`
+for delete order (in order history in remove scenario for client) with response:
+- HTTP STATUS 200 with empty body
+
+## GET `/order/{order_id}`
+info about the order with no request body and response body:
+ ```json
+{
+   "order_id" : "XXX",
+   "status_code" : "CREATED",
+   "positions" : [
+      {
+         "position_id": "XXX",
+         "product" : {
+            "product_id" : "XXX",
+            "name": "Name of Product",
+            "description": "Description of Product",
+            "price": 100.0,
+            "quantity": 5
+         },
+         "quantity" : 3,
+         "position_price" : "XXXX"
+      }
+   ],
+   "payment_code": "CASH"
+}
+```
+
+## GET `/order/seller` and GET `/order/client`
+info about seller's orders for seller and client order history for client with no request body and response body:
+ ```json
+[
+   {
+      "order_id" : "XXX",
+      "status_code" : "CREATED",
+      "positions" : [
+         {
+            "position_id": "XXX",
+            "product" : {
+               "product_id" : "XXX",
+               "name": "Name of Product",
+               "description": "Description of Product",
+               "price": 100.0,
+               "quantity": 5
+            },
+            "quantity" : 3,
+            "position_price" : "XXXX"
+         }
+      ],
+      "payment_code": "CASH"
+   }
+]
+```
+
+
+### Order Microservice database:
+
+Table Order Position:
+ - User ID
+ - Position Id
+- Order id
+- Product Id
+- Quantity
+- Position Price (Quantity * Product Price)
+
+Table Order :
+- User ID
+- Order ID
+- Status Code (enum, see below)
+- Payment Method Code (enum of method, let’s start from cash only)
+
+Order Status codes:
+- 1 Created
+- 2 Delivered
+- 3 Cancelled
+
+Additional check (1):
+When user removes an order, status must be 3
+When user cancel - 1
+When user redo - any status
+
+
+Additional check (2):
+When user adds to cart and removes from - increase and decrease quantity from product table
+
+User actions from listing to create order
+1 Add to cart from listing
+2 Go to cart page (with info about cart positions)
+3 Go to order page (with info about payment method and delivery info)
+4 Go to created order page info (with positions, order info and order status)
+
 ## CI/CD Pipeline (using Jenkins)
 
-The whole process of the project has been automated using Jenkins (accessible at http://164.90.178.137:8080). The process consists of the following stages:
+The whole process of the project has been automated using Jenkins. The process consists of the following stages:
 
 -  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
--  Unit Tests: the unit-tests (consisting of frontend-tests and backend-tests for each and every microservice) are performed at the build-server.
+-  Setup Credentials: all MongoDB credentials and JWT secret are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
+-  Clean Workspace: all old quality-check report-tasks are removed from the workspace.
+-  SonarQube Analysis: this stage is performed for each and every backend microservice as well as frontend.
+   +  If any of the analyses has been failed, the Post Actions stage will be triggered (Quality Gate, Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
+-  Quality Gate: this stage is performed for each and every backend microservice as well as frontend.
+   +  If any of the quality-gates has been failed, the Post Actions stage will be triggered (Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
+-  Frontend Unit Tests: the unit-tests for frontend are performed at the build-server.
    +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
 -  Build: once all the unit-tests have been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server.
    +  If all the builds are passed, the produced Docker images will then be pushed to a Docker Hub and are ready to be deployed.
@@ -112,9 +299,14 @@ The whole process of the project has been automated using Jenkins (accessible at
    +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. 
 -  Post Actions:
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
-  
 
-The application is then accessible via https://164.92.252.125:4200
+## Dashboard URLs
+
+Jenkins: http://164.90.178.137:8080
+
+SonarQube Server: http://209.38.204.141:9000
+
+Application: https://164.92.252.125:4200
 
 ## Installation
 
@@ -140,7 +332,7 @@ Contributions are welcome. Please open an issue or submit a pull request if you 
 
 ## Authors
 
-- [Danglam] (https://github.com/danglam88)
-- [Ashley] (https://github.com/hgwtra)
-- [Iuliia] (https://github.com/ManWhoSoldTheW0rld)
-- [Nafi] (https://github.com/NafiRanta)
+- [Danglam](https://github.com/danglam88)
+- [Ashley](https://github.com/hgwtra)
+- [Iuliia](https://github.com/ManWhoSoldTheW0rld)
+- [Nafi](https://github.com/NafiRanta)

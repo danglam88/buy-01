@@ -41,7 +41,9 @@ import { ProductService } from './services/product.service';
 import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from './services/validation.service';
+import { ErrorService } from './services/error.service';
 import { SearchComponent } from './app-home/search/search.component';
+import { FilterComponent } from './app-home/product-listing/filter/filter.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +67,8 @@ import { SearchComponent } from './app-home/search/search.component';
     MediaListingComponent,
     MediaComponent,
     HighlightDirective,
-    SearchComponent
+    SearchComponent,
+    FilterComponent
   ],
   imports: [
     BrowserModule,
@@ -82,7 +85,15 @@ import { SearchComponent } from './app-home/search/search.component';
     }),
    
   ],
-  providers: [AuthenticateGuard, AuthenticationService, UserService, ProductService, MediaService, EncryptionService, ValidationService],
+  providers: [
+    AuthenticateGuard, 
+    AuthenticationService, 
+    EncryptionService, 
+    ErrorService,
+    MediaService, 
+    ProductService, 
+    UserService, 
+    ValidationService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

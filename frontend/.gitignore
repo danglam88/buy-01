@@ -41,9 +41,6 @@ typings
 .DS_Store
 Thumbs.db
 
-# npm packages
-package-lock.json
-
 # .scannerwork
 .scannerwork
 scr/.scannerwork

@@ -24,16 +24,6 @@ RUN mvn -f ./media/pom.xml clean package -DskipTests
 # Stage 2: Create the final image
 FROM openjdk:17-slim
 
-# Accept build arguments
-ARG MEDIA_DB_CREDENTIALS_USERNAME
-ARG MEDIA_DB_CREDENTIALS_PASSWORD
-ARG JWT_SECRET
-
-# Set arguments as environment variables for runtime
-ENV MEDIA_DB_CREDENTIALS_USERNAME=${MEDIA_DB_CREDENTIALS_USERNAME}
-ENV MEDIA_DB_CREDENTIALS_PASSWORD=${MEDIA_DB_CREDENTIALS_PASSWORD}
-ENV JWT_SECRET=${JWT_SECRET}
-
 WORKDIR /app
 
 # Install curl for health checking
@@ -47,4 +37,4 @@ CMD ["java", "-jar", "media.jar"]
 
 # Health check using Spring Boot Actuator
 HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=30s \
-  CMD curl -k -f https://localhost:8445/actuator/health || exit 1
+  CMD curl -f http://localhost:8082/actuator/health || exit 1

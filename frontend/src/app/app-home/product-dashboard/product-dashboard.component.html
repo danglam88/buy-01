@@ -10,6 +10,7 @@
       aria-label="Select page"
       #paginator>
     </mat-paginator>
+    <app-search (searchTextChanged)="setSearchText($event)"></app-search>
   </div>
   <!--Products thumnail area-->
   <p *ngIf="(sellerProducts$ | async)?.length == 0">You have no products!</p>
@@ -17,6 +18,7 @@
     <ng-container *ngFor="let product of sellerProducts.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
       <app-product  
         [product]="product" 
+        [searchText] = "searchText"
         (click)="openProductDetail(product)"
       >
       </app-product>
@@ -24,4 +26,3 @@
   </ng-container>
 </div>
 <app-footer></app-footer>
-

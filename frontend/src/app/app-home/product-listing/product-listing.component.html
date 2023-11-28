@@ -9,6 +9,9 @@
       #paginator>
     </mat-paginator>
     <app-search (searchTextChanged)="setSearchText($event)"></app-search>
+    <app-filter
+      (selectedFilterRadioButtonChanged)="onFilterChanged($event)">
+    </app-filter>
   </div>
  
   <p *ngIf="(allProducts$ | async)?.length == 0">There are no products!</p> 
@@ -17,7 +20,7 @@
     <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
       <app-product  
         [product]="product" 
-        *ngIf="searchText === '' || product.name.toLowerCase().includes(searchText.toLowerCase())"
+        [searchText]="searchText"
         (click)="openProductDetail(product)"
       >
       </app-product>

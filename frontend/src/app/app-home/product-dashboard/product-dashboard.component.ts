@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -16,6 +16,8 @@ import { catchError, map } from 'rxjs/operators';
 export class ProductDashboardComponent implements OnInit {
   selectedProduct: Product;
   sellerProducts$: Observable<any>;
+  @Input() product: Product;
+  @Input() searchText: string[] = [];
   
   constructor(
     private productService: ProductService,
@@ -76,4 +78,7 @@ export class ProductDashboardComponent implements OnInit {
       },
     });
   }
+  setSearchText(value: string[]){
+    this.searchText = value;
+ }
 }

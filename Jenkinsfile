@@ -32,53 +32,121 @@ pipeline {
                         env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
+                        env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
                 }
             }
         }
 
-        stage('Unit Tests') {
-            parallel {
-                stage('Frontend Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-                    steps {
-                        script {
-                            env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
-                        }
-                        sh '''
-                        cd frontend
-                        npm install
-                        ng test --watch=false --browsers ChromeHeadless
-                        '''
-                    }
+        stage('Clean Workspace') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh 'find . -name "report-task.txt" -exec rm {} +'
                 }
-                stage('Media-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-                    steps {
-                        sh '''
-                        cd backend/media
-                        mvn test
-                        '''
-                    }
+            }
+        }
+
+        stage('SonarQube Analysis for User-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                echo "SonarQube analysis for User-Microservice has been started."
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/user
+                    mvn clean verify sonar:sonar
+                    """
                 }
-                stage('Product-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-                    steps {
-                        sh '''
-                        cd backend/product
-                        mvn test
-                        '''
-                    }
+                echo "SonarQube analysis for User-Microservice has been completed."
+            }
+        }
+
+        stage("Quality Gate for User-Microservice") {
+            agent { label 'build-agent' }
+            steps {
+                waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
+                echo "Quality Gate for User-Microservice has been completed."
+            }
+        }
+
+        stage('SonarQube Analysis for Product-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                echo "SonarQube analysis for Product-Microservice has been started."
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/product
+                    mvn clean verify sonar:sonar
+                    """
                 }
-                stage('User-Microservice Tests') {
-                    agent { label 'build-agent' } // This stage will be executed on the 'build' agent
-                    steps {
-                        sh '''
-                        cd backend/user
-                        mvn test
-                        '''
-                    }
+                echo "SonarQube analysis for Product-Microservice has been completed."
+            }
+        }
+
+        stage("Quality Gate for Product-Microservice") {
+            agent { label 'build-agent' }
+            steps {
+                waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
+                echo "Quality Gate for Product-Microservice has been completed."
+            }
+        }
+
+        stage('SonarQube Analysis for Media-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                echo "SonarQube analysis for Media-Microservice has been started."
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/media
+                    mvn clean verify sonar:sonar
+                    """
                 }
+                echo "SonarQube analysis for Media-Microservice has been completed."
+            }
+        }
+
+        stage("Quality Gate for Media-Microservice") {
+            agent { label 'build-agent' }
+            steps {
+                waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
+                echo "Quality Gate for Media-Microservice has been completed."
+            }
+        }
+
+        stage('SonarQube Analysis for Frontend') {
+            agent { label 'build-agent' }
+            steps {
+                echo "SonarQube analysis for Frontend has been started."
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd frontend
+                    npm install
+                    sonar-scanner
+                    """
+                }
+                echo "SonarQube analysis for Frontend has been completed."
+            }
+        }
+
+        stage("Quality Gate for Frontend") {
+            agent { label 'build-agent' }
+            steps {
+                waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
+                echo "Quality Gate for Frontend has been completed."
+            }
+        }
+
+        stage('Frontend Unit Tests') {
+            agent { label 'build-agent' }
+            steps {
+                sh '''
+                cd frontend
+                ng test --watch=false --browsers ChromeHeadless
+                '''
             }
         }
 
@@ -101,7 +169,7 @@ pipeline {
                     maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                         // Execute the build commands
                         sh '''
-                        docker system prune -a -f
+                        docker system prune -a -f --volumes
 
                         cd backend
 
@@ -134,7 +202,7 @@ pipeline {
                         docker tag frontend $FRONTEND_IMAGE
                         docker push $FRONTEND_IMAGE
 
-                        docker system prune -a -f
+                        docker system prune -a -f --volumes
                         '''
                     }
                 }
@@ -170,7 +238,7 @@ pipeline {
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker rm -f $(docker ps -aq)
                             fi
-                            docker system prune -a -f
+                            docker system prune -a -f --volumes
 
                             docker pull $USER_MICROSERVICE_IMAGE
                             docker pull $PRODUCT_MICROSERVICE_IMAGE
@@ -212,7 +280,7 @@ pipeline {
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker rm -f $(docker ps -aq)
                             fi
-                            docker system prune -a -f
+                            docker system prune -a -f --volumes
 
                             cp ~/backup/*.tar ~/
 

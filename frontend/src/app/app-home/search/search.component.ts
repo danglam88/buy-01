@@ -7,18 +7,21 @@ import { Component, EventEmitter, Output, ViewChild, ElementRef } from '@angular
 })
 export class SearchComponent {
   
-  searchText: string = '';
+  searchText: string[] = [];
 
 @Output()
- searchTextChanged: EventEmitter<string> = new EventEmitter<string>()
+ searchTextChanged: EventEmitter<string[]> = new EventEmitter<string[]>()
 
  @ViewChild('searchInput') searchInputEl: ElementRef;
 
   updateSearchText() {
-    //this.searchText = event.target.value;
-    this.searchText = this.searchInputEl.nativeElement.value;
+    this.searchText = this.searchInputEl.nativeElement.value.split(' ').filter((word: string) => word.trim() != '');
     this.searchTextChanged.emit(this.searchText);
-    console.log("search text: ", this.searchText)
+  }
+
+  cancelSearch(item: string) {
+    this.searchText = this.searchText.filter((word: string) => word != item);
+    this.searchTextChanged.emit(this.searchText);
   }
 
 }

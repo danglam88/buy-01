@@ -3,6 +3,7 @@ services:
 
   user-microservice:
     image: danglamgritlab/user-microservice:latest
+    container_name: user-microservice-container
     ports:
       - "8443:8443"
     networks:
@@ -10,10 +11,17 @@ services:
     depends_on:
       - kafka
       - user-mongodb
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8443/actuator/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   product-microservice:
     image: danglamgritlab/product-microservice:latest
+    container_name: product-microservice-container
     ports:
       - "8444:8444"
     networks:
@@ -21,10 +29,17 @@ services:
     depends_on:
       - kafka
       - product-mongodb
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8444/actuator/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   media-microservice:
     image: danglamgritlab/media-microservice:latest
+    container_name: media-microservice-container
     ports:
       - "8445:8445"
     networks:
@@ -32,18 +47,32 @@ services:
     depends_on:
       - kafka
       - media-mongodb
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8445/actuator/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   frontend:
     image: danglamgritlab/frontend:latest
+    container_name: frontend-container
     ports:
       - "4200:4200"
     networks:
       - buy01-network
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:4200"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   user-mongodb:
     image: mongo:latest
+    container_name: user-mongodb-container
     ports:
       - "27018:27017"
     networks:
@@ -53,10 +82,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${USER_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${USER_DB_CREDENTIALS_PASSWORD}
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   product-mongodb:
     image: mongo:latest
+    container_name: product-mongodb-container
     ports:
       - "27019:27017"
     networks:
@@ -66,10 +102,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${PRODUCT_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${PRODUCT_DB_CREDENTIALS_PASSWORD}
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   media-mongodb:
     image: mongo:latest
+    container_name: media-mongodb-container
     ports:
       - "27020:27017"
     networks:
@@ -79,10 +122,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MEDIA_DB_CREDENTIALS_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MEDIA_DB_CREDENTIALS_PASSWORD}
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka-container
     ports:
       - "9092:9092"
     networks:
@@ -94,10 +144,17 @@ services:
       KAFKA_MESSAGE_MAX_BYTES: '10000000'
     depends_on:
       - zookeeper
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server=localhost:9092"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-container
     ports:
       - "2181:2181"
     networks:
@@ -105,7 +162,13 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
 
 volumes:
   user-mongo-volume:
