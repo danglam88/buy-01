@@ -164,10 +164,7 @@ for getting current cart positions for cart page with empty body and response :
 for create an order with json body:
  ```json
 {   
-    "payment_code": "CASH",
-    "zip_code": "XXX",
-    "city" : "XXX",
-    "address" : "XXX"
+    "payment_code": "CASH"
 }
 ```
 
@@ -175,7 +172,7 @@ and response:
 - HTTP STATUS 400 with body:
  ```json
 {
-  "message": "Invalid zip code"
+  "message": "Invalid payment code"
 }
 ```
 - HTTP STATUS 200 with body:
@@ -212,10 +209,7 @@ info about the order with no request body and response body:
          "position_price" : "XXXX"
       }
    ],
-   "payment_code": "CASH",
-   "zip_code": "XXX",
-   "city" : "XXX",
-   "address" : "XXX"
+   "payment_code": "CASH"
 }
 ```
 
@@ -240,10 +234,7 @@ info about seller's orders for seller and client order history for client with n
             "position_price" : "XXXX"
          }
       ],
-      "payment_code": "CASH",
-      "zip_code": "XXX",
-      "city" : "XXX",
-      "address" : "XXX"
+      "payment_code": "CASH"
    }
 ]
 ```
@@ -264,24 +255,15 @@ Table Order :
 - Order ID
 - Status Code (enum, see below)
 - Payment Method Code (enum of method, let’s start from cash only)
- Delivery Info (up to us, it is gonna be in the frontend form as well in the order section)
- Could be:
-- Zip Code
-- City
-- State
-- Address
-- Phone number
 
 Order Status codes:
 - 1 Created
-- 2 Packing
-- 3 Delivering
-- 4 Delivered
-- 5 Cancelled
+- 2 Delivered
+- 3 Cancelled
 
 Additional check (1):
-When user removes an order, status must be 5
-When user cancel - 1 or 2
+When user removes an order, status must be 3
+When user cancel - 1
 When user redo - any status
 
 
