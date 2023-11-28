@@ -36,8 +36,15 @@ ENV JWT_SECRET=${JWT_SECRET}
 
 WORKDIR /app
 
+# Install curl for health checking
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Copy only the built artifact from the builder stage
 COPY --from=builder /app/product/target/product.jar ./
 
 # Specify the startup command
 CMD ["java", "-jar", "product.jar"]
+
+# Health check using Spring Boot Actuator
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=30s \
+  CMD curl -k -f https://localhost:8444/actuator/health || exit 1
