@@ -216,7 +216,6 @@ export class ProductDetailComponent implements OnInit {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
               this.mediaService.mediaDeleted.emit(true);
-             // this.getProductImages();
               this.toastr.success('Image deleted');
             },
             error: (error) => {
