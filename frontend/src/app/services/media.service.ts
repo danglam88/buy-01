@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
