@@ -36,9 +36,7 @@ export class UserDashboardComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private validationService: ValidationService 
-  ) {
-    this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
-  }
+  ) {  }
 
   ngOnInit(): void {
     this.userProfileForm = this.builder.group({
@@ -138,9 +136,18 @@ export class UserDashboardComponent implements OnInit {
 
   // Remove user avatar
   removeAvatar(): void {
-    this.updateUserInformation('removeAvatar');
-    this.avatar = this.defaultAvatar;
-    this.cancelUploadImage();
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        confirmationText: 'Delete this avatar?' 
+      }
+    });
+    dialogRef.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.updateUserInformation('removeAvatar');
+        this.avatar = this.defaultAvatar;
+        this.cancelUploadImage();
+      }
+    });
   }
 
   // Common method to update user information. Add the field to formData and call the updateUser method

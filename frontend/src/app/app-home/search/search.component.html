@@ -1,0 +1,15 @@
+<div class="search--product">
+    <input class="search-product-input" #searchInput>
+    <button class="btn btn-search" (click)="updateSearchText()">Search</button>
+    <div class="search-result-for" *ngIf="searchText.length > 0">
+        <p><strong>Search result for:</strong></p>
+        <div *ngFor="let item of searchText" class="search-item-results">
+            <div class="search-item">
+                {{ item }}
+            </div>
+            <div class="search-item-delete">
+                <mat-icon class="highlight-off-icon" (click)="cancelSearch(item)">highlight_off</mat-icon>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,16 +1,16 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MediaService {
-  productMediaUpdated = new EventEmitter<any>();
-  productMediaDeleted = new EventEmitter<any>();
+  mediaUpload = new EventEmitter<any>();
+  mediaDeleted = new EventEmitter<any>();
 
   constructor(
     private httpClient: HttpClient,
