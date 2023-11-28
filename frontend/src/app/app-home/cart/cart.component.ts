@@ -32,5 +32,10 @@ export class CartComponent implements OnInit {
     this.cartService.changeQuantity(cartItem.product.id, quantity);
     this.setCart();
   }
+
+  getQuantityOptions(quantity: number): number[] {
+    return new Array(quantity).fill(0).map((_, index) => index + 1);
+  }
+
   
 }

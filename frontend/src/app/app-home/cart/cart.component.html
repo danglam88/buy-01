@@ -1,85 +1,124 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
 <app-header></app-header>
 
 <section class="shoppingcart-container">
-    <!-- IF THERE IS NO PRODUCTS -->
-    <!-- <div *ngIf="products.length === 0" class="empty-product">
-        <h1>There are no products in your cart.</h1>
-        <button routerLink="../home">Shopping now</button>
-      </div> -->
-      <ul>
-        <li *ngFor="let cartItem of cart.items">
-            <div>
-              {{cartItem.product.name}}
-            </div>
-            <select #quantitySelect (change)="changeQuantity(cartItem, quantitySelect.value)">
-              <option>1</option> <option>1</option> 
-              <option>2</option> 
-              <option>3</option> 
-              <option>4</option> 
+  <!-- IF THERE IS NO PRODUCTS -->
+  <!-- <div *ngIf="cart.items.length === 0" class="empty-product">
+    <a class="alert">There are no products in your cart.</a>
+    <button class="shopping-btn" routerLink="../home">
+      <div class="pretext">Shop Now</div>
+    </button>
+  </div> -->
+  <!-- IF THERE IS PRODUCTS -->
+  <div class="list" *ngIf="cart.items.length !== 0">
+    <div class="heading">
+      <a class="">Your Cart</a>
+    </div>
 
-              <!-- loop here to max quantity -->
-            </select>
-            <div>
-              {{cartItem.price | currency}}
-            </div>
+    <div class="main">
+      <span class="customer">
+        <span>Products</span>
+      </span>
+      <span class="quantity">
+        <span>Quantity</span>
+      </span>
+      <span class="status">
+        <span>Price</span>
+      </span>
+    </div>
 
-        </li>
-      </ul>
-    
+    <div class="items">
+      <div class="item" *ngFor="let cartItem of cart.items">
+        <span>{{ cartItem.product.name }}</span>
+        <span>
+          <select
+            #quantitySelect
+            (change)="changeQuantity(cartItem, quantitySelect.value)"
+          >
+            <option
+              *ngFor="let _ of getQuantityOptions(cartItem.product.quantity)"
+            >
+              {{ _ }}
+            </option>
+          </select>
+        </span>
+        <div>
+          {{ cartItem.price | currency }}
+        </div>
+        <div>
+          <button class="remove-button" (click)="removeFromCart(cartItem)">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="showing">
+        <span>You have {{ cart.items.length }} products in your cart</span>
+      </div>
+      <div class="total-price">
+        <span>Total: {{ cart.totalPrice | currency }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shopping-cart">
+    <div>
+      <div class="column-labels">
+        <label class="product-details">Product</label>
+        <label class="product-price">Price</label>
+        <label class="product-quantity">Quantity</label>
+
+        <label class="product-line-price">Total</label>
+      </div>
+
+      <div class="product">
+        <div class="product-details">
+          <div class="product-title">Dingo Dog Bones</div>
+        </div>
+        <div class="product-price">12.99</div>
+        <div class="product-quantity">
+          <input class="quantity-input" type="number" value="1" min="1" />
+        </div>
+ 
+        <div class="product-line-price">25.98</div>
+      </div>
+
+      <div class="product">
+        <div class="product-details">
+          <div class="product-title">Nutro™ Adult Lamb and Rice Dog Food</div>
+        </div>
+        <div class="product-price">45.99</div>
+        <div class="product-quantity">
+         <input class="quantity-input" type="number" value="1" min="1" />
+        </div>
+
+        <div class="product-line-price">45.99</div>
+      </div>
+
+      <div class="totals">
+        <div class="totals-item">
+          <label>Subtotal</label>
+          <div class="totals-value" id="cart-subtotal">71.97</div>
+        </div>
+        <div class="totals-item">
+          <label>Tax (5%)</label>
+          <div class="totals-value" id="cart-tax">3.60</div>
+        </div>
+        <div class="totals-item">
+          <label>Shipping</label>
+          <div class="totals-value" id="cart-shipping">15.00</div>
+        </div>
+        <div class="totals-item totals-item-total">
+          <label>Grand Total</label>
+          <div class="totals-value" id="cart-total">90.57</div>
+        </div>
+      </div>
+
+      <button class="checkout">Checkout</button>
+    </div>
+  </div>
 </section>
-
-  <!-- Product List -->
-  <!-- <section class="container"> -->
-    <!-- <div ngIf="products.length !== 0">
-      <ul class="products">
-      <li class="row" v-for="(product, index) in products">
-        <div class="col left">
-          <div class="thumbnail">
-            <a href="#">
-             i
-            </a>
-          </div>
-          <div class="detail">
-            <div class="name"><a href="#"></a></div>
-            <div class="description"></div>
-            <div class="price"></div>
-          </div>
-        </div>
-
-        <div class="col right">
-          <div class="quantity">
-            <input type="number" class="quantity" />
-          </div>
-          
-          <div class="remove">
-           i
-          </div>
-        </div>
-      </li>
-    </ul>
-    </div> -->
-
-  <!-- </section> -->
-  <!-- End Product List -->
-  
-  <!-- Summary -->
-  <!-- <section class="container" v-if="products.length > 0">
-    <div class="promotion">
-      <label for="promo-code">Have A Promo Code?</label>
-      <input type="text" id="promo-code" /> <button type="button"></button>
-    </div>
-
-    <div class="summary">
-      <ul>
-        <li>Subtotal</li>
-        <li v-if="discount > 0">Discount</li>
-        <li class="total">Total</li>
-      </ul>
-    </div>
-
-    <div class="checkout">
-      <button type="button">Check Out</button>
-    </div>
-  </section> -->
-  <!-- End Summary -->

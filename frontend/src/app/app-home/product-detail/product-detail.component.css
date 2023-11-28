@@ -311,7 +311,7 @@ right: -11px;
 }
 
 .fa-cart-plus{
-  background:#016dcb;
+  background:#778da9;
 }
 
 
@@ -331,7 +331,7 @@ right: -11px;
   border:none;
   font-size:1.2em;
   position:relative;
-  background:#016dcb;
+  background:#778da9;
   cursor:pointer;
   height:2em;
   width:10em;
@@ -344,7 +344,7 @@ right: -11px;
 }
 .pretext{
   color:#fff;
-  background:#016dcb;
+  background:#778da9;
   position:absolute;
   top:0;
   left:0;

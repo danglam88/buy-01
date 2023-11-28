@@ -1,323 +1,300 @@
-* {
-    box-sizing: border-box;
-    font-family: Poppins, sans-serif !important;
+.alert {
+  font-size: 20px;
+  position: inherit;
+  display: flex;
+  justify-content: center;
+  margin-top: 80px;
+}
+
+.shopping-btn {
+  display: block;
+  padding: 1.2em 1em 1.2em 1em;
+  border-radius: 20px;
+  border: none;
+  font-size: 1.2em;
+  position: relative;
+  background: #778da9;
+  cursor: pointer;
+  height: 2em;
+  width: 10em;
+  overflow: hidden;
+  transition: transform 0.1s;
+  z-index: 1;
+  margin: auto;
+  margin-top: 35px;
+}
+.pretext:hover {
+  transform: scale(1.1);
+}
+
+.pretext {
+  color: #fff;
+  background: #778da9;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Global "table" column settings */
+
+.product-details {
+  float: left;
+  width: 40%;
+}
+.product-price {
+  justify-items: center !important;
+  margin: auto;
+  width: 10%;
+  text-align: right;
+}
+.product-quantity {
+  float: left;
+  width: 10%;
+  text-align: right;
+}
+
+.product-line-price {
+  float: left;
+  width: 10%;
+  text-align: right;
+}
+
+/* This is used as the traditional .clearfix class */
+.group:before,
+.group:after {
+  content: "";
+  display: table;
+}
+.group:after {
+  clear: both;
+}
+.group {
+  zoom: 1;
+}
+
+/* Apply clearfix in a few places */
+.column-labels,
+.product,
+.totals-item,
+.product-removal,
+.product-quantity {
+  position: relative;
+  display: flex;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.column-labels {
+  display: flex;
+  margin-bottom: 25px;
+  font-size: large;
+  background-color: beige;
+  padding: 15px;
+}
+
+.shopping-cart {
+  margin-top: 100px !important;
+  margin: auto;
+  justify-content: space-around;
+}
+
+/* Apply dollar signs */
+.product .product-price:before,
+.product .product-line-price:before,
+.totals-value:before {
+  content: "$";
+}
+
+/* Body/Header stuff */
+body {
+  padding: 0px 30px 30px 20px;
+  font-weight: 100;
+}
+
+h1 {
+  font-weight: 100;
+}
+
+label {
+  color: red;
+}
+
+.shopping-cart {
+  margin-top: -45px;
+}
+
+/* Column headers */
+.column-labels {
+  label {
+    padding-bottom: 15px;
+    margin-bottom: 15px;
   }
 
-  body {
-    margin: 20px 0;
-    padding: 0;
-    overflow: scroll;
+  .product-image,
+  .product-details,
+  .product-removal {
+    text-indent: -9999px;
   }
-  
-  .empty-product {
-    margin-top: 150px;
+}
+
+/* Product entries */
+.product {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid red;
+
+  .product-image {
     text-align: center;
-  }
-  
-  .empty-product > button {
-    font-size: 1.3rem;
-    padding: 10px 30px;
-    border-radius: 5px;
+    img {
+      width: 100px;
+    }
   }
 
-    
-  button {
-    background-color: #16cc9b;
-    border: 2px solid #16cc9b;
-    color: #ffffff;
-    transition: all 0.25s linear;
-    cursor: pointer;
-  }
-  
-  button::after {
-    position: relative;
-    right: 0;
-    content: " \276f";
-    transition: all 0.15s linear;
-  }
-  
-  button:hover {
-    background-color: #f58551;
-    border-color: #f58551;
-  }
-  
-  button:hover::after {
-    right: -5px;
-  }
-  
-  button:focus {
-    outline: none;
-  }
-  
-
-  /* NOT WORKING YET BELOW THIS LINE */
-  img {
-    max-width: 100%;
-    vertical-align: middle;
-    border-radius: 4px;
-  }
-  
-  a {
-    text-decoration: none;
-    color: #333333;
-  }
-  
-  a:hover {
-    color: #f58551;
+  .product-details {
+    .product-title {
+      margin-right: 20px;
+    }
   }
 
-  
-  ul {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
+  .product-quantity {
+    width: max-content;
   }
-  
-  input {
-    transition: all 0.25s linear;
-  }
-  
 
-  
-  input {
-    outline: none;
+  .remove-product {
+    border: 0;
+    padding: 4px 8px;
+    background-color: #c66;
+    color: #fff;
+
+    font-size: 12px;
+    border-radius: 3px;
   }
-  
-  .container {
-    width: 90%;
-    margin: 0 auto;
-    overflow: auto;
+
+  .remove-product:hover {
+    background-color: #a44;
   }
-  
- 
-  
-  /* --- PRODUCT LIST --- */
-  .products {
-    border-top: 1px solid #ddd;
-  }
-  
-  .products > li {
-    padding: 1rem 0;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .row {
-    position: relative;
-    overflow: auto;
+}
+
+/* Totals section */
+.totals {
+  .totals-item {
+    float: right;
+    clear: both;
     width: 100%;
-  }
-  
-  .col,
-  .quantity,
-  .remove {
-    float: left;
-  }
-  
-  .col.left {
-    width: 70%;
-  }
-  
-  .col.right {
-    width: 30%;
-    position: absolute;
-    right: 0;
-    top: calc(50% - 30px);
-  }
-  
-  .detail {
-    padding: 0 0.5rem;
-    line-height: 2.2rem;
-  }
-  
-  .detail .name {
-    font-size: 1.2rem;
-  }
-  
-  .detail .description {
-    color: #7d7d7d;
-    font-size: 1rem;
-  }
-  
-  .detail .price {
-    font-size: 1.5rem;
-  }
-  
-  .quantity,
-  .remove {
-    width: 50%;
-    text-align: center;
-  }
-  
-  .remove svg {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .quantity > input {
-    display: inline-block;
-    width: 60px;
-    height: 60px;
-    position: relative;
-    left: calc(50% - 30px);
-    background: #fff;
-    border: 2px solid #ddd;
-    color: #7f7f7f;
-    text-align: center;
-    font: 600 1.5rem Helvetica, Arial, sans-serif;
-  }
-  
-  .quantity > input:hover,
-  .quantity > input:focus {
-    border-color: #f58551;
-  }
-  
-  .close {
-    fill: #7d7d7d;
-    transition: color 150ms linear, background-color 150ms linear,
-      fill 150ms linear, 150ms opacity linear;
-    cursor: pointer;
-  }
-  
-  .close:hover {
-    fill: #f58551;
-  }
-  
-  /* --- SUMMARY --- */
-  .promotion,
-  .summary,
-  .checkout {
-    float: left;
-    width: 100%;
-    margin-top: 1.5rem;
-  }
-  
-  .promotion > label {
-    float: left;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  .promotion > input {
-    float: left;
-    width: 80%;
-    font-size: 1rem;
-    padding: 0.5rem 0 0.5rem 1.8rem;
-    border: 2px solid #16cc9b;
-    border-radius: 2rem 0 0 2rem;
-  }
-  
-  .promotion:hover > input {
-    border-color: #f58551;
-  }
-  
-  .promotion > button {
-    float: left;
-    width: 20%;
-    height: 2.4rem;
-    border-radius: 0 2rem 2rem 0;
-  }
-  
-  .promotion:hover > button {
-    border-color: #f58551;
-    background-color: #f58551;
-  }
-  
-  .promotion > button::after {
-    content: "\276f";
-    font-size: 1rem;
-  }
-  
-  .summary {
-    font-size: 1.2rem;
-    text-align: right;
-  }
-  
-  .summary ul li {
-    padding: 0.5rem 0;
-  }
-  
-  .summary ul li span {
-    display: inline-block;
-    width: 30%;
-  }
-  
-  .summary ul li.total {
-    font-weight: bold;
-  }
-  
-  .checkout {
-    text-align: right;
-  }
-  
-  .checkout > button {
-    font-size: 1.2rem;
-    padding: 0.8rem 2.8rem;
-    border-radius: 1.5rem;
-  }
-  
+    margin-bottom: 10px;
 
-  
-  /* --- SMALL SCREEN --- */
-  @media all and (max-width: 599px) {
-    .thumbnail img {
-      display: none;
-    }
-  
-    .quantity > input {
-      width: 40px;
-      height: 40px;
-      left: calc(50% - 20px);
-    }
-  
-    .remove svg {
-      width: 40px;
-      height: 40px;
-    }
-  }
-  
-  /* --- MEDIUM & LARGE SCREEN --- */
-  @media all and (min-width: 600px) {
-    html {
-      font-size: 14px;
-    }
-  
-    .container {
-      width: 75%;
-      max-width: 960px;
-    }
-  
-    .thumbnail,
-    .detail {
+    label {
       float: left;
+      clear: both;
+      width: 79%;
+      text-align: right;
     }
-  
-    .thumbnail {
-      width: 35%;
-    }
-  
-    .detail {
-      width: 65%;
-    }
-  
-    .promotion,
-    .summary {
-      width: 50%;
-    }
-  
-    .checkout {
-      width: 100%;
-    }
-  
-    .checkout,
-    .summary {
+
+    .totals-value {
+      float: right;
+      width: 21%;
       text-align: right;
     }
   }
-  
-  /* --- LARGE SCREEN --- */
-  @media all and (min-width: 992px) {
-    html {
-      font-size: 16px;
+}
+
+.checkout {
+  float: right;
+  border: 0;
+  margin-top: 20px;
+  padding: 6px 25px;
+  background-color: #6b6;
+  color: #fff;
+  font-size: 25px;
+  border-radius: 3px;
+}
+
+.checkout:hover {
+  background-color: #494;
+}
+
+/* Make adjustments for tablet */
+@media screen and (max-width: 650px) {
+  .shopping-cart {
+    margin: 0;
+    padding-top: 20px;
+    border-top: 1px solid red;
+  }
+
+  .column-labels {
+    display: none;
+  }
+
+  .product-image {
+    float: right;
+    width: auto;
+    img {
+      margin: 0 0 10px 10px;
     }
   }
-  
+
+  .product-details {
+    float: none;
+    margin-bottom: 10px;
+    width: auto;
+  }
+
+  .product-price {
+    clear: both;
+    width: 70px;
+  }
+
+  .product-quantity {
+    width: 100px;
+    
+  }
+
+
+  .product-quantity:before {
+    content: "x";
+  }
+
+  .product-removal {
+    width: auto;
+  }
+
+  .product-line-price {
+    float: right;
+    width: 70px;
+  }
+}
+
+/* Make more adjustments for phone */
+@media screen and (max-width: 350px) {
+  .product-removal {
+    float: right;
+  }
+
+  .product-line-price {
+    float: right;
+    clear: left;
+    width: auto;
+    margin-top: 10px;
+  }
+
+  .product .product-line-price:before {
+    content: "Item Total: $";
+  }
+
+  .totals {
+    .totals-item {
+      label {
+        width: 60%;
+      }
+
+      .totals-value {
+        width: 40%;
+      }
+    }
+  }
+}
