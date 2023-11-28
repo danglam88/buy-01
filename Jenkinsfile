@@ -1,4 +1,7 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
+def expectedContainers = ['user-microservice-container', 'product-microservice-container', 'media-microservice-container',
+                        'user-mongodb-container', 'product-mongodb-container', 'media-mongodb-container',
+                        'frontend-container', 'kafka-container', 'zookeeper-container']
 
 pipeline {
     agent any // We define the specific agents within each stage
@@ -236,6 +239,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
 
                             if [ "$(docker ps -aq)" != "" ]; then
+                                docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
                                 docker rm -f $(docker ps -aq)
                             fi
                             docker system prune -a -f --volumes
@@ -246,10 +250,24 @@ pipeline {
                             docker pull $FRONTEND_IMAGE
 
                             docker-compose up -d
+                            '''
 
-                            if [ "$(docker ps -q | wc -l)" != "9" ]; then
-                                exit 1
-                            fi
+                            def allContainersRunning = true
+                            for (container in expectedContainers) {
+                                def status = sh(script: "docker inspect --format='{{.State.Status}}' ${container}", returnStdout: true).trim()
+                                if (status != 'running') {
+                                    echo "Container ${container} is not running. Status: ${status}"
+                                    allContainersRunning = false
+                                    break
+                                }
+                            }
+
+                            if (!allContainersRunning) {
+                                error("Not all containers are running as expected.")
+                            }
+                            
+                            sh '''
+                            echo "Deployment passed. Executing backup."
 
                             docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
                             docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
@@ -268,6 +286,7 @@ pipeline {
                         maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                             // If deploy fails, the rollback commands are executed
                             sh '''
+                            echo "Error: ${err.getMessage()}"
                             echo "Deployment failed. Executing rollback."
                             
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
@@ -278,6 +297,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
 
                             if [ "$(docker ps -aq)" != "" ]; then
+                                docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
                                 docker rm -f $(docker ps -aq)
                             fi
                             docker system prune -a -f --volumes
