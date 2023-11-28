@@ -10,6 +10,7 @@ import { ProductDetailComponent } from '../product-detail/product-detail.compone
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { ProductComponent } from '../product-listing/product/product.component';
+import { SearchComponent } from '../search/search.component';
 
 import { ProductService } from 'src/app/services/product.service';
 import { ValidationService } from 'src/app/services/validation.service';
@@ -45,7 +46,8 @@ describe('ProductDashboardComponent', () => {
         ProductDetailComponent, 
         HeaderComponent,
         FooterComponent,
-        ProductComponent       
+        ProductComponent,
+        SearchComponent       
       ],
       providers: [
         ValidationService,

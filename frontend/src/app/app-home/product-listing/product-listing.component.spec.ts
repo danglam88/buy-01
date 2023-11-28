@@ -16,6 +16,7 @@ import { ProductListingComponent } from './product-listing.component';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { SearchComponent } from '../search/search.component';
+import { FilterComponent } from './filter/filter.component';
 
 class ToastrServiceStub {
   error(message: string) {}
@@ -40,7 +41,7 @@ describe('ProductListingComponent', () => {
   beforeEach(() => {
     const productServiceSpy = jasmine.createSpyObj('ProductService', ['getAllProductsInfo']);
     TestBed.configureTestingModule({
-      declarations: [ProductListingComponent, SearchComponent, HeaderComponent, FooterComponent],
+      declarations: [ProductListingComponent, SearchComponent, HeaderComponent, FooterComponent, FilterComponent],
       providers: [
         ErrorService,
         { provide: ProductService, useValue: productServiceSpy },
@@ -71,7 +72,7 @@ describe('ProductListingComponent', () => {
   }));
 
   it('should set searchText on setSearchText', () => {
-    const mockSearchText = 'test';
+    const mockSearchText = ['test'];
 
     component.setSearchText(mockSearchText);
 
