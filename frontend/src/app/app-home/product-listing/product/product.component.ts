@@ -11,10 +11,10 @@ export class ProductComponent {
   @Input() searchText: string[];
 
   shouldShowProduct(product: any): boolean {
-    if (this.searchText.length === 0) {
+    if (this.searchText?.length === 0) {
       return true;
     }
 
-    return this.searchText.some(term => product.name.toLowerCase().includes(term.toLowerCase()));
+    return this.searchText?.some(term => product.name.toLowerCase().includes(term.toLowerCase()));
   }
 }
