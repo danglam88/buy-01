@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MediaService } from 'src/app/services/media.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { Product } from 'src/app/Models/Product';
-import { Observable, catchError, of, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-media-listing',
