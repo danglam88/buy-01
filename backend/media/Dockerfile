@@ -4,9 +4,14 @@ FROM maven:3.8.3-openjdk-17 as builder
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the pom.xml and source code
+# Copy only pom.xml initially to leverage Docker cache
 COPY pom.xml ./
 COPY media/pom.xml media/pom.xml
+
+# Download dependencies - cached unless pom.xml changes
+RUN mvn -f ./media/pom.xml dependency:go-offline
+
+# Copy the source code and build the application
 COPY media/src media/src
 
 # Copy the certificate into the docker image
@@ -36,7 +41,7 @@ ENV JWT_SECRET=${JWT_SECRET}
 
 WORKDIR /app
 
-# Install curl for health checking
+# Install curl for health checking and cleanup in one layer
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy only the built artifact from the builder stage
