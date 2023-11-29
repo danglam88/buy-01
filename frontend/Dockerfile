@@ -6,20 +6,15 @@ FROM node:16-alpine as build
 # Set the working directory
 WORKDIR /app
 
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install --ignore-scripts
+
 # Copy the codebase into the image
 COPY src src
 COPY nginx.conf ./
 COPY sonar-project.properties ./
 COPY *.json ./
-
-# Remove the existing node_modules and dist folders
-RUN rm -rf node_modules dist
-
-# Clean the npm cache
-RUN npm cache clean --force
-
-# Install all the dependencies
-RUN npm install --ignore-scripts
 
 # Generate the build of the application using npx to call local ng
 RUN npx ng build

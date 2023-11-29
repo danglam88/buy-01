@@ -4,9 +4,14 @@ FROM maven:3.8.3-openjdk-17 as builder
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the pom.xml and source code
+# Copy only pom.xml initially to leverage Docker cache
 COPY pom.xml ./
 COPY user/pom.xml user/pom.xml
+
+# Download dependencies - cached unless pom.xml changes
+RUN mvn -f ./user/pom.xml dependency:go-offline
+
+# Copy the source code and build the application
 COPY user/src user/src
 
 # Copy the certificate into the docker image
@@ -21,12 +26,12 @@ RUN keytool -import -trustcacerts -noprompt -storepass changeit -alias mycert -f
 # Build the application without running tests
 RUN mvn -f ./user/pom.xml clean package -DskipTests
 
-# Stage 2: Create the final image
-FROM openjdk:17-slim
+# Stage 2: Create the final image using JRE slim
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
-# Install curl for health checking
+# Install curl for health checking and cleanup in one layer
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy only the built artifact from the builder stage
