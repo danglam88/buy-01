@@ -18,6 +18,12 @@ export class ProductDashboardComponent implements OnInit {
   sellerProducts$: Observable<any>;
   @Input() product: Product;
   @Input() searchText: string[] = [];
+  @Input() selectedFilterRadioButton: string = "all";
+  totalProductUnder100: number = 0;
+  totalProductUnder200: number = 0;
+  totalProductUnder300: number = 0;
+  totalProductUnder400: number = 0;
+  totalProductAbove400: number = 0;
   
   constructor(
     private productService: ProductService,
@@ -78,7 +84,12 @@ export class ProductDashboardComponent implements OnInit {
       },
     });
   }
+
   setSearchText(value: string[]){
     this.searchText = value;
  }
+
+ onFilterChanged(value: string){
+  this.selectedFilterRadioButton = value;
+}
 }
