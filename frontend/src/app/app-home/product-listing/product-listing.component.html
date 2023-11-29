@@ -7,20 +7,26 @@
       [pageSizeOptions]="[7, 14, 21]"
       aria-label="Select page"
       #paginator>
-    </mat-paginator>
-    <app-search (searchTextChanged)="setSearchText($event)"></app-search>
-    <app-filter
-      (selectedFilterRadioButtonChanged)="onFilterChanged($event)">
-    </app-filter>
+    </mat-paginator> 
+    <div *ngIf="(allProducts$ | async)?.length > 0">
+      <app-search (searchTextChanged)="setSearchText($event)"></app-search>
+      <app-filter
+        [under100]="totalProductUnder100" 
+        [under200]="totalProductUnder200"
+        [under300]="totalProductUnder300"
+        [under400]="totalProductUnder400"
+        [above400]="totalProductAbove400"
+        (selectedFilterRadioButtonChanged)="onFilterChanged($event)">
+      </app-filter>
+    </div>
+    <p *ngIf="(allProducts$ | async)?.length == 0">There are no products!</p> 
   </div>
- 
-  <p *ngIf="(allProducts$ | async)?.length == 0">There are no products!</p> 
- 
   <ng-container *ngIf="(allProducts$ | async) as products">
     <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
       <app-product  
         [product]="product" 
         [searchText]="searchText"
+        [selectedFilterRadioButton] = "selectedFilterRadioButton"
         (click)="openProductDetail(product)"
       >
       </app-product>

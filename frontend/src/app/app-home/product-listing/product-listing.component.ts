@@ -5,7 +5,7 @@ import { ProductDetailComponent } from '../product-detail/product-detail.compone
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-listing',
@@ -16,13 +16,18 @@ export class ProductListingComponent implements OnInit {
   allProducts$: Observable<any>;
   @Input() product: Product;
   @Input() searchText: string[] = [];
-
+  @Input() selectedFilterRadioButton: string = "all";
+  totalProductUnder100: number = 0;
+  totalProductUnder200: number = 0;
+  totalProductUnder300: number = 0;
+  totalProductUnder400: number = 0;
+  totalProductAbove400: number = 0;
   constructor( 
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
     ) {
-      
+     // get the total number of products under 100 from object Product
     }
   
   ngOnInit(): void {
@@ -38,12 +43,18 @@ export class ProductListingComponent implements OnInit {
   }
 
   getAllProducts(){
-    this.allProducts$ = this.productService.getAllProductsInfo().pipe(      
+    this.allProducts$ = this.productService.getAllProductsInfo().pipe(  
+      tap((products: Product[]) => {
+        this.totalProductUnder100 = products.filter((product) => product.price < 100).length;
+        this.totalProductUnder200 = products.filter((product) => product.price >= 100 && product.price < 200).length;
+        this.totalProductUnder300 = products.filter((product) => product.price >= 200 && product.price < 300).length;
+        this.totalProductUnder400 = products.filter((product) => product.price >= 300 && product.price < 400).length;
+        this.totalProductAbove400 = products.filter((product) => product.price >= 400).length;
+      }), 
       catchError((error) => {
         if (this.errorService.isAuthError(error.status)) {
           this.errorService.handleSessionExpirationError();
         }
-        // Return an empty observable or default value to avoid breaking the chain
         return of([]);
       })
     );
@@ -57,19 +68,12 @@ export class ProductListingComponent implements OnInit {
       },
     });
   }
-
-  // creating reference of productListComponent 
  
   setSearchText(value: string[]){
      this.searchText = value;
   }
-  
-  
-  selectedFilterRadioButton: string = "all";
 
   onFilterChanged(value: string){
-    console.log("value" + value)
     this.selectedFilterRadioButton = value;
-    console.log("onFilterChanged called" + this.selectedFilterRadioButton)
   }
 }

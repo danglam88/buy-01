@@ -1,6 +1,5 @@
 <div class="filter-container">
     <span>Filter: </span>
-
     <input 
         type="radio" 
         name="filter" 
@@ -12,16 +11,40 @@
     <input 
         type="radio" 
         name="filter" 
-        value="true" 
+        value="under100" 
         [(ngModel)]="selectedFilterRadioButton" 
         (change)="onSelectedFilterRadioButtonChanged()"/>
-    <span>{{'In Stock ('+inStock+')'}}</span>
+    <span>{{'€0-99 ('+under100+')'}}</span>
 
     <input 
         type="radio" 
         name="filter" 
-        value="false" 
+        value="under200" 
         [(ngModel)]="selectedFilterRadioButton" 
         (change)="onSelectedFilterRadioButtonChanged()"/>
-    <span>{{'Out of Stock( '+outOfStock+' )'}}</span>
+        <span>{{'€100-199 ('+under200+')'}}</span>
+
+    <input 
+        type="radio" 
+        name="filter" 
+        value="under300" 
+        [(ngModel)]="selectedFilterRadioButton" 
+        (change)="onSelectedFilterRadioButtonChanged()"/>
+    <span>{{'€200-299 ('+under300+')'}}</span>
+
+    <input 
+        type="radio" 
+        name="filter" 
+        value="under400" 
+        [(ngModel)]="selectedFilterRadioButton" 
+        (change)="onSelectedFilterRadioButtonChanged()"/>
+    <span>{{'€300-399 ('+under400+')'}}</span>
+
+    <input 
+        type="radio" 
+        name="filter" 
+        value="above400" 
+        [(ngModel)]="selectedFilterRadioButton" 
+        (change)="onSelectedFilterRadioButtonChanged()"/>
+    <span>{{'€400+ ('+above400+')'}}</span>
 </div>
