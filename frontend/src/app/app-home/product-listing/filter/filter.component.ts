@@ -10,10 +10,19 @@ export class FilterComponent {
   all: number = 0;
 
   @Input()
-  inStock: number = 0;
+  under100: number = 0;
 
   @Input()
-  outOfStock: number = 0;
+  under200: number = 0;
+
+  @Input()
+  under300: number = 0;
+
+  @Input()
+  under400: number = 0;
+
+  @Input()
+  above400: number = 0;
 
   @Output()
   selectedFilterRadioButtonChanged: EventEmitter<string> = new EventEmitter<string>();

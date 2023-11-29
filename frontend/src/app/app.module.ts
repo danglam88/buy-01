@@ -9,10 +9,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AngularMaterialModule } from './angular-material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-
-import { HighlightDirective } from './CustomDirectives/highlight.directive';
-
-
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -61,12 +57,10 @@ import { FilterComponent } from './app-home/product-listing/filter/filter.compon
     CreateProductComponent,
     ProductComponent,
     ProductDetailComponent,
-    HighlightDirective,
     ConfirmationDialogComponent,
     ImageSliderComponent,
     MediaListingComponent,
     MediaComponent,
-    HighlightDirective,
     SearchComponent,
     FilterComponent
   ],
