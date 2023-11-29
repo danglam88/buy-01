@@ -8,7 +8,7 @@ import { AuthenticateGuard } from './guard/authenticate.guard';
 import { ErrorsComponent } from './errors/errors.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 import { CartComponent } from './app-home/cart/cart.component';
-import { OrderConfirmationComponent } from './app-home/cart/order-confirmation/order-confirmation.component';
+import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
 
 const routes: Routes = [
 
