@@ -20,6 +20,7 @@
       <module>user</module>
       <module>product</module>
       <module>media</module>
+      <module>order</module>
     </modules>
 
     <properties>
