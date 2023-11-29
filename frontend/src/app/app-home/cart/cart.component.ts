@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Cart } from 'src/app/Models/Cart';
 import { CartItems } from 'src/app/Models/CartItems';
 import { CartService } from 'src/app/services/cart.service';
@@ -9,13 +10,15 @@ import { CartService } from 'src/app/services/cart.service';
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
+  //@Output() orderConfirmation: EventEmitter<Cart> = new EventEmitter<Cart>();
   products: any[] = [];
   cart! :Cart;
-  constructor (private cartService: CartService) {
+  constructor (private cartService: CartService,
+    private router: Router) {
     this.setCart();
   }
   ngOnInit():void {
-  
+
   }
 
   setCart() {
@@ -37,5 +40,10 @@ export class CartComponent implements OnInit {
     return new Array(quantity).fill(0).map((_, index) => index + 1);
   }
 
+  checkOut(cart: Cart) {
+    this.cartService.setCurrentCart(cart);
+    this.router.navigate(['/order-confirmation']);
+    // this.orderConfirmation.emit(cart);
+  }
   
 }

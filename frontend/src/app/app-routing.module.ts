@@ -8,6 +8,7 @@ import { AuthenticateGuard } from './guard/authenticate.guard';
 import { ErrorsComponent } from './errors/errors.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 import { CartComponent } from './app-home/cart/cart.component';
+import { OrderConfirmationComponent } from './app-home/cart/order-confirmation/order-confirmation.component';
 
 const routes: Routes = [
 
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'product-dashboard', canActivate: [AuthenticateGuard],component: ProductDashboardComponent}, //canActivate: [AuthenticateGuard] 
   { path: 'user-dashboard', canActivate: [AuthenticateGuard],component: UserDashboardComponent },
   { path: 'cart', canActivate: [AuthenticateGuard],component: CartComponent},
+  {path: 'order-confirmation', canActivate: [AuthenticateGuard],component: OrderConfirmationComponent},
   {path: 'forbidden', component: ErrorsComponent},
   { path: '**', component: ErrorsComponent }, // Wildcard route should be the last one
 ];

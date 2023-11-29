@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CartService {
-
+  private currentCart: Cart;
   private cart: Cart = new Cart();
   cartItemsLength: number;
   private cartItemsSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -53,5 +53,13 @@ export class CartService {
   private updateCartItemsCount(): void {
     this.cartItemsLength = this.cart.items.length;
     this.cartItemsSubject.next(this.cartItemsLength);
+  }
+
+  setCurrentCart(cart: Cart): void {
+    this.currentCart = cart;
+  }
+
+  getCurrentCart(): Cart {
+    return this.currentCart;
   }
 }

@@ -13,10 +13,10 @@
     </button>
   </div> -->
   <!-- IF THERE IS PRODUCTS -->
-  <div class="cart-heading" >
+  <div class="cart-heading">
     <a class="">Your Shopping Cart</a>
   </div>
-  <div class="shopping-cart" > 
+  <div class="shopping-cart">
     <!-- Column labels -->
     <div>
       <div class="column-labels">
@@ -32,16 +32,17 @@
         </div>
         <div class="product-price">{{ cartItem.product.price }}</div>
         <div class="product-quantity">
-          <select class="product-quantity"
-          #quantitySelect
-          (change)="changeQuantity(cartItem, quantitySelect.value)"
-        >
-          <option
-            *ngFor="let _ of getQuantityOptions(cartItem.product.quantity)"
+          <select
+            class="product-quantity"
+            #quantitySelect
+            (change)="changeQuantity(cartItem, quantitySelect.value)"
           >
-            {{ _ }}
-          </option>
-        </select>
+            <option
+              *ngFor="let _ of getQuantityOptions(cartItem.product.quantity)"
+            >
+              {{ _ }}
+            </option>
+          </select>
         </div>
 
         <div class="product-line-price">{{ cartItem.price }}</div>
@@ -51,10 +52,8 @@
       </div>
 
       <div class="product">
+        <div class="product-title">Dingo Dog Bones</div>
 
-    
-          <div class="product-title">Dingo Dog Bones</div>
-     
         <div class="product-price">12.99</div>
         <div class="product-quantity">
           <select>
@@ -67,12 +66,10 @@
 
         <div class="product-line-price">25.98</div>
         <div class="product-removal">
-          <button class="remove-product">
-            Remove
-          </button>
+          <button class="remove-product">Remove</button>
         </div>
       </div>
-    
+
       <div class="totals">
         <div class="totals-item">
           <label>Items in Cart</label>
@@ -84,10 +81,7 @@
         </div>
       </div>
 
-      <button class="checkout">Checkout</button>
+      <button class="checkout" (click)="checkOut(cart)">Checkout</button>
     </div>
   </div>
-
-  
-   
 </section>
