@@ -26,8 +26,8 @@ RUN keytool -import -trustcacerts -noprompt -storepass changeit -alias mycert -f
 # Build the application without running tests
 RUN mvn -f ./media/pom.xml clean package -DskipTests
 
-# Stage 2: Create the final image using JRE slim
-FROM openjdk:17-jre-slim
+# Stage 2: Create the final image
+FROM openjdk:17-slim
 
 WORKDIR /app
 
