@@ -80,9 +80,8 @@ describe('ProductDashboardComponent', () => {
     component.ngOnInit();
     tick();
 
-   expect(productService.getSellerProductsInfo).toHaveBeenCalled();
+    expect(productService.getSellerProductsInfo).toHaveBeenCalled();
   }));
-  
   
   it('should open product detail modal', () => {
     const mockProduct: any = {}; 
@@ -95,5 +94,21 @@ describe('ProductDashboardComponent', () => {
         product: mockProduct,
       },
     });
-  }); 
+  });
+
+  it('should set searchText', () => {
+    const mockSearchText: string[] = ['test', 'search'];
+
+    component.setSearchText(mockSearchText);
+
+    expect(component.searchText).toEqual(mockSearchText);
+  });
+
+  it('should set selectedFilterRadioButton', () => {
+    const mockFilter: string = 'under100';
+
+    component.onFilterChanged(mockFilter);
+
+    expect(component.selectedFilterRadioButton).toEqual(mockFilter);
+  });
 });

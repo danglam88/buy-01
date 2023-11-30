@@ -1,7 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { FilterComponent } from './filter.component';
-import { FormsModule } from '@angular/forms';
 
 describe('FilterComponent', () => {
   let component: FilterComponent;
@@ -9,15 +7,24 @@ describe('FilterComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FilterComponent],
-      imports: [FormsModule],
+      declarations: [FilterComponent]
     });
+
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should emit selectedFilterRadioButton on change', () => {
+    spyOn(component.selectedFilterRadioButtonChanged, 'emit');
+    const newFilter = 'under100';
+
+    component.selectedFilterRadioButton = newFilter;
+    component.onSelectedFilterRadioButtonChanged();
+
+    expect(component.selectedFilterRadioButtonChanged.emit).toHaveBeenCalledWith(newFilter);
   });
 });
