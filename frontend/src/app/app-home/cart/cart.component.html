@@ -1,0 +1,87 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
+<app-header></app-header>
+
+<section class="shoppingcart-container">
+  <!-- IF THERE IS NO PRODUCTS -->
+  <!-- <div *ngIf="cart.items.length === 0" class="empty-product">
+    <a class="alert">There are no products in your cart.</a>
+    <button class="shopping-btn" routerLink="../home">
+      <div class="pretext">Shop Now</div>
+    </button>
+  </div> -->
+  <!-- IF THERE IS PRODUCTS -->
+  <div class="cart-heading">
+    <a class="">Your Shopping Cart</a>
+  </div>
+  <div class="shopping-cart">
+    <!-- Column labels -->
+    <div>
+      <div class="column-labels">
+        <label class="product-title">Product</label>
+        <label class="product-price">Price</label>
+        <label class="product-quantity">Quantity</label>
+        <label class="product-line-price">Total</label>
+        <label class="product-remove">Remove</label>
+      </div>
+      <div class="product" *ngFor="let cartItem of cart.items">
+        <div class="product-details">
+          <div class="product-title">{{ cartItem.product.name }}</div>
+        </div>
+        <div class="product-price">{{ cartItem.product.price }}</div>
+        <div class="product-quantity">
+          <select
+            class="product-quantity"
+            #quantitySelect
+            (change)="changeQuantity(cartItem, quantitySelect.value)"
+          >
+            <option
+              *ngFor="let _ of getQuantityOptions(cartItem.product.quantity)"
+            >
+              {{ _ }}
+            </option>
+          </select>
+        </div>
+
+        <div class="product-line-price">{{ cartItem.price }}</div>
+        <button class="remove-button" (click)="removeFromCart(cartItem)">
+          Remove
+        </button>
+      </div>
+
+      <div class="product">
+        <div class="product-title">Dingo Dog Bones</div>
+
+        <div class="product-price">12.99</div>
+        <div class="product-quantity">
+          <select>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+
+        <div class="product-line-price">25.98</div>
+        <div class="product-removal">
+          <button class="remove-product">Remove</button>
+        </div>
+      </div>
+
+      <div class="totals">
+        <div class="totals-item">
+          <label>Items in Cart</label>
+          <div id="cart-subtotal">{{ cart.items.length }}</div>
+        </div>
+        <div class="totals-item totals-item-total">
+          <label>Grand Total</label>
+          <div class="totals-value" id="cart-total">{{ cart.totalPrice }}</div>
+        </div>
+      </div>
+
+      <button class="checkout" (click)="checkOut(cart)">Checkout</button>
+    </div>
+  </div>
+</section>

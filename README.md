@@ -98,10 +98,10 @@ An example of a valid form-data object for creating a new user is:
 
 ## Endpoints for buy-02
 
-### For positions in the cart:
+### For items in the cart:
 
-### POST  `/order/position` 
- for add position from product listing of other pages with json body:
+### POST  `/order/item` 
+ for add item to cart from product listing page or other pages with json body:
  ```json
 {
     "productId": "XXX",
@@ -113,32 +113,38 @@ and response :
  - HTTP STATUS 400 
  ```json
 {
-  "error": "Decrease quantity",
+  "message": "Decrease quantity",
 }
 ```
 - HTTP STATUS 201 with empty body
 
-### PUT  `/order/position/{positionID}` 
-with empty body for update quantity in a cart page and response:
+### PUT  `/order/item/{itemID}` 
+ for update quantity in a cart page with body 
+  ```json
+{
+    "quantity": 1
+}
+```
+ and response:
 - HTTP STATUS 200 with empty body
 - HTTP STATUS 400
  ```json
 {
-  "error": "Decrease quantity"
+  "message": "Decrease quantity"
 }
 ```
 
-### DELETE  `/order/position/{positionID}` 
-with empty body for delete position in a cart page and response:
+### DELETE  `/order/item/{itemID}` 
+with empty body for delete item in a cart page and response:
 - HTTP STATUS 200 with empty body
 
 
-### GET  `/order/positions`
-for getting current cart positions for cart page with empty body and response :
+### GET  `/order/item/`
+for getting current cart items for cart page with empty body and response :
  ```json
 [
    {
-      "position_id": "XXX",
+      "item_id": "XXX",
       "product" : {
          "product_id" : "XXX",
         "name": "Name of Product",
@@ -147,7 +153,7 @@ for getting current cart positions for cart page with empty body and response :
         "quantity": 5
       },
       "quantity" : 3,
-      "position_price" : "XXXX"
+      "item_price" : "XXXX"
    }
 ]
 ```
@@ -158,10 +164,7 @@ for getting current cart positions for cart page with empty body and response :
 for create an order with json body:
  ```json
 {   
-    "payment_code": "CASH",
-    "zip_code": "XXX",
-    "city" : "XXX",
-    "address" : "XXX"
+    "payment_code": "CASH"
 }
 ```
 
@@ -169,7 +172,7 @@ and response:
 - HTTP STATUS 400 with body:
  ```json
 {
-  "error": "Invalid zip code"
+  "message": "Invalid payment code"
 }
 ```
 - HTTP STATUS 200 with body:
@@ -192,9 +195,9 @@ info about the order with no request body and response body:
 {
    "order_id" : "XXX",
    "status_code" : "CREATED",
-   "positions" : [
+   "items" : [
       {
-         "position_id": "XXX",
+         "item_id": "XXX",
          "product" : {
             "product_id" : "XXX",
             "name": "Name of Product",
@@ -203,13 +206,10 @@ info about the order with no request body and response body:
             "quantity": 5
          },
          "quantity" : 3,
-         "position_price" : "XXXX"
+         "item_price" : "XXXX"
       }
    ],
-   "payment_code": "CASH",
-   "zip_code": "XXX",
-   "city" : "XXX",
-   "address" : "XXX"
+   "payment_code": "CASH"
 }
 ```
 
@@ -220,9 +220,9 @@ info about seller's orders for seller and client order history for client with n
    {
       "order_id" : "XXX",
       "status_code" : "CREATED",
-      "positions" : [
+      "items" : [
          {
-            "position_id": "XXX",
+            "item_id": "XXX",
             "product" : {
                "product_id" : "XXX",
                "name": "Name of Product",
@@ -231,13 +231,10 @@ info about seller's orders for seller and client order history for client with n
                "quantity": 5
             },
             "quantity" : 3,
-            "position_price" : "XXXX"
+            "item_price" : "XXXX"
          }
       ],
-      "payment_code": "CASH",
-      "zip_code": "XXX",
-      "city" : "XXX",
-      "address" : "XXX"
+      "payment_code": "CASH"
    }
 ]
 ```
@@ -245,37 +242,29 @@ info about seller's orders for seller and client order history for client with n
 
 ### Order Microservice database:
 
-Table Order Position:
- - User ID
- - Position Id
+Table Order Item:
+ - Buyer Id
+ - Seller Id
+ - Item Id
 - Order id
 - Product Id
 - Quantity
-- Position Price (Quantity * Product Price)
+- Item Price (Quantity * Product Price)
 
 Table Order :
-- User ID
+- Buyer ID
 - Order ID
 - Status Code (enum, see below)
 - Payment Method Code (enum of method, let’s start from cash only)
- Delivery Info (up to us, it is gonna be in the frontend form as well in the order section)
- Could be:
-- Zip Code
-- City
-- State
-- Address
-- Phone number
 
 Order Status codes:
 - 1 Created
-- 2 Packing
-- 3 Delivering
-- 4 Delivered
-- 5 Cancelled
+- 2 Delivered
+- 3 Cancelled
 
 Additional check (1):
-When user removes an order, status must be 5
-When user cancel - 1 or 2
+When user removes an order, status must be 3
+When user cancel - 1
 When user redo - any status
 
 
@@ -284,9 +273,9 @@ When user adds to cart and removes from - increase and decrease quantity from pr
 
 User actions from listing to create order
 1 Add to cart from listing
-2 Go to cart page (with info about cart positions)
+2 Go to cart page (with info about cart items)
 3 Go to order page (with info about payment method and delivery info)
-4 Go to created order page info (with positions, order info and order status)
+4 Go to created order page info (with items, order info and order status)
 
 ## CI/CD Pipeline (using Jenkins)
 

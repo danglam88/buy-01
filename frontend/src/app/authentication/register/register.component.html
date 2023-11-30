@@ -57,7 +57,7 @@
           </div>
           <!--Register Button-->
           <div class="field button-field">
-              <button type="submit" (keyup.enter)="register()">Register</button>
+              <button type="submit" (keyup.enter)="register()" [disabled]="isRegistering">Register</button>
           </div>
         </form>
         <!--Form End-->

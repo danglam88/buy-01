@@ -42,6 +42,8 @@ import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from './services/validation.service';
 import { ErrorService } from './services/error.service';
+import { CartComponent } from './app-home/cart/cart.component';
+import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +66,9 @@ import { ErrorService } from './services/error.service';
     ImageSliderComponent,
     MediaListingComponent,
     MediaComponent,
-    HighlightDirective
+    HighlightDirective,
+    CartComponent,
+    OrderConfirmationComponent
   ],
   imports: [
     BrowserModule,

@@ -34,6 +34,7 @@ export class ProductListingComponent implements OnInit {
   getAllProducts(){
     this.productService?.getAllProductsInfo().subscribe({
       next: (result) => {
+        console.log('api called')
         this.products = result;
       },
       error: (error) => {

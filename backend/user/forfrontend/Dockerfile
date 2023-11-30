@@ -24,16 +24,6 @@ RUN mvn -f ./user/pom.xml clean package -DskipTests
 # Stage 2: Create the final image
 FROM openjdk:17-slim
 
-# Accept build arguments
-ARG USER_DB_CREDENTIALS_USERNAME
-ARG USER_DB_CREDENTIALS_PASSWORD
-ARG JWT_SECRET
-
-# Set arguments as environment variables for runtime
-ENV USER_DB_CREDENTIALS_USERNAME=${USER_DB_CREDENTIALS_USERNAME}
-ENV USER_DB_CREDENTIALS_PASSWORD=${USER_DB_CREDENTIALS_PASSWORD}
-ENV JWT_SECRET=${JWT_SECRET}
-
 WORKDIR /app
 
 # Install curl for health checking
@@ -47,4 +37,4 @@ CMD ["java", "-jar", "user.jar"]
 
 # Health check using Spring Boot Actuator
 HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=30s \
-  CMD curl -k -f https://localhost:8443/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1

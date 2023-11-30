@@ -14,6 +14,7 @@ import { ErrorService } from 'src/app/services/error.service';
 export class CreateProductComponent {
   productInfo: any = {};
   mediaInfo: any = {};
+  isCreatingProduct = false;
   previewUrl: string | ArrayBuffer | null = null;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   selectedFiles: Array<{ file: File, url: string }> = [];
@@ -29,9 +30,10 @@ export class CreateProductComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CreateProductComponent>, 
   ) {
+    
   }
 
-  
+
 
   // Creates a product form with validation
   createProductForm = this.builder.group({
@@ -74,6 +76,7 @@ export class CreateProductComponent {
   // Create a product and handles errors, including validation errors from createProductForm
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
+      this.isCreatingProduct = true;
       const formData = new FormData();
       for (const selectedFile of this.selectedFiles) {
         const file = selectedFile.file;

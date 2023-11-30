@@ -12,6 +12,7 @@
       <li><a routerLink="../home" [ngClass]="{ 'selected': currentRoute === '/home' }">Home</a></li>
       <li *ngIf="role === 'SELLER'"><a routerLink="../product-dashboard" [ngClass]="{ 'selected': currentRoute === '/product-dashboard' }">My Products</a></li>
       <li><a routerLink="../user-dashboard" [ngClass]="{ 'selected': currentRoute === '/user-dashboard' }">Profile</a></li>
+      <li *ngIf="role === 'CLIENT'"><a routerLink="../cart" [ngClass]="{ 'selected': currentRoute === '/cart' }">Cart ({{cartItems}})</a></li>
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>
