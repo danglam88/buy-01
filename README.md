@@ -196,18 +196,14 @@ info about the order with no request body and response body:
    "order_id" : "XXX",
    "status_code" : "CREATED",
    "items" : [
-      {
-         "item_id": "XXX",
-         "product" : {
-            "product_id" : "XXX",
-            "name": "Name of Product",
-            "description": "Description of Product",
-            "price": 100.0,
-            "quantity": 5
-         },
-         "quantity" : 3,
-         "item_price" : "XXXX"
-      }
+        {
+             "item_id": "XXX",
+             "product_id" : "XXX",
+             "name": "Name of Product",
+             "description": "Description of Product",
+             "quantity" : 3,
+             "item_price" : "XXXX"
+         }
    ],
    "payment_code": "CASH"
 }
@@ -222,16 +218,12 @@ info about seller's orders for seller and client order history for client with n
       "status_code" : "CREATED",
       "items" : [
          {
-            "item_id": "XXX",
-            "product" : {
-               "product_id" : "XXX",
-               "name": "Name of Product",
-               "description": "Description of Product",
-               "price": 100.0,
-               "quantity": 5
-            },
-            "quantity" : 3,
-            "item_price" : "XXXX"
+             "item_id": "XXX",
+             "product_id" : "XXX",
+             "name": "Name of Product",
+             "description": "Description of Product",
+             "quantity" : 3,
+             "item_price" : "XXXX"
          }
       ],
       "payment_code": "CASH"
