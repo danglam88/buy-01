@@ -1,6 +1,7 @@
 const userBaseUrl = 'http://localhost:8080'
 const productBaseUrl = 'http://localhost:8081'
 const mediaBaseUrl = 'http://localhost:8082'
+const orderBaseUrl = 'http://localhost:8083'
 
 export const environment = {
     production: false,
@@ -11,7 +12,10 @@ export const environment = {
     avatarUserUrl: `${userBaseUrl}/users/avatar/`,
     productUrl: `${productBaseUrl}/products`,
     sellerProductUrl: `${productBaseUrl}/products/seller`,
-    addToCartUrl: `${productBaseUrl}/order/position`,
     mediaUrl: `${mediaBaseUrl}/media`,
     productMediaUrl: `${mediaBaseUrl}/media/product/`,
+    orderUrl: `${orderBaseUrl}/order`,
+    sellerOrderUrl: `${orderBaseUrl}/order/seller`,
+    clientOrderUrl: `${orderBaseUrl}/order/client`,
+    orderItemUrl: `${orderBaseUrl}/order/item`,
 };

@@ -1,9 +1,10 @@
 const userBaseUrl = 'https://164.92.252.125:8443'
 const productBaseUrl = 'https://164.92.252.125:8444'
 const mediaBaseUrl = 'https://164.92.252.125:8445'
+const orderBaseUrl = 'https://164.92.252.125:8446'
 
 export const environment = {
-    production: true,
+    production: false,
     authUrl: `${userBaseUrl}/auth`,
     regUrl: `${userBaseUrl}/reg`,
     userInfoUrl: `${userBaseUrl}/users/userInfo`,
@@ -11,7 +12,10 @@ export const environment = {
     avatarUserUrl: `${userBaseUrl}/users/avatar/`,
     productUrl: `${productBaseUrl}/products`,
     sellerProductUrl: `${productBaseUrl}/products/seller`,
-    addToCartUrl: `${productBaseUrl}/order/position`,
     mediaUrl: `${mediaBaseUrl}/media`,
     productMediaUrl: `${mediaBaseUrl}/media/product/`,
+    orderUrl: `${orderBaseUrl}/order`,
+    sellerOrderUrl: `${orderBaseUrl}/order/seller`,
+    clientOrderUrl: `${orderBaseUrl}/order/client`,
+    orderItemUrl: `${orderBaseUrl}/order/item`,
 };
