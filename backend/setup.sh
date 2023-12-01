@@ -13,4 +13,6 @@ docker build -t product-microservice -f product/forfrontend/Dockerfile .
 
 docker build -t media-microservice -f media/forfrontend/Dockerfile .
 
+docker build -t order-microservice -f order/forfrontend/Dockerfile .
+
 docker-compose up -d
