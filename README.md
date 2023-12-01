@@ -175,11 +175,8 @@ and response:
   "message": "Invalid payment code"
 }
 ```
-- HTTP STATUS 200 with body:
- ```json
-{
-  "order_id": "XXX"
-}
+- HTTP STATUS 200 with body with string with order id:
+ XXX
 ```
 
 ### PUT  `/order/{order_id}`
@@ -212,23 +209,56 @@ info about the order with no request body and response body:
 ## GET `/order/seller` and GET `/order/client`
 info about seller's orders for seller and client order history for client with no request body and response body:
  ```json
-[
-   {
-      "order_id" : "XXX",
-      "status_code" : "CREATED",
-      "items" : [
-         {
-             "item_id": "XXX",
-             "product_id" : "XXX",
-             "name": "Name of Product",
-             "description": "Description of Product",
-             "quantity" : 3,
-             "item_price" : "XXXX"
-         }
-      ],
-      "payment_code": "CASH"
-   }
-]
+{
+    "orders": [
+        {
+            "items": [
+                {
+                    "name": "Mock Product",
+                    "description": "Mock Description",
+                    "quantity": 1,
+                    "item_id": "656a0cd0fe90237ff8920dfb",
+                    "product_id": "productId5",
+                    "item_price": 200.0
+                },
+                {
+                    "name": "Mock Product",
+                    "description": "Mock Description",
+                    "quantity": 3,
+                    "item_id": "656a0cd7fe90237ff8920dfc",
+                    "product_id": "productId6",
+                    "item_price": 200.0
+                }
+            ],
+            "order_id": "656a0cfafe90237ff8920dfd",
+            "status_code": "CREATED",
+            "payment_code": "CASH"
+        },
+        {
+            "items": [
+                {
+                    "name": "Mock Product",
+                    "description": "Mock Description",
+                    "quantity": 2,
+                    "item_id": "656a0f27c07d403bc441c9a5",
+                    "product_id": "productId6",
+                    "item_price": 200.0
+                }
+            ],
+            "order_id": "656a0f37c07d403bc441c9a6",
+            "status_code": "CREATED",
+            "payment_code": "CASH"
+        }
+    ],
+    "top_products": [
+        {
+            "product_id": "productId6",
+            "name": "Mock Product",
+            "total_quantity": 5
+        }
+    ],
+    "total_amount": 600.0
+}
 ```
 
 
