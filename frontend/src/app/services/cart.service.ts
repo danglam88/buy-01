@@ -55,6 +55,8 @@ export class CartService {
     this.cartItemsSubject.next(this.cartItemsLength);
   }
 
+  //for testing for the order confirmation
+
   setCurrentCart(cart: Cart): void {
     this.currentCart = cart;
   }
