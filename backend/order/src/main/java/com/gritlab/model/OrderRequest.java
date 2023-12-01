@@ -4,21 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Document(collection = "order")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-    @Id
-    private String orderId;
+public class OrderRequest {
 
-    private String buyerId;
-
+    @JsonProperty("order_status")
     private OrderStatus statusCode;
 
+    @JsonProperty("payment_code")
     private Payment paymentCode;
 }

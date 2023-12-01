@@ -2,7 +2,7 @@ package com.gritlab.service;
 
 import com.gritlab.model.OrderItem;
 import com.gritlab.model.OrderItemDTO;
-import com.gritlab.model.OrderItemResponse;
+import com.gritlab.model.CartItemResponse;
 import com.gritlab.model.ProductDTO;
 import com.gritlab.repository.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +17,15 @@ public class OrderItemService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    public List<OrderItemResponse> getOrderItems(String buyerId) {
+    public List<CartItemResponse> getOrderItems(String buyerId) {
         List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
-        List<OrderItemResponse> responseItems = new ArrayList<>();
+        List<CartItemResponse> responseItems = new ArrayList<>();
 
         for (OrderItem item : items) {
-            ProductDTO product = new ProductDTO(item.getProductId(), "Mock name", "Mock description", 101.01, 10,  "mockId");
-             OrderItemResponse responseItem = OrderItemResponse.builder()
+
+             ProductDTO product = new ProductDTO(item.getProductId(), "Mock name", "Mock description", 101.01, 10,  "mockId");
+             CartItemResponse responseItem = CartItemResponse.builder()
                      .itemId(item.getItemId())
-                     .orderId(item.getOrderId())
                      .quantity(item.getQuantity())
                      //.positionPrice(item.getPositionPrice())
                      .itemPrice(101.01 * item.getQuantity())
