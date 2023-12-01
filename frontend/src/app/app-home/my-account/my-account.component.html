@@ -1,0 +1,21 @@
+<!-- app.component.html -->
+
+<app-header></app-header>
+<div class="my-account-container">
+  <!-- Navigation Bar -->
+  <div class="navigation-bar">
+      <button mat-button class="active" (click)="showProfileSection()">Profile</button>
+      <button mat-button class="active" (click)="showOrderSection()">Orders</button>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    <div *ngIf="view=== 'profile'">
+      <app-user-dashboard></app-user-dashboard>
+    </div>
+    <div *ngIf="view=== 'orders'">
+      <app-order-history></app-order-history>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

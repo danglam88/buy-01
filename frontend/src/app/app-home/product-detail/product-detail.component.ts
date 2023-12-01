@@ -24,7 +24,7 @@ import { Media } from 'src/app/Models/Media';
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
   @Output() mediaArray$: Observable<Media[]>;
-
+  view: string = '';
   editingField: string | null = null;
   productImages: any = {};
   mediaID: any = {};
@@ -56,6 +56,7 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
   ) {
     this.product = data.product; // get product details from product-listing component
+    this.view = data.view;
   }
 
   get userRole() : string {

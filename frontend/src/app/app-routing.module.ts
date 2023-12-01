@@ -7,6 +7,7 @@ import { UserDashboardComponent } from './app-home/my-account/user-dashboard/use
 import { AuthenticateGuard } from './guard/authenticate.guard';
 import { ErrorsComponent } from './errors/errors.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
+import { MyAccountComponent } from './app-home/my-account/my-account.component';
 
 const routes: Routes = [
 
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', canActivate: [AuthenticateGuard],component: ProductListingComponent },
   { path: 'product-dashboard', canActivate: [AuthenticateGuard],component: ProductDashboardComponent}, //canActivate: [AuthenticateGuard] 
+  { path: 'my-account', canActivate: [AuthenticateGuard],component: MyAccountComponent},
   { path: 'user-dashboard', canActivate: [AuthenticateGuard],component: UserDashboardComponent },
   {path: 'forbidden', component: ErrorsComponent},
   { path: '**', component: ErrorsComponent }, // Wildcard route should be the last one

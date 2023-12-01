@@ -40,6 +40,7 @@ import { ErrorService } from './services/error.service';
 import { SearchComponent } from './app-home/search/search.component';
 import { FilterComponent } from './app-home/product-listing/filter/filter.component';
 import { MyAccountComponent } from './app-home/my-account/my-account.component';
+import { OrderHistoryComponent } from './app-home/my-account/order-history/order-history.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +64,8 @@ import { MyAccountComponent } from './app-home/my-account/my-account.component';
     MediaComponent,
     SearchComponent,
     FilterComponent,
-    MyAccountComponent
+    MyAccountComponent,
+    OrderHistoryComponent,
   ],
   imports: [
     BrowserModule,
