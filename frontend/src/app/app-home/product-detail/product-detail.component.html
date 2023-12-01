@@ -2,8 +2,7 @@
 
 <div class="product--details--info scroll">
     <div class="header">
-        <h1 mat-dialog-title class="title" *ngIf="view !== 'order'">Product Information</h1>
-        <h1 mat-dialog-title class="title" *ngIf="view === 'order'">Order Information</h1>
+        <h1 mat-dialog-title class="title">Product Information</h1>
         <div class="create-product-close">
             <i class="fa fa-times" aria-hidden="true" (click)="closeModal()"></i>
         </div>
@@ -65,22 +64,7 @@
                     </div>
                 </div>                  
             </div>
-            <div class="product-detail" *ngIf="view === 'order'">
-                <h1><strong>{{product?.name}} : € {{product?.price}}</strong></h1>
-                <div class="product-value">
-                    <h2>Order #: 1234</h2>
-                </div>
-                <div class="product-value">
-                    <h2>Quantity Ordered: 4</h2>
-                </div>
-                <div class="product-value">
-                    <h2>Total Amount: $400</h2>
-                </div>
-                <div class="product-value">
-                    <h2>Status: Created</h2>
-                </div>
-            </div>
-            <div class="product-detail" *ngIf="view !== 'order'">
+            <div class="product-detail">
                 <!--Name-->
                 <div class="product-detail-name">
                     <div class="product-value" *ngIf="editingField !== 'name'">

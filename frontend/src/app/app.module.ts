@@ -41,6 +41,7 @@ import { SearchComponent } from './app-home/search/search.component';
 import { FilterComponent } from './app-home/product-listing/filter/filter.component';
 import { MyAccountComponent } from './app-home/my-account/my-account.component';
 import { OrderHistoryComponent } from './app-home/my-account/order-history/order-history.component';
+import { OrderDetailsComponent } from './app-home/my-account/order-details/order-details.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { OrderHistoryComponent } from './app-home/my-account/order-history/order
     FilterComponent,
     MyAccountComponent,
     OrderHistoryComponent,
+    OrderDetailsComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ProductDetailComponent } from '../../product-detail/product-detail.component';
+import { OrderDetailsComponent } from '../order-details/order-details.component';
 
 @Component({
   selector: 'app-order-history',
@@ -33,7 +33,7 @@ export class OrderHistoryComponent {
 
     // Opens product detail modal
     openProductDetail(product): void {
-      this.dialog.open(ProductDetailComponent, {
+      this.dialog.open(OrderDetailsComponent, {
        data: {
          product: product, 
          view: 'order'

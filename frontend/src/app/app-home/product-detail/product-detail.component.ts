@@ -56,7 +56,6 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
   ) {
     this.product = data.product; // get product details from product-listing component
-    this.view = data.view;
   }
 
   get userRole() : string {

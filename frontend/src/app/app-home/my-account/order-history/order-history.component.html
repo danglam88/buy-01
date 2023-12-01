@@ -6,6 +6,7 @@
     <h1 mat-dialog-title class="title">My Order History</h1>
   </div>
 
+  <!--CLIENT-->
   <div *ngIf="userInfoRole== 'CLIENT'">
     <div class="row">
       <div >Order #</div>
@@ -26,6 +27,7 @@
     </div>
   </div>
 
+  <!--SELLER-->
   <div *ngIf="userInfoRole== 'SELLER'">
     <div class="row">
       <div >Order #</div>

@@ -18,7 +18,6 @@ export const AuthenticateGuard: CanActivateFn = (
 
   // Decrypt the loggedIn value from sessionStorage
   const encryptedLoggedIn = sessionStorage.getItem("loggedIn");
-  console.log("encryptedLoggedIn", encryptedLoggedIn);
   if (encryptedLoggedIn) {
    
     const loggedIn = encryptionService.decrypt(encryptedLoggedIn);
@@ -27,7 +26,6 @@ export const AuthenticateGuard: CanActivateFn = (
       service.loggedIn = true;
       return true;
     } 
-
   }
   return router.parseUrl("/login");
 };
