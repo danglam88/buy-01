@@ -1,34 +1,33 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
-import { AuthenticationService } from '../services/authentication.service';
-import { ToastrService } from 'ngx-toastr';
-import { EncryptionService } from '../services/encryption.service'; // Import EncryptionService
+import { inject } from "@angular/core";
+import {
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+  CanActivateFn,
+} from "@angular/router";
+import { AuthenticationService } from "../services/authentication.service";
+import { EncryptionService } from "../services/encryption.service"; // Import EncryptionService
 
-@Injectable()
-export class AuthenticateGuard implements CanActivate {
+export const AuthenticateGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  const service = inject(AuthenticationService);
+  const router = inject(Router);
+  const encryptionService = inject(EncryptionService);
 
-  constructor(
-    private service: AuthenticationService,
-    private router: Router,
-    private toastr: ToastrService,
-    private encryptionService: EncryptionService // Inject EncryptionService
-  ) {}
+  // Decrypt the loggedIn value from sessionStorage
+  const encryptedLoggedIn = sessionStorage.getItem("loggedIn");
+  console.log("encryptedLoggedIn", encryptedLoggedIn);
+  if (encryptedLoggedIn) {
+   
+    const loggedIn = encryptionService.decrypt(encryptedLoggedIn);
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean | UrlTree {
+    if (loggedIn === "true") {
+      service.loggedIn = true;
+      return true;
+    } 
 
-    // Decrypt the loggedIn value from sessionStorage
-    const encryptedLoggedIn = sessionStorage.getItem('loggedIn');
-    if (encryptedLoggedIn) {
-      const loggedIn = this.encryptionService.decrypt(encryptedLoggedIn);
-      if (loggedIn === 'true') {
-        this.service.loggedIn = true;
-        return true;
-      }
-    }
-     return this.router.parseUrl('/login');
-
-  }  
-}
+  }
+  return router.parseUrl("/login");
+};

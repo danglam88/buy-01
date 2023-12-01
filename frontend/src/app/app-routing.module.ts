@@ -3,14 +3,14 @@ import { Routes, RouterModule } from '@angular/router';
 import { LogInComponent } from './authentication/log-in/log-in.component';
 import { RegisterComponent } from './authentication/register/register.component';
 import { ProductDashboardComponent } from './app-home/product-dashboard/product-dashboard.component';
-import { UserDashboardComponent } from './app-home/user-dashboard/user-dashboard.component';
+import { UserDashboardComponent } from './app-home/my-account/user-dashboard/user-dashboard.component';
 import { AuthenticateGuard } from './guard/authenticate.guard';
 import { ErrorsComponent } from './errors/errors.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 
 const routes: Routes = [
 
-  { path: 'login', component: LogInComponent },
+  { path: 'login', component: LogInComponent},
   { path: 'register', component: RegisterComponent },
   //AuthenticateGuard is used to protect the routes, if no user in session, currently it redirects user to login page, if the user in session is a buyer, it shows you do not have acess
   { path: '', pathMatch: 'full', redirectTo: 'home' },
