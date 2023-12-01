@@ -1,8 +1,7 @@
 package com.gritlab.controller;
 
-import com.gritlab.model.OrderItem;
 import com.gritlab.model.OrderItemDTO;
-import com.gritlab.model.OrderItemResponse;
+import com.gritlab.model.CartItemResponse;
 import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.OrderItemService;
 import jakarta.validation.Valid;
@@ -25,10 +24,10 @@ public class OrderItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderItemResponse>> getOrderItems(Authentication authentication) {
+    public ResponseEntity<List<CartItemResponse>> getOrderItems(Authentication authentication) {
 
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
-        List<OrderItemResponse> items = orderItemService.getOrderItems(userDetails.getId());
+        List<CartItemResponse> items = orderItemService.getOrderItems(userDetails.getId());
         return ResponseEntity.ok().body(items);
     }
 

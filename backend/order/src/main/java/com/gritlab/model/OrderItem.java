@@ -24,6 +24,10 @@ public class OrderItem {
 
     private String productId;
 
+    private String name;
+
+    private String description;
+
     private Integer quantity;
 
     private Double itemPrice;
