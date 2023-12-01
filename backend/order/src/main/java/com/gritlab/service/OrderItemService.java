@@ -22,7 +22,7 @@ public class OrderItemService {
         List<OrderItemResponse> responseItems = new ArrayList<>();
 
         for (OrderItem item : items) {
-            ProductDTO product = new ProductDTO(item.getProductId(), "Mock name", "Mock description", 101.01, 1,  "mockId");
+            ProductDTO product = new ProductDTO(item.getProductId(), "Mock name", "Mock description", 101.01, 10,  "mockId");
              OrderItemResponse responseItem = OrderItemResponse.builder()
                      .itemId(item.getItemId())
                      .orderId(item.getOrderId())

@@ -14,7 +14,7 @@ export class OrderConfirmationComponent implements OnInit {
   constructor(private cartService: CartService) { }
 
   ngOnInit(): void {
-    this.orderConfirmation = this.cartService.getCart();
+    //this.orderConfirmation = this.cartService.getCart();
     console.log(this.orderConfirmation);
   }
 }

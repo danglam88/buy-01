@@ -437,27 +437,22 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  //TODO: Adding Product Quantity? Must start with 1 and max than the quantity the product has
+  //TODO: Add to cart button needs to be disabled when the product was added
   //TODO: Instead of using isAddingToCart boolean to disable the add to cart button, use smth else
   addToCart() {
     this.isAddingToCart = true;
     if (this.product) {
-      this.cartService.addToCart(this.product);
-      // console.log(this.product);
+      this.cartService.addToCart(this.product).subscribe({
+        next: (result) => {
+          this.productAdded.emit();
+        }
+      });
     }
 
     if (this.product.quantity === 0) {
       this.noProductsAvailble = true;
     }
   }
-
-  // decrementQuantity() {
-  //   this.selectedQuantity = Math.max(1, this.selectedQuantity - 1);
-  // }
-
-  // incrementQuantity() {
-  //   this.selectedQuantity = Math.min(this.product.quantity, this.selectedQuantity + 1);
-  // }
 
   // Close modal
   closeModal(): void {

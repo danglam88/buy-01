@@ -1,44 +1,85 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Cart } from '../Models/Cart';
-import { Product } from '../Models/Product';
-import { CartItems } from '../Models/CartItems';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Cart } from "../Models/Cart";
+import { Product } from "../Models/Product";
+import { CartItems } from "../Models/CartItems";
+import { BehaviorSubject, Observable } from "rxjs";
+import { environment } from "../../environments/environment";
+import { EncryptionService } from "./encryption.service";
+import { Router } from "@angular/router";
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class CartService {
   private currentCart: Cart;
   private cart: Cart = new Cart();
   cartItemsLength: number;
-  private cartItemsSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private cartItemsSubject: BehaviorSubject<number> =
+    new BehaviorSubject<number>(0);
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private encryptionService: EncryptionService,
+    private router: Router
+  ) {}
 
-  addToCart(product: Product):void {
-    let CartItem = this.cart.items.find(item => item.product.id === product.id)
-    if (CartItem) {
-      this.changeQuantity(product.id, CartItem.quantity +1 );
-      return;
+  get token(): string {
+    const encryptedSecret = sessionStorage.getItem("srt");
+    if (encryptedSecret) {
+      try {
+        const currentToken = JSON.parse(
+          this.encryptionService.decrypt(encryptedSecret)
+        )["token"];
+        return currentToken;
+      } catch (error) {
+        this.router.navigate(["../login"]);
+      }
     }
-    this.cart.items.push(new CartItems(product));
-    this.updateCartItemsCount();
+    return "";
   }
 
-  removeFromCart(productId: string):void {
-    this.cart.items = this.cart.items.filter(item => item.product.id != productId);
-    this.updateCartItemsCount();
+
+//function to add a product to cart
+  addToCart(product: Product): Observable<object> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+    let defaultItem = {
+      productId: product.id,
+      quantity: 1,
+    };
+    return this.http.post(`${environment.orderItemUrl}`, defaultItem, { headers });
   }
 
-  changeQuantity(productId: string, quantity:number) {
-    let CartItem = this.cart.items.find(item => item.product.id === productId);
-    if (!CartItem) return;
-    CartItem.quantity=quantity;
-    this.updateCartItemsCount();
+  //update quantity in a product
+  changeQuantity(productId: string, quantity: number) {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+    let defaultItem = {
+      productId: productId,
+      quantity: quantity,
+    };
+    return this.http.put(`${environment.orderItemUrl}/` + productId, defaultItem, { headers });
   }
 
-  getCart(): Cart {
-    return this.cart;
+  //get all items in cart
+  getCart(): Observable<object> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+    return this.http.get(`${environment.orderItemUrl}`, { headers });
+  }
+
+  removeFromCart(productId: string): void {
+    this.cart.items = this.cart.items.filter(
+      (item) => item.product.id != productId
+    );
+    this.updateCartItemsCount();
   }
 
   getNumberOfCartItems(): number {

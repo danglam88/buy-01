@@ -6,7 +6,7 @@
 
 <section class="shoppingcart-container">
   <!-- IF THERE IS NO PRODUCTS -->
-  <!-- <div *ngIf="cart.items.length === 0" class="empty-product">
+  <!-- <div *ngIf="cart?.items.length === 0" class="empty-product">
     <a class="alert">There are no products in your cart.</a>
     <button class="shopping-btn" routerLink="../home">
       <div class="pretext">Shop Now</div>
@@ -26,7 +26,7 @@
         <label class="product-line-price">Total</label>
         <label class="product-remove">Remove</label>
       </div>
-      <div class="product" *ngFor="let cartItem of cart.items">
+      <div class="product"  *ngFor="let cartItem of cart?.items">
         <div class="product-details">
           <div class="product-title">{{ cartItem.product.name }}</div>
         </div>
@@ -77,7 +77,7 @@
         </div>
         <div class="totals-item totals-item-total">
           <label>Grand Total</label>
-          <div class="totals-value" id="cart-total">{{ cart.totalPrice }}</div>
+          <!-- <div class="totals-value" id="cart-total">{{ cart.totalPrice }}</div> -->
         </div>
       </div>
 

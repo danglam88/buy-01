@@ -45,7 +45,6 @@ public class OrderItemController {
     public ResponseEntity<Void> updateOrderItems(@PathVariable String id,
                                                     Authentication authentication,
                                                     @Valid @RequestBody OrderItemDTO data) {
-
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         orderItemService.updateOrderItem(id, userDetails.getId(), data);
 

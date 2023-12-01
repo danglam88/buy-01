@@ -12,7 +12,7 @@ import { CartService } from 'src/app/services/cart.service';
 export class CartComponent implements OnInit {
   //@Output() orderConfirmation: EventEmitter<Cart> = new EventEmitter<Cart>();
   products: any[] = [];
-  cart! :Cart;
+  cart :Cart = new Cart();
   constructor (private cartService: CartService,
     private router: Router) {
     this.setCart();
@@ -21,9 +21,28 @@ export class CartComponent implements OnInit {
 
   }
 
+
+
   setCart() {
-    this.cart=this.cartService.getCart();
+    this.cartService?.getCart().subscribe(
+      (data: any) => {
+        console.log(data);
+        this.cart = new Cart();
+        this.cart.items = data.map((item: any) => {
+          let cartItem = new CartItems(item.product);
+          cartItem.product = item.product;
+          cartItem.quantity = item.quantity;
+          cartItem.price = item.item_price;
+          console.log(cartItem.product.id);
+          return cartItem;
+        });
+      },
+      error => {
+        console.error("Error fetching cart data", error);
+      }
+    );
   }
+  
 
   removeFromCart(cartItem: CartItems) {
     this.cartService.removeFromCart(cartItem.product.id);
@@ -31,9 +50,19 @@ export class CartComponent implements OnInit {
   }
 
   changeQuantity(cartItem: CartItems, quantityInString: string) {
+    console.log(cartItem.product.id);
     const quantity = parseInt(quantityInString);
-    this.cartService.changeQuantity(cartItem.product.id, quantity);
-    this.setCart();
+    this.cartService?.changeQuantity(cartItem.product.id, quantity).subscribe( {
+      next: (data: any) => {
+        console.log(data);
+        this.setCart();
+      },
+      error: (error: any) => {
+        console.error("Error changing quantity", error);
+      }
+    }
+    );
+
   }
 
   getQuantityOptions(quantity: number): number[] {
@@ -45,5 +74,13 @@ export class CartComponent implements OnInit {
     this.router.navigate(['/order-confirmation']);
     // this.orderConfirmation.emit(cart);
   }
-  
+
+  // get totalPrice(): number {
+  //   let totalPrice = 0;
+  //   this.items.forEach(items => {
+  //       totalPrice += items.price;
+  //   });
+  //   return totalPrice;
 }
+  
+

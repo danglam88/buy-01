@@ -147,26 +147,13 @@
                         </span>
                     </button>
                 </div>
-                <!-- QUANTITY AND ADD TO CART FEATURE -->
+                <!-- ADD TO CART FEATURE -->
                 <div class="addToCartDiv" *ngIf="!noProductsAvailble">
-                    <!-- <div class="d-flex flex-row justify-content-between align-items-center mt-4 rounded" id="quantity-box">
-                        <div class="d-flex flex-row align-self-center product_data"  id="qty_select">
-                            <input type="hidden" value=" 1 " class="prod_id">
-                                <div class="input-group text-center" id="qty_selector">
-                                    <a class="decrement-btn" id="quantity-btn" (click)="decrementQuantity()">
-                                        <i class="fa fa-minus" style="padding-left:9px"></i>
-                                    </a>
-                                    <input type="text" readonly="readonly" id="qty_display" class="qty-input text-center" [value]="selectedQuantity"/>
-                                    <a class="increment-btn" id="quantity-btn" (click)="incrementQuantity()">
-                                    <i class="fa fa-plus" style="padding-left:6px" ></i>
-                                    </a>
-                                </div>
-                        </div>
-                    </div> -->
                     <button class="addtocart" *ngIf="userRole === 'CLIENT'" [disabled]="isAddingToCart">
                         <div class="pretext" (click)="addToCart()">
                           <i class="fas fa-cart-plus"></i> ADD TO CART
                         </div>
+                        <!-- Disable this button when Add to cart is clicked -->
                         <div class="pretext" *ngIf="isAddingToCart" id="addedToCart">
                             <i class="fas fa-check"></i> ADDED TO CART
                           </div>

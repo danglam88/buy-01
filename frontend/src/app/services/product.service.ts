@@ -74,13 +74,4 @@ export class ProductService {
     return this.httpClient.delete(`${environment.productUrl}/` + user.id, { headers });
   }
 
-  // addProductToCart(productId: number): Observable<object> {
-  //   let headers = new HttpHeaders();
-  //   if (this.token) {
-  //     headers = headers.set('Authorization', `Bearer ${this.token}`);
-  //   }
-  //   const addToCartUrl = `${environment.addToCartUrl}/${productId}`;
-  //   return this.httpClient.post(addToCartUrl, null, { headers });
-  // }
-
 }
