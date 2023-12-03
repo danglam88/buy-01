@@ -68,7 +68,7 @@ div.product-line-price {
 /* Apply clearfix in a few places */
 
 
-.totals-item{
+.totals-item, .payment{
   position: relative;
   display: flex;
   margin-left: 140px;

@@ -43,7 +43,6 @@ public class OrderItemService {
         //todo check that product is exists
         //todo reach data with product info
         OrderItem item = OrderItem.builder()
-                .itemId(data.getProductId())
                 .productId(data.getProductId())
                 .quantity(data.getQuantity())
                 .buyerId(buyerId)

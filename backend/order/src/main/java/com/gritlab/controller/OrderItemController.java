@@ -32,12 +32,12 @@ public class OrderItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addOrderItems(Authentication authentication,
+    public ResponseEntity<String> addOrderItems(Authentication authentication,
                                                  @Valid @RequestBody OrderItemDTO data) {
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
-        orderItemService.addOrderItem(userDetails.getId(), data);
+        String itemId = orderItemService.addOrderItem(userDetails.getId(), data);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(itemId);
     }
 
     @PutMapping("/{id}")

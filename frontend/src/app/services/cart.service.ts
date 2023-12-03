@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Cart } from "../Models/Cart";
 import { Product } from "../Models/Product";
-import { CartItems } from "../Models/CartItems";
 import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "../../environments/environment";
 import { EncryptionService } from "./encryption.service";
@@ -17,6 +16,8 @@ export class CartService {
   cartItemsLength: number;
   private cartItemsSubject: BehaviorSubject<number> =
     new BehaviorSubject<number>(0);
+  private itemId = new BehaviorSubject<object>({itemId: ""});
+  itemId$ = this.itemId.asObservable();
 
   constructor(
     private httpClient: HttpClient,
@@ -39,8 +40,7 @@ export class CartService {
     return "";
   }
 
-
-//function to add a product to cart
+  //function to add a product to cart
   addToCart(product: Product): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -50,11 +50,19 @@ export class CartService {
       productId: product.id,
       quantity: 1,
     };
-    return this.httpClient.post(`${environment.orderItemUrl}`, defaultItem, { headers });
+    const options = {
+      headers: headers,
+      responseType: "text" as "json", // This 'as json' casting is required due to Angular's typing
+    };
+    return this.httpClient.post(
+      `${environment.orderItemUrl}`,
+      defaultItem,
+      options
+    );
   }
 
   //update quantity in a product
-  changeQuantity(productId: string, quantity: number) {
+  changeQuantity(itemId: string, productId: string, quantity: number) {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
@@ -63,7 +71,11 @@ export class CartService {
       productId: productId,
       quantity: quantity,
     };
-    return this.httpClient.put(`${environment.orderItemUrl}` + `/${productId}`, defaultItem, { headers });
+    return this.httpClient.put(
+      `${environment.orderItemUrl}` + `/${itemId}`,
+      defaultItem,
+      { headers }
+    );
   }
 
   //get all items in cart
@@ -76,14 +88,15 @@ export class CartService {
   }
 
   //remove a product from cart
-  removeFromCart(productId: string): Observable<object> {
-    console.log("product to be removed: " + productId);
-    console.log(`${environment.orderItemUrl}` + `/${productId}`);
+  removeFromCart(itemId: string): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
     }
-    return this.httpClient.delete(`${environment.orderItemUrl}` + `/${productId}`, { headers });
+    return this.httpClient.delete(
+      `${environment.orderItemUrl}` + `/${itemId}`,
+      { headers }
+    );
   }
 
   getNumberOfCartItems(): number {
@@ -100,13 +113,7 @@ export class CartService {
     this.cartItemsSubject.next(this.cartItemsLength);
   }
 
-  //for testing for the order confirmation
-
-  setCurrentCart(cart: Cart): void {
-    this.currentCart = cart;
-  }
-
-  getCurrentCart(): Cart {
-    return this.currentCart;
+  setItemId(itemId: any): void {
+    this.itemId.next(itemId);
   }
 }
