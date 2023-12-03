@@ -27,6 +27,7 @@ describe('ProductComponent', () => {
       quantity: 1,
       description: 'Mock Description',
       editable: false, 
+      productMedia: []
     };
 
     fixture.detectChanges();

@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient,
+   private encryptionService: EncryptionService ) { }
   
   authenticate(user: any): Observable<object> {
     return this.httpClient.post(`${environment.authUrl}`, user);
@@ -31,6 +33,6 @@ export class AuthenticationService {
     }
 
     logout() {
-        this.loggedIn = false;
+        sessionStorage.setItem('loggedIn', this.encryptionService.encrypt('false'));
     }
 }

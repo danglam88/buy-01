@@ -1,0 +1,85 @@
+mat-card {
+    margin: 0 auto;
+    box-shadow: 0 4px 6px #778da9;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 35px;
+    border: 1px solid #778da9;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px);
+    min-width: 350px;
+    justify-items: center;
+    max-width: 800px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 25px;
+  }
+
+  a {
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+  }
+
+  .role {
+    color: #231E39;
+      background-color: #FEBB0B;
+      border-radius: 5px;
+      font-size: 14px;
+  
+      padding: 6px 10px;
+      position: absolute;
+      top: 40px;
+      left: 40px;
+  }
+  
+  .title {
+    margin: 0;
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px; /* Adjust as needed */
+  }
+  
+  .row div {
+    flex: 1;
+    margin-right: 10px; /* Adjust as needed */
+  }
+  
+  /* Example styling for individual elements within the row */
+  .row .order-no {
+    /* Add your specific styles for Order No here */
+  }
+  
+  .row .total-amount {
+    /* Add your specific styles for Total Amount here */
+  }
+  
+  .row .status {
+    /* Add your specific styles for Status here */
+  }
+  
+  .row .action {
+    /* Add your specific styles for Action here */
+  }
+  @media (max-width: 767px) {
+    .mat-card {
+      width: 100%;
+      margin: 0 !important;
+      padding: 0 !important;
+      justify-content: center;
+    }
+  }

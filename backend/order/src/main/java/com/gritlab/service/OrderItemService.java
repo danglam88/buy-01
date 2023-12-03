@@ -67,7 +67,6 @@ public class OrderItemService {
     }
 
     public void deleteOrderItem(String itemId, String userId) {
-        System.out.println("deleteOrderItem " + itemId + " " + userId);
         OrderItem position = orderItemRepository
                 .findByItemIdAndBuyerId(itemId, userId).orElseThrow();
 

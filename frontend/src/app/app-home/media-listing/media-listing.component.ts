@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MediaService } from 'src/app/services/media.service';
-import { ToastrService } from 'ngx-toastr';
 import { ErrorService } from 'src/app/services/error.service';
-import { Router } from '@angular/router';
+import { Product } from 'src/app/Models/Product';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-media-listing',
@@ -10,54 +10,68 @@ import { Router } from '@angular/router';
   styleUrls: ['./media-listing.component.css']
 })
 export class MediaListingComponent implements OnInit {
-  mediaImageData:any;
-  @Input() productId: string;
+  mediaImageData: any;
+  @Input() product: Product;
+  mediaImageData$: Observable<string | ArrayBuffer | null>;
 
   constructor(
     private mediaService: MediaService, 
-    private toastr: ToastrService,
     private errorService: ErrorService,
-    private router: Router
-  ) { 
-     // this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
-    // Handles deletion of product media. If so, will get product media to display updates
-    this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
-      if (productMediaDeleted) {
-        this.getProductMedia(this.productId);
-      }
-    });
-  }
+  ) { }
 
   ngOnInit(): void {
-    this.getProductMedia(this.productId);
-  }
+    this.getProductImages(this.product.id);
 
-  // Gets product media in a timeout to allow for product media to be created before getting it
-  getProductMedia(productId: string){
-    setTimeout(() => {
-      this.mediaService.getImageByProductId(productId).subscribe({
-        next: (result) => {
-          this.mediaService.getImageByMediaId(result[0]).subscribe({
-            next: (mediaResult) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              this.mediaImageData = reader.result; 
-            };
-            reader.readAsDataURL(mediaResult); 
-            },
-            error: (error) => {
+    this.mediaService.mediaUpload.subscribe((mediaCreated) => {
+      if (mediaCreated) {
+        this.getProductImages(this.product.id);
+      }
+    });
+
+    this.mediaService.mediaDeleted.subscribe((mediaDeleted) => {
+      if (mediaDeleted) {
+        this.getProductImages(this.product.id);
+      }
+    });
+  }  
+  
+  // Get all product images
+  getProductImages(productId: string): void {
+    this.mediaImageData$ = this.mediaService.getImageByProductId(productId).pipe(
+      switchMap((result) => {
+        if (result && typeof result === 'object' && Object.keys(result).length > 0) {
+          return this.mediaService.getImageByMediaId(result[0]).pipe(
+            switchMap((mediaResult) => {
+              return new Observable<string | ArrayBuffer>((observer) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  observer.next(reader.result);
+                  observer.complete();
+                };
+                reader.onerror = () => {
+                  observer.error('Error reading image data');
+                };
+                reader.readAsDataURL(mediaResult);
+              });
+            }),
+            catchError((error) => {
               if (this.errorService.isAuthError(error.status)) {
                 this.errorService.handleSessionExpirationError();
               }
-            },
-          });
-        },
-        error: (error) => {
-          if (this.errorService.isAuthError(error.status)) {
-            this.errorService.handleSessionExpirationError();
-          }
-        },
-      });
-    }, 250);
-  }
+              return of(null);
+            })
+          );
+        } else {
+          console.log('No media found for product');
+          return of(null);
+        }
+      }),
+      catchError((error) => {
+        if (this.errorService.isAuthError(error.status)) {
+          this.errorService.handleSessionExpirationError();
+        }
+        return of(null);
+      })
+    );
+  } 
 }

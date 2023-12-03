@@ -13,6 +13,14 @@
     justify-content: center;
 }
 
+.product--item :hover{
+    -webkit-box-shadow: 0 0 1px 3px #000 inset;
+    -moz-box-shadow: 0 0 1px 3px #000 inset;
+    box-shadow: 10px 100 18px #cccccc;
+    border: #efefef 2px solid;
+    transform: scale(1.05);
+}
+
 .product--price{
     padding:2px 6px;
     position:absolute;

@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { UserService } from 'src/app/services/user.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
@@ -36,9 +36,7 @@ export class UserDashboardComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private validationService: ValidationService 
-  ) {
-    this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
-  }
+  ) {  }
 
   ngOnInit(): void {
     this.userProfileForm = this.builder.group({
@@ -78,6 +76,7 @@ export class UserDashboardComponent implements OnInit {
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
+        this.userService.setUserInfoRole(this.userInfo.role);
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
           this.getUserAvatar(this.userInfo.id);
         } else {
@@ -138,9 +137,18 @@ export class UserDashboardComponent implements OnInit {
 
   // Remove user avatar
   removeAvatar(): void {
-    this.updateUserInformation('removeAvatar');
-    this.avatar = this.defaultAvatar;
-    this.cancelUploadImage();
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        confirmationText: 'Delete this avatar?' 
+      }
+    });
+    dialogRef.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.updateUserInformation('removeAvatar');
+        this.avatar = this.defaultAvatar;
+        this.cancelUploadImage();
+      }
+    });
   }
 
   // Common method to update user information. Add the field to formData and call the updateUser method

@@ -1,32 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { FormBuilder, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
-import { EncryptionService } from 'src/app/services/encryption.service';
-import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-
+import { Component, OnInit } from "@angular/core";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { FormBuilder, Validators } from "@angular/forms";
+import { ToastrService } from "ngx-toastr";
+import { Router } from "@angular/router";
+import { EncryptionService } from "src/app/services/encryption.service";
+import { MatDialogRef, MatDialog } from "@angular/material/dialog";
 
 @Component({
-  selector: 'app-log-in',
-  templateUrl: './log-in.component.html',
-  styleUrls: ['./log-in.component.css']
+  selector: "app-log-in",
+  templateUrl: "./log-in.component.html",
+  styleUrls: ["./log-in.component.css"],
 })
-export class LogInComponent  implements OnInit{
-  constructor(private builder: FormBuilder, 
-    private toastr:ToastrService,
-    private authService:AuthenticationService,
+export class LogInComponent implements OnInit {
+  constructor(
+    private builder: FormBuilder,
+    private toastr: ToastrService,
+    private authService: AuthenticationService,
     private encryptionService: EncryptionService,
-    private router:Router,
-    private dialog: MatDialog,
+    private router: Router,
+    private dialog: MatDialog
   ) {
-      this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    this.toastr.toastrConfig.positionClass = "toast-bottom-right";
+    //console.log("sessionStorage", encryptionService.decrypt(sessionStorage.getItem("loggedIn")));
+    if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
+      console.log("User is logged in in login component");
+      this.router.navigate(["../home"]);
+    } else {
       sessionStorage.clear();
     }
+  }
 
-  loginform=this.builder.group({
-    username:this.builder.control('',Validators.required),
-    password:this.builder.control('',Validators.required),
+  loginform = this.builder.group({
+    username: this.builder.control("", Validators.required),
+    password: this.builder.control("", Validators.required),
   });
 
   ngOnInit(): void {
@@ -36,14 +42,15 @@ export class LogInComponent  implements OnInit{
         dialog.close();
       });
     }
-
   }
 
   login() {
     this.authService.authenticate(this.loginform.value).subscribe({
       next: (result) => {
-        const encryptedObj = this.encryptionService.encrypt(JSON.stringify(result));
-        sessionStorage.setItem('srt', encryptedObj);
+        const encryptedObj = this.encryptionService.encrypt(
+          JSON.stringify(result)
+        );
+        sessionStorage.setItem("srt", encryptedObj);
       },
       error: (error) => {
         if (error.status == 400) {
@@ -54,18 +61,18 @@ export class LogInComponent  implements OnInit{
               this.toastr.error(errorMessage);
             }
           } else {
-            this.toastr.error('Something went wrong');
+            this.toastr.error("Something went wrong");
           }
         } else if (error.status == 401 || error.status == 403) {
-          this.toastr.error('Invalid credentials');
+          this.toastr.error("Invalid credentials");
         }
       },
       complete: () => {
         this.authService.login();
-        const encryptedLoggedIn = this.encryptionService.encrypt('true');
-        sessionStorage.setItem('loggedIn', encryptedLoggedIn);
-        this.router.navigate(['../home']);
-      }
+        const encryptedLoggedIn = this.encryptionService.encrypt("true");
+        sessionStorage.setItem("loggedIn", encryptedLoggedIn);
+        this.router.navigate(["../home"]);
+      },
     });
   }
 }

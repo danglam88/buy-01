@@ -1,17 +1,12 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { AuthenticateGuard } from '../app/guard/authenticate.guard';
 import { ToastrModule } from 'ngx-toastr';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AngularMaterialModule } from './angular-material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-
-import { HighlightDirective } from './CustomDirectives/highlight.directive';
-
 
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -21,7 +16,7 @@ import { LogInComponent } from './authentication/log-in/log-in.component';
 import { RegisterComponent } from './authentication/register/register.component';
 import { HeaderComponent } from './app-home/header/header.component';
 import { FooterComponent } from './app-home/footer/footer.component';
-import { UserDashboardComponent } from './app-home/user-dashboard/user-dashboard.component';
+import { UserDashboardComponent } from './app-home/my-account/user-dashboard/user-dashboard.component';
 import { ProductDashboardComponent } from './app-home/product-dashboard/product-dashboard.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 import { AppHomeComponent } from './app-home/app-home.component';
@@ -42,6 +37,11 @@ import { AuthenticationService } from '../app/services/authentication.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
 import { ValidationService } from './services/validation.service';
 import { ErrorService } from './services/error.service';
+import { SearchComponent } from './app-home/search/search.component';
+import { FilterComponent } from './app-home/product-listing/filter/filter.component';
+import { MyAccountComponent } from './app-home/my-account/my-account.component';
+import { OrderHistoryComponent } from './app-home/my-account/order-history/order-history.component';
+import { OrderDetailsComponent } from './app-home/my-account/order-details/order-details.component';
 import { CartComponent } from './app-home/cart/cart.component';
 import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
 
@@ -61,12 +61,15 @@ import { OrderConfirmationComponent } from './app-home/order-confirmation/order-
     CreateProductComponent,
     ProductComponent,
     ProductDetailComponent,
-    HighlightDirective,
     ConfirmationDialogComponent,
     ImageSliderComponent,
     MediaListingComponent,
     MediaComponent,
-    HighlightDirective,
+    SearchComponent,
+    FilterComponent,
+    MyAccountComponent,
+    OrderHistoryComponent,
+    OrderDetailsComponent,
     CartComponent,
     OrderConfirmationComponent
   ],
@@ -86,7 +89,6 @@ import { OrderConfirmationComponent } from './app-home/order-confirmation/order-
    
   ],
   providers: [
-    AuthenticateGuard, 
     AuthenticationService, 
     EncryptionService, 
     ErrorService,

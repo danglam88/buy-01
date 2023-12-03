@@ -27,6 +27,8 @@ import { ErrorService } from "src/app/services/error.service";
 import { Product } from "../../Models/Product";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { CartService } from "src/app/services/cart.service";
+import { Observable, catchError, forkJoin, of, switchMap } from 'rxjs';
+import { Media } from 'src/app/Models/Media';
 
 @Component({
   selector: "product-detail",
@@ -35,6 +37,8 @@ import { CartService } from "src/app/services/cart.service";
 })
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
+  @Output() mediaArray$: Observable<Media[]>;
+  view: string = '';
   @Output() productAdded = new EventEmitter();
   editingField: string | null = null;
   productImages: any = {};
@@ -74,24 +78,21 @@ export class ProductDetailComponent implements OnInit {
     //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
     // Handles product media updates and get product images again from media service
-    this.mediaService.productMediaUpdated.subscribe((productMediaUpdated) => {
-      if (productMediaUpdated) {
-        this.productImages = {};
-        this.getProductImages(this.product.id);
+    if (this.mediaService.mediaUpload) {
+      this.mediaService.mediaUpload.subscribe(() => {
+        this.getProductImages();
         this.currentIndexOfImageSlider = this.noOfImages;
-      }
-    });
+      });
+    } 
 
-    // Handles product media deletion and get product images again from media service
-    this.mediaService.productMediaDeleted.subscribe((productMediaDeleted) => {
-      if (productMediaDeleted) {
-        this.productImages = {};
-        this.getProductImages(this.product.id);
-        if (this.currentIndexOfImageSlider === this.noOfImages - 1) {
+    if (this.mediaService.mediaDeleted) {
+      this.mediaService.mediaDeleted.subscribe(() => {
+        this.getProductImages();
+        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
           this.currentIndexOfImageSlider = 0;
         }
-      }
-    });
+      });
+    }
   }
 
   get userRole(): string {
@@ -148,43 +149,72 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
+    this.getProductImages();  
 
-    this.getProductImages(this.product.id);
+      // Handles product media updates and get product images again from media service
+      
+    if (this.mediaService.mediaUpload) {
+      this.mediaService.mediaUpload.subscribe(() => {
+        this.getProductImages();
+        this.currentIndexOfImageSlider = this.noOfImages;
+      });
+    } 
+
+    if (this.mediaService.mediaDeleted) {
+      this.mediaService.mediaDeleted.subscribe(() => {
+        this.getProductImages();
+        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+          this.currentIndexOfImageSlider = 0;
+        }
+      });
+    }
   }
 
-  // Get product images from media service, save to productImages and display in image slider
-  getProductImages(productId: string) {
-    this.mediaService.getImageByProductId(productId).subscribe({
-      next: (result) => {
-        for (const key in result) {
-          if (result.hasOwnProperty(key)) {
-            this.mediaService.getImageByMediaId(result[key]).subscribe({
-              next: (image) => {
+  getProductImages(): void {
+    this.getMediaArray(this.product.id);
+    this.mediaArray$.subscribe((result) => {
+      for (const key in result) {
+        if (result.hasOwnProperty(key)) {
+          this.productImages[key] = { data: result[key].imageData, mediaId: result[key].mediaId };
+        }  
+      }
+      this.noOfImages = result.length;
+    });
+  }
+
+  getMediaArray(productId:string): void{
+    this.mediaArray$ = this.mediaService.getImageByProductId(productId).pipe(
+      switchMap((result) => {
+        console.log("product detail getImageByProductId result: ", result);
+        const mediaObservables = Object.keys(result).map((key) =>
+          this.mediaService.getImageByMediaId(result[key]).pipe(
+            switchMap((image) => {
+              console.log("product detail getImageByMediaId image: ", image)
+              return new Observable<Media>((observer) => {
                 const reader = new FileReader();
                 reader.onload = () => {
-                  this.productImages[key] = {
-                    data: reader.result,
+                  const media: Media = {
+                    productId: productId,
                     mediaId: result[key],
+                    imageData: reader.result,
                   };
+                  observer.next(media);
+                  observer.complete();
                 };
                 reader.readAsDataURL(image);
-              },
-              error: (error) => {
-                if (this.errorService.isAuthError(error.status)) {
-                  this.errorService.handleSessionExpirationError();
-                  this.dialogRef.close();
-                }
-              },
-            });
-          }
-        }
-        const objectLength = Object.keys(result).length;
-        this.noOfImages = objectLength;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
+              });
+            }),
+            catchError((error) => {
+              if (this.errorService.isAuthError(error.status)) {
+                this.errorService.handleSessionExpirationError();
+              }
+              return of(null);
+            })
+          )
+        );
+        return forkJoin(mediaObservables);
+      })
+    );
   }
 
   // Update the product based on which field is being edited
@@ -224,9 +254,8 @@ export class ProductDetailComponent implements OnInit {
         if (confirm) {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
-              this.getProductImages(this.product.id);
-              this.toastr.success("Image deleted");
-              this.mediaService.productMediaDeleted.emit(true);
+              this.mediaService.mediaDeleted.emit(true);
+              this.toastr.success('Image deleted');
             },
             error: (error) => {
               console.log(error);
@@ -253,8 +282,8 @@ export class ProductDetailComponent implements OnInit {
         "Image Limit Exceeded: You can only add a maximum of 5 images"
       );
     } else {
-      this.saveEachSelectedFile(this.product.id, 0);
-      this.mediaService.productMediaUpdated.emit(true);
+      this.saveEachSelectedFile(this.product.id, 0)
+      this.mediaService.mediaUpload.emit(true);
     }
   }
 
@@ -410,8 +439,8 @@ export class ProductDetailComponent implements OnInit {
       formData.append("file", file);
 
       this.mediaService.uploadMedia(formData).subscribe({
-        next: (result) => {
-          this.getProductImages(this.product.id);
+        next: (result) => {;
+          this.getProductImages();
           this.saveEachSelectedFile(productId, index + 1);
           this.selectedFiles = [];
           this.previewUrl = null;
