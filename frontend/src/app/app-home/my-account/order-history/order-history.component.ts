@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
+import { OrderService } from 'src/app/services/order.service';
 
 @Component({
   selector: 'app-order-history',
@@ -9,17 +10,10 @@ import { OrderDetailsComponent } from '../order-details/order-details.component'
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent {
+  allOrders: any[] = [];
   userInfoRole: string = '';
-  product = {
-    description: "Avatars for social media",
-    editable: true,
-    id: "6569fb6018b4e222a419a4f8",
-    name: "Avatars",
-    price: 40,
-    quantity: 4,
-  }
 
-  constructor(private userService: UserService,  private dialog: MatDialog, ) { }
+  constructor(private userService: UserService, private dialog: MatDialog, private orderService: OrderService) { }
 
   ngOnInit(): void {
 
@@ -28,17 +22,34 @@ export class OrderHistoryComponent {
       // Do something with the updated role, for example, update your view
     });
 
-    this.product.editable = false
+    if (this.userInfoRole === 'CLIENT') {
+      this.getClientOrders();
+    } else if (this.userInfoRole === 'SELLER') {
+      this.getSellerOrders();
+    }
   }
 
     // Opens product detail modal
-    openProductDetail(product): void {
+    openProductDetail(order: any): void {
       this.dialog.open(OrderDetailsComponent, {
        data: {
-         product: product, 
+         order: order,
          view: 'order'
        },
      });
    }
- 
+
+   getClientOrders() {
+    this.orderService.getClientOrders().subscribe((res) => {
+      console.log(res);
+      this.allOrders = res.orders;
+    });
+   }
+
+   getSellerOrders() {
+    this.orderService.getSellerOrders().subscribe((res) => {
+      console.log(res);
+      this.allOrders = res.orders;
+    });
+   }
 }

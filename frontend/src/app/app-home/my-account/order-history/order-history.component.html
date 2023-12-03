@@ -10,29 +10,26 @@
   <div *ngIf="userInfoRole== 'CLIENT'">
     <div class="row">
       <div >Order #</div>
-      <div >Total</div>
       <div >Status</div>
       <div >Action</div>
     </div>
   
     <hr>
    
-    <div class="row">
-      <div class="order-no">12345</div>
-      <div class="total-amount">$123</div>
-      <div class="status">Created</div>
+    <div class="row" *ngFor="let order of allOrders">
+      <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
+      <div class="status">{{ order.status_code }}</div>
       <div class="action">
-          <button mat-button color="primary" class="view-button">Cancel</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'">Cancel</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='DELIVERED'">Redo</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'">Remove</button>
       </div>
     </div>
   </div>
-
   <!--SELLER-->
   <div *ngIf="userInfoRole== 'SELLER'">
     <div class="row">
       <div >Order #</div>
-      <div >Quantity</div>
-      <div >Total</div>
       <div >Status</div>
       <div >Action</div>
     </div>
@@ -40,9 +37,7 @@
     <hr>
    
     <div class="row">
-      <div class="order-no" (click)="openProductDetail(product)"><a>1234</a></div>
-      <div class="quantity">1</div>
-      <div class="total-amount">$123</div>
+      <div class="order-no"><a>1234</a></div>
       <div class="status">Created</div>
       <div class="action">
           <button mat-button color="primary" class="view-button">Remove</button>

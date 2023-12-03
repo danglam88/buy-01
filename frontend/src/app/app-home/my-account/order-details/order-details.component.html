@@ -9,22 +9,31 @@
     </div>
     <mat-dialog-content>
         <div class="order-detail" >
-            <h1><strong>{{product?.name}} : € {{product?.price}}</strong></h1>
             <div class="product-value">
-                <h2>Order #: 1234</h2>
+                <h2>Order #: {{ order.order_id }}</h2>
             </div>
             <div class="product-value">
-                <h2>Quantity Ordered: 4</h2>
+                <h2>Status: {{ order.status_code }}</h2>
+            </div>
+            <hr>
+            <div class="product-value" *ngFor="let item of orderItems">
+                <div>
+                    <h2>Product Name: {{ item.name }}</h2>
+                </div>
+                <div>
+                    <h2>Product Price: €{{ item.item_price }}</h2>
+                </div>
+                <div>
+                    <h2>Order Quantity: {{ item.quantity }}</h2>
+                </div>
+                <div>
+                    <h2>Total Price: {{ item.item_price * item.quantity }}</h2>
+                </div>
+                <hr>
             </div>
             <div class="product-value">
-                <h2>Total Amount: $400</h2>
-            </div>
-            <div class="product-value">
-                <h2>Status: Created</h2>
+                <h2>Order Total: €{{ orderTotal }}</h2>
             </div>
         </div>
     </mat-dialog-content>
 </div>
-
-
-

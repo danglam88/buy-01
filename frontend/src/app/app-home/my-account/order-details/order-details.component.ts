@@ -1,4 +1,4 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Product } from 'src/app/Models/Product';
 
@@ -7,14 +7,27 @@ import { Product } from 'src/app/Models/Product';
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.css']
 })
-export class OrderDetailsComponent {
+export class OrderDetailsComponent implements OnInit {
   @Input() product: Product;
+  order: any;
+  orderItems: any[] = [];
+  orderTotal: number = 0;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<OrderDetailsComponent>,
     ) {
-      this.product = data.product;
+      this.order = data.order;
+      this.orderItems = data.order.items;
     }
+
+  ngOnInit(): void {
+    console.log(this.orderItems);
+    this.orderItems.forEach((item) => {
+      this.orderTotal += item.item_price * item.quantity;
+    });
+  }
+
    // Close modal
    closeModal(): void {
     this.dialogRef.close();

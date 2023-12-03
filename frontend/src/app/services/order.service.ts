@@ -48,4 +48,22 @@ export class OrderService {
   
     return this.httpClient.post(`${environment.orderUrl}`, order, options);
   }
+
+  getClientOrders(): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.get(`${environment.clientOrderUrl}`, { headers });
+  }
+
+  getSellerOrders(): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.get(`${environment.sellerOrderUrl}`, { headers });
+  }
 }
