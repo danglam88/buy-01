@@ -25,8 +25,10 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     this.cartService.itemId$.subscribe((itemId) => {
       this.itemId = itemId;
+      
     });
     console.log("itemId at ngOnInit: ", this.itemId);
+    
   }
 
   setCart() {
@@ -39,7 +41,8 @@ export class CartComponent implements OnInit {
           cartItem.product = item.product;
           cartItem.quantity = item.quantity;
           cartItem.price = item.item_price;
-          console.log(cartItem.product.id);
+          cartItem.itemId = item.itemId;
+          //console.log(cartItem.product.id);
           return cartItem;
         });
       },
@@ -49,9 +52,8 @@ export class CartComponent implements OnInit {
     });
   }
 
-  removeFromCart() {
-    console.log("itemId at removeFromCart: ", this.itemId);
-    this.cartService.removeFromCart(this.itemId).subscribe({
+  removeFromCart(cartItem: CartItems) {
+    this.cartService.removeFromCart(cartItem.itemId).subscribe({
       next: (data: any) => {
         console.log(data);
         this.setCart();
@@ -64,7 +66,7 @@ export class CartComponent implements OnInit {
 
   changeQuantity(cartItem: CartItems, quantityInString: string) {
     const quantity = parseInt(quantityInString);
-    this.cartService?.changeQuantity(this.itemId, cartItem.product.id, quantity).subscribe({
+    this.cartService?.changeQuantity(cartItem.itemId, cartItem.product.id, quantity).subscribe({
       next: (data: any) => {
         console.log(data);
         this.setCart();

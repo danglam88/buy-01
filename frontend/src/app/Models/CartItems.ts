@@ -7,4 +7,5 @@ export class CartItems {
    product: Product;
    quantity:number=1;
    price:number=0;
+   itemId:string="";
 }

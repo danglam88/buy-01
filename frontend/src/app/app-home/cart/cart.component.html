@@ -45,8 +45,9 @@
           </select>
         </div>
 
+        <div class="product-quantity">{{ cartItem.itemId }}</div>
         <div class="product-line-price">{{ cartItem.price }}</div>
-        <button class="remove-button" (click)="removeFromCart()">
+        <button class="remove-button" (click)="removeFromCart(cartItem)">
           Remove
         </button>
       </div>
