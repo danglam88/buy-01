@@ -43,6 +43,7 @@ public class OrderItemService {
         //todo check that product is exists
         //todo reach data with product info
         OrderItem item = OrderItem.builder()
+                .itemId(data.getProductId())
                 .productId(data.getProductId())
                 .quantity(data.getQuantity())
                 .buyerId(buyerId)
@@ -66,7 +67,7 @@ public class OrderItemService {
     }
 
     public void deleteOrderItem(String itemId, String userId) {
-
+        System.out.println("deleteOrderItem " + itemId + " " + userId);
         OrderItem position = orderItemRepository
                 .findByItemIdAndBuyerId(itemId, userId).orElseThrow();
 

@@ -53,8 +53,9 @@ public class OrderItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrderItems(@PathVariable String id,
                                                             Authentication authentication) {
-
+        System.out.println("deleteOrderItems before userDetails: " + id);
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
+        System.out.println("deleteOrderItems after userDetails: " + id + " " + userDetails.getId());
         orderItemService.deleteOrderItem(id, userDetails.getId());
 
         return ResponseEntity.ok().build();
