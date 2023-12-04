@@ -5,6 +5,7 @@ import com.gritlab.repository.OrderItemRepository;
 import com.gritlab.repository.OrderItemRepositoryCustom;
 import com.gritlab.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class OrderService {
     @Autowired
     OrderItemRepositoryCustom customRepository;
 
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public OrderHistory getOrdersByBuyerId(String buyerId) {
 

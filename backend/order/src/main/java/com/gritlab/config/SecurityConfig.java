@@ -56,6 +56,9 @@ public class SecurityConfig {
     @Value("${spring.kafka.consumer.max-partition-fetch-bytes}")
     private String maxPartitionFetchBytes;
 
+    @Value("${spring.kafka.producer.max-request-size}")
+    private String maxRequestSize;
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -81,5 +84,35 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated())
                 .build();
+    }
+
+    @Bean
+    public NewTopic productDataRequest() {
+        return TopicBuilder.name("PRODUCT_DATA_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic productDataResponse() {
+        return TopicBuilder.name("PRODUCT_DATA_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
     }
 }

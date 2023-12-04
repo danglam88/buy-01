@@ -1,10 +1,13 @@
 package com.gritlab.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.BinaryData;
 import com.gritlab.model.Product;
 import com.gritlab.model.ProductDTO;
+import com.gritlab.model.OrderItem;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import java.util.Optional;
-
 
 @Service
 public class ProductService {
@@ -188,6 +190,47 @@ public class ProductService {
             } else {
                 kafkaTemplate.send("CHECK_PRODUCT_RESPONSE",message, "invalid");
             }
+        }
+    }
+
+    @KafkaListener(topics = "PRODUCT_DATA_REQUEST", groupId = "my-consumer-group")
+    public void productDataRequest(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJson(message);
+
+        Product product = productRepository.findById(orderItem.getProductId()).orElseThrow();
+
+        if (product.getQuantity() > 0 && product.getQuantity() >= orderItem.getQuantity() && orderItem.getQuantity() == 1) {
+            orderItem.setName(product.getName());
+            orderItem.setDescription(product.getDescription());
+            orderItem.setItemPrice(product.getPrice());
+            orderItem.setSellerId(product.getUserId());
+            orderItem.setMaxQuantity(product.getQuantity());
+
+            // Serialize OrderItem to JSON
+            String jsonMessage = convertToJson(orderItem);
+
+            kafkaTemplate.send("PRODUCT_DATA_RESPONSE", jsonMessage);
+        }
+    }
+
+    private OrderItem convertFromJson(String jsonMessage) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(jsonMessage, OrderItem.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String convertToJson(OrderItem item) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

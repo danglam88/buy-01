@@ -117,6 +117,22 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic productDataRequest() {
+        return TopicBuilder.name("PRODUCT_DATA_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic productDataResponse() {
+        return TopicBuilder.name("PRODUCT_DATA_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);

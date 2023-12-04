@@ -47,7 +47,6 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<String> createOrder(Authentication authentication, @Valid @RequestBody OrderRequest data) {
-        System.out.println("OrderController.createOrder: " + data);
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         String orderId = orderService.addOrder(userDetails.getId(), data);
         return ResponseEntity.ok().body(orderId);
