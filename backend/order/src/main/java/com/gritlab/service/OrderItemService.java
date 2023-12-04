@@ -46,7 +46,7 @@ public class OrderItemService {
 
     public String addOrderItem(String buyerId, OrderItemDTO data) {
         if (data.getQuantity() != 1) {
-            throw new IllegalArgumentException("Quantity must be 1");
+            return null;
         }
 
         Optional<OrderItem> itemOptional = orderItemRepository.findByOrderIdAndProductId(null, data.getProductId());
@@ -99,7 +99,11 @@ public class OrderItemService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJson(message);
 
-        orderItemRepository.save(orderItem);
+        if (orderItem.getProductId() == null) {
+            orderItemRepository.delete(orderItem);
+        } else {
+            orderItemRepository.save(orderItem);
+        }
     }
 
     public void updateOrderItem(String itemId, String userId, OrderItemDTO data) {

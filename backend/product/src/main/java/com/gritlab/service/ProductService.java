@@ -198,20 +198,23 @@ public class ProductService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJson(message);
 
-        Product product = productRepository.findById(orderItem.getProductId()).orElseThrow();
+        Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
-        if (product.getQuantity() > 0 && product.getQuantity() >= orderItem.getQuantity() && orderItem.getQuantity() == 1) {
-            orderItem.setName(product.getName());
-            orderItem.setDescription(product.getDescription());
-            orderItem.setItemPrice(product.getPrice());
-            orderItem.setSellerId(product.getUserId());
-            orderItem.setMaxQuantity(product.getQuantity());
-
-            // Serialize OrderItem to JSON
-            String jsonMessage = convertToJson(orderItem);
-
-            kafkaTemplate.send("PRODUCT_DATA_RESPONSE", jsonMessage);
+        if (product.isEmpty() || product.get().getQuantity() < orderItem.getQuantity()
+                || orderItem.getQuantity() != 1) {
+            orderItem.setProductId(null);
+        } else {
+            orderItem.setName(product.get().getName());
+            orderItem.setDescription(product.get().getDescription());
+            orderItem.setItemPrice(product.get().getPrice());
+            orderItem.setSellerId(product.get().getUserId());
+            orderItem.setMaxQuantity(product.get().getQuantity());
         }
+
+        // Serialize OrderItem to JSON
+        String jsonMessage = convertToJson(orderItem);
+
+        kafkaTemplate.send("PRODUCT_DATA_RESPONSE", jsonMessage);
     }
 
     private OrderItem convertFromJson(String jsonMessage) {
