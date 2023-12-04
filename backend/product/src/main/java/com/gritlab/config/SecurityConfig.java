@@ -117,16 +117,32 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NewTopic productDataRequest() {
-        return TopicBuilder.name("PRODUCT_DATA_REQUEST")
+    public NewTopic createCartRequest() {
+        return TopicBuilder.name("CREATE_CART_REQUEST")
                 .partitions(1)
                 .replicas(1)
                 .build();
     }
 
     @Bean
-    public NewTopic productDataResponse() {
-        return TopicBuilder.name("PRODUCT_DATA_RESPONSE")
+    public NewTopic createCartResponse() {
+        return TopicBuilder.name("CREATE_CART_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateCartRequest() {
+        return TopicBuilder.name("UPDATE_CART_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateCartResponse() {
+        return TopicBuilder.name("UPDATE_CART_RESPONSE")
                 .partitions(1)
                 .replicas(1)
                 .build();

@@ -49,16 +49,14 @@ public class OrderItemService {
             throw new IllegalArgumentException("Quantity must be 1");
         }
 
-        Optional<OrderItem> itemOptional = orderItemRepository.findByOrderIdAndProductId(null, data.getProductId());
+        Optional<OrderItem> itemOptional =
+                orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
 
         if (itemOptional.isEmpty()) {
             OrderItem item = OrderItem.builder()
                     .productId(data.getProductId())
                     .quantity(data.getQuantity())
                     .buyerId(buyerId)
-                    .sellerId(null)
-                    .orderId(null)
-                    .itemPrice(null)
                     .build();
 
             OrderItem newItem = orderItemRepository.save(item);
@@ -66,7 +64,7 @@ public class OrderItemService {
             // Serialize newItem to JSON
             String jsonMessage = convertToJson(newItem);
 
-            kafkaTemplate.send("PRODUCT_DATA_REQUEST", jsonMessage);
+            kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
 
             return newItem.getItemId();
         }
@@ -94,8 +92,8 @@ public class OrderItemService {
         }
     }
 
-    @KafkaListener(topics = "PRODUCT_DATA_RESPONSE", groupId = "my-consumer-group")
-    public void productDataResponse(String message) {
+    @KafkaListener(topics = "CREATE_CART_RESPONSE", groupId = "my-consumer-group")
+    public void createCartResponse(String message) {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJson(message);
 
@@ -107,20 +105,41 @@ public class OrderItemService {
         }
     }
 
-    public void updateOrderItem(String itemId, String userId, OrderItemDTO data) {
+    @KafkaListener(topics = "UPDATE_CART_RESPONSE", groupId = "my-consumer-group")
+    public void updateCartResponse(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJson(message);
 
-        //todo check product quantity
-        //todo check that product is exists
-        OrderItem position = orderItemRepository
-                .findByItemIdAndBuyerIdAndProductId(itemId, userId, data.getProductId()).orElseThrow();
-        position.setQuantity(data.getQuantity());
-        orderItemRepository.save(position);
+        if (orderItem.getProductId() == null) {
+            orderItemRepository.delete(orderItem);
+            throw new IllegalArgumentException("Product is not available anymore");
+        } else {
+            orderItemRepository.save(orderItem);
+        }
     }
 
-    public void deleteOrderItem(String itemId, String userId) {
-        OrderItem position = orderItemRepository
-                .findByItemIdAndBuyerId(itemId, userId).orElseThrow();
+    public void updateOrderItem(String itemId, String buyerId, OrderItemDTO data) {
 
-        orderItemRepository.delete(position);
+        OrderItem item = orderItemRepository
+                .findByItemIdAndBuyerIdAndProductId(itemId, buyerId, data.getProductId()).orElseThrow();
+
+        OrderItem updatedItem = OrderItem.builder()
+                .itemId(itemId)
+                .productId(data.getProductId())
+                .quantity(data.getQuantity())
+                .buyerId(buyerId)
+                .build();
+
+        // Serialize newItem to JSON
+        String jsonMessage = convertToJson(updatedItem);
+
+        kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
+    }
+
+    public void deleteOrderItem(String itemId, String buyerId) {
+        OrderItem item = orderItemRepository
+                .findByItemIdAndBuyerId(itemId, buyerId).orElseThrow();
+
+        orderItemRepository.delete(item);
     }
 }

@@ -193,8 +193,8 @@ public class ProductService {
         }
     }
 
-    @KafkaListener(topics = "PRODUCT_DATA_REQUEST", groupId = "my-consumer-group")
-    public void productDataRequest(String message) {
+    @KafkaListener(topics = "CREATE_CART_REQUEST", groupId = "my-consumer-group")
+    public void createCartRequest(String message) {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJson(message);
 
@@ -214,7 +214,34 @@ public class ProductService {
         // Serialize OrderItem to JSON
         String jsonMessage = convertToJson(orderItem);
 
-        kafkaTemplate.send("PRODUCT_DATA_RESPONSE", jsonMessage);
+        kafkaTemplate.send("CREATE_CART_RESPONSE", jsonMessage);
+    }
+
+    @KafkaListener(topics = "UPDATE_CART_REQUEST", groupId = "my-consumer-group")
+    public void updateCartRequest(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJson(message);
+
+        Optional<Product> product = productRepository.findById(orderItem.getProductId());
+
+        if (product.isEmpty() || product.get().getQuantity() <= 0) {
+            orderItem.setProductId(null);
+        } else {
+            orderItem.setName(product.get().getName());
+            orderItem.setDescription(product.get().getDescription());
+            orderItem.setItemPrice(product.get().getPrice());
+            orderItem.setSellerId(product.get().getUserId());
+            orderItem.setMaxQuantity(product.get().getQuantity());
+
+            if (orderItem.getQuantity() > product.get().getQuantity()) {
+                orderItem.setQuantity(product.get().getQuantity());
+            }
+        }
+
+        // Serialize OrderItem to JSON
+        String jsonMessage = convertToJson(orderItem);
+
+        kafkaTemplate.send("UPDATE_CART_RESPONSE", jsonMessage);
     }
 
     private OrderItem convertFromJson(String jsonMessage) {
