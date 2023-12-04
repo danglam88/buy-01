@@ -46,7 +46,7 @@ public class OrderItemService {
 
     public String addOrderItem(String buyerId, OrderItemDTO data) {
         if (data.getQuantity() != 1) {
-            return null;
+            throw new IllegalArgumentException("Quantity must be 1");
         }
 
         Optional<OrderItem> itemOptional = orderItemRepository.findByOrderIdAndProductId(null, data.getProductId());
@@ -101,6 +101,7 @@ public class OrderItemService {
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
+            throw new IllegalArgumentException("Product is not available");
         } else {
             orderItemRepository.save(orderItem);
         }
