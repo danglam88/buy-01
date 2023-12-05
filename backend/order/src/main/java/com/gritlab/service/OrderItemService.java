@@ -119,7 +119,6 @@ public class OrderItemService {
     }
 
     public void updateOrderItem(String itemId, String buyerId, OrderItemDTO data) {
-
         OrderItem item = orderItemRepository
                 .findByItemIdAndBuyerIdAndProductId(itemId, buyerId, data.getProductId()).orElseThrow();
 

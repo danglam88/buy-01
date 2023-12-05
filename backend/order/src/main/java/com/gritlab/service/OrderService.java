@@ -27,6 +27,9 @@ public class OrderService {
     OrderItemRepositoryCustom customRepository;
 
     @Autowired
+    private OrderItemService orderItemService;
+
+    @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     public OrderHistory getOrdersByBuyerId(String buyerId) {
@@ -169,15 +172,20 @@ public class OrderService {
     }
 
     public void updateOrder(String orderId, String buyerId, OrderRequest data) {
-
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
         order.setStatusCode(data.getStatusCode());
         orderRepository.save(order);
     }
 
     public void deleteOrder(String orderId, String buyerId) {
-
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
+
+        List<OrderItem> items = order.getItems();
+
+        for (OrderItem orderItem: items) {
+            orderItemService.deleteOrderItem(orderItem.getItemId(), buyerId);
+        }
+
         orderRepository.delete(order);
     }
 }
