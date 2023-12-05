@@ -35,7 +35,6 @@ public class OrderItemResponse {
                 .name(item.getName())
                 .description(item.getDescription())
                 .quantity(item.getQuantity())
-                //todo remove mock
                 .itemPrice(item.getItemPrice())
                 .build();
     }

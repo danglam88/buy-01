@@ -62,7 +62,7 @@ public class OrderItemService {
             OrderItem newItem = orderItemRepository.save(item);
 
             // Serialize newItem to JSON
-            String jsonMessage = convertToJson(newItem);
+            String jsonMessage = convertFromOrderItemToJson(newItem);
 
             kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
 
@@ -72,7 +72,7 @@ public class OrderItemService {
         return itemOptional.get().getItemId();
     }
 
-    private OrderItem convertFromJson(String jsonMessage) {
+    private OrderItem convertFromJsonToOrderItem(String jsonMessage) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, OrderItem.class);
@@ -82,7 +82,7 @@ public class OrderItemService {
         }
     }
 
-    private String convertToJson(OrderItem item) {
+    private String convertFromOrderItemToJson(OrderItem item) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(item);
@@ -95,11 +95,11 @@ public class OrderItemService {
     @KafkaListener(topics = "CREATE_CART_RESPONSE", groupId = "my-consumer-group")
     public void createCartResponse(String message) {
         // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJson(message);
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
-            throw new IllegalArgumentException("Product is not available");
+            throw new IllegalArgumentException("Product " + orderItem.getName() + " is not available");
         } else {
             orderItemRepository.save(orderItem);
         }
@@ -108,11 +108,11 @@ public class OrderItemService {
     @KafkaListener(topics = "UPDATE_CART_RESPONSE", groupId = "my-consumer-group")
     public void updateCartResponse(String message) {
         // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJson(message);
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
-            throw new IllegalArgumentException("Product is not available anymore");
+            throw new IllegalArgumentException("Product " + orderItem.getName() + " is not available anymore");
         } else {
             orderItemRepository.save(orderItem);
         }
@@ -131,7 +131,7 @@ public class OrderItemService {
                 .build();
 
         // Serialize newItem to JSON
-        String jsonMessage = convertToJson(updatedItem);
+        String jsonMessage = convertFromOrderItemToJson(updatedItem);
 
         kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
     }

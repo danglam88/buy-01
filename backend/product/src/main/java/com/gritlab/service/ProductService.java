@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gritlab.exception.ForbiddenException;
 import com.gritlab.exception.InvalidParamException;
-import com.gritlab.model.BinaryData;
-import com.gritlab.model.Product;
-import com.gritlab.model.ProductDTO;
-import com.gritlab.model.OrderItem;
+import com.gritlab.model.*;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,7 +193,7 @@ public class ProductService {
     @KafkaListener(topics = "CREATE_CART_REQUEST", groupId = "my-consumer-group")
     public void createCartRequest(String message) {
         // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJson(message);
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
 
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
@@ -212,15 +209,38 @@ public class ProductService {
         }
 
         // Serialize OrderItem to JSON
-        String jsonMessage = convertToJson(orderItem);
+        String jsonMessage = convertFromOrderItemToJson(orderItem);
 
         kafkaTemplate.send("CREATE_CART_RESPONSE", jsonMessage);
+    }
+
+    @KafkaListener(topics = "CREATE_ORDER_REQUEST", groupId = "my-consumer-group")
+    public void createOrderRequest(String message) {
+        // Deserialize JSON to Order
+        Order order = convertFromJsonToOrder(message);
+
+        List<OrderItem> items = order.getItems();
+
+        for (OrderItem orderItem: items) {
+            Optional<Product> product = productRepository.findById(orderItem.getProductId());
+
+            if (product.isEmpty() || product.get().getQuantity() < orderItem.getQuantity()) {
+                orderItem.setProductId(null);
+            } else {
+                orderItem.setMaxQuantity(product.get().getQuantity());
+            }
+        }
+
+        // Serialize Order to JSON
+        String jsonMessage = convertFromOrderToJson(order);
+
+        kafkaTemplate.send("CREATE_ORDER_RESPONSE", jsonMessage);
     }
 
     @KafkaListener(topics = "UPDATE_CART_REQUEST", groupId = "my-consumer-group")
     public void updateCartRequest(String message) {
         // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJson(message);
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
 
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
@@ -239,12 +259,12 @@ public class ProductService {
         }
 
         // Serialize OrderItem to JSON
-        String jsonMessage = convertToJson(orderItem);
+        String jsonMessage = convertFromOrderItemToJson(orderItem);
 
         kafkaTemplate.send("UPDATE_CART_RESPONSE", jsonMessage);
     }
 
-    private OrderItem convertFromJson(String jsonMessage) {
+    private OrderItem convertFromJsonToOrderItem(String jsonMessage) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, OrderItem.class);
@@ -254,10 +274,30 @@ public class ProductService {
         }
     }
 
-    private String convertToJson(OrderItem item) {
+    private String convertFromOrderItemToJson(OrderItem item) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Order convertFromJsonToOrder(String jsonMessage) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(jsonMessage, Order.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String convertFromOrderToJson(Order order) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(order);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
