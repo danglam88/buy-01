@@ -86,11 +86,11 @@ public class OrderService {
 
     public String addOrder(String buyerId, OrderRequest data) {
         if (data.getStatusCode() != OrderStatus.CREATED) {
-            throw new IllegalArgumentException("Order status must be CREATED");
+            throw new IllegalArgumentException("Order status must be CREATED for order to be created");
         }
 
         if (data.getPaymentCode() != Payment.CASH) {
-            throw new IllegalArgumentException("Payment method not supported");
+            throw new IllegalArgumentException("Payment method not supported. Only CASH is supported for now");
         }
 
         Order order = Order.builder()
@@ -179,6 +179,10 @@ public class OrderService {
 
     public void deleteOrder(String orderId, String buyerId) {
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
+
+        if (order.getStatusCode() != OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("Order status must be CANCELLED for order to be deleted");
+        }
 
         List<OrderItem> items = order.getItems();
 
