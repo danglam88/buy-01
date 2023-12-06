@@ -12,11 +12,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderItemResponse {
 
+    @JsonProperty("order_id")
+    private String orderId;
+
     @JsonProperty("item_id")
     private String itemId;
 
     @JsonProperty("product_id")
     private String productId;
+
+    @JsonProperty("seller_id")
+    private String sellerId;
 
     private String name;
 
@@ -33,8 +39,10 @@ public class OrderItemResponse {
     public static OrderItemResponse fromOrderItem(OrderItem item) {
 
         return OrderItemResponse.builder()
+                .orderId(item.getOrderId())
                 .itemId(item.getItemId())
                 .productId(item.getProductId())
+                .sellerId(item.getSellerId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .quantity(item.getQuantity())

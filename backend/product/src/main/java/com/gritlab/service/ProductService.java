@@ -230,6 +230,8 @@ public class ProductService {
             }
         }
 
+        order.setItems(items);
+
         // Serialize Order to JSON
         String jsonMessage = convertFromOrderToJson(order);
 

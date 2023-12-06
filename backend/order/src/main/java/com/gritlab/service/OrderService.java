@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +47,7 @@ public class OrderService {
                     .items(convertToDTO(items))
                     .paymentCode(order.getPaymentCode())
                     .build();
+
             ordersFullData.add(fullOrderData);
         }
 
@@ -72,10 +72,18 @@ public class OrderService {
                 .build();
     }
 
-    public List<OrderResponse> getOrdersBySellerId(String sellerId) {
+    public OrderItemHistory getOrderItemsBySellerId(String sellerId) {
 
-        List<OrderResponse> responseItems = new ArrayList<>();
-        return responseItems;
+        OrderItemHistory history = new OrderItemHistory();
+        List<OrderItem> items = orderItemRepository.findBySellerIdAndOrderIdIsNotNull(sellerId);
+
+        List<OrderItemResponse> itemsFullData = convertToDTO(items);
+
+        history.setItems(itemsFullData);
+        history.setTopProducts(customRepository.sumQuantityByProductIdAndSellerId(sellerId));
+        history.setTotalAmount(customRepository.getTotalSumItemPriceBySellerId(sellerId));
+
+        return history;
     }
 
     public List<OrderItemResponse> convertToDTO(List<OrderItem> orderItems) {
@@ -106,11 +114,13 @@ public class OrderService {
 
         List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
         List<OrderItem> newItems = new ArrayList<>();
+        List<String> sellerIds = new ArrayList<>();
 
         for (OrderItem orderItem: items) {
             orderItem.setOrderId(orderId);
             OrderItem newItem = orderItemRepository.save(orderItem);
             newItems.add(newItem);
+            sellerIds.add(newItem.getSellerId());
         }
 
         newOrder.setItems(newItems);
@@ -141,7 +151,7 @@ public class OrderService {
             }
         }
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             // Remove order from DB
             orderRepository.delete(order);
             throw new IllegalArgumentException("None of the chosen products are available anymore for order " + order.getOrderId());

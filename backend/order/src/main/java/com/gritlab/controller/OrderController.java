@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/order")
 public class OrderController {
@@ -22,11 +20,11 @@ public class OrderController {
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<List<OrderResponse>> getSellerOrders(Authentication authentication) {
+    public ResponseEntity<OrderItemHistory> getSellerOrderItems(Authentication authentication) {
 
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
-        List<OrderResponse> orders = orderService.getOrdersBySellerId(userDetails.getId());
-        return ResponseEntity.ok().body(orders);
+        OrderItemHistory items = orderService.getOrderItemsBySellerId(userDetails.getId());
+        return ResponseEntity.ok().body(items);
     }
 
     @GetMapping("/client")

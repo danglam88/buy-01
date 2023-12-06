@@ -39,10 +39,39 @@ public class OrderItemRepositoryCustom {
         return  results.getMappedResults();
     }
 
+    public List<TopProduct> sumQuantityByProductIdAndSellerId(String sellerId) {
+        GroupOperation groupOperation = Aggregation.group("productId")
+                .first("productId").as("productId")
+                .first("name").as("name")
+                .sum("quantity").as("totalQuantity");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("sellerId").is(sellerId)),
+                groupOperation,
+                Aggregation.sort(Sort.Direction.DESC, "totalQuantity"),
+                Aggregation.limit(1)
+        );
+
+        AggregationResults<TopProduct> results = mongoTemplate.aggregate(aggregation, "order_item", TopProduct.class);
+        return results.getMappedResults();
+    }
 
     public Double getTotalSumItemPriceByBuyerId(String buyerId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("buyerId").is(buyerId)),
+                Aggregation.group()
+                        .sum("itemPrice").as("totalItemPrice")
+        );
+
+        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "order_item", Document.class);
+        Document resultDocument = results.getUniqueMappedResult();
+
+        return resultDocument == null ? 0.0 : resultDocument.getDouble("totalItemPrice");
+    }
+
+    public Double getTotalSumItemPriceBySellerId(String sellerId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("sellerId").is(sellerId)),
                 Aggregation.group()
                         .sum("itemPrice").as("totalItemPrice")
         );
