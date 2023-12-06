@@ -21,9 +21,6 @@ public class OrderItemResponse {
     @JsonProperty("product_id")
     private String productId;
 
-    @JsonProperty("seller_id")
-    private String sellerId;
-
     private String name;
 
     private String description;
@@ -42,7 +39,6 @@ public class OrderItemResponse {
                 .orderId(item.getOrderId())
                 .itemId(item.getItemId())
                 .productId(item.getProductId())
-                .sellerId(item.getSellerId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .quantity(item.getQuantity())
