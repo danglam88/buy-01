@@ -119,6 +119,22 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic updateStatusRequest() {
+        return TopicBuilder.name("UPDATE_STATUS_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateStatusResponse() {
+        return TopicBuilder.name("UPDATE_STATUS_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public NewTopic createOrderRequest() {
         return TopicBuilder.name("CREATE_ORDER_REQUEST")
                 .partitions(1)

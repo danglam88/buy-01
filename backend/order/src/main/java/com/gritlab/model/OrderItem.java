@@ -33,4 +33,6 @@ public class OrderItem {
     private Double itemPrice;
 
     private Integer maxQuantity;
+
+    private OrderStatus statusCode;
 }

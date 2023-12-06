@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,7 +144,7 @@ public class OrderService {
         if (items.isEmpty()) {
             // Remove order from DB
             orderRepository.delete(order);
-            throw new IllegalArgumentException("None of the chosen products are available anymore");
+            throw new IllegalArgumentException("None of the chosen products are available anymore for order " + order.getOrderId());
         } else {
             // Update items list to order and update order to DB
             order.setItems(items);
@@ -173,8 +174,15 @@ public class OrderService {
 
     public void updateOrder(String orderId, String buyerId, OrderRequest data) {
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
-        order.setStatusCode(data.getStatusCode());
-        orderRepository.save(order);
+
+        if (order.getStatusCode() == OrderStatus.CREATED
+                && (data.getStatusCode() == OrderStatus.CANCELLED
+                || (data.getStatusCode() == OrderStatus.CONFIRMED
+                && orderItemService.allItemsAreConfirmed(order.getItems())))) {
+
+            order.setStatusCode(data.getStatusCode());
+            orderRepository.save(order);
+        }
     }
 
     public void deleteOrder(String orderId, String buyerId) {

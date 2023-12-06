@@ -2,6 +2,7 @@ package com.gritlab.controller;
 
 import com.gritlab.model.OrderItemDTO;
 import com.gritlab.model.CartItemResponse;
+import com.gritlab.model.OrderItemStatusDTO;
 import com.gritlab.model.UserDetailsJWT;
 import com.gritlab.service.OrderItemService;
 import jakarta.validation.Valid;
@@ -46,6 +47,16 @@ public class OrderItemController {
                                                     @Valid @RequestBody OrderItemDTO data) {
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         orderItemService.updateOrderItem(id, userDetails.getId(), data);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Void> updateOrderItemsStatus(@PathVariable String id,
+                                                    Authentication authentication,
+                                                    @Valid @RequestBody OrderItemStatusDTO data) {
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
+        orderItemService.updateOrderItemStatus(id, userDetails.getId(), data);
 
         return ResponseEntity.ok().build();
     }

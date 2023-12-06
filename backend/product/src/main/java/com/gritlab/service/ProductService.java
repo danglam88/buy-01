@@ -197,8 +197,7 @@ public class ProductService {
 
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
-        if (product.isEmpty() || product.get().getQuantity() < orderItem.getQuantity()
-                || orderItem.getQuantity() != 1) {
+        if (product.isEmpty() || product.get().getQuantity() < orderItem.getQuantity()) {
             orderItem.setProductId(null);
         } else {
             orderItem.setName(product.get().getName());
@@ -262,6 +261,32 @@ public class ProductService {
         String jsonMessage = convertFromOrderItemToJson(orderItem);
 
         kafkaTemplate.send("UPDATE_CART_RESPONSE", jsonMessage);
+    }
+
+    @KafkaListener(topics = "UPDATE_STATUS_REQUEST", groupId = "my-consumer-group")
+    public void updateStatusRequest(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
+
+        Optional<Product> product = productRepository.findById(orderItem.getProductId());
+
+        if (product.isEmpty() || product.get().getQuantity() <= 0) {
+            orderItem.setStatusCode(OrderStatus.CANCELLED);
+        } else {
+            orderItem.setName(product.get().getName());
+            orderItem.setDescription(product.get().getDescription());
+            orderItem.setItemPrice(product.get().getPrice());
+            orderItem.setMaxQuantity(product.get().getQuantity());
+
+            if (orderItem.getQuantity() > product.get().getQuantity()) {
+                orderItem.setStatusCode(OrderStatus.CANCELLED);
+            }
+        }
+
+        // Serialize OrderItem to JSON
+        String jsonMessage = convertFromOrderItemToJson(orderItem);
+
+        kafkaTemplate.send("UPDATE_STATUS_RESPONSE", jsonMessage);
     }
 
     private OrderItem convertFromJsonToOrderItem(String jsonMessage) {

@@ -24,7 +24,10 @@ import java.util.Optional;
 @Repository
 public interface OrderItemRepository extends MongoRepository<OrderItem, String> {
 
-    public Optional<OrderItem> findByItemIdAndBuyerIdAndProductId(String itemId, String buyerId, String productId);
+    public Optional<OrderItem> findByItemIdAndBuyerIdAndProductIdAndOrderIdIsNull(String itemId,
+                                                                                  String buyerId, String productId);
+    public Optional<OrderItem> findByItemIdAndSellerIdAndProductIdAndOrderId(String itemId,
+                                                                  String sellerId, String productId, String orderId);
     public Optional<OrderItem> findByItemIdAndBuyerId(String itemId, String buyerId);
     public Optional<OrderItem> findByProductIdAndOrderIdIsNull(String productId);
     public List<OrderItem> findByBuyerIdAndOrderIdIsNull(String buyerId);

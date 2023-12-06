@@ -27,6 +27,9 @@ public class OrderItemResponse {
     @JsonProperty("item_price")
     private Double itemPrice;
 
+    @JsonProperty("status_code")
+    private OrderStatus statusCode;
+
     public static OrderItemResponse fromOrderItem(OrderItem item) {
 
         return OrderItemResponse.builder()
@@ -36,6 +39,7 @@ public class OrderItemResponse {
                 .description(item.getDescription())
                 .quantity(item.getQuantity())
                 .itemPrice(item.getItemPrice())
+                .statusCode(item.getStatusCode())
                 .build();
     }
 }

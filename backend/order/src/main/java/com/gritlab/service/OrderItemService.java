@@ -2,11 +2,9 @@ package com.gritlab.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gritlab.model.OrderItem;
-import com.gritlab.model.OrderItemDTO;
-import com.gritlab.model.CartItemResponse;
-import com.gritlab.model.ProductDTO;
+import com.gritlab.model.*;
 import com.gritlab.repository.OrderItemRepository;
+import com.gritlab.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,6 +22,9 @@ public class OrderItemService {
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     public List<CartItemResponse> getOrderItems(String buyerId) {
         List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
@@ -57,6 +58,7 @@ public class OrderItemService {
                     .productId(data.getProductId())
                     .quantity(data.getQuantity())
                     .buyerId(buyerId)
+                    .statusCode(OrderStatus.CREATED)
                     .build();
 
             OrderItem newItem = orderItemRepository.save(item);
@@ -118,21 +120,101 @@ public class OrderItemService {
         }
     }
 
+    @KafkaListener(topics = "UPDATE_STATUS_RESPONSE", groupId = "my-consumer-group")
+    public void updateStatusResponse(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
+
+        if (orderItem.getStatusCode() == OrderStatus.CANCELLED) {
+            orderItemRepository.delete(orderItem);
+        } else if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+            orderItemRepository.save(orderItem);
+        }
+
+        Order order = orderRepository.findByOrderId(orderItem.getOrderId()).orElseThrow();
+
+        List<OrderItem> items = order.getItems();
+
+        for (OrderItem item: items) {
+            if (item.getItemId().equals(orderItem.getItemId()) && orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+                item.setStatusCode(orderItem.getStatusCode());
+                break;
+            } else if (item.getItemId().equals(orderItem.getItemId()) && orderItem.getStatusCode() == OrderStatus.CANCELLED) {
+                items.remove(item);
+                break;
+            }
+        }
+
+        order.setItems(items);
+
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            order.setStatusCode(OrderStatus.CANCELLED);
+        } else if (allItemsAreConfirmed(order.getItems())) {
+            order.setStatusCode(OrderStatus.CONFIRMED);
+        }
+
+        orderRepository.save(order);
+    }
+
+    public boolean allItemsAreConfirmed(List<OrderItem> items) {
+        for (OrderItem item: items) {
+            if (item.getStatusCode() != OrderStatus.CONFIRMED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void updateOrderItem(String itemId, String buyerId, OrderItemDTO data) {
-        OrderItem item = orderItemRepository
-                .findByItemIdAndBuyerIdAndProductId(itemId, buyerId, data.getProductId()).orElseThrow();
+        Optional<OrderItem> itemOptional = orderItemRepository
+                .findByItemIdAndBuyerIdAndProductIdAndOrderIdIsNull(itemId,
+                        buyerId, data.getProductId());
 
-        OrderItem updatedItem = OrderItem.builder()
-                .itemId(itemId)
-                .productId(data.getProductId())
-                .quantity(data.getQuantity())
-                .buyerId(buyerId)
-                .build();
+        if (itemOptional.isPresent()) {
+            OrderItem updatedItem = OrderItem.builder()
+                    .itemId(itemId)
+                    .productId(data.getProductId())
+                    .statusCode(OrderStatus.CREATED)
+                    .quantity(data.getQuantity())
+                    .buyerId(buyerId)
+                    .build();
 
-        // Serialize newItem to JSON
-        String jsonMessage = convertFromOrderItemToJson(updatedItem);
+            // Serialize newItem to JSON
+            String jsonMessage = convertFromOrderItemToJson(updatedItem);
 
-        kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
+            kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
+        } else {
+            throw new IllegalArgumentException("You can only update order items that are in your cart");
+        }
+    }
+
+    public void updateOrderItemStatus(String itemId, String sellerId, OrderItemStatusDTO data) {
+        if (data.getStatusCode() == OrderStatus.CREATED) {
+            throw new IllegalArgumentException("You can only confirm or cancel order items");
+        }
+
+        Optional<OrderItem> itemOptional = orderItemRepository
+                .findByItemIdAndSellerIdAndProductIdAndOrderId(itemId,
+                        sellerId, data.getProductId(), data.getOrderId());
+
+        if (itemOptional.isPresent()) {
+            OrderItem updatedItem = OrderItem.builder()
+                    .itemId(itemId)
+                    .productId(data.getProductId())
+                    .statusCode(data.getStatusCode())
+                    .orderId(data.getOrderId())
+                    .quantity(itemOptional.get().getQuantity())
+                    .buyerId(itemOptional.get().getBuyerId())
+                    .sellerId(sellerId)
+                    .build();
+
+            // Serialize newItem to JSON
+            String jsonMessage = convertFromOrderItemToJson(updatedItem);
+
+            kafkaTemplate.send("UPDATE_STATUS_REQUEST", jsonMessage);
+        } else {
+            throw new IllegalArgumentException("You can only update order items that have your products");
+        }
     }
 
     public void deleteOrderItem(String itemId, String buyerId) {
