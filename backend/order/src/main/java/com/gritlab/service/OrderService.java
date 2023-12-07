@@ -98,8 +98,10 @@ public class OrderService {
             throw new IllegalArgumentException("Order status must be CREATED for order to be created");
         }
 
-        if (data.getPaymentCode() != Payment.CASH) {
-            throw new IllegalArgumentException("Payment method not supported. Only CASH is supported for now");
+        List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
+
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Order can only be created with at least one order item in cart");
         }
 
         Order order = Order.builder()
@@ -112,15 +114,12 @@ public class OrderService {
 
         String orderId = newOrder.getOrderId();
 
-        List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
         List<OrderItem> newItems = new ArrayList<>();
-        List<String> sellerIds = new ArrayList<>();
 
         for (OrderItem orderItem: items) {
             orderItem.setOrderId(orderId);
             OrderItem newItem = orderItemRepository.save(orderItem);
             newItems.add(newItem);
-            sellerIds.add(newItem.getSellerId());
         }
 
         newOrder.setItems(newItems);
