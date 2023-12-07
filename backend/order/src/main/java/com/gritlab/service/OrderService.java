@@ -142,24 +142,18 @@ public class OrderService {
 
         for (OrderItem orderItem: items) {
             if (orderItem.getProductId() == null) {
-                // Remove orderItem from DB and from items list
-                orderItemRepository.delete(orderItem);
-                items.remove(orderItem);
-            } else {
-                // Update orderItem to DB
-                orderItemRepository.save(orderItem);
+                orderItem.setStatusCode(OrderStatus.CANCELLED);
             }
+            orderItemRepository.save(orderItem);
         }
 
-        if (items == null || items.isEmpty()) {
-            // Remove order from DB
-            orderRepository.delete(order);
-            throw new IllegalArgumentException("None of the chosen products are available anymore for order " + order.getOrderId());
-        } else {
-            // Update items list to order and update order to DB
-            order.setItems(items);
-            orderRepository.save(order);
+        order.setItems(items);
+
+        if (orderItemService.allItemsHaveStatus(order.getItems(), OrderStatus.CANCELLED)) {
+            order.setStatusCode(OrderStatus.CANCELLED);
         }
+
+        orderRepository.save(order);
     }
 
     private Order convertFromJsonToOrder(String jsonMessage) {
@@ -188,10 +182,12 @@ public class OrderService {
         if (order.getStatusCode() == OrderStatus.CREATED
                 && (data.getStatusCode() == OrderStatus.CANCELLED
                 || (data.getStatusCode() == OrderStatus.CONFIRMED
-                && orderItemService.allItemsAreConfirmed(order.getItems())))) {
+                && orderItemService.allItemsHaveStatus(order.getItems(), OrderStatus.CONFIRMED)))) {
 
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
+        } else {
+            throw new IllegalArgumentException("You can only CANCEL a CREATED order or CONFIRM a CREATED order with all order items CONFIRMED");
         }
     }
 

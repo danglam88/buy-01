@@ -32,7 +32,9 @@ public class OrderItemService {
 
         for (OrderItem item : items) {
 
-             ProductDTO product = new ProductDTO(item.getProductId(), item.getName(), item.getDescription(), item.getItemPrice(), item.getMaxQuantity(), item.getSellerId());
+             ProductDTO product = new ProductDTO(item.getProductId(),
+                     item.getName(), item.getDescription(),
+                     item.getItemPrice(), item.getMaxQuantity(), item.getSellerId());
              CartItemResponse responseItem = CartItemResponse.builder()
                      .itemId(item.getItemId())
                      .quantity(item.getQuantity())
@@ -125,9 +127,7 @@ public class OrderItemService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
-        if (orderItem.getStatusCode() == OrderStatus.CANCELLED) {
-            orderItemRepository.delete(orderItem);
-        } else if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+        if (orderItem.getStatusCode() == OrderStatus.CANCELLED || orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
             orderItemRepository.save(orderItem);
         }
 
@@ -136,29 +136,28 @@ public class OrderItemService {
         List<OrderItem> items = order.getItems();
 
         for (OrderItem item: items) {
-            if (item.getItemId().equals(orderItem.getItemId()) && orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+            if (item.getItemId().equals(orderItem.getItemId())
+                    && (orderItem.getStatusCode() == OrderStatus.CANCELLED
+                    || orderItem.getStatusCode() == OrderStatus.CONFIRMED)) {
                 item.setStatusCode(orderItem.getStatusCode());
-                break;
-            } else if (item.getItemId().equals(orderItem.getItemId()) && orderItem.getStatusCode() == OrderStatus.CANCELLED) {
-                items.remove(item);
                 break;
             }
         }
 
         order.setItems(items);
 
-        if (order.getItems() == null || order.getItems().isEmpty()) {
+        if (allItemsHaveStatus(order.getItems(), OrderStatus.CANCELLED)) {
             order.setStatusCode(OrderStatus.CANCELLED);
-        } else if (allItemsAreConfirmed(order.getItems())) {
+        } else if (allItemsHaveStatus(order.getItems(), OrderStatus.CONFIRMED)) {
             order.setStatusCode(OrderStatus.CONFIRMED);
         }
 
         orderRepository.save(order);
     }
 
-    public boolean allItemsAreConfirmed(List<OrderItem> items) {
+    public boolean allItemsHaveStatus(List<OrderItem> items, OrderStatus status) {
         for (OrderItem item: items) {
-            if (item.getStatusCode() != OrderStatus.CONFIRMED) {
+            if (item.getStatusCode() != status) {
                 return false;
             }
         }
@@ -184,13 +183,13 @@ public class OrderItemService {
 
             kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
         } else {
-            throw new IllegalArgumentException("You can only update order items that are in your cart");
+            throw new IllegalArgumentException("You can only update quantity of order item that is in your own cart");
         }
     }
 
     public void updateOrderItemStatus(String itemId, String sellerId, OrderItemStatusDTO data) {
         if (data.getStatusCode() == OrderStatus.CREATED) {
-            throw new IllegalArgumentException("You can only confirm or cancel order items");
+            throw new IllegalArgumentException("You can only set status of order item to CONFIRMED or CANCELLED");
         }
 
         Optional<OrderItem> itemOptional = orderItemRepository
@@ -198,6 +197,11 @@ public class OrderItemService {
                         sellerId, data.getProductId(), data.getOrderId());
 
         if (itemOptional.isPresent()) {
+
+            if (itemOptional.get().getStatusCode() != OrderStatus.CREATED) {
+                throw new IllegalArgumentException("You can only update status of order item with current status as CREATED");
+            }
+
             OrderItem updatedItem = OrderItem.builder()
                     .itemId(itemId)
                     .productId(data.getProductId())
@@ -213,7 +217,7 @@ public class OrderItemService {
 
             kafkaTemplate.send("UPDATE_STATUS_REQUEST", jsonMessage);
         } else {
-            throw new IllegalArgumentException("You can only update order items that have your products");
+            throw new IllegalArgumentException("You can only update status of order item that has your own product");
         }
     }
 
@@ -221,6 +225,21 @@ public class OrderItemService {
         OrderItem item = orderItemRepository
                 .findByItemIdAndBuyerId(itemId, buyerId).orElseThrow();
 
-        orderItemRepository.delete(item);
+        if (item.getOrderId() == null) {
+            orderItemRepository.delete(item);
+
+        } else if (item.getStatusCode() == OrderStatus.CANCELLED) {
+            orderItemRepository.delete(item);
+
+            Order order = orderRepository.findByOrderIdAndBuyerId(item.getOrderId(), buyerId).orElseThrow();
+
+            List<OrderItem> items = order.getItems();
+            items.remove(item);
+
+            order.setItems(items);
+            orderRepository.save(order);
+        } else {
+            throw new IllegalArgumentException("You can only delete order item that is in your own cart or has been cancelled by seller");
+        }
     }
 }
