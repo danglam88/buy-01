@@ -148,11 +148,27 @@ public class OrderItemService {
 
         if (allItemsHaveStatus(order.getItems(), OrderStatus.CANCELLED)) {
             order.setStatusCode(OrderStatus.CANCELLED);
-        } else if (allItemsHaveStatus(order.getItems(), OrderStatus.CONFIRMED)) {
+        } else if (atLeastOneItemHasRequiredStatus(order.getItems(), OrderStatus.CONFIRMED, OrderStatus.CANCELLED)) {
             order.setStatusCode(OrderStatus.CONFIRMED);
         }
 
         orderRepository.save(order);
+    }
+
+    public boolean atLeastOneItemHasRequiredStatus(List<OrderItem> items, OrderStatus requiredStatus, OrderStatus allowedStatus) {
+        boolean atLeastOneItemHasRequiredStatus = false;
+        boolean allItemsHaveValidStatus = true;
+
+        for (OrderItem item: items) {
+            if (item.getStatusCode() == requiredStatus) {
+                atLeastOneItemHasRequiredStatus = true;
+            } else if (item.getStatusCode() != allowedStatus) {
+                allItemsHaveValidStatus = false;
+                break;
+            }
+        }
+
+        return atLeastOneItemHasRequiredStatus && allItemsHaveValidStatus;
     }
 
     public boolean allItemsHaveStatus(List<OrderItem> items, OrderStatus status) {

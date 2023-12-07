@@ -182,7 +182,8 @@ public class OrderService {
         if (order.getStatusCode() == OrderStatus.CREATED
                 && (data.getStatusCode() == OrderStatus.CANCELLED
                 || (data.getStatusCode() == OrderStatus.CONFIRMED
-                && orderItemService.allItemsHaveStatus(order.getItems(), OrderStatus.CONFIRMED)))) {
+                && orderItemService.atLeastOneItemHasRequiredStatus(order.getItems(),
+                OrderStatus.CONFIRMED, OrderStatus.CANCELLED)))) {
 
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
