@@ -14,11 +14,11 @@
 
 ## Description
 
-This is a Java project that develops and end-to-end e-commerce platform with Spring Boot microservices and Angular. The platplorms supports user registration (either as a client or a seller), authentication, product CRUD functionality exclusively for sellers, and media management for product images.
+This is a Java project that develops and end-to-end e-commerce platform with Spring Boot microservices and Angular. The platplorms supports user registration (either as a client or a seller), authentication, product CRUD functionality exclusively for sellers, order and order item CRUD functionality for sellers and clients, and media management for product images.
 
 * Role-based functionalities: A user can either register as a Seller or a Client.
-- Seller: Can access the home page with product listings view. Sellers have the ability to create products and manage their products. They also have the ability to view and update their own profile.
-- Client: Can access the home page with product listings view. They have the ability to view and update their own profile.
+- Seller: Can access the home page with product listings view. Sellers have the ability to create products, manage their products, confirm/cancel order items for their own product. They also have the ability to view and update their own profile.
+- Client: Can access the home page with product listings view. Clients have the ability to add order items to their own cart, create orders and cancel their own orders. They also have the ability to view and update their own profile.
 
 ## Front-end Specifications
 
@@ -29,7 +29,7 @@ This is a Java project that develops and end-to-end e-commerce platform with Spr
 
 ## Back-end Specifications
 
-The list of REST APIs to perform CRUD operations on Users (https://164.92.252.125:8443), Products (https://164.92.252.125:8444) and Media (https://164.92.252.125:8445) are:
+The list of REST APIs to perform CRUD operations on Users (https://164.92.252.125:8443), Products (https://164.92.252.125:8444), Media (https://164.92.252.125:8445) and Order (https://164.92.252.125:8446) are:
 
 - POST `/auth` - Authenticate a user by their username (email) and password then return a 7-day valid token to them (accessible without authentication)
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)

@@ -184,6 +184,17 @@ public class OrderService {
                 && orderItemService.atLeastOneItemHasRequiredStatus(order.getItems(),
                 OrderStatus.CONFIRMED, OrderStatus.CANCELLED)))) {
 
+            if (data.getStatusCode() == OrderStatus.CANCELLED) {
+                List<OrderItem> items = order.getItems();
+
+                for (OrderItem orderItem: items) {
+                    orderItem.setStatusCode(OrderStatus.CANCELLED);
+                    orderItemRepository.save(orderItem);
+                }
+
+                order.setItems(items);
+            }
+
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
         } else {
