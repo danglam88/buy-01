@@ -79,8 +79,11 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(HttpMethod.OPTIONS)
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/media").hasAnyAuthority("SELLER")
-                                        .requestMatchers(HttpMethod.DELETE, "/media").hasAnyAuthority("SELLER")
+                                        .requestMatchers(HttpMethod.GET, "/order/item").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.POST, "/order/item").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.PUT, "/order/item/**").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.PUT, "/order/item/status/**").hasAnyAuthority("SELLER")
+                                        .requestMatchers(HttpMethod.DELETE, "/order/item/**").hasAnyAuthority("CLIENT")
                                         .anyRequest()
                                         .authenticated())
                 .build();

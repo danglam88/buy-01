@@ -29,7 +29,7 @@ This is a Java project that develops and end-to-end e-commerce platform with Spr
 
 ## Back-end Specifications
 
-The list of REST APIs to perform CRUD operations on Users (https://164.92.252.125:8443), Products (https://164.92.252.125:8444), Media (https://164.92.252.125:8445) and Order (https://164.92.252.125:8446) are:
+The list of REST APIs to perform CRUD operations on Users (https://164.92.252.125:8443), Products (https://164.92.252.125:8444) and Media (https://164.92.252.125:8445) are:
 
 - POST `/auth` - Authenticate a user by their username (email) and password then return a 7-day valid token to them (accessible without authentication)
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)
@@ -96,186 +96,68 @@ An example of a valid form-data object for creating a new user is:
 }
 ```
 
-## Endpoints for buy-02
+### Endpoints for order-microservice
 
-### For items in the cart:
+The list of REST APIs to perform CRUD operations on Order (https://164.92.252.125:8446) are:
 
-### POST  `/order/item` 
- for add item to cart from product listing page or other pages with json body:
- ```json
-{
-    "productId": "XXX",
-    "quantity": 1
-}
-```
+- GET `/order/item` - Get all order items in the current cart of the logged-in client (accessible by a client only)
 
-and response :
- - HTTP STATUS 400 
- ```json
-{
-  "message": "Decrease quantity",
-}
-```
-- HTTP STATUS 201 with empty body
+   + Response:
 
-### PUT  `/order/item/{itemID}` 
- for update quantity in a cart page with body 
-  ```json
-{
-    "quantity": 1
-}
-```
- and response:
-- HTTP STATUS 200 with empty body
-- HTTP STATUS 400
- ```json
-{
-  "message": "Decrease quantity"
-}
-```
-
-### DELETE  `/order/item/{itemID}` 
-with empty body for delete item in a cart page and response:
-- HTTP STATUS 200 with empty body
-
-
-### GET  `/order/item/`
-for getting current cart items for cart page with empty body and response :
- ```json
-[
-   {
-      "item_id": "XXX",
-      "product" : {
-         "product_id" : "XXX",
-        "name": "Name of Product",
-        "description": "Description of Product",
-        "price": 100.0,
-        "quantity": 5
-      },
-      "quantity" : 3,
-      "item_price" : "XXXX"
-   }
-]
-```
-
-### For orders:
-
-### POST  `/order`
-for create an order with json body:
- ```json
-{   
-    "payment_code": "CASH"
-}
-```
-
-and response:
-- HTTP STATUS 400 with body:
- ```json
-{
-  "message": "Invalid payment code"
-}
-```
-- HTTP STATUS 200 with body:
- ```json
-{
-  "order_id": "XXX"
-}
-```
-
-### PUT  `/order/{order_id}`
-for update order info (with the same body as for POST and the same response scenarios)
-
-### DELETE  `/order/{order_id}`
-for delete order (in order history in remove scenario for client) with response:
-- HTTP STATUS 200 with empty body
-
-## GET `/order/{order_id}`
-info about the order with no request body and response body:
- ```json
-{
-   "order_id" : "XXX",
-   "status_code" : "CREATED",
-   "items" : [
-      {
-         "item_id": "XXX",
-         "product" : {
-            "product_id" : "XXX",
-            "name": "Name of Product",
-            "description": "Description of Product",
-            "price": 100.0,
-            "quantity": 5
-         },
-         "quantity" : 3,
-         "item_price" : "XXXX"
-      }
-   ],
-   "payment_code": "CASH"
-}
-```
-
-## GET `/order/seller` and GET `/order/client`
-info about seller's orders for seller and client order history for client with no request body and response body:
- ```json
-[
-   {
-      "order_id" : "XXX",
-      "status_code" : "CREATED",
-      "items" : [
+      ```json
+      [
          {
-            "item_id": "XXX",
-            "product" : {
-               "product_id" : "XXX",
-               "name": "Name of Product",
-               "description": "Description of Product",
-               "price": 100.0,
-               "quantity": 5
+            "itemId": "ABC",
+            "product": {
+               "id": "XYZ",
+               "name": "iPhone",
+               "description": "iPhone",
+               "price": 10.0,
+               "quantity": 80
             },
-            "quantity" : 3,
-            "item_price" : "XXXX"
+            "quantity": 5,
+            "itemPrice": 50.0
          }
-      ],
-      "payment_code": "CASH"
-   }
-]
-```
+      ]
+      ```
 
+- POST `/order/item` - Add a new order item to the current cart of the logged-in client (accessible by a client only)
 
-### Order Microservice database:
+   + Request:
 
-Table Order Item:
- - Buyer Id
- - Seller Id
- - Item Id
-- Order id
-- Product Id
-- Quantity
-- Item Price (Quantity * Product Price)
+      ```json
+      {
+         "productId": "ABC",
+         "quantity": 5
+      }
+      ```
 
-Table Order :
-- Buyer ID
-- Order ID
-- Status Code (enum, see below)
-- Payment Method Code (enum of method, let’s start from cash only)
+   + Response: itemId as a string
 
-Order Status codes:
-- 1 Created
-- 2 Delivered
-- 3 Cancelled
+- PUT `/order/item/{id}` - Update quantity for an existing order item in the current cart of the logged-in client (accessible by a client only)
 
-Additional check (1):
-When user removes an order, status must be 3
-When user cancel - 1
-When user redo - any status
+   + Request:
 
+      ```json
+      {
+         "productId": "ABC",
+         "quantity": 10
+      }
+      ```
 
-Additional check (2):
-When user adds to cart and removes from - increase and decrease quantity from product table
+- PUT `/order/item/status/{id}` - Confirm/Cancel an order item of a client as a seller of the product for that order item (accessible by a seller only)
 
-User actions from listing to create order
-1 Add to cart from listing
-2 Go to cart page (with info about cart items)
-3 Go to order page (with info about payment method and delivery info)
-4 Go to created order page info (with items, order info and order status)
+   + Request:
+
+      ```json
+      {
+         "productId": "ABC",
+         "statusCode": "CONFIRMED",
+         "orderId": "RST"
+      }
+      ```
+
+- DELETE `/order/item/{id}` - Delete an order item in the current cart of the logged-in client or an order item that has been cancelled by a seller before (accessible by a client only)
 
 ## CI/CD Pipeline (using Jenkins)
 

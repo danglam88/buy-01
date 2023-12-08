@@ -1,7 +1,6 @@
 package com.gritlab.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class ProductDTO {
 
+    @Id
     private String id;
 
     private String name;
@@ -26,5 +26,6 @@ public class ProductDTO {
 
     private Integer quantity;
 
+    @JsonIgnore
     private String sellerId;
 }
