@@ -135,6 +135,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic updateProductQuantity() {
+        return TopicBuilder.name("UPDATE_PRODUCT_QUANTITY")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public NewTopic createOrderRequest() {
         return TopicBuilder.name("CREATE_ORDER_REQUEST")
                 .partitions(1)

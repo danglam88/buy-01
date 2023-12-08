@@ -188,6 +188,13 @@ public class OrderService {
                 List<OrderItem> items = order.getItems();
 
                 for (OrderItem orderItem: items) {
+                    if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+
+                        // Serialize newItem to JSON
+                        String jsonMessage = orderItemService.convertFromOrderItemToJson(orderItem);
+                        kafkaTemplate.send("UPDATE_PRODUCT_QUANTITY", jsonMessage);
+                    }
+
                     orderItem.setStatusCode(OrderStatus.CANCELLED);
                     orderItemRepository.save(orderItem);
                 }

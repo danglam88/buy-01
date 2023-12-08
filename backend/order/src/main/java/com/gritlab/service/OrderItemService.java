@@ -76,7 +76,7 @@ public class OrderItemService {
         return itemOptional.get().getItemId();
     }
 
-    private OrderItem convertFromJsonToOrderItem(String jsonMessage) {
+    public OrderItem convertFromJsonToOrderItem(String jsonMessage) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, OrderItem.class);
@@ -86,7 +86,7 @@ public class OrderItemService {
         }
     }
 
-    private String convertFromOrderItemToJson(OrderItem item) {
+    public String convertFromOrderItemToJson(OrderItem item) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(item);
@@ -204,7 +204,7 @@ public class OrderItemService {
     }
 
     public void updateOrderItemStatus(String itemId, String sellerId, OrderItemStatusDTO data) {
-        if (data.getStatusCode() == OrderStatus.CREATED) {
+        if (data.getStatusCode() != OrderStatus.CONFIRMED && data.getStatusCode() != OrderStatus.CANCELLED) {
             throw new IllegalArgumentException("You can only set status of order item to CONFIRMED or CANCELLED");
         }
 

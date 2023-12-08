@@ -283,12 +283,33 @@ public class ProductService {
             if (orderItem.getQuantity() > product.get().getQuantity()) {
                 orderItem.setStatusCode(OrderStatus.CANCELLED);
             }
+
+            if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+                // Reduce product quantity when order item is confirmed
+                product.get().setQuantity(product.get().getQuantity() - orderItem.getQuantity());
+                productRepository.save(product.get());
+            }
         }
 
         // Serialize OrderItem to JSON
         String jsonMessage = convertFromOrderItemToJson(orderItem);
 
         kafkaTemplate.send("UPDATE_STATUS_RESPONSE", jsonMessage);
+    }
+
+    @KafkaListener(topics = "UPDATE_PRODUCT_QUANTITY", groupId = "my-consumer-group")
+    public void updateProductQuantity(String message) {
+        // Deserialize JSON to OrderItem
+        OrderItem orderItem = convertFromJsonToOrderItem(message);
+
+        if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+            Optional<Product> product = productRepository.findById(orderItem.getProductId());
+
+            if (product.isPresent()) {
+                product.get().setQuantity(product.get().getQuantity() + orderItem.getQuantity());
+                productRepository.save(product.get());
+            }
+        }
     }
 
     private OrderItem convertFromJsonToOrderItem(String jsonMessage) {
