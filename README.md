@@ -145,7 +145,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       }
       ```
 
-- PUT `/order/item/status/{id}` - Confirm/Cancel an order item of a client as a seller of the product for that order item (accessible by a seller only)
+- PUT `/order/item/status/{id}` - Confirm/Cancel an order item of a client as a logged-in seller of the product for that order item (accessible by a seller only)
 
    + Request:
 
@@ -158,6 +158,98 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       ```
 
 - DELETE `/order/item/{id}` - Delete an order item in the current cart of the logged-in client or an order item that has been cancelled by a seller before (accessible by a client only)
+
+- GET `/order/seller` - Get all order items for the products of the logged-in seller as well as his most-selling products and total money earned (accessible by a seller only)
+
+   + Response:
+
+      ```json
+      {
+         "items": [
+            {
+               "order_id": "XUV",
+               "item_id": "GHI",
+               "product_id": "RFB",
+               "name": "MAC Book",
+               "description": "MAC Book",
+               "quantity": 2,
+               "item_price": 3500.0,
+               "status_code": "CONFIRMED"
+            },
+            {
+               "order_id": "UJC",
+               "item_id": "YHN",
+               "product_id": "QAZ",
+               "name": "iPad",
+               "description": "iPad",
+               "quantity": 3,
+               "item_price": 2500.0,
+               "status_code": "CANCELLED"
+            }
+         ],
+         "top_products": [
+            {
+               "product_id": "RFB",
+               "name": "MAC Book",
+               "total_quantity": 2
+            }
+         ],
+         "total_amount": 7000.0
+      }
+      ```
+
+- GET `/order/client` - Get all orders of the logged-in client as well as his most-buying products and total money spent (accessible by a client only)
+
+   + Response:
+
+      ```json
+      {
+         "orders": [
+            {
+               "order_id": "XUV",
+               "status_code": "CONFIRMED",
+               "items": [
+                  {
+                     "order_id": "XUV",
+                     "item_id": "GHI",
+                     "product_id": "RFB",
+                     "name": "MAC Book",
+                     "description": "MAC Book",
+                     "quantity": 2,
+                     "item_price": 3500.0,
+                     "status_code": "CONFIRMED"
+                  }
+               ],
+               "payment_code": "CASH"
+            },
+            {
+               "order_id": "UJC",
+               "status_code": "CANCELLED",
+               "items": [
+                  {
+                     "order_id": "UJC",
+                     "item_id": "YHN",
+                     "product_id": "QAZ",
+                     "name": "iPad",
+                     "description": "iPad",
+                     "quantity": 3,
+                     "item_price": 2500.0,
+                     "status_code": "CANCELLED"
+                  }
+               ],
+               "payment_code": "CASH"
+            }
+         ],
+         "top_products": [
+            {
+               "product_id": "RFB",
+               "name": "MAC Book",
+               "total_quantity": 2
+            }
+         ],
+         "total_amount": 7000.0
+      }
+      ```
 
 ## CI/CD Pipeline (using Jenkins)
 

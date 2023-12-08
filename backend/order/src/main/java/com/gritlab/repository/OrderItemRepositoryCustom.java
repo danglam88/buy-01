@@ -1,5 +1,6 @@
 package com.gritlab.repository;
 
+import com.gritlab.model.OrderStatus;
 import com.gritlab.model.TopProduct;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,7 @@ public class OrderItemRepositoryCustom {
                 .sum("quantity").as("totalQuantity");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("buyerId").is(buyerId)),
+                Aggregation.match(Criteria.where("buyerId").is(buyerId).and("statusCode").is(OrderStatus.CONFIRMED)),
                 groupOperation,
                 Aggregation.sort(Sort.Direction.DESC, "totalQuantity"),
                 Aggregation.limit(1)
@@ -46,7 +47,7 @@ public class OrderItemRepositoryCustom {
                 .sum("quantity").as("totalQuantity");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("sellerId").is(sellerId)),
+                Aggregation.match(Criteria.where("sellerId").is(sellerId).and("statusCode").is(OrderStatus.CONFIRMED)),
                 groupOperation,
                 Aggregation.sort(Sort.Direction.DESC, "totalQuantity"),
                 Aggregation.limit(1)
@@ -58,7 +59,7 @@ public class OrderItemRepositoryCustom {
 
     public Double getTotalSumItemPriceByBuyerId(String buyerId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("buyerId").is(buyerId)),
+                Aggregation.match(Criteria.where("buyerId").is(buyerId).and("statusCode").is(OrderStatus.CONFIRMED)),
                 Aggregation.group()
                         .sum("itemPrice").as("totalItemPrice")
         );
@@ -71,7 +72,7 @@ public class OrderItemRepositoryCustom {
 
     public Double getTotalSumItemPriceBySellerId(String sellerId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("sellerId").is(sellerId)),
+                Aggregation.match(Criteria.where("sellerId").is(sellerId).and("statusCode").is(OrderStatus.CONFIRMED)),
                 Aggregation.group()
                         .sum("itemPrice").as("totalItemPrice")
         );

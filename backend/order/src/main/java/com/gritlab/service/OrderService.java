@@ -205,7 +205,7 @@ public class OrderService {
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
         } else {
-            throw new IllegalArgumentException("You can only CANCEL a CREATED order or CONFIRM a CREATED order with all order items CONFIRMED");
+            throw new IllegalArgumentException("You can only CANCEL a CREATED order or CONFIRM a CREATED order with at least one order item CONFIRMED");
         }
     }
 
