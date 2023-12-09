@@ -49,6 +49,15 @@ export class OrderService {
     return this.httpClient.post(`${environment.orderUrl}`, order, options);
   }
 
+  getOrderByOrderId(orderId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.get(`${environment.orderUrl}/${orderId}`, { headers });
+  }
+
   getClientOrders(): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -65,5 +74,23 @@ export class OrderService {
     }
   
     return this.httpClient.get(`${environment.sellerOrderUrl}`, { headers });
+  }
+
+  cancelOrder(orderId: string, orderData: Object): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.put(`${environment.orderUrl}/${orderId}`, orderData, { headers });
+  }
+
+  removeOrder(orderId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.delete(`${environment.orderUrl}/${orderId}`, { headers });
   }
 }

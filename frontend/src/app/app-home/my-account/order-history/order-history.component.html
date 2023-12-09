@@ -3,7 +3,7 @@
   <!--HEADER-->
   <div class="header">
     <span class="role">{{ userInfoRole }}</span>
-    <h1 mat-dialog-title class="title">My Order History</h1>
+    <h1 mat-dialog-title class="title">My Order Transactions</h1>
   </div>
 
   <!--CLIENT-->
@@ -20,9 +20,9 @@
       <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
       <div class="status">{{ order.status_code }}</div>
       <div class="action">
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'">Cancel</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='DELIVERED'">Redo</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'">Remove</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'" (click)="cancelOrder(order.order_id)">Cancel</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CONFIRMED'" (click)="openProductDetail(order)">Redo</button>
+          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'" (click)="removeOrder(order.order_id)">Remove</button>
       </div>
     </div>
   </div>

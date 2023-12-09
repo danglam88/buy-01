@@ -17,6 +17,7 @@ export class OrderDetailsComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<OrderDetailsComponent>,
     ) {
+      console.log("OrderDetails data: ", data);
       this.order = data.order;
       this.orderItems = data.order.items;
     }

@@ -249,7 +249,12 @@ public class OrderItemService {
             items.remove(item);
 
             order.setItems(items);
-            orderRepository.save(order);
+
+            if (order.getItems() == null || order.getItems().isEmpty()) {
+                orderRepository.delete(order);
+            } else {
+                orderRepository.save(order);
+            }
         } else {
             throw new IllegalArgumentException("You can only delete order item that is in your own cart or has been cancelled by seller");
         }

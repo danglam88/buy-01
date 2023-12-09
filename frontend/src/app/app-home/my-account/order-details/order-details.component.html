@@ -29,6 +29,12 @@
                 <div>
                     <h2>Total Price: {{ item.item_price * item.quantity }}</h2>
                 </div>
+                <div>
+                    <h2>Status: {{ item.status_code }}</h2>
+                </div>
+                <button *ngIf="item.status_code === 'CONFIRMED'">Redo</button>
+                <button *ngIf="item.status_code === 'CREATED'">Cancel</button>
+                <button *ngIf="item.status_code === 'CANCELLED'">Remove</button>
                 <hr>
             </div>
             <div class="product-value">

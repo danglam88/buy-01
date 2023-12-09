@@ -4,6 +4,8 @@ import { Cart } from "src/app/Models/Cart";
 import { CartItems } from "src/app/Models/CartItems";
 import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
+import { MatDialog } from '@angular/material/dialog';
+import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
 
 @Component({
   selector: "app-cart",
@@ -17,9 +19,8 @@ export class CartComponent implements OnInit {
   cart: Cart = new Cart();
   @Input() productAdded: any;
   itemId: any;
-  
 
-  constructor(private cartService: CartService, private router: Router, private orderService: OrderService) {
+  constructor(private cartService: CartService, private router: Router, private orderService: OrderService, private dialog: MatDialog) {
     this.setCart();
   }
   ngOnInit(): void {
@@ -87,8 +88,23 @@ export class CartComponent implements OnInit {
       payment_code : "CASH",
     };
     this.orderService.createOrder(orderData).subscribe({
-      next: (data: string) => {
-        console.log("createOrder: ", data);
+      next: (orderId: string) => {
+        console.log("createOrder orderId: ", orderId);
+        this.orderService.getOrderByOrderId(orderId).subscribe({
+          next: (orderData: any) => {
+            console.log("getOrderByOrderId data: ", orderData);
+            this.dialog.open(OrderDetailsComponent, {
+              data: {
+                order: orderData,
+                view: 'cart'
+              },
+            });
+            this.router.navigate(["home"]);
+          },
+          error: (error: any) => {
+            console.error("Error fetching order data", error);
+          },
+        });
       },
       error: (error: any) => {
         console.error("Error creating order", error);

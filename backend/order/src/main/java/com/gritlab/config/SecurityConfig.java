@@ -86,6 +86,10 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.DELETE, "/order/item/**").hasAnyAuthority("CLIENT")
                                         .requestMatchers(HttpMethod.GET, "/order/seller").hasAnyAuthority("SELLER")
                                         .requestMatchers(HttpMethod.GET, "/order/client").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.GET, "/order/**").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.POST, "/order").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.PUT, "/order/**").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.DELETE, "/order/**").hasAnyAuthority("CLIENT")
                                         .anyRequest()
                                         .authenticated())
                 .build();
