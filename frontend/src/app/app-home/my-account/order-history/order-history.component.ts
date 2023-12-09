@@ -12,8 +12,8 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent {
-  allOrders: any[] = [];
-  userInfoRole: string = '';
+  allTrans: any[] = [];
+  role: string = '';
 
   constructor(
     private userService: UserService,
@@ -23,25 +23,24 @@ export class OrderHistoryComponent {
   ) { }
 
   ngOnInit(): void {
-
     this.userService.userInfoRole$.subscribe((role) => {
-      this.userInfoRole = role;
+      this.role = role;
       // Do something with the updated role, for example, update your view
     });
 
-    if (this.userInfoRole === 'CLIENT') {
+    if (this.role === 'CLIENT') {
       this.getClientOrders();
-    } else if (this.userInfoRole === 'SELLER') {
-      this.getSellerOrders();
+    } else if (this.role === 'SELLER') {
+      this.getSellerOrderItems();
     }
   }
 
     // Opens product detail modal
-    openProductDetail(order: any): void {
+    openProductDetail(detail: any): void {
       this.dialog.open(OrderDetailsComponent, {
        data: {
-         order: order,
-         view: 'order'
+         detail: detail,
+         role: this.role
        },
      });
    }
@@ -49,14 +48,14 @@ export class OrderHistoryComponent {
    getClientOrders() {
     this.orderService.getClientOrders().subscribe((res) => {
       console.log(res);
-      this.allOrders = res.orders;
+      this.allTrans = res.orders;
     });
    }
 
-   getSellerOrders() {
-    this.orderService.getSellerOrders().subscribe((res) => {
+   getSellerOrderItems() {
+    this.orderService.getSellerOrderItems().subscribe((res) => {
       console.log(res);
-      this.allOrders = res.orders;
+      this.allTrans = res.items;
     });
    }
 

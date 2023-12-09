@@ -36,7 +36,9 @@ export class HeaderComponent {
   }
 
   ngOnInit() {
-    this.getCartItemsNumber();
+    if (this.role === "CLIENT") {
+      this.getCartItemsNumber();
+    }
     // this.subscribeToCartItemsChanges();
   }
 

@@ -74,6 +74,7 @@ mat-card {
   
   .row .action {
     /* Add your specific styles for Action here */
+    display: contents;
   }
   @media (max-width: 767px) {
     .mat-card {

@@ -6,15 +6,19 @@
   <div class="navigation-bar">
       <button mat-button class="active" (click)="showProfileSection()">Profile</button>
       <button mat-button class="active" (click)="showOrderSection()">Orders</button>
+      <button mat-button class="active" (click)="showStatsSection()">Stats</button>
   </div>
 
   <!-- Content Section -->
   <div class="content-section">
-    <div *ngIf="view=== 'profile'">
+    <div *ngIf="view === 'profile'">
       <app-user-dashboard></app-user-dashboard>
     </div>
-    <div *ngIf="view=== 'orders'">
+    <div *ngIf="view === 'orders'">
       <app-order-history></app-order-history>
+    </div>
+    <div *ngIf="view === 'stats'">
+      <app-stats></app-stats>
     </div>
   </div>
 </div>

@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<mat-card>
+  <!--HEADER-->
+  <div class="header">
+    <span class="role">{{ role }}</span>
+    <h1 mat-dialog-title class="title">My Stats</h1>
+  </div>
+
+  <!--CLIENT-->
+  <div *ngIf="role === 'CLIENT'">
+    <div class="row">
+      <div >Total Money Spent</div>
+      <h1>€ {{ totalAmount }}</h1>
+      <hr>
+      <div>Most Buying Products</div>
+        <br>
+        <div *ngFor="let item of topProducts">
+            <div class="product-name">Name: {{ item.name }}</div>
+            <div class="product-quantity">Total Quantity: {{ item.total_quantity }}</div>
+            <hr>
+        </div>
+    </div>
+  </div>
+
+  <!--SELLER-->
+  <div *ngIf="role === 'SELLER'">
+    <div class="row">
+      <div >Total Money Earned</div>
+      <h1>€ {{ totalAmount }}</h1>
+      <hr>
+      <div>Most Selling Products</div>
+        <br>
+        <div *ngFor="let item of topProducts">
+            <div class="product-name">Name: {{ item.name }}</div>
+            <div class="product-quantity">Total Quantity: {{ item.total_quantity }}</div>
+            <hr>
+        </div>
+    </div>
+  </div>
+  
+  <!-- Add more rows as needed -->
+</mat-card>

@@ -44,6 +44,7 @@ import { OrderHistoryComponent } from './app-home/my-account/order-history/order
 import { OrderDetailsComponent } from './app-home/my-account/order-details/order-details.component';
 import { CartComponent } from './app-home/cart/cart.component';
 import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
+import { StatsComponent } from './app-home/my-account/stats/stats.component';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { OrderConfirmationComponent } from './app-home/order-confirmation/order-
     OrderHistoryComponent,
     OrderDetailsComponent,
     CartComponent,
-    OrderConfirmationComponent
+    OrderConfirmationComponent,
+    StatsComponent
   ],
   imports: [
     BrowserModule,
