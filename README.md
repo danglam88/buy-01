@@ -251,6 +251,56 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       }
       ```
 
+- GET `/order/{id}` - Get an order (with all order items inside) of the logged-in client (accessible by a client only)
+
+   + Response:
+
+      ```json
+      {
+         "order_id": "UJC",
+         "status_code": "CANCELLED",
+         "items": [
+            {
+               "order_id": "UJC",
+               "item_id": "YHN",
+               "product_id": "QAZ",
+               "name": "iPad",
+               "description": "iPad",
+               "quantity": 3,
+               "item_price": 2500.0,
+               "status_code": "CANCELLED"
+            }
+         ],
+         "payment_code": "CASH"
+      }
+      ```
+
+- POST `/order` - Create a new order with all order items in the current cart of the logged-in client (accessible by a client only)
+
+   + Request:
+
+      ```json
+      {
+         "order_status": "CREATED",
+         "payment_code": "CASH"
+      }
+      ```
+
+   + Response: orderId as a string
+
+- PUT `/order/{id}` - Cancel an order or confirm an order (with at lease one order item confirmed) as a logged-in client who owns that order (accessible by a client only)
+
+   + Request:
+
+      ```json
+      {
+         "order_status": "CANCELLED",
+         "payment_code": "CASH"
+      }
+      ```
+
+- DELETE `/order/{id}` - Delete an order (and all its order items) that has been cancelled before as a logged-in client who owns that order (accessible by a client only)
+
 ## CI/CD Pipeline (using Jenkins)
 
 The whole process of the project has been automated using Jenkins. The process consists of the following stages:
