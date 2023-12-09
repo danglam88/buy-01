@@ -48,10 +48,6 @@ public class OrderItemService {
     }
 
     public String addOrderItem(String buyerId, OrderItemDTO data) {
-        if (data.getQuantity() != 1) {
-            throw new IllegalArgumentException("Quantity must be 1 for order item to be initially added");
-        }
-
         Optional<OrderItem> itemOptional =
                 orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
 
