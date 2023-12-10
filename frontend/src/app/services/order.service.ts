@@ -67,7 +67,7 @@ export class OrderService {
     return this.httpClient.get(`${environment.clientOrderUrl}`, { headers });
   }
 
-  getSellerOrders(): Observable<any> {
+  getSellerOrderItems(): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);

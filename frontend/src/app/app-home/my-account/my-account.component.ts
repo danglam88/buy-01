@@ -16,4 +16,7 @@ export class MyAccountComponent{
     this.view = 'orders';
   }
 
+  showStatsSection(): void {
+    this.view = 'stats';
+  }
 }

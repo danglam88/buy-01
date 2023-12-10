@@ -61,6 +61,7 @@ public class OrderItemController {
         return ResponseEntity.ok().build();
     }
 
+    // todo: remove this API endpoint to maintain data integrity for both sellers and clients (discuss with team)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrderItems(@PathVariable String id,
                                                             Authentication authentication) {

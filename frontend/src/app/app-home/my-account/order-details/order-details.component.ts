@@ -9,24 +9,27 @@ import { Product } from 'src/app/Models/Product';
 })
 export class OrderDetailsComponent implements OnInit {
   @Input() product: Product;
-  order: any;
-  orderItems: any[] = [];
-  orderTotal: number = 0;
+  dialogData: any;
+  totalSum: number = 0;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<OrderDetailsComponent>,
     ) {
       console.log("OrderDetails data: ", data);
-      this.order = data.order;
-      this.orderItems = data.order.items;
+      this.dialogData = data;
     }
 
   ngOnInit(): void {
-    console.log(this.orderItems);
-    this.orderItems.forEach((item) => {
-      this.orderTotal += item.item_price * item.quantity;
-    });
+    if (this.dialogData.role === 'CLIENT') {
+      console.log("Client order items: ", this.dialogData.detail);
+      this.dialogData.detail.items.forEach((item) => {
+        this.totalSum += item.item_price * item.quantity;
+      });
+    } else if (this.dialogData.role === 'SELLER') {
+      console.log("Seller order items: ", this.dialogData.detail);
+      this.totalSum = this.dialogData.detail.item_price * this.dialogData.detail.quantity;
+    }
   }
 
    // Close modal

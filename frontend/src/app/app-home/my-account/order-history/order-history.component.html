@@ -2,21 +2,21 @@
 <mat-card>
   <!--HEADER-->
   <div class="header">
-    <span class="role">{{ userInfoRole }}</span>
+    <span class="role">{{ role }}</span>
     <h1 mat-dialog-title class="title">My Order Transactions</h1>
   </div>
 
   <!--CLIENT-->
-  <div *ngIf="userInfoRole== 'CLIENT'">
+  <div *ngIf="role === 'CLIENT'">
     <div class="row">
-      <div >Order #</div>
-      <div >Status</div>
-      <div >Action</div>
+      <div>Order #</div>
+      <div>Status</div>
+      <div>Action</div>
     </div>
   
     <hr>
    
-    <div class="row" *ngFor="let order of allOrders">
+    <div class="row" *ngFor="let order of allTrans">
       <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
       <div class="status">{{ order.status_code }}</div>
       <div class="action">
@@ -26,25 +26,31 @@
       </div>
     </div>
   </div>
+
   <!--SELLER-->
-  <div *ngIf="userInfoRole== 'SELLER'">
+  <div *ngIf="role === 'SELLER'">
     <div class="row">
-      <div >Order #</div>
-      <div >Status</div>
-      <div >Action</div>
+      <div>Order Item #</div>
+      <div>Product Name</div>
+      <div>Status</div>
+      <div>Action</div>
     </div>
   
     <hr>
    
-    <div class="row">
-      <div class="order-no"><a>1234</a></div>
-      <div class="status">Created</div>
+    <div class="row" *ngFor="let item of allTrans">
+      <div class="order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
+      <div class="product-name">{{ item.name }}</div>
+      <div class="status">{{ item.status_code }}</div>
       <div class="action">
-          <button mat-button color="primary" class="view-button">Remove</button>
+        <div *ngIf="item.status_code === 'CREATED'">
+          <button mat-button color="primary" class="view-button">Confirm</button>
+          <button mat-button color="primary" class="view-button">Cancel</button>
+        </div>
+        <div *ngIf="item.status_code !== 'CREATED'"></div>
       </div>
     </div>
   </div>
   
   <!-- Add more rows as needed -->
 </mat-card>
-
