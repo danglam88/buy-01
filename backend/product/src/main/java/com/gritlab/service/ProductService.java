@@ -190,29 +190,6 @@ public class ProductService {
         }
     }
 
-    @KafkaListener(topics = "CREATE_CART_REQUEST", groupId = "my-consumer-group")
-    public void createCartRequest(String message) {
-        // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJsonToOrderItem(message);
-
-        Optional<Product> product = productRepository.findById(orderItem.getProductId());
-
-        if (product.isEmpty() || product.get().getQuantity() < orderItem.getQuantity()) {
-            orderItem.setProductId(null);
-        } else {
-            orderItem.setName(product.get().getName());
-            orderItem.setDescription(product.get().getDescription());
-            orderItem.setItemPrice(product.get().getPrice());
-            orderItem.setSellerId(product.get().getUserId());
-            orderItem.setMaxQuantity(product.get().getQuantity());
-        }
-
-        // Serialize OrderItem to JSON
-        String jsonMessage = convertFromOrderItemToJson(orderItem);
-
-        kafkaTemplate.send("CREATE_CART_RESPONSE", jsonMessage);
-    }
-
     @KafkaListener(topics = "CREATE_ORDER_REQUEST", groupId = "my-consumer-group")
     public void createOrderRequest(String message) {
         // Deserialize JSON to Order
@@ -238,8 +215,8 @@ public class ProductService {
         kafkaTemplate.send("CREATE_ORDER_RESPONSE", jsonMessage);
     }
 
-    @KafkaListener(topics = "UPDATE_CART_REQUEST", groupId = "my-consumer-group")
-    public void updateCartRequest(String message) {
+    @KafkaListener(topics = "CREATE_CART_REQUEST", groupId = "my-consumer-group")
+    public void createCartRequest(String message) {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
@@ -262,7 +239,7 @@ public class ProductService {
         // Serialize OrderItem to JSON
         String jsonMessage = convertFromOrderItemToJson(orderItem);
 
-        kafkaTemplate.send("UPDATE_CART_RESPONSE", jsonMessage);
+        kafkaTemplate.send("CREATE_CART_RESPONSE", jsonMessage);
     }
 
     @KafkaListener(topics = "UPDATE_STATUS_REQUEST", groupId = "my-consumer-group")

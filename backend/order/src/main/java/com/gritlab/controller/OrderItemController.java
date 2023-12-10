@@ -1,9 +1,6 @@
 package com.gritlab.controller;
 
-import com.gritlab.model.OrderItemDTO;
-import com.gritlab.model.CartItemResponse;
-import com.gritlab.model.OrderItemStatusDTO;
-import com.gritlab.model.UserDetailsJWT;
+import com.gritlab.model.*;
 import com.gritlab.service.OrderItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,15 @@ public class OrderItemController {
                                                  @Valid @RequestBody OrderItemDTO data) {
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         String itemId = orderItemService.addOrderItem(userDetails.getId(), data);
+
+        return ResponseEntity.ok().body(itemId);
+    }
+
+    @PostMapping("/redo")
+    public ResponseEntity<String> redoOrderItems(Authentication authentication,
+                                                 @Valid @RequestBody OrderItemRedo data) {
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
+        String itemId = orderItemService.redoOrderItem(userDetails.getId(), data);
 
         return ResponseEntity.ok().body(itemId);
     }

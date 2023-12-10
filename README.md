@@ -107,9 +107,9 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       ```json
       [
          {
-            "itemId": "ABC",
+            "itemId": "XYZ",
             "product": {
-               "id": "XYZ",
+               "id": "ABC",
                "name": "iPhone",
                "description": "iPhone",
                "price": 10.0,
@@ -127,6 +127,21 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
 
       ```json
       {
+         "productId": "ABC",
+         "quantity": 5
+      }
+      ```
+
+   + Response: itemId as a string
+
+- POST `/order/item/redo` - Redo a confirmed order item by adding it to the current cart of the logged-in client (accessible by a client only)
+
+   + Request:
+
+      ```json
+      {
+         "itemId": "XYZ",
+         "orderId": "VSL",
          "productId": "ABC",
          "quantity": 5
       }
@@ -153,6 +168,18 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       {
          "productId": "ABC",
          "statusCode": "CONFIRMED",
+         "orderId": "RST"
+      }
+      ```
+
+- PUT `/order/item/cancel/{id}` - Cancel an order item as a logged-in client who owns that order item (accessible by a client only)
+
+   + Request:
+
+      ```json
+      {
+         "productId": "ABC",
+         "statusCode": "CANCELLED",
          "orderId": "RST"
       }
       ```

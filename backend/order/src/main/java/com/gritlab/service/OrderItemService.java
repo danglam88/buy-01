@@ -58,31 +58,6 @@ public class OrderItemService {
         return responseItems;
     }
 
-    public String addOrderItem(String buyerId, OrderItemDTO data) {
-        Optional<OrderItem> itemOptional =
-                orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
-
-        if (itemOptional.isEmpty()) {
-            OrderItem item = OrderItem.builder()
-                    .productId(data.getProductId())
-                    .quantity(data.getQuantity())
-                    .buyerId(buyerId)
-                    .statusCode(OrderStatus.CREATED)
-                    .build();
-
-            OrderItem newItem = orderItemRepository.save(item);
-
-            // Serialize newItem to JSON
-            String jsonMessage = convertFromOrderItemToJson(newItem);
-
-            kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
-
-            return newItem.getItemId();
-        }
-
-        return itemOptional.get().getItemId();
-    }
-
     public OrderItem convertFromJsonToOrderItem(String jsonMessage) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -111,19 +86,6 @@ public class OrderItemService {
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
             throw new IllegalArgumentException("Product " + orderItem.getName() + " is not available");
-        } else {
-            orderItemRepository.save(orderItem);
-        }
-    }
-
-    @KafkaListener(topics = "UPDATE_CART_RESPONSE", groupId = "my-consumer-group")
-    public void updateCartResponse(String message) {
-        // Deserialize JSON to OrderItem
-        OrderItem orderItem = convertFromJsonToOrderItem(message);
-
-        if (orderItem.getProductId() == null) {
-            orderItemRepository.delete(orderItem);
-            throw new IllegalArgumentException("Product " + orderItem.getName() + " is not available anymore");
         } else {
             orderItemRepository.save(orderItem);
         }
@@ -187,6 +149,85 @@ public class OrderItemService {
         return true;
     }
 
+    public String addOrderItem(String buyerId, OrderItemDTO data) {
+        if (data.getQuantity() != 1) {
+            throw new IllegalArgumentException("Quantity must be 1 for order item to be initially added");
+        }
+
+        Optional<OrderItem> itemOptional =
+                orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
+
+        if (itemOptional.isEmpty()) {
+            OrderItem item = OrderItem.builder()
+                    .productId(data.getProductId())
+                    .quantity(data.getQuantity())
+                    .buyerId(buyerId)
+                    .statusCode(OrderStatus.CREATED)
+                    .build();
+
+            OrderItem newItem = orderItemRepository.save(item);
+
+            // Serialize newItem to JSON
+            String jsonMessage = convertFromOrderItemToJson(newItem);
+
+            kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
+
+            return newItem.getItemId();
+        }
+
+        return itemOptional.get().getItemId();
+    }
+
+    public String redoOrderItem(String buyerId, OrderItemRedo data) {
+        Optional<OrderItem> itemOptional =
+                orderItemRepository.findByItemIdAndBuyerIdAndProductIdAndOrderId(data.getItemId(),
+                        buyerId, data.getProductId(), data.getOrderId());
+
+        if (itemOptional.isEmpty()) {
+            throw new IllegalArgumentException("You can only redo your own order item");
+        }
+
+        if (itemOptional.get().getStatusCode() != OrderStatus.CONFIRMED) {
+            throw new IllegalArgumentException("You can only redo order item that has been confirmed by a seller");
+        }
+
+        Optional<OrderItem> cartItemOptional =
+                orderItemRepository.findByBuyerIdAndProductIdAndOrderIdIsNull(buyerId, data.getProductId());
+
+        if (cartItemOptional.isEmpty()) {
+            OrderItem item = OrderItem.builder()
+                    .productId(data.getProductId())
+                    .quantity(data.getQuantity())
+                    .buyerId(buyerId)
+                    .statusCode(OrderStatus.CREATED)
+                    .build();
+
+            OrderItem newItem = orderItemRepository.save(item);
+
+            // Serialize newItem to JSON
+            String jsonMessage = convertFromOrderItemToJson(newItem);
+
+            kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
+
+            return newItem.getItemId();
+        }
+
+        OrderItem updatedItem = OrderItem.builder()
+                .itemId(cartItemOptional.get().getItemId())
+                .productId(data.getProductId())
+                .statusCode(OrderStatus.CREATED)
+                .quantity(data.getQuantity() + cartItemOptional.get().getQuantity())
+                .buyerId(buyerId)
+                .build();
+
+        // Serialize updatedItem to JSON
+        String jsonMessage = convertFromOrderItemToJson(updatedItem);
+
+        kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
+
+        return cartItemOptional.get().getItemId();
+    }
+
     public void updateOrderItem(String itemId, String buyerId, OrderItemDTO data) {
         Optional<OrderItem> itemOptional = orderItemRepository
                 .findByItemIdAndBuyerIdAndProductIdAndOrderIdIsNull(itemId,
@@ -204,7 +245,7 @@ public class OrderItemService {
             // Serialize newItem to JSON
             String jsonMessage = convertFromOrderItemToJson(updatedItem);
 
-            kafkaTemplate.send("UPDATE_CART_REQUEST", jsonMessage);
+            kafkaTemplate.send("CREATE_CART_REQUEST", jsonMessage);
         } else {
             throw new IllegalArgumentException("You can only update quantity of order item that is in your own cart");
         }

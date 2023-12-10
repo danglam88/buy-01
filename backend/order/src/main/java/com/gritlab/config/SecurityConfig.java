@@ -82,6 +82,7 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/order/item").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.POST, "/order/item").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.POST, "/order/item/redo").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.PUT, "/order/item/**").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.PUT, "/order/item/status/**").hasAnyAuthority(SELLER)
                                         .requestMatchers(HttpMethod.PUT, "/order/item/cancel/**").hasAnyAuthority(CLIENT)
@@ -108,22 +109,6 @@ public class SecurityConfig {
     @Bean
     public NewTopic createCartResponse() {
         return TopicBuilder.name("CREATE_CART_RESPONSE")
-                .partitions(1)
-                .replicas(1)
-                .build();
-    }
-
-    @Bean
-    public NewTopic updateCartRequest() {
-        return TopicBuilder.name("UPDATE_CART_REQUEST")
-                .partitions(1)
-                .replicas(1)
-                .build();
-    }
-
-    @Bean
-    public NewTopic updateCartResponse() {
-        return TopicBuilder.name("UPDATE_CART_RESPONSE")
                 .partitions(1)
                 .replicas(1)
                 .build();
