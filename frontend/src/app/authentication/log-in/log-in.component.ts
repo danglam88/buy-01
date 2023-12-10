@@ -5,6 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
 import { EncryptionService } from "src/app/services/encryption.service";
 import { MatDialogRef, MatDialog } from "@angular/material/dialog";
+import { UserService } from "src/app/services/user.service";
 
 @Component({
   selector: "app-log-in",
@@ -18,7 +19,8 @@ export class LogInComponent implements OnInit {
     private authService: AuthenticationService,
     private encryptionService: EncryptionService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private userService: UserService
   ) {
     this.toastr.toastrConfig.positionClass = "toast-bottom-right";
     //console.log("sessionStorage", encryptionService.decrypt(sessionStorage.getItem("loggedIn")));
@@ -47,6 +49,7 @@ export class LogInComponent implements OnInit {
   login() {
     this.authService.authenticate(this.loginform.value).subscribe({
       next: (result) => {
+        this.userService.setUserInfoRole(result["role"]);
         const encryptedObj = this.encryptionService.encrypt(
           JSON.stringify(result)
         );

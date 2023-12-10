@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { Router } from "@angular/router";
 import { Cart } from "src/app/Models/Cart";
 import { CartItems } from "src/app/Models/CartItems";
@@ -6,6 +6,7 @@ import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: "app-cart",
@@ -19,17 +20,27 @@ export class CartComponent implements OnInit {
   cart: Cart = new Cart();
   @Input() productAdded: any;
   itemId: any;
+  role: string = '';
 
-  constructor(private cartService: CartService, private router: Router, private orderService: OrderService, private dialog: MatDialog) {
+  constructor(
+    private cartService: CartService,
+    private router: Router,
+    private orderService: OrderService,
+    private dialog: MatDialog,
+    private userService: UserService) {
+
     this.setCart();
   }
+
   ngOnInit(): void {
+    this.userService.userInfoRole$.subscribe((role) => {
+      this.role = role;
+      console.log("role at ngOnInit: ", this.role);
+    });
     this.cartService.itemId$.subscribe((itemId) => {
       this.itemId = itemId;
-      
+      console.log("itemId at ngOnInit: ", this.itemId);
     });
-    console.log("itemId at ngOnInit: ", this.itemId);
-    
   }
 
   setCart() {
@@ -96,7 +107,8 @@ export class CartComponent implements OnInit {
             this.dialog.open(OrderDetailsComponent, {
               data: {
                 order: orderData,
-                view: 'cart'
+                view: 'cart',
+                role: this.role
               },
             });
             this.router.navigate(["home"]);

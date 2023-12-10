@@ -39,8 +39,9 @@ export class OrderHistoryComponent {
     openProductDetail(detail: any): void {
       this.dialog.open(OrderDetailsComponent, {
        data: {
-         detail: detail,
-         role: this.role
+         order: detail,
+         role: this.role,
+         view: 'history'
        },
      });
    }
