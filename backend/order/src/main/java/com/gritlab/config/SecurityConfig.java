@@ -6,13 +6,11 @@ import com.gritlab.component.ExceptionFilter;
 import com.gritlab.component.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,6 +29,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String CLIENT = "CLIENT";
+    private static final String SELLER = "SELLER";
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -79,17 +80,17 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(HttpMethod.OPTIONS)
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/order/item").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.POST, "/order/item").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.PUT, "/order/item/**").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.PUT, "/order/item/status/**").hasAnyAuthority("SELLER")
-                                        //.requestMatchers(HttpMethod.DELETE, "/order/item/**").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.GET, "/order/seller").hasAnyAuthority("SELLER")
-                                        .requestMatchers(HttpMethod.GET, "/order/client").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.GET, "/order/**").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.POST, "/order").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.PUT, "/order/**").hasAnyAuthority("CLIENT")
-                                        .requestMatchers(HttpMethod.DELETE, "/order/**").hasAnyAuthority("CLIENT")
+                                        .requestMatchers(HttpMethod.GET, "/order/item").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.POST, "/order/item").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.PUT, "/order/item/**").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.PUT, "/order/item/status/**").hasAnyAuthority(SELLER)
+                                        .requestMatchers(HttpMethod.DELETE, "/order/item/**").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.GET, "/order/seller").hasAnyAuthority(SELLER)
+                                        .requestMatchers(HttpMethod.GET, "/order/client").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.GET, "/order/**").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.POST, "/order").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.PUT, "/order/**").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.DELETE, "/order/**").hasAnyAuthority(CLIENT)
                                         .anyRequest()
                                         .authenticated())
                 .build();

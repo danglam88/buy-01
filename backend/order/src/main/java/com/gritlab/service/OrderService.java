@@ -6,6 +6,8 @@ import com.gritlab.model.*;
 import com.gritlab.repository.OrderItemRepository;
 import com.gritlab.repository.OrderItemRepositoryCustom;
 import com.gritlab.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,24 +15,35 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
+    private final OrderRepository orderRepository;
+
+    private final OrderItemRepository orderItemRepository;
+
+    private final OrderItemRepositoryCustom customRepository;
+
+    private final OrderItemService orderItemService;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
-    private OrderItemRepository orderItemRepository;
+    public OrderService(OrderRepository orderRepository,
+                        OrderItemRepository orderItemRepository,
+                        OrderItemRepositoryCustom customRepository,
+                        OrderItemService orderItemService,
+                        KafkaTemplate<String, Object> kafkaTemplate) {
 
-    @Autowired
-    OrderItemRepositoryCustom customRepository;
-
-    @Autowired
-    private OrderItemService orderItemService;
-
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.customRepository = customRepository;
+        this.orderItemService = orderItemService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public OrderHistory getOrdersByBuyerId(String buyerId) {
 
@@ -90,7 +103,7 @@ public class OrderService {
 
         return orderItems.stream()
                 .map(OrderItemResponse::fromOrderItem)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public String addOrder(String buyerId, OrderRequest data) {
@@ -137,6 +150,7 @@ public class OrderService {
         // Deserialize JSON to Order
         Order order = convertFromJsonToOrder(message);
 
+        assert order != null;
         List<OrderItem> items = order.getItems();
 
         for (OrderItem orderItem: items) {
@@ -160,7 +174,7 @@ public class OrderService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, Order.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from json to order : {}", e.getMessage());
             return null;
         }
     }
@@ -170,7 +184,7 @@ public class OrderService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(order);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from order to json : {}", e.getMessage());
             return null;
         }
     }

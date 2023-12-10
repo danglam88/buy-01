@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +19,23 @@ import java.util.Optional;
 @Service
 public class OrderItemService {
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
+    private static final Logger log = LoggerFactory.getLogger(OrderItemService.class);
+
+    private final OrderItemRepository orderItemRepository;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    private final OrderRepository orderRepository;
 
     @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    public OrderItemService(OrderItemRepository orderItemRepository,
+                            KafkaTemplate<String, Object> kafkaTemplate,
+                            OrderRepository orderRepository) {
 
-    @Autowired
-    private OrderRepository orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.orderRepository = orderRepository;
+    }
 
     public List<CartItemResponse> getOrderItems(String buyerId) {
         List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
@@ -77,7 +88,7 @@ public class OrderItemService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, OrderItem.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from json to order item : {}", e.getMessage());
             return null;
         }
     }
@@ -87,7 +98,7 @@ public class OrderItemService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(item);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from order item to json : {}", e.getMessage());
             return null;
         }
     }
