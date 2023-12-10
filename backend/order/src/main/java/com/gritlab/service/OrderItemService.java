@@ -235,12 +235,46 @@ public class OrderItemService {
                     .sellerId(sellerId)
                     .build();
 
-            // Serialize newItem to JSON
+            // Serialize updatedItem to JSON
             String jsonMessage = convertFromOrderItemToJson(updatedItem);
 
             kafkaTemplate.send("UPDATE_STATUS_REQUEST", jsonMessage);
         } else {
             throw new IllegalArgumentException("You can only update status of order item that has your own product");
+        }
+    }
+
+    public void cancelOrderItem(String itemId, String buyerId, OrderItemStatusDTO data) {
+        if (data.getStatusCode() != OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("You can only set status of your order item to CANCELLED");
+        }
+
+        Optional<OrderItem> itemOptional = orderItemRepository
+                .findByItemIdAndBuyerIdAndProductIdAndOrderId(itemId,
+                        buyerId, data.getProductId(), data.getOrderId());
+
+        if (itemOptional.isPresent()) {
+
+            if (itemOptional.get().getStatusCode() != OrderStatus.CREATED) {
+                throw new IllegalArgumentException("You can only cancel order item with current status as CREATED");
+            }
+
+            OrderItem updatedItem = OrderItem.builder()
+                    .itemId(itemId)
+                    .productId(data.getProductId())
+                    .statusCode(data.getStatusCode())
+                    .orderId(data.getOrderId())
+                    .quantity(itemOptional.get().getQuantity())
+                    .sellerId(itemOptional.get().getSellerId())
+                    .buyerId(buyerId)
+                    .build();
+
+            // Serialize updatedItem to JSON
+            String jsonMessage = convertFromOrderItemToJson(updatedItem);
+
+            kafkaTemplate.send("UPDATE_STATUS_REQUEST", jsonMessage);
+        } else {
+            throw new IllegalArgumentException("You can only CANCEL your own order item");
         }
     }
 
