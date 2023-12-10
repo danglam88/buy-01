@@ -68,7 +68,7 @@ export class OrderHistoryComponent {
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        confirmationText: 'Cancel this order?' 
+        confirmationText: 'Cancel this order?'
       }
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {

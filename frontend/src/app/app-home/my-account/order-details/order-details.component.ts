@@ -1,6 +1,10 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Product } from 'src/app/Models/Product';
+import { OrderItemService } from 'src/app/services/order-item.service';
+import { OrderService } from 'src/app/services/order.service';
+import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-order-details',
@@ -15,6 +19,10 @@ export class OrderDetailsComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<OrderDetailsComponent>,
+    private orderItemService: OrderItemService,
+    private orderService: OrderService,
+    private dialog: MatDialog,
+    private toastr: ToastrService
     ) {
       console.log("OrderDetails data: ", data);
       this.dialogData = data;
@@ -28,6 +36,44 @@ export class OrderDetailsComponent implements OnInit {
     } else if (this.dialogData.role === 'SELLER') {
       this.totalSum = this.dialogData.order.item_price * this.dialogData.order.quantity;
     }
+  }
+
+  cancelOrderItemByClient(item: any): void {
+    const data = {
+      "productId": item.product_id,
+      "orderId": item.order_id,
+      "statusCode": "CANCELLED"
+    };
+
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        confirmationText: 'Cancel this order item?'
+      }
+    });
+    dialogRef.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        console.log('Order Item cancelled');
+        this.orderItemService.cancelOrderItem(item.item_id, data).subscribe({
+          next: () => {
+            this.orderService.getOrderByOrderId(item.order_id).subscribe({
+              next: (result) => {
+                console.log("Order detail after item cancelled: ", result);
+                // todo: make it "async"
+              },
+              error: (error) => {
+                console.log(error);
+              }
+            });
+          },
+          error: (error) => {
+            console.log(error);
+          },
+          complete: () => {
+            this.toastr.success('Order item cancelled successfully', 'Success');
+          }
+        });
+      }
+    });
   }
 
    // Close modal

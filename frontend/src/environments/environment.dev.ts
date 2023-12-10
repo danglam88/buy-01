@@ -18,4 +18,6 @@ export const environment = {
     sellerOrderUrl: `${orderBaseUrl}/order/seller`,
     clientOrderUrl: `${orderBaseUrl}/order/client`,
     orderItemUrl: `${orderBaseUrl}/order/item`,
+    cancelOrderItemUrl: `${orderBaseUrl}/order/item/cancel`,
+    statusOrderItemUrl: `${orderBaseUrl}/order/item/status`
 };

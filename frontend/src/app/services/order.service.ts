@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 })
 export class OrderService {
   private cart: Cart = new Cart();
-  
 
   constructor(
     private httpClient: HttpClient,
