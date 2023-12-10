@@ -24,6 +24,7 @@ public interface OrderItemRepository extends MongoRepository<OrderItem, String> 
     public List<OrderItem> findByBuyerIdAndOrderIdIsNull(String buyerId);
     public Optional<OrderItem> findByBuyerIdAndProductIdAndOrderIdIsNull(String buyerId, String productId);
     public List<OrderItem> findByOrderId(String orderId);
+    public List<OrderItem> findByOrderIdAndBuyerId(String orderId, String buyerId);
     public List<OrderItem> findBySellerIdAndOrderIdIsNotNull(String sellerId);
 
     @Query("{'orderId': {$in : ?0}}")

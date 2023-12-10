@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -104,6 +105,42 @@ public class OrderService {
         return orderItems.stream()
                 .map(OrderItemResponse::fromOrderItem)
                 .toList();
+    }
+
+    public List<String> redoOrder(String orderId, String buyerId) {
+        Optional<Order> orderOptional = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId);
+
+        if (orderOptional.isEmpty()) {
+            throw new IllegalArgumentException("You can only redo your own order");
+        }
+
+        if (orderOptional.get().getStatusCode() != OrderStatus.CONFIRMED) {
+            throw new IllegalArgumentException("You can only redo order that has been confirmed");
+        }
+
+        List<OrderItem> items = orderItemRepository.findByOrderIdAndBuyerId(orderId, buyerId);
+
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("You can only redo order with at least one order item");
+        }
+
+        List<String> itemIds = new ArrayList<>();
+
+        for (OrderItem orderItem: items) {
+            if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+                OrderItemRedo data = OrderItemRedo.builder()
+                        .itemId(orderItem.getItemId())
+                        .orderId(orderItem.getOrderId())
+                        .productId(orderItem.getProductId())
+                        .quantity(orderItem.getQuantity())
+                        .build();
+
+                String itemId = orderItemService.redoOrderItem(buyerId, data);
+                itemIds.add(itemId);
+            }
+        }
+
+        return itemIds;
     }
 
     public String addOrder(String buyerId, OrderRequest data) {

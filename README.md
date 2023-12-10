@@ -315,6 +315,10 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
 
    + Response: orderId as a string
 
+- POST `/order/redo/{id}` - Redo a confirmed order by adding all its confirmed order items to the current cart of the logged-in client (accessible by a client only)
+
+   + Response: itemIds as a list of strings
+
 - PUT `/order/{id}` - Cancel an order or confirm an order (with at lease one order item confirmed) as a logged-in client who owns that order (accessible by a client only)
 
    + Request:

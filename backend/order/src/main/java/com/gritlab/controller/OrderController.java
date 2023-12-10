@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/order")
 public class OrderController {
@@ -48,6 +50,13 @@ public class OrderController {
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
         String orderId = orderService.addOrder(userDetails.getId(), data);
         return ResponseEntity.ok().body(orderId);
+    }
+
+    @PostMapping("/redo/{id}")
+    public ResponseEntity<List<String>> redoOrder(@PathVariable String id, Authentication authentication) {
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
+        List<String> itemIds = orderService.redoOrder(id, userDetails.getId());
+        return ResponseEntity.ok().body(itemIds);
     }
 
     @PutMapping("/{id}")
