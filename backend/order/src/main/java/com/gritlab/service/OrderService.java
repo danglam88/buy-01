@@ -2,6 +2,7 @@ package com.gritlab.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.*;
 import com.gritlab.repository.OrderItemRepository;
 import com.gritlab.repository.OrderItemRepositoryCustom;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -108,20 +108,16 @@ public class OrderService {
     }
 
     public List<String> redoOrder(String orderId, String buyerId) {
-        Optional<Order> orderOptional = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId);
+        Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
 
-        if (orderOptional.isEmpty()) {
-            throw new IllegalArgumentException("You can only redo your own order");
-        }
-
-        if (orderOptional.get().getStatusCode() != OrderStatus.CONFIRMED) {
-            throw new IllegalArgumentException("You can only redo order that has been confirmed");
+        if (order.getStatusCode() != OrderStatus.CONFIRMED) {
+            throw new InvalidParamException("You can only redo order that has been confirmed");
         }
 
         List<OrderItem> items = orderItemRepository.findByOrderIdAndBuyerId(orderId, buyerId);
 
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("You can only redo order with at least one order item");
+            throw new InvalidParamException("You can only redo order with at least one order item");
         }
 
         List<String> itemIds = new ArrayList<>();
@@ -145,13 +141,13 @@ public class OrderService {
 
     public String addOrder(String buyerId, OrderRequest data) {
         if (data.getStatusCode() != OrderStatus.CREATED) {
-            throw new IllegalArgumentException("Order status must be CREATED for order to be created");
+            throw new InvalidParamException("Order status must be CREATED for order to be created");
         }
 
         List<OrderItem> items = orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId);
 
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("Order can only be created with at least one order item in cart");
+            throw new InvalidParamException("Order can only be created with at least one order item in cart");
         }
 
         Order order = Order.builder()
@@ -189,21 +185,25 @@ public class OrderService {
 
         assert order != null;
         List<OrderItem> items = order.getItems();
+        List<OrderItem> newItems = new ArrayList<>();
 
         for (OrderItem orderItem: items) {
             if (orderItem.getProductId() == null) {
-                orderItem.setStatusCode(OrderStatus.CANCELLED);
+                orderItemRepository.delete(orderItem);
+            } else {
+                orderItemRepository.save(orderItem);
+                newItems.add(orderItem);
             }
-            orderItemRepository.save(orderItem);
         }
 
-        order.setItems(items);
+        order.setItems(newItems);
 
-        if (orderItemService.allItemsHaveStatus(order.getItems(), OrderStatus.CANCELLED)) {
-            order.setStatusCode(OrderStatus.CANCELLED);
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            orderRepository.delete(order);
+            throw new InvalidParamException("Order cannot be created since none of the chosen products are available");
+        } else {
+            orderRepository.save(order);
         }
-
-        orderRepository.save(order);
     }
 
     private Order convertFromJsonToOrder(String jsonMessage) {
@@ -229,34 +229,28 @@ public class OrderService {
     public void updateOrder(String orderId, String buyerId, OrderRequest data) {
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
 
-        if (order.getStatusCode() == OrderStatus.CREATED
-                && (data.getStatusCode() == OrderStatus.CANCELLED
-                || (data.getStatusCode() == OrderStatus.CONFIRMED
-                && orderItemService.atLeastOneItemHasRequiredStatus(order.getItems(),
-                OrderStatus.CONFIRMED, OrderStatus.CANCELLED)))) {
+        if (order.getStatusCode() == OrderStatus.CREATED && data.getStatusCode() == OrderStatus.CANCELLED) {
 
-            if (data.getStatusCode() == OrderStatus.CANCELLED) {
-                List<OrderItem> items = order.getItems();
+            List<OrderItem> items = order.getItems();
 
-                for (OrderItem orderItem: items) {
-                    if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+            for (OrderItem orderItem: items) {
+                if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
 
-                        // Serialize newItem to JSON
-                        String jsonMessage = orderItemService.convertFromOrderItemToJson(orderItem);
-                        kafkaTemplate.send("UPDATE_PRODUCT_QUANTITY", jsonMessage);
-                    }
-
-                    orderItem.setStatusCode(OrderStatus.CANCELLED);
-                    orderItemRepository.save(orderItem);
+                    // Serialize newItem to JSON
+                    String jsonMessage = orderItemService.convertFromOrderItemToJson(orderItem);
+                    kafkaTemplate.send("UPDATE_PRODUCT_QUANTITY", jsonMessage);
                 }
 
-                order.setItems(items);
+                orderItem.setStatusCode(OrderStatus.CANCELLED);
+                orderItemRepository.save(orderItem);
             }
+
+            order.setItems(items);
 
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
         } else {
-            throw new IllegalArgumentException("You can only CANCEL a CREATED order or CONFIRM a CREATED order with at least one order item CONFIRMED");
+            throw new InvalidParamException("You can only CANCEL a CREATED order");
         }
     }
 
@@ -264,13 +258,14 @@ public class OrderService {
         Order order = orderRepository.findByOrderIdAndBuyerId(orderId, buyerId).orElseThrow();
 
         if (order.getStatusCode() != OrderStatus.CANCELLED) {
-            throw new IllegalArgumentException("Order status must be CANCELLED for order to be deleted");
+            throw new InvalidParamException("Order status must be CANCELLED for order to be deleted");
         }
 
         List<OrderItem> items = order.getItems();
 
         for (OrderItem orderItem: items) {
-            orderItemService.deleteOrderItem(orderItem.getItemId(), buyerId);
+            orderItem.setOrderId(null);
+            orderItemRepository.save(orderItem);
         }
 
         orderRepository.delete(order);

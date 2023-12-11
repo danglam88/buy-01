@@ -184,7 +184,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       }
       ```
 
-- DELETE `/order/item/{id}` - Delete an order item in the current cart of the logged-in client or an order item that has been cancelled by a seller before (accessible by a client only)
+- DELETE `/order/item/{id}` - Delete an order item in the current cart of the logged-in client (accessible by a client only)
 
 - GET `/order/seller` - Get all order items for the products of the logged-in seller as well as his most-selling products and total money earned (accessible by a seller only)
 
@@ -321,7 +321,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
 
    + Response: itemIds as a list of strings
 
-- PUT `/order/{id}` - Cancel an order or confirm an order (with at lease one order item confirmed) as a logged-in client who owns that order (accessible by a client only)
+- PUT `/order/{id}` - Cancel an order as a logged-in client who owns that order (accessible by a client only)
 
    + Request:
 
@@ -332,7 +332,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       }
       ```
 
-- DELETE `/order/{id}` - Delete an order (and all its order items) that has been cancelled before as a logged-in client who owns that order (accessible by a client only)
+- DELETE `/order/{id}` - Delete an order that has been cancelled before as a logged-in client who owns that order (accessible by a client only)
 
 ## CI/CD Pipeline (using Jenkins)
 

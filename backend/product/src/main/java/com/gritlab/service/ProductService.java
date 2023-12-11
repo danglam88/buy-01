@@ -7,6 +7,8 @@ import com.gritlab.exception.InvalidParamException;
 import com.gritlab.model.*;
 import com.gritlab.repository.ProductRepository;
 import com.gritlab.utility.ImageFileTypeChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,6 +24,8 @@ import java.util.Optional;
 
 @Service
 public class ProductService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     private final String[] allowedExtensions = {"png", "gif", "jpeg", "jpg"};
 
@@ -195,6 +199,7 @@ public class ProductService {
         // Deserialize JSON to Order
         Order order = convertFromJsonToOrder(message);
 
+        assert order != null;
         List<OrderItem> items = order.getItems();
 
         for (OrderItem orderItem: items) {
@@ -220,6 +225,7 @@ public class ProductService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
+        assert orderItem != null;
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
         if (product.isEmpty() || product.get().getQuantity() <= 0) {
@@ -247,6 +253,7 @@ public class ProductService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
+        assert orderItem != null;
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
         if (product.isEmpty() || product.get().getQuantity() <= 0) {
@@ -279,6 +286,7 @@ public class ProductService {
         // Deserialize JSON to OrderItem
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
+        assert orderItem != null;
         if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
             Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
@@ -294,7 +302,7 @@ public class ProductService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, OrderItem.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from json to order item : {}", e.getMessage());
             return null;
         }
     }
@@ -304,7 +312,7 @@ public class ProductService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(item);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from order item to json : {}", e.getMessage());
             return null;
         }
     }
@@ -314,7 +322,7 @@ public class ProductService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, Order.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from json to order : {}", e.getMessage());
             return null;
         }
     }
@@ -324,7 +332,7 @@ public class ProductService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(order);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert from order to json : {}", e.getMessage());
             return null;
         }
     }

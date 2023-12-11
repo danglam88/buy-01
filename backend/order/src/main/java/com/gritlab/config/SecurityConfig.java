@@ -42,24 +42,6 @@ public class SecurityConfig {
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
 
-    @Value("${spring.kafka.consumer.key-deserializer}")
-    private String keyDeserializer;
-
-    @Value("${spring.kafka.consumer.value-deserializer}")
-    private String valueDeserializer;
-
-    @Value("${spring.kafka.consumer.my-group-id}")
-    private String myGroupId;
-
-    @Value("${spring.kafka.consumer.binary-group-id}")
-    private String binaryGroupId;
-
-    @Value("${spring.kafka.consumer.max-partition-fetch-bytes}")
-    private String maxPartitionFetchBytes;
-
-    @Value("${spring.kafka.producer.max-request-size}")
-    private String maxRequestSize;
-
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
