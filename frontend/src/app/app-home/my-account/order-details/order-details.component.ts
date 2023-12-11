@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dial
 import { Product } from 'src/app/Models/Product';
 import { OrderItemService } from 'src/app/services/order-item.service';
 import { OrderService } from 'src/app/services/order.service';
+import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
@@ -21,6 +22,7 @@ export class OrderDetailsComponent implements OnInit {
     public dialogRef: MatDialogRef<OrderDetailsComponent>,
     private orderItemService: OrderItemService,
     private orderService: OrderService,
+    private cartService: CartService,
     private dialog: MatDialog,
     private toastr: ToastrService
     ) {
@@ -36,6 +38,27 @@ export class OrderDetailsComponent implements OnInit {
     } else if (this.dialogData.role === 'SELLER') {
       this.totalSum = this.dialogData.order.item_price * this.dialogData.order.quantity;
     }
+  }
+
+  redoOrderItem(item: any): void {
+    const data = {
+      "itemId": item.item_id,
+      "orderId": item.order_id,
+      "productId": item.product_id,
+      "quantity": item.quantity
+    };
+
+    this.orderItemService.redoOrderItem(data).subscribe({
+      next: (result) => {
+        this.cartService.setItemId(result);
+      },
+      error: (error) => {
+        console.log(error);
+      },
+      complete: () => {
+        this.toastr.success('Added to Cart');
+      }
+    });
   }
 
   cancelOrderItemByClient(item: any): void {

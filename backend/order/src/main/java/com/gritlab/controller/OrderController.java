@@ -52,10 +52,10 @@ public class OrderController {
         return ResponseEntity.ok().body(orderId);
     }
 
-    @PostMapping("/redo/{id}")
-    public ResponseEntity<List<String>> redoOrder(@PathVariable String id, Authentication authentication) {
+    @PostMapping("/redo")
+    public ResponseEntity<List<String>> redoOrder(Authentication authentication, @Valid @RequestBody String orderId) {
         UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
-        List<String> itemIds = orderService.redoOrder(id, userDetails.getId());
+        List<String> itemIds = orderService.redoOrder(orderId, userDetails.getId());
         return ResponseEntity.ok().body(itemIds);
     }
 

@@ -39,4 +39,22 @@ export class OrderItemService {
   
     return this.httpClient.put(`${environment.cancelOrderItemUrl}/${itemId}`, itemData, { headers });
   }
+
+  redoOrderItem(itemData: Object): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.post(`${environment.redoOrderItemUrl}`, itemData, { headers });
+  }
+
+  updateOrderItemStatus(itemId: string, itemData: Object): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.put(`${environment.statusOrderItemUrl}/${itemId}`, itemData, { headers });
+  }
 }

@@ -475,7 +475,18 @@ export class ProductDetailComponent implements OnInit {
         next: (result) => {
           //console.log("itemId added to current cart: ", result);
           this.cartService.setItemId(result);
-        }
+        },
+        error: (error) => {
+          if (this.errorService.isAuthError(error.status)) {
+            this.errorService.handleSessionExpirationError();
+            this.dialogRef.close();
+          } else if (this.errorService.is400Error(error.status)) {
+            this.errorService.handleBadRequestError(error);
+          }
+        },
+        complete: () => {
+          this.toastr.success("Added to Cart");
+        },
       });
     }
 

@@ -90,7 +90,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/order/seller").hasAnyAuthority(SELLER)
                                         .requestMatchers(HttpMethod.GET, "/order/client").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.GET, "/order/**").hasAnyAuthority(CLIENT)
-                                        .requestMatchers(HttpMethod.POST, "/order/redo/**").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.POST, "/order/redo").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.POST, "/order").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.PUT, "/order/**").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.DELETE, "/order/**").hasAnyAuthority(CLIENT)

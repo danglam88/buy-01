@@ -34,7 +34,7 @@
                 <div>
                     <h2>Status: {{ item.status_code }}</h2>
                 </div>
-                <button *ngIf="item.status_code === 'CONFIRMED'">Redo</button>
+                <button *ngIf="item.status_code === 'CONFIRMED'" (click)="redoOrderItem(item)">Redo</button>
                 <button *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)">Cancel</button>
                 <hr>
             </div>
@@ -67,10 +67,6 @@
                 </div>
                 <div>
                     <h2>Status: {{ dialogData.order.status_code }}</h2>
-                </div>
-                <div *ngIf="dialogData.order.status_code === 'CREATED'">
-                    <button>Confirm</button>
-                    <button>Cancel</button>
                 </div>
                 <hr>
             </div>

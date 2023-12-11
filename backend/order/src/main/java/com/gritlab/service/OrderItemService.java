@@ -85,7 +85,6 @@ public class OrderItemService {
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
-            throw new IllegalArgumentException("Product " + orderItem.getName() + " is not available");
         } else {
             orderItemRepository.save(orderItem);
         }

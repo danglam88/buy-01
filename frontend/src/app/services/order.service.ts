@@ -92,4 +92,13 @@ export class OrderService {
   
     return this.httpClient.delete(`${environment.orderUrl}/${orderId}`, { headers });
   }
+
+  redoOrder(orderId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+  
+    return this.httpClient.post(`${environment.redoOrderUrl}`, orderId, { headers });
+  }
 }
