@@ -88,7 +88,7 @@ public class OrderItemService {
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
-            throw new InvalidParamException("Order item cannot be created since the chosen product is not available");
+            //throw new InvalidParamException("Order item cannot be created since the chosen product is not available");
         } else {
             orderItemRepository.save(orderItem);
         }
@@ -163,9 +163,9 @@ public class OrderItemService {
         if (itemOptional.isEmpty()) {
             OrderItem item = OrderItem.builder()
                     .productId(data.getProductId())
-                    .quantity(data.getQuantity())
                     .buyerId(buyerId)
                     .statusCode(OrderStatus.CREATED)
+                    .quantity(data.getQuantity())
                     .build();
 
             OrderItem newItem = orderItemRepository.save(item);
@@ -177,6 +177,19 @@ public class OrderItemService {
 
             return newItem.getItemId();
         }
+
+        OrderItem updatedItem = OrderItem.builder()
+                .itemId(itemOptional.get().getItemId())
+                .productId(data.getProductId())
+                .buyerId(buyerId)
+                .statusCode(OrderStatus.CREATED)
+                .quantity(data.getQuantity() + itemOptional.get().getQuantity())
+                .build();
+
+        // Serialize updatedItem to JSON
+        String jsonMessage = convertFromOrderItemToJson(updatedItem);
+
+        kafkaTemplate.send(CREATE_CART_REQUEST, jsonMessage);
 
         return itemOptional.get().getItemId();
     }
@@ -196,9 +209,9 @@ public class OrderItemService {
         if (cartItemOptional.isEmpty()) {
             OrderItem redoItem = OrderItem.builder()
                     .productId(data.getProductId())
-                    .quantity(data.getQuantity())
                     .buyerId(buyerId)
                     .statusCode(OrderStatus.CREATED)
+                    .quantity(data.getQuantity())
                     .build();
 
             OrderItem newItem = orderItemRepository.save(redoItem);
@@ -214,9 +227,9 @@ public class OrderItemService {
         OrderItem updatedItem = OrderItem.builder()
                 .itemId(cartItemOptional.get().getItemId())
                 .productId(data.getProductId())
+                .buyerId(buyerId)
                 .statusCode(OrderStatus.CREATED)
                 .quantity(data.getQuantity() + cartItemOptional.get().getQuantity())
-                .buyerId(buyerId)
                 .build();
 
         // Serialize updatedItem to JSON

@@ -200,7 +200,7 @@ public class OrderService {
 
         if (order.getItems() == null || order.getItems().isEmpty()) {
             orderRepository.delete(order);
-            throw new InvalidParamException("Order cannot be created since none of the chosen products are available");
+            //throw new InvalidParamException("Order cannot be created since none of the chosen products are available");
         } else {
             orderRepository.save(order);
         }
