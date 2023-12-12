@@ -264,7 +264,7 @@ public class OrderService {
         List<OrderItem> items = order.getItems();
 
         for (OrderItem orderItem: items) {
-            orderItem.setOrderId(null);
+            orderItem.setOrderId("removed");
             orderItemRepository.save(orderItem);
         }
 
