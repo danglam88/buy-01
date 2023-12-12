@@ -101,22 +101,26 @@ export class CartComponent implements OnInit {
     this.orderService.createOrder(orderData).subscribe({
       next: (orderId: string) => {
         console.log("createOrder orderId: ", orderId);
-        this.orderService.getOrderByOrderId(orderId).subscribe({
-          next: (orderData: any) => {
-            console.log("getOrderByOrderId data: ", orderData);
-            this.dialog.open(OrderDetailsComponent, {
-              data: {
-                order: orderData,
-                view: 'cart',
-                role: this.role
-              },
-            });
-            this.router.navigate(["home"]);
-          },
-          error: (error: any) => {
-            console.error("Error fetching order data", error);
-          },
-        });
+
+        setTimeout(() => {
+          this.orderService.getOrderByOrderId(orderId).subscribe({
+            next: (orderData: any) => {
+              console.log("getOrderByOrderId data: ", orderData);
+              this.dialog.open(OrderDetailsComponent, {
+                data: {
+                  order: orderData,
+                  view: 'cart',
+                  role: this.role
+                },
+              });
+              this.router.navigate(["home"]);
+            },
+            error: (error: any) => {
+              console.error("Error fetching order data", error);
+            },
+          });
+        }, 250);
+
       },
       error: (error: any) => {
         console.error("Error creating order", error);

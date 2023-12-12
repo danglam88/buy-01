@@ -88,7 +88,6 @@ public class OrderItemService {
 
         if (orderItem.getProductId() == null) {
             orderItemRepository.delete(orderItem);
-            //throw new InvalidParamException("Order item cannot be created since the chosen product is not available");
         } else {
             orderItemRepository.save(orderItem);
         }

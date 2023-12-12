@@ -200,7 +200,6 @@ public class OrderService {
 
         if (order.getItems() == null || order.getItems().isEmpty()) {
             orderRepository.delete(order);
-            //throw new InvalidParamException("Order cannot be created since none of the chosen products are available");
         } else {
             orderRepository.save(order);
         }
@@ -264,7 +263,7 @@ public class OrderService {
         List<OrderItem> items = order.getItems();
 
         for (OrderItem orderItem: items) {
-            orderItem.setOrderId("removed");
+            orderItem.setOrderId("<removed>");
             orderItemRepository.save(orderItem);
         }
 
