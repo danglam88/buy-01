@@ -33,7 +33,9 @@ export class OrderDetailsComponent implements OnInit {
   ngOnInit(): void {
     if (this.dialogData.role === 'CLIENT') {
       this.dialogData.order.items.forEach((item) => {
-        this.totalSum += item.item_price * item.quantity;
+        if (item.status_code !== 'CANCELLED') {
+          this.totalSum += item.item_price * item.quantity;
+        }
       });
     } else if (this.dialogData.role === 'SELLER') {
       this.totalSum = this.dialogData.order.item_price * this.dialogData.order.quantity;
