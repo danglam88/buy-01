@@ -65,9 +65,12 @@ public class OrderItemRepositoryCustom {
 
     public Double getTotalSumItemPriceByBuyerId(String buyerId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("buyerId").is(buyerId).and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
+                Aggregation.match(Criteria.where("buyerId").is(buyerId)
+                        .and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
+                Aggregation.project()
+                        .andExpression("itemPrice * quantity").as("priceTimesQuantity"),
                 Aggregation.group()
-                        .sum("itemPrice").as(TOTAL_ITEM_PRICE)
+                        .sum("priceTimesQuantity").as(TOTAL_ITEM_PRICE)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, Document.class);
@@ -78,9 +81,12 @@ public class OrderItemRepositoryCustom {
 
     public Double getTotalSumItemPriceBySellerId(String sellerId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("sellerId").is(sellerId).and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
+                Aggregation.match(Criteria.where("sellerId").is(sellerId)
+                        .and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
+                Aggregation.project()
+                        .andExpression("itemPrice * quantity").as("priceTimesQuantity"),
                 Aggregation.group()
-                        .sum("itemPrice").as(TOTAL_ITEM_PRICE)
+                        .sum("priceTimesQuantity").as(TOTAL_ITEM_PRICE)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, Document.class);
