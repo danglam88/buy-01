@@ -87,6 +87,15 @@ export class CartService {
     return this.httpClient.get(`${environment.orderItemUrl}`, { headers });
   }
 
+  //get a specific item in cart
+  getCartItem(itemId: string): Observable<object> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set("Authorization", `Bearer ${this.token}`);
+    }
+    return this.httpClient.get(`${environment.orderItemUrl}` + `/${itemId}`, { headers });
+  }
+
   //remove a product from cart
   removeFromCart(itemId: string): Observable<object> {
     let headers = new HttpHeaders();

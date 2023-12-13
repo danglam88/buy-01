@@ -51,14 +51,28 @@ export class OrderDetailsComponent implements OnInit {
     };
 
     this.orderItemService.redoOrderItem(data).subscribe({
-      next: (result) => {
-        this.cartService.setItemId(result);
+      next: (itemId) => {
+        console.log("Redo order itemId: ", itemId);
+
+        setTimeout(() => {
+          this.cartService.getCartItem(itemId).subscribe({
+            next: (result) => {
+              console.log("Cart item after redo: ", result);
+
+              this.cartService.setItemId(itemId);
+            },
+            error: (error) => {
+              console.log(error);
+            },
+            complete: () => {
+              this.toastr.success('Added to Cart');
+            }
+          });
+        }, 250);
+
       },
       error: (error) => {
         console.log(error);
-      },
-      complete: () => {
-        this.toastr.success('Added to Cart');
       }
     });
   }

@@ -45,8 +45,14 @@ export class OrderItemService {
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
     }
+
+    // Specify the responseType as 'text'
+    const options = {
+      headers: headers,
+      responseType: "text" as "json", // This 'as json' casting is required due to Angular's typing
+    };
   
-    return this.httpClient.post(`${environment.redoOrderItemUrl}`, itemData, { headers });
+    return this.httpClient.post(`${environment.redoOrderItemUrl}`, itemData, options);
   }
 
   updateOrderItemStatus(itemId: string, itemData: Object): Observable<any> {

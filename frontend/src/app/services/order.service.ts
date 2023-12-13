@@ -98,7 +98,9 @@ export class OrderService {
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
     }
+
+    const options = { headers: headers };
   
-    return this.httpClient.post(`${environment.redoOrderUrl}`, orderId, { headers });
+    return this.httpClient.post<string[]>(`${environment.redoOrderUrl}`, orderId, options);
   }
 }

@@ -90,14 +90,27 @@ export class OrderHistoryComponent {
     this.orderService.redoOrder(orderId).subscribe({
       next: (result) => {
         result.forEach((itemId) => {
-          this.cartService.setItemId(itemId);
+
+          setTimeout(() => {
+            this.cartService.getCartItem(itemId).subscribe({
+              next: (result) => {
+                console.log("Cart item after redo: ", result);
+  
+                this.cartService.setItemId(itemId);
+              },
+              error: (error) => {
+                console.log(error);
+              },
+              complete: () => {
+                this.toastr.success('Added to Cart');
+              }
+            });
+          }, 250);
+
         });
       },
       error: (error) => {
         console.log(error);
-      },
-      complete: () => {
-        this.toastr.success('Added to Cart');
       }
     });
    }
