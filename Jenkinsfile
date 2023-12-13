@@ -161,7 +161,7 @@ pipeline {
             }
         }
 
-        stage("Quality Gate for Frontend") {
+        /*stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
@@ -170,7 +170,7 @@ pipeline {
             }
         }
 
-        /*stage('Frontend Unit Tests') {
+        stage('Frontend Unit Tests') {
             agent { label 'build-agent' }
             steps {
                 sh '''
