@@ -55,6 +55,24 @@ services:
       start_period: 30s
     restart: on-failure
 
+  order-microservice:
+    image: order-microservice
+    container_name: order-microservice-container
+    ports:
+      - "8083:8083"
+    networks:
+      - buy01-network
+    depends_on:
+      - kafka
+      - mongodb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
+
   mongodb:
     image: mongo:latest
     container_name: mongodb-container

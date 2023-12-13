@@ -15,6 +15,7 @@ export class CreateProductComponent {
   previewUrl: string | ArrayBuffer | null = null;
   imgPlaceholder = '../../../../assets/images/uploadPhoto.jpg';
   selectedFiles: Array<{ file: File, url: string }> = [];
+  isCreatingProduct = false;
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -82,7 +83,8 @@ export class CreateProductComponent {
 
       this.productService.createProduct(formData).subscribe({
         next: (result) => {
-          this.productService.productCreated.emit(true);     
+          this.productService.productCreated.emit(true);
+          this.isCreatingProduct = true;
         },
         error: (error) => {
           if (this.errorService.is400Error(error.status)) {

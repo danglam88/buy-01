@@ -78,6 +78,7 @@ export class ProductDashboardComponent implements OnInit {
   }
   // Opens product detail modal
   openProductDetail(productData: Product): void {
+    console.log('Product data:', productData);
      this.dialog.open(ProductDetailComponent, {
       data: {
         product: productData, 

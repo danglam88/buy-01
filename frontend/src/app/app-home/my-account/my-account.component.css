@@ -1,0 +1,14 @@
+.navigation-bar {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    text-align: center; 
+  
+  .active {
+    background-color: #e6e6e6;
+    margin: 0 5px; 
+  }
+}
+
+

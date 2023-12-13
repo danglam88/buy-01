@@ -55,6 +55,24 @@ services:
       start_period: 30s
     restart: on-failure
 
+  order-microservice:
+    image: danglamgritlab/order-microservice:latest
+    container_name: order-microservice-container
+    ports:
+      - "8446:8446"
+    networks:
+      - buy01-network
+    depends_on:
+      - kafka
+      - order-mongodb
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8446/actuator/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
+
   frontend:
     image: danglamgritlab/frontend:latest
     container_name: frontend-container
@@ -130,6 +148,26 @@ services:
       start_period: 30s
     restart: on-failure
 
+  order-mongodb:
+    image: mongo:latest
+    container_name: order-mongodb-container
+    ports:
+      - "27021:27017"
+    networks:
+      - buy01-network
+    volumes:
+      - order-mongo-volume:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ORDER_DB_CREDENTIALS_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${ORDER_DB_CREDENTIALS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka-container
@@ -176,6 +214,8 @@ volumes:
   product-mongo-volume:
     external: true
   media-mongo-volume:
+    external: true
+  order-mongo-volume:
     external: true
 
 networks:

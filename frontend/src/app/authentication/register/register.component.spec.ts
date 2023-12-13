@@ -75,4 +75,11 @@ describe('RegisterComponent', () => {
     expect(toastrService.error).toHaveBeenCalledWith('Please select a role');
   });
 
+  it('should disable the "Register" button when isRegistering is true', () => {
+    component.isRegistering = true;
+    fixture.detectChanges();
+    const registerButton = fixture.nativeElement.querySelector('button[type="submit"]');
+    expect(registerButton.disabled).toBeTruthy();
+  });
+
 });

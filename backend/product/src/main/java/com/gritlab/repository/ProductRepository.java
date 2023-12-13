@@ -12,7 +12,7 @@ import java.util.Optional;
 @Component
 @RepositoryRestResource(collectionResourceRel = "products", path = "products")
 public interface ProductRepository extends MongoRepository<Product, String> {
-    Optional <Product> findByUserIdAndId(String userId, String id);
+    Optional<Product> findByUserIdAndId(String userId, String id);
     boolean existsByUserIdAndId(String userId, String id);
     void deleteAllByUserId(String userId);
     List<Product> findAllByUserId(String userId);

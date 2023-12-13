@@ -91,4 +91,12 @@ describe('ProductListingComponent', () => {
       },
     });
   });
+
+  it('should set selectedFilterRadioButton', () => {
+    const mockFilter: string = 'under100';
+
+    component.onFilterChanged(mockFilter);
+
+    expect(component.selectedFilterRadioButton).toEqual(mockFilter);
+  });
 });

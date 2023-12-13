@@ -117,6 +117,62 @@ public class SecurityConfig {
     }
 
     @Bean
+    public NewTopic createCartRequest() {
+        return TopicBuilder.name("CREATE_CART_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic createCartResponse() {
+        return TopicBuilder.name("CREATE_CART_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateStatusRequest() {
+        return TopicBuilder.name("UPDATE_STATUS_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateStatusResponse() {
+        return TopicBuilder.name("UPDATE_STATUS_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic updateProductQuantity() {
+        return TopicBuilder.name("UPDATE_PRODUCT_QUANTITY")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic createOrderRequest() {
+        return TopicBuilder.name("CREATE_ORDER_REQUEST")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic createOrderResponse() {
+        return TopicBuilder.name("CREATE_ORDER_RESPONSE")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
