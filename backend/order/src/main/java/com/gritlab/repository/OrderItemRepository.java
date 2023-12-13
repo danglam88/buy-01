@@ -19,7 +19,7 @@ public interface OrderItemRepository extends MongoRepository<OrderItem, String> 
                                                                 String sellerId, String productId, String orderId);
     public Optional<OrderItem> findByItemIdAndBuyerIdAndProductIdAndOrderId(String itemId,
                                                                 String buyerId, String productId, String orderId);
-    public Optional<OrderItem> findByItemIdAndBuyerId(String itemId, String buyerId);
+    public Optional<OrderItem> findByItemIdAndBuyerIdAndOrderIdIsNull(String itemId, String buyerId);
     public Optional<OrderItem> findByProductIdAndOrderIdIsNull(String productId);
     public List<OrderItem> findByBuyerIdAndOrderIdIsNull(String buyerId);
     public Optional<OrderItem> findByBuyerIdAndProductIdAndOrderIdIsNull(String buyerId, String productId);

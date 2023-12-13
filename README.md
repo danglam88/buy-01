@@ -121,6 +121,25 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
       ]
       ```
 
+- GET `/order/item/{id}` - Get an existing order item in the current cart of the logged-in client (accessible by a client only)
+
+   + Response:
+
+      ```json
+      {
+         "itemId": "XYZ",
+         "product": {
+            "id": "ABC",
+            "name": "iPhone",
+            "description": "iPhone",
+            "price": 10.0,
+            "quantity": 80
+         },
+         "quantity": 5,
+         "itemPrice": 50.0
+      }
+      ```
+
 - POST `/order/item` - Add a new order item to the current cart of the logged-in client (accessible by a client only)
 
    + Request:

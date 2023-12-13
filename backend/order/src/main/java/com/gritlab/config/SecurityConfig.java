@@ -63,6 +63,7 @@ public class SecurityConfig {
                                 auth.requestMatchers(HttpMethod.OPTIONS)
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/order/item").hasAnyAuthority(CLIENT)
+                                        .requestMatchers(HttpMethod.GET, "/order/item/**").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.POST, "/order/item/redo").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.POST, "/order/item").hasAnyAuthority(CLIENT)
                                         .requestMatchers(HttpMethod.PUT, "/order/item/status/**").hasAnyAuthority(SELLER)

@@ -261,7 +261,6 @@ public class ProductService {
         } else {
             orderItem.setName(product.get().getName());
             orderItem.setDescription(product.get().getDescription());
-            orderItem.setItemPrice(product.get().getPrice());
             orderItem.setMaxQuantity(product.get().getQuantity());
 
             if (orderItem.getQuantity() > product.get().getQuantity()) {

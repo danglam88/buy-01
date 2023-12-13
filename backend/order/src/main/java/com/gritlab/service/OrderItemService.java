@@ -45,20 +45,27 @@ public class OrderItemService {
         List<CartItemResponse> responseItems = new ArrayList<>();
 
         for (OrderItem item : items) {
-
-             ProductDTO product = new ProductDTO(item.getProductId(),
-                     item.getName(), item.getDescription(),
-                     item.getItemPrice(), item.getMaxQuantity(), item.getSellerId());
-             CartItemResponse responseItem = CartItemResponse.builder()
-                     .itemId(item.getItemId())
-                     .quantity(item.getQuantity())
-                     .itemPrice(item.getItemPrice() * item.getQuantity())
-                     .product(product).build();
-
+            CartItemResponse responseItem = getOrderItemByItemIdAndBuyerId(item.getItemId(), buyerId);
             responseItems.add(responseItem);
         }
 
         return responseItems;
+    }
+
+    public CartItemResponse getOrderItemByItemIdAndBuyerId(String itemId, String buyerId) {
+        OrderItem item = orderItemRepository.findByItemIdAndBuyerIdAndOrderIdIsNull(itemId, buyerId).orElseThrow();
+
+        ProductDTO product = new ProductDTO(item.getProductId(),
+                item.getName(), item.getDescription(),
+                item.getItemPrice(), item.getMaxQuantity(), item.getSellerId());
+
+        CartItemResponse responseItem = CartItemResponse.builder()
+                .itemId(item.getItemId())
+                .quantity(item.getQuantity())
+                .itemPrice(item.getItemPrice() * item.getQuantity())
+                .product(product).build();
+
+        return responseItem;
     }
 
     public OrderItem convertFromJsonToOrderItem(String jsonMessage) {
@@ -276,6 +283,7 @@ public class OrderItemService {
                 .statusCode(data.getStatusCode())
                 .orderId(data.getOrderId())
                 .quantity(item.getQuantity())
+                .itemPrice(item.getItemPrice())
                 .buyerId(item.getBuyerId())
                 .sellerId(sellerId)
                 .build();
@@ -305,8 +313,9 @@ public class OrderItemService {
                 .statusCode(data.getStatusCode())
                 .orderId(data.getOrderId())
                 .quantity(item.getQuantity())
-                .sellerId(item.getSellerId())
+                .itemPrice(item.getItemPrice())
                 .buyerId(buyerId)
+                .sellerId(item.getSellerId())
                 .build();
 
         // Serialize updatedItem to JSON
@@ -317,9 +326,7 @@ public class OrderItemService {
 
     public void deleteOrderItem(String itemId, String buyerId) {
         OrderItem item = orderItemRepository
-                .findByItemIdAndBuyerId(itemId, buyerId).orElseThrow();
-        if (item.getOrderId() == null) {
-            orderItemRepository.delete(item);
-        }
+                .findByItemIdAndBuyerIdAndOrderIdIsNull(itemId, buyerId).orElseThrow();
+        orderItemRepository.delete(item);
     }
 }

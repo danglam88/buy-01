@@ -29,6 +29,14 @@ public class OrderItemController {
         return ResponseEntity.ok().body(items);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CartItemResponse> getOrderItem(@PathVariable String id, Authentication authentication) {
+
+        UserDetailsJWT userDetails = (UserDetailsJWT) authentication.getPrincipal();
+        CartItemResponse item = orderItemService.getOrderItemByItemIdAndBuyerId(id, userDetails.getId());
+        return ResponseEntity.ok().body(item);
+    }
+
     @PostMapping
     public ResponseEntity<String> addOrderItems(Authentication authentication,
                                                  @Valid @RequestBody OrderItemDTO data) {
