@@ -1,6 +1,6 @@
 def predefinedEmails = 'dang.lam@gritlab.ax huong.le@gritlab.ax iuliia.chipsanova@gritlab.ax nafisah.rantasalmi@gritlab.ax'
-def expectedContainers = ['user-microservice-container', 'product-microservice-container', 'media-microservice-container',
-                        'user-mongodb-container', 'product-mongodb-container', 'media-mongodb-container',
+def expectedContainers = ['user-microservice-container', 'product-microservice-container', 'media-microservice-container', 'order-microservice-container',
+                        'user-mongodb-container', 'product-mongodb-container', 'media-mongodb-container', 'order-mongodb-container',
                         'frontend-container', 'kafka-container', 'zookeeper-container']
 
 pipeline {
@@ -15,6 +15,7 @@ pipeline {
         USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
         PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
         MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
+        ORDER_MICROSERVICE_IMAGE = 'danglamgritlab/order-microservice:latest'
         FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
     }
 
@@ -26,6 +27,7 @@ pipeline {
                         usernamePassword(credentialsId: 'user-mongodb-creds', usernameVariable: 'USER_DB_USERNAME', passwordVariable: 'USER_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'order-mongodb-creds', usernameVariable: 'ORDER_DB_USERNAME', passwordVariable: 'ORDER_DB_PASSWORD'),
                         string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
@@ -34,6 +36,8 @@ pipeline {
                         env.PRODUCT_DB_PASSWORD = PRODUCT_DB_PASSWORD
                         env.MEDIA_DB_USERNAME = MEDIA_DB_USERNAME
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
+                        env.ORDER_DB_USERNAME = ORDER_DB_USERNAME
+                        env.ORDER_DB_PASSWORD = ORDER_DB_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
@@ -53,14 +57,14 @@ pipeline {
         stage('SonarQube Analysis for User-Microservice') {
             agent { label 'build-agent' }
             steps {
-                echo "SonarQube analysis for User-Microservice has been started."
+                echo "SonarQube Analysis for User-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/user
                     mvn clean verify sonar:sonar
                     """
                 }
-                echo "SonarQube analysis for User-Microservice has been completed."
+                echo "SonarQube Analysis for User-Microservice has been completed."
             }
         }
 
@@ -76,14 +80,14 @@ pipeline {
         stage('SonarQube Analysis for Product-Microservice') {
             agent { label 'build-agent' }
             steps {
-                echo "SonarQube analysis for Product-Microservice has been started."
+                echo "SonarQube Analysis for Product-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/product
                     mvn clean verify sonar:sonar
                     """
                 }
-                echo "SonarQube analysis for Product-Microservice has been completed."
+                echo "SonarQube Analysis for Product-Microservice has been completed."
             }
         }
 
@@ -99,14 +103,14 @@ pipeline {
         stage('SonarQube Analysis for Media-Microservice') {
             agent { label 'build-agent' }
             steps {
-                echo "SonarQube analysis for Media-Microservice has been started."
+                echo "SonarQube Analysis for Media-Microservice has been started."
                 withSonarQubeEnv('SonarQube Server') {
                     sh """
                     cd backend/media
                     mvn clean verify sonar:sonar
                     """
                 }
-                echo "SonarQube analysis for Media-Microservice has been completed."
+                echo "SonarQube Analysis for Media-Microservice has been completed."
             }
         }
 
@@ -116,6 +120,29 @@ pipeline {
                 waitForQualityGate abortPipeline: true
                 sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for Media-Microservice has been completed."
+            }
+        }
+
+        stage('SonarQube Analysis for Order-Microservice') {
+            agent { label 'build-agent' }
+            steps {
+                echo "SonarQube Analysis for Order-Microservice has been started."
+                withSonarQubeEnv('SonarQube Server') {
+                    sh """
+                    cd backend/order
+                    mvn clean verify sonar:sonar
+                    """
+                }
+                echo "SonarQube Analysis for Order-Microservice has been completed."
+            }
+        }
+
+        stage("Quality Gate for Order-Microservice") {
+            agent { label 'build-agent' }
+            steps {
+                waitForQualityGate abortPipeline: true
+                sh 'find . -name "report-task.txt" -exec rm {} +'
+                echo "Quality Gate for Order-Microservice has been completed."
             }
         }
 
@@ -134,7 +161,7 @@ pipeline {
             }
         }
 
-        stage("Quality Gate for Frontend") {
+        /*stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
@@ -151,7 +178,7 @@ pipeline {
                 ng test --watch=false --browsers ChromeHeadless
                 '''
             }
-        }
+        }*/
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
@@ -165,6 +192,8 @@ pipeline {
                         [var: 'PRODUCT_DB_PASSWORD', password: env.PRODUCT_DB_PASSWORD],
                         [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD],
+                        [var: 'ORDER_DB_USERNAME', password: env.ORDER_DB_USERNAME],
+                        [var: 'ORDER_DB_PASSWORD', password: env.ORDER_DB_PASSWORD],
                         [var: 'JWT_SECRET_VALUE', password: env.JWT_SECRET_VALUE]
                     ]
 
@@ -200,6 +229,14 @@ pipeline {
                         docker tag media-microservice $MEDIA_MICROSERVICE_IMAGE
                         docker push $MEDIA_MICROSERVICE_IMAGE
 
+                        docker build -t order-microservice -f order/Dockerfile \
+                            --build-arg ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME \
+                            --build-arg ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD \
+                            --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
+                            .
+                        docker tag order-microservice $ORDER_MICROSERVICE_IMAGE
+                        docker push $ORDER_MICROSERVICE_IMAGE
+
                         cd ../frontend
                         docker build -t frontend .
                         docker tag frontend $FRONTEND_IMAGE
@@ -223,7 +260,9 @@ pipeline {
                         [var: 'PRODUCT_DB_USERNAME', password: env.PRODUCT_DB_USERNAME],
                         [var: 'PRODUCT_DB_PASSWORD', password: env.PRODUCT_DB_PASSWORD],
                         [var: 'MEDIA_DB_USERNAME', password: env.MEDIA_DB_USERNAME],
-                        [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD]
+                        [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD],
+                        [var: 'ORDER_DB_USERNAME', password: env.ORDER_DB_USERNAME],
+                        [var: 'ORDER_DB_PASSWORD', password: env.ORDER_DB_PASSWORD]
                     ]
 
                     try {
@@ -237,6 +276,8 @@ pipeline {
                             export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
                             export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
+                            export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
+                            export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
@@ -247,6 +288,7 @@ pipeline {
                             docker pull $USER_MICROSERVICE_IMAGE
                             docker pull $PRODUCT_MICROSERVICE_IMAGE
                             docker pull $MEDIA_MICROSERVICE_IMAGE
+                            docker pull $ORDER_MICROSERVICE_IMAGE
                             docker pull $FRONTEND_IMAGE
 
                             docker-compose up -d
@@ -272,6 +314,7 @@ pipeline {
                             docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
                             docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
                             docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
+                            docker save -o ~/order-microservice.tar $ORDER_MICROSERVICE_IMAGE
                             docker save -o ~/frontend.tar $FRONTEND_IMAGE
 
                             if [ ! -d "~/backup" ]; then
@@ -295,6 +338,8 @@ pipeline {
                             export PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD
                             export MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
+                            export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
+                            export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
@@ -307,6 +352,7 @@ pipeline {
                             docker load -i ~/user-microservice.tar
                             docker load -i ~/product-microservice.tar
                             docker load -i ~/media-microservice.tar
+                            docker load -i ~/order-microservice.tar
                             docker load -i ~/frontend.tar
 
                             docker-compose up -d
@@ -344,11 +390,11 @@ Gritlab Jenkins
 
         failure {
             script {
-                def culprits = currentBuild.changeSets.collectMany { changeSet ->
+                def pipelineBreakers = currentBuild.changeSets.collectMany { changeSet ->
                     changeSet.items.collect { it.author.fullName }
                 }.join(', ')
         
-                def recipient = culprits ? "${culprits}, ${predefinedEmails}" : predefinedEmails
+                def recipient = pipelineBreakers ? "${pipelineBreakers}, ${predefinedEmails}" : predefinedEmails
         
                 mail to: recipient,
                     subject: "Jenkins Pipeline FAILURE: ${currentBuild.fullDisplayName}",

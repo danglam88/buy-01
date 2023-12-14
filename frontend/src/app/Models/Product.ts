@@ -7,5 +7,6 @@ export class Product {
     price: number;
     quantity: number;
     editable: boolean;
+    // selectedQuantity: number;
     productMedia: Media[];
 }

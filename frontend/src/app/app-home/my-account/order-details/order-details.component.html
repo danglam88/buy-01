@@ -1,0 +1,75 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="order--details--info scroll">
+    <div class="header">
+        <h1 mat-dialog-title class="title">Order Information</h1>
+        <div class="order-detail-close">
+            <i class="fa fa-times" aria-hidden="true" (click)="closeModal()"></i>
+        </div>
+    </div>
+    <mat-dialog-content>
+
+        <!--CLIENT-->
+        <div class="order-detail" *ngIf="dialogData.role === 'CLIENT'">
+            <div class="product-value">
+                <h2>Order #: {{ dialogData.order.order_id }}</h2>
+            </div>
+            <div class="product-value">
+                <h2>Status: {{ dialogData.order.status_code }}</h2>
+            </div>
+            <hr>
+            <div class="product-value" *ngFor="let item of dialogData.order.items">
+                <div>
+                    <h2>Product Name: {{ item.name }}</h2>
+                </div>
+                <div>
+                    <h2>Product Price: € {{ item.item_price }}</h2>
+                </div>
+                <div>
+                    <h2>Order Quantity: {{ item.quantity }}</h2>
+                </div>
+                <div>
+                    <h2>Total Price: {{ item.item_price * item.quantity }}</h2>
+                </div>
+                <div>
+                    <h2>Status: {{ item.status_code }}</h2>
+                </div>
+                <button *ngIf="item.status_code === 'CONFIRMED'" (click)="redoOrderItem(item)">Redo</button>
+                <button *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)">Cancel</button>
+                <hr>
+            </div>
+            <div class="product-value">
+                <h2>Order Total: € {{ totalSum }}</h2>
+            </div>
+        </div>
+
+        <!--SELLER-->
+        <div class="order-detail" *ngIf="dialogData.role === 'SELLER'">
+            <div class="product-value">
+                <h2>Order #: {{ dialogData.order.order_id }}</h2>
+            </div>
+            <hr>
+            <div class="product-value">
+                <div>
+                    <h2>Item #: {{ dialogData.order.item_id }}</h2>
+                </div>
+                <div>
+                    <h2>Product Name: {{ dialogData.order.name }}</h2>
+                </div>
+                <div>
+                    <h2>Product Price: € {{ dialogData.order.item_price }}</h2>
+                </div>
+                <div>
+                    <h2>Order Quantity: {{ dialogData.order.quantity }}</h2>
+                </div>
+                <div>
+                    <h2>Total Price: {{ totalSum }}</h2>
+                </div>
+                <div>
+                    <h2>Status: {{ dialogData.order.status_code }}</h2>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </mat-dialog-content>
+</div>

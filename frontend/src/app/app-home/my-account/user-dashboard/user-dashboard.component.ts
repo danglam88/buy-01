@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { UserService } from 'src/app/services/user.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
@@ -76,6 +76,7 @@ export class UserDashboardComponent implements OnInit {
     this.userService.getUserInfo().subscribe({
       next: (result) => {
         this.userInfo = result;
+        this.userService.setUserInfoRole(this.userInfo.role);
         if (this.userInfo.avatar != null && this.userInfo.avatarData != null) {
           this.getUserAvatar(this.userInfo.id);
         } else {

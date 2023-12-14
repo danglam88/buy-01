@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -9,6 +9,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class UserService {
+  private userInfoRoleSource = new BehaviorSubject<string>('');
+  userInfoRole$ = this.userInfoRoleSource.asObservable();
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService, 
@@ -63,6 +65,8 @@ export class UserService {
 
     return this.httpClient.get(`${environment.avatarUserUrl}` + userId , { headers, responseType: 'blob' });
   }
-
+  setUserInfoRole(role: string): void {
+    this.userInfoRoleSource.next(role);
+  }
 }
 
