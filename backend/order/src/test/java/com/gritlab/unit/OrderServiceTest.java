@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
@@ -52,6 +51,32 @@ class OrderServiceTest {
     }
 
     @Test
+    void getOrdersByBuyerId_WhenValidBuyerId_thenReturnOrderHistory() {
+        String buyerId = "valid-buyer-id";
+        List<Order> mockOrders = Collections.singletonList(new Order());
+        when(orderRepository.findByBuyerId(buyerId)).thenReturn(mockOrders);
+        when(orderItemRepository.findByOrderId(anyString())).thenReturn(Collections.singletonList(new OrderItem()));
+        when(customRepository.sumQuantityByProductIdAndBuyerId(buyerId)).thenReturn(Collections.emptyList());
+        when(customRepository.getTotalSumItemPriceByBuyerId(buyerId)).thenReturn(100.0);
+
+        OrderHistory result = orderService.getOrdersByBuyerId(buyerId);
+
+        assertNotNull(result);
+        assertFalse(result.getOrders().isEmpty());
+    }
+
+    @Test
+    void getOrdersByBuyerId_WhenInvalidBuyerId_thenReturnEmptyHistory() {
+        String buyerId = "invalid-buyer-id";
+        when(orderRepository.findByBuyerId(buyerId)).thenReturn(Collections.emptyList());
+
+        OrderHistory result = orderService.getOrdersByBuyerId(buyerId);
+
+        assertNotNull(result);
+        assertTrue(result.getOrders().isEmpty());
+    }
+
+    @Test
     void getOrderByOrderIdAndBuyerId_WhenValidInputs_thenReturnOrderResponse() {
         String orderId = "valid-order-id";
         String buyerId = "valid-buyer-id";
@@ -76,6 +101,66 @@ class OrderServiceTest {
         when(orderRepository.findByOrderIdAndBuyerId(orderId, buyerId)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> orderService.getOrderByOrderIdAndBuyerId(orderId, buyerId));
+    }
+
+    @Test
+    void getOrderItemsBySellerId_WhenValidSellerId_thenReturnOrderItemHistory() {
+        String sellerId = "valid-seller-id";
+        List<OrderItem> mockOrderItems = Arrays.asList(new OrderItem(), new OrderItem());
+        when(orderItemRepository.findBySellerIdAndOrderIdIsNotNull(sellerId)).thenReturn(mockOrderItems);
+        when(customRepository.sumQuantityByProductIdAndSellerId(sellerId)).thenReturn(Collections.emptyList());
+        when(customRepository.getTotalSumItemPriceBySellerId(sellerId)).thenReturn(100.0);
+
+        OrderItemHistory result = orderService.getOrderItemsBySellerId(sellerId);
+
+        assertNotNull(result);
+        assertFalse(result.getItems().isEmpty());
+    }
+
+    @Test
+    void getOrderItemsBySellerId_WhenInvalidSellerId_thenReturnEmptyOrderItemHistory() {
+        String sellerId = "invalid-seller-id";
+        when(orderItemRepository.findBySellerIdAndOrderIdIsNotNull(sellerId)).thenReturn(Collections.emptyList());
+
+        OrderItemHistory result = orderService.getOrderItemsBySellerId(sellerId);
+
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void addOrder_WhenValidData_thenSuccess() {
+        String buyerId = "valid-buyer-id";
+        OrderRequest data = new OrderRequest();
+        data.setStatusCode(OrderStatus.CREATED);
+        data.setPaymentCode(Payment.CASH);
+
+        // Mock OrderItem
+        OrderItem item1 = new OrderItem();
+        item1.setStatusCode(OrderStatus.CONFIRMED);
+
+        when(orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId)).thenReturn(Collections.singletonList(item1));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setOrderId("generated-order-id"); // Simulate orderId generation
+            return order;
+        });
+
+        String orderId = orderService.addOrder(buyerId, data);
+
+        assertNotNull(orderId);
+        verify(kafkaTemplate).send(eq("CREATE_ORDER_REQUEST"), anyString());
+        verify(orderItemRepository).save(any(OrderItem.class));
+        verify(orderRepository).save(any(Order.class));
+    }
+
+    @Test
+    void addOrder_WhenInvalidData_thenThrowException() {
+        String buyerId = "valid-buyer-id";
+        OrderRequest data = new OrderRequest();
+        data.setStatusCode(OrderStatus.CONFIRMED);
+
+        assertThrows(InvalidParamException.class, () -> orderService.addOrder(buyerId, data));
     }
 
     @Test
@@ -114,64 +199,6 @@ class OrderServiceTest {
     }
 
     @Test
-    void getOrdersByBuyerId_WhenValidBuyerId_thenReturnOrderHistory() {
-        String buyerId = "valid-buyer-id";
-        List<Order> mockOrders = Collections.singletonList(new Order());
-        when(orderRepository.findByBuyerId(buyerId)).thenReturn(mockOrders);
-        when(orderItemRepository.findByOrderId(anyString())).thenReturn(Collections.singletonList(new OrderItem()));
-        when(customRepository.sumQuantityByProductIdAndBuyerId(buyerId)).thenReturn(Collections.emptyList());
-        when(customRepository.getTotalSumItemPriceByBuyerId(buyerId)).thenReturn(100.0);
-
-        OrderHistory result = orderService.getOrdersByBuyerId(buyerId);
-
-        assertNotNull(result);
-        assertFalse(result.getOrders().isEmpty());
-    }
-
-    @Test
-    void getOrdersByBuyerId_WhenInvalidBuyerId_thenReturnEmptyHistory() {
-        String buyerId = "invalid-buyer-id";
-        when(orderRepository.findByBuyerId(buyerId)).thenReturn(Collections.emptyList());
-
-        OrderHistory result = orderService.getOrdersByBuyerId(buyerId);
-
-        assertNotNull(result);
-        assertTrue(result.getOrders().isEmpty());
-    }
-
-    @Test
-    void addOrder_WhenValidData_thenSuccess() {
-        String buyerId = "valid-buyer-id";
-        OrderRequest data = new OrderRequest();
-        data.setStatusCode(OrderStatus.CREATED);
-        data.setPaymentCode(Payment.CASH);
-
-        // Mock OrderItem
-        OrderItem item1 = new OrderItem();
-        item1.setStatusCode(OrderStatus.CONFIRMED);
-
-        when(orderItemRepository.findByBuyerIdAndOrderIdIsNull(buyerId)).thenReturn(Collections.singletonList(item1));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-            Order order = invocation.getArgument(0);
-            order.setOrderId("generated-order-id"); // Simulate orderId generation
-            return order;
-        });
-
-        String orderId = orderService.addOrder(buyerId, data);
-
-        assertNotNull(orderId);
-    }
-
-    @Test
-    void addOrder_WhenInvalidData_thenThrowException() {
-        String buyerId = "valid-buyer-id";
-        OrderRequest data = new OrderRequest();
-        data.setStatusCode(OrderStatus.CONFIRMED);
-
-        assertThrows(InvalidParamException.class, () -> orderService.addOrder(buyerId, data));
-    }
-
-    @Test
     void updateOrder_WhenValidInputs_thenUpdateSuccessfully() {
         String orderId = "valid-order-id";
         String buyerId = "valid-buyer-id";
@@ -193,9 +220,13 @@ class OrderServiceTest {
 
         when(orderRepository.findByOrderIdAndBuyerId(orderId, buyerId)).thenReturn(Optional.of(mockOrder));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderItemRepository.save(any(OrderItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderItemService.convertFromOrderItemToJson(any(OrderItem.class))).thenReturn("mock-json");
 
         orderService.updateOrder(orderId, buyerId, data);
 
+        verify(kafkaTemplate).send(eq("UPDATE_PRODUCT_QUANTITY"), anyString());
+        verify(orderItemRepository, times(mockOrder.getItems().size())).save(any(OrderItem.class));
         verify(orderRepository).save(any(Order.class));
     }
 
@@ -204,7 +235,7 @@ class OrderServiceTest {
         String orderId = "valid-order-id";
         String buyerId = "valid-buyer-id";
         OrderRequest data = new OrderRequest();
-        data.setStatusCode(OrderStatus.CONFIRMED);
+        data.setStatusCode(OrderStatus.CONFIRMED); // Status not CANCELLED
 
         Order mockOrder = new Order();
         mockOrder.setStatusCode(OrderStatus.CREATED);
@@ -223,9 +254,9 @@ class OrderServiceTest {
 
         // Mock OrderItems
         OrderItem item1 = new OrderItem();
-        item1.setStatusCode(OrderStatus.CONFIRMED);
+        item1.setStatusCode(OrderStatus.CANCELLED);
         OrderItem item2 = new OrderItem();
-        item2.setStatusCode(OrderStatus.CREATED);
+        item2.setStatusCode(OrderStatus.CANCELLED);
 
         mockOrder.setItems(Arrays.asList(item1, item2));
         when(orderRepository.findByOrderIdAndBuyerId(orderId, buyerId)).thenReturn(Optional.of(mockOrder));
