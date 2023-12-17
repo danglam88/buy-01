@@ -106,7 +106,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, userId, true)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, userId, false)).thenReturn(authorizedUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
