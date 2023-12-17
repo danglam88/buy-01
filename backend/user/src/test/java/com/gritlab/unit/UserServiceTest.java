@@ -159,7 +159,7 @@ class UserServiceTest {
         when(userService.getUserByEmail(userDetails.getUsername())).thenReturn(Optional.of(user));
 
         // Act
-        User result = userService.authorizeUser(authentication, userId);
+        User result = userService.authorizeUser(authentication, userId, true);
         assertEquals(userId, result.getId());
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getEmail(), result.getEmail());
@@ -177,7 +177,7 @@ class UserServiceTest {
         when(userService.findUserById(userId)).thenReturn(false);
 
         Throwable exception = assertThrows(NoSuchElementException.class, () -> {
-            userService.authorizeUser(authentication, userId);
+            userService.authorizeUser(authentication, userId, true);
         });
 
         assertEquals("User not found", exception.getMessage());
@@ -200,7 +200,7 @@ class UserServiceTest {
         when(userService.getUserByEmail(userDetails.getUsername())).thenReturn(Optional.of(user));
 
         Throwable exception = assertThrows(BadCredentialsException.class, () -> {
-            userService.authorizeUser(authentication, userId);
+            userService.authorizeUser(authentication, userId, true);
         });
 
         assertEquals("Operation is not allowed", exception.getMessage());

@@ -225,15 +225,22 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public User authorizeUser(Authentication authentication, String userId) {
+    public User authorizeUser(Authentication authentication, String userId, boolean selfCheck) {
         if (userId != null && !findUserById(userId)) {
             throw new NoSuchElementException("User not found");
         }
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = getUserByEmail(userDetails.getUsername());
-        if (user.isEmpty() || (userId != null && !user.get().getId().equals(userId))) {
+
+        if (user.isEmpty() || (selfCheck && userId != null && !user.get().getId().equals(userId))) {
             throw new BadCredentialsException("Operation is not allowed");
         }
+
+        if (!selfCheck) {
+            return userRepository.findById(userId).orElseThrow();
+        }
+
         return user.get();
     }
 }

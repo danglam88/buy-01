@@ -35,7 +35,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/userInfo")
     public ResponseEntity<JsonNode> getUserInfo(Authentication authentication) throws JsonProcessingException {
-        User user = userService.authorizeUser(authentication, null);
+        User user = userService.authorizeUser(authentication, null, true);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.readTree(userNoPass));
@@ -44,7 +44,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @GetMapping("/avatar/{userId}")
     public ResponseEntity<ByteArrayResource> getAvatarById(@PathVariable String userId, Authentication authentication) {
-        User user = userService.authorizeUser(authentication, userId);
+        User user = userService.authorizeUser(authentication, userId, true);
 
         // Create a ByteArrayResource from the file content
         ByteArrayResource resource = new ByteArrayResource(user.getAvatarData());
@@ -61,7 +61,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<JsonNode> getUserById(@PathVariable String userId, Authentication authentication)
             throws JsonProcessingException {
-        User user = userService.authorizeUser(authentication, userId);
+        User user = userService.authorizeUser(authentication, userId, false);
         ObjectMapper objectMapper = new ObjectMapper();
         String userNoPass = objectMapper.writeValueAsString(userService.convertToDto(user));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.readTree(userNoPass));
@@ -79,7 +79,7 @@ public class UserController {
             throw new MethodArgumentNotValidException((MethodParameter) null, result);
         }
 
-        userService.authorizeUser(authentication, userId);
+        userService.authorizeUser(authentication, userId, true);
         User updatedUser = userService.updateUser(userId, request, file);
         URI locationOfUpdatedUser = ucb
                 .path("/users/{userId}")
@@ -91,7 +91,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('SELLER', 'CLIENT')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable String userId, Authentication authentication) {
-        userService.authorizeUser(authentication, userId);
+        userService.authorizeUser(authentication, userId, true);
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
