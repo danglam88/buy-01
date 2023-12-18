@@ -205,7 +205,7 @@ public class OrderService {
         }
     }
 
-    private Order convertFromJsonToOrder(String jsonMessage) {
+    public Order convertFromJsonToOrder(String jsonMessage) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(jsonMessage, Order.class);
@@ -215,7 +215,7 @@ public class OrderService {
         }
     }
 
-    private String convertFromOrderToJson(Order order) {
+    public String convertFromOrderToJson(Order order) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(order);

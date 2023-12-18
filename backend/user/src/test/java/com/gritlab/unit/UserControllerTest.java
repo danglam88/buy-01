@@ -55,7 +55,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, null)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, null, true)).thenReturn(authorizedUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -83,7 +83,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, userId, true)).thenReturn(authorizedUser);
 
         // Act
         ResponseEntity<ByteArrayResource> response = userController.getAvatarById(userId, authentication);
@@ -106,7 +106,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, userId, false)).thenReturn(authorizedUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -136,7 +136,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, userId, true)).thenReturn(authorizedUser);
 
         // Request params
         UserRequest userRequest = new UserRequest("Test2 Name",
@@ -171,7 +171,7 @@ class UserControllerTest {
         User authorizedUser = new User(userId, "Test Name", "test@mail.com",
                 "Test1@", Role.SELLER, "avatar.png", "avatar".getBytes());
 
-        when(userService.authorizeUser(authentication, userId)).thenReturn(authorizedUser);
+        when(userService.authorizeUser(authentication, userId, true)).thenReturn(authorizedUser);
 
         // Call the controller method
         ResponseEntity<Void> responseEntity = userController.deleteUser(userId, authentication);

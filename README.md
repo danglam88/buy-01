@@ -35,7 +35,7 @@ The list of REST APIs to perform CRUD operations on Users (https://164.92.252.12
 - POST `/reg` - Register a new user as a seller or a client (accessible without authentication)
 
 - GET `/users/userInfo` - Get the information (excepts for avatar) of the currently authenticated user (accessible by a seller or a client)
-- GET `/users/{id}` - Get the information (excepts for avatar) of the currently authenticated user if they have the same ID as the given ID (accessible by a seller or a client)
+- GET `/users/{id}` - Get the information (excepts for avatar) of a user with the given ID (accessible by a seller or a client)
 - GET `/users/avatar/{id}` - Get the avatar image of the currently authenticated user (accessible by a seller or a client)
 - PUT `/users/{id}` - Update the currently authenticated user if they have the same ID as the given ID (accessible by a seller or a client)
 - DELETE `/users/{id}` - Delete the currently authenticated user if they have the same ID as the given ID (accessible by a seller or a client)
