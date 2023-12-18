@@ -263,6 +263,8 @@ pipeline {
                 script {
                     sh '''
                     cd backend/user
+                    ls -la .
+                    ls -la target
                     '''
                     nexusArtifactUploader(
                         nexusVersion: NEXUS_VERSION,
