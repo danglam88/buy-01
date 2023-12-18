@@ -277,7 +277,7 @@ pipeline {
                         artifacts: [
                             [artifactId: "user",
                             classifier: '',
-                            file: "./target/user.jar",
+                            file: "backend/user/target/user.jar",
                             type: "jar"],
                             [artifactId: "user",
                             classifier: '',
