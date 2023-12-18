@@ -256,14 +256,10 @@ pipeline {
             agent { label 'build-agent' }
             steps {
                 script {
-                    // Assuming you have a list or a way to iterate through your microservices
-                    def microservices = ['user', 'product', 'media', 'order']
-                    microservices.each { service ->
-                        dir("backend/${service}") {
-                            sh """
-                            mvn clean deploy -DskipTests
-                            """
-                        }
+                    withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh """
+                        mvn clean deploy -DskipTests
+                        """
                     }
                 }
             }
