@@ -19,7 +19,7 @@ pipeline {
         FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "http://209.38.204.141:9001/"
+        NEXUS_URL = "209.38.204.141:9001"
         NEXUS_REPOSITORY = "maven-snapshots"
         NEXUS_CREDENTIAL_ID = "nexus-creds"
     }
