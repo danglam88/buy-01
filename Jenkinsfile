@@ -28,6 +28,7 @@ pipeline {
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'order-mongodb-creds', usernameVariable: 'ORDER_DB_USERNAME', passwordVariable: 'ORDER_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD'),
                         string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
@@ -38,6 +39,8 @@ pipeline {
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.ORDER_DB_USERNAME = ORDER_DB_USERNAME
                         env.ORDER_DB_PASSWORD = ORDER_DB_PASSWORD
+                        env.NEXUS_USERNAME = NEXUS_USERNAME
+                        env.NEXUS_PASSWORD = NEXUS_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
@@ -244,6 +247,23 @@ pipeline {
 
                         docker system prune -a -f --volumes
                         '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Artifacts to Nexus') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    // Assuming you have a list or a way to iterate through your microservices
+                    def microservices = ['user', 'product', 'media', 'order']
+                    microservices.each { service ->
+                        dir("backend/${service}") {
+                            sh """
+                            mvn clean deploy -DskipTests
+                            """
+                        }
                     }
                 }
             }
