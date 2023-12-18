@@ -188,36 +188,6 @@ pipeline {
             }
         }*/
 
-        stage('Deploy Artifacts to Nexus') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    sh '''
-                    cd backend/user
-                    '''
-                    nexusArtifactUploader(
-                        nexusVersion: NEXUS_VERSION,
-                        protocol: NEXUS_PROTOCOL,
-                        nexusUrl: NEXUS_URL,
-                        groupId: "com.gritlab",
-                        version: "1.0-SNAPSHOT",
-                        repository: NEXUS_REPOSITORY,
-                        credentialsId: NEXUS_CREDENTIAL_ID,
-                        artifacts: [
-                            [artifactId: "user",
-                            classifier: '',
-                            file: "/app/user/target/user.jar",
-                            type: "jar"],
-                            [artifactId: "user",
-                            classifier: '',
-                            file: "pom.xml",
-                            type: "pom"]
-                        ]
-                    );
-                }
-            }
-        }
-
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
@@ -283,6 +253,36 @@ pipeline {
                         docker system prune -a -f --volumes
                         '''
                     }
+                }
+            }
+        }
+
+        stage('Deploy Artifacts to Nexus') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh '''
+                    cd backend/user
+                    '''
+                    nexusArtifactUploader(
+                        nexusVersion: NEXUS_VERSION,
+                        protocol: NEXUS_PROTOCOL,
+                        nexusUrl: NEXUS_URL,
+                        groupId: "com.gritlab",
+                        version: "1.0-SNAPSHOT",
+                        repository: NEXUS_REPOSITORY,
+                        credentialsId: NEXUS_CREDENTIAL_ID,
+                        artifacts: [
+                            [artifactId: "user",
+                            classifier: '',
+                            file: "/app/user/target/user.jar",
+                            type: "jar"],
+                            [artifactId: "user",
+                            classifier: '',
+                            file: "pom.xml",
+                            type: "pom"]
+                        ]
+                    );
                 }
             }
         }
