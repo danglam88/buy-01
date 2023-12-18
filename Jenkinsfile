@@ -281,7 +281,7 @@ pipeline {
                             type: "jar"],
                             [artifactId: "user",
                             classifier: '',
-                            file: "pom.xml",
+                            file: "backend/user/pom.xml",
                             type: "pom"]
                         ]
                     );
