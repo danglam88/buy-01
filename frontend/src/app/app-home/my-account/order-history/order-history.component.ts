@@ -252,10 +252,17 @@ export class OrderHistoryComponent {
    setSearchText(value: string[]){
     this.searchText = value;
  }
-  shouldShowClientsOrder(order){
+  shouldShowClientOrders(order){
     if (this.searchText?.length === 0) {
       return true;
     }
     return this.searchText?.some(keyword => order.items.some(item => item.name.toLowerCase().includes(keyword.toLowerCase())));
+  }
+
+  shouldShowSellerOrderItems(item){
+    if (this.searchText?.length === 0) {
+      return true;
+    }
+    return this.searchText?.some(keyword => item.name.toLowerCase().includes(keyword.toLowerCase()));
   }
 }
