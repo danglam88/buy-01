@@ -35,7 +35,7 @@
                     <h2>Status: {{ item.status_code }}</h2>
                 </div>
                 <button *ngIf="item.status_code === 'CONFIRMED'" (click)="redoOrderItem(item)">Redo</button>
-                <button *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)">Cancel</button>
+                <button *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)" (click)="cancelOrderItemByClient(item)">Cancel</button>
                 <hr>
             </div>
             <div class="product-value">

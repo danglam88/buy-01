@@ -4,13 +4,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from './encryption.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import {ClientOrder} from '../Models/ClientOrder'
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
   private cart: Cart = new Cart();
+  private clientOrders: ClientOrder[];
 
   constructor(
     private httpClient: HttpClient,
@@ -91,6 +93,16 @@ export class OrderService {
     }
   
     return this.httpClient.delete(`${environment.orderUrl}/${orderId}`, { headers });
+  }
+
+  // Set client orders
+  setClientOrdersArr(clientOrders: ClientOrder[]){
+    this.clientOrders = clientOrders;
+  }
+
+  // Get filtered fund array
+  getClientOrderArr(): ClientOrder[] {
+    return this.clientOrders;
   }
 
   redoOrder(orderId: string): Observable<any> {

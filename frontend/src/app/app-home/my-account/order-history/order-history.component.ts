@@ -7,6 +7,7 @@ import { OrderItemService } from 'src/app/services/order-item.service';
 import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
+import { Cart } from 'src/app/Models/Cart';
 
 @Component({
   selector: 'app-order-history',
@@ -21,9 +22,10 @@ export class OrderHistoryComponent {
     private userService: UserService,
     private dialog: MatDialog,
     private orderService: OrderService,
+    private toastr: ToastrService,
     private orderItemService: OrderItemService,
-    private cartService: CartService,
-    private toastr: ToastrService
+    private cartService: CartService
+  
   ) { }
 
   ngOnInit(): void {
@@ -36,7 +38,13 @@ export class OrderHistoryComponent {
       this.getClientOrders();
     } else if (this.role === 'SELLER') {
       this.getSellerOrderItems();
-    }
+    } 
+
+   
+  }
+
+  ngOnChanges(){
+    console.log("onchanges", this.orderService.getClientOrderArr())
   }
 
     // Opens product detail modal
