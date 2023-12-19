@@ -4,13 +4,19 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EncryptionService } from './encryption.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import {ClientOrder} from '../Models/ClientOrder'
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
   private cart: Cart = new Cart();
+  private clientOrders: ClientOrder[];
+
+  // Observable for seller update order item status 
+  private isUpdateOrderItemStatusSubject = new BehaviorSubject<boolean>(false);
+  isUpdateOrderItemStatus$ = this.isUpdateOrderItemStatusSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient,
@@ -102,5 +108,10 @@ export class OrderService {
     const options = { headers: headers };
   
     return this.httpClient.post<string[]>(`${environment.redoOrderUrl}`, orderId, options);
+  }
+
+  // Emit cancel order to subscribers
+  isUpdateOrderItemStatus(): void {
+    this.isUpdateOrderItemStatusSubject.next(true); 
   }
 }

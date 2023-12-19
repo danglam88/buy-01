@@ -11,6 +11,7 @@ import { environment } from '../../environments/environment';
 export class UserService {
   private userInfoRoleSource = new BehaviorSubject<string>('');
   userInfoRole$ = this.userInfoRoleSource.asObservable();
+  
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService, 
@@ -29,7 +30,8 @@ export class UserService {
       }
       return '';
     }
-
+  
+  // Get logged in user info
   getUserInfo(): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -39,6 +41,17 @@ export class UserService {
     return this.httpClient.get(`${environment.userInfoUrl}`, { headers });
   }
 
+  // Get a buyer/seller info by id
+  getUserById(id: string): Observable<object> {
+    let headers = new HttpHeaders();
+    if (this.token) {
+      headers = headers.set('Authorization', `Bearer ${this.token}`);
+    }
+
+    return this.httpClient.get(`${environment.userUrl}` + id, { headers });
+  }
+
+  // Update logged in user info
   updateUser(user: any, id: string): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -48,6 +61,7 @@ export class UserService {
     return this.httpClient.put(`${environment.userUrl}` + id, user, { headers });
   }
 
+  // Delete logged in user
   deleteUser(user: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -57,6 +71,7 @@ export class UserService {
     return this.httpClient.delete(`${environment.userUrl}` + user.id, { headers });
   }
 
+  // Get logged in user avatar
   getUserAvatar(userId: string): Observable<Blob> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -65,8 +80,11 @@ export class UserService {
 
     return this.httpClient.get(`${environment.avatarUserUrl}` + userId , { headers, responseType: 'blob' });
   }
+
+  // Set logged in user role
   setUserInfoRole(role: string): void {
     this.userInfoRoleSource.next(role);
   }
+
 }
 

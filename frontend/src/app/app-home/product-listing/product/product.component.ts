@@ -18,6 +18,7 @@ export class ProductComponent {
     return this.searchText?.some(keyword => product.name.toLowerCase().includes(keyword.toLowerCase()));
   }
 
+  //TODO: change the range of price
   shouldShowProductBasedOnFilter(product: Product, filter: string): boolean {
     switch (filter) {
       case 'under100':

@@ -7,6 +7,8 @@ import { OrderService } from "src/app/services/order.service";
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
 import { UserService } from 'src/app/services/user.service';
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin, map } from "rxjs";
 
 @Component({
   selector: "app-cart",
@@ -27,7 +29,9 @@ export class CartComponent implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private dialog: MatDialog,
-    private userService: UserService) {
+    private userService: UserService,
+    private toastr: ToastrService
+    ) {
 
     this.setCart();
   }
@@ -54,7 +58,6 @@ export class CartComponent implements OnInit {
           cartItem.quantity = item.quantity;
           cartItem.price = item.item_price;
           cartItem.itemId = item.itemId;
-          //console.log(cartItem.product.id);
           return cartItem;
         });
       },
@@ -100,23 +103,26 @@ export class CartComponent implements OnInit {
     };
     this.orderService.createOrder(orderData).subscribe({
       next: (orderId: string) => {
-        console.log("createOrder orderId: ", orderId);
-
         setTimeout(() => {
           this.orderService.getOrderByOrderId(orderId).subscribe({
             next: (orderData: any) => {
-              console.log("getOrderByOrderId data: ", orderData);
-              this.dialog.open(OrderDetailsComponent, {
-                data: {
-                  order: orderData,
-                  view: 'cart',
-                  role: this.role
-                },
-              });
+                this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
+                  console.log("Order Data with Seller Info: ", updatedOrderData);
+                  this.dialog.open(OrderDetailsComponent, {
+                    data: {
+                      order: updatedOrderData,
+                      view: 'cart',
+                      role: 'CLIENT'
+                    },
+                  });
+                });
               this.router.navigate(["home"]);
             },
             error: (error: any) => {
               console.error("Error fetching order data", error);
+              this.toastr.error('Order cannot be created');
+              this.router.navigate(["home"]);
+              
             },
           });
         }, 250);
@@ -128,10 +134,25 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // get totalPrice(): number {
-  //   let totalPrice = 0;
-  //   this.items.forEach(items => {
-  //       totalPrice += items.price;
-  //   });
-  //   return totalPrice;
+  getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
+    const itemObservables = orderData.items.map((item: any) =>
+      this.userService.getUserById(item.seller_id).pipe(
+        map((sellerInfo) => ({
+          ...item,
+          sellerInfo: {
+            name: sellerInfo["name"],
+            email: sellerInfo["email"],
+          },
+        }))
+      )
+    );
+  
+    forkJoin(itemObservables).subscribe((itemsWithSellerInfo) => {
+      const updatedOrderData = {
+        ...orderData,
+        items: itemsWithSellerInfo,
+      };
+      callback(updatedOrderData);
+    });
+  }
 }

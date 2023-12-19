@@ -59,6 +59,12 @@ mat-card {
     margin-right: 10px; /* Adjust as needed */
   }
   
+  .row-items{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
   /* Example styling for individual elements within the row */
   .row .order-no {
     /* Add your specific styles for Order No here */

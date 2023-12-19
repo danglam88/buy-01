@@ -11,7 +11,9 @@ import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -24,6 +26,7 @@ public class OrderItemRepositoryCustom {
     private static final String TOTAL_QUANTITY = "totalQuantity";
     private static final String STATUS_CODE = "statusCode";
     private static final String TOTAL_ITEM_PRICE = "totalItemPrice";
+    private static final String PRICE_TIMES_QUANTITY = "priceTimesQuantity";
 
     public OrderItemRepositoryCustom(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
@@ -38,12 +41,17 @@ public class OrderItemRepositoryCustom {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("buyerId").is(buyerId).and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
                 groupOperation,
-                Aggregation.sort(Sort.Direction.DESC, TOTAL_QUANTITY),
-                Aggregation.limit(1)
+                Aggregation.sort(Sort.Direction.DESC, TOTAL_QUANTITY)
         );
 
-        AggregationResults<TopProduct> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, TopProduct.class);
-        return  results.getMappedResults();
+        AggregationResults<TopProduct> groupedResults = mongoTemplate.aggregate(aggregation, ORDER_ITEM, TopProduct.class);
+        List<TopProduct> results = groupedResults.getMappedResults();
+
+        if (!results.isEmpty()) {
+            int maxQuantity = results.get(0).getTotalQuantity();
+            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     public List<TopProduct> sumQuantityByProductIdAndSellerId(String sellerId) {
@@ -55,12 +63,17 @@ public class OrderItemRepositoryCustom {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("sellerId").is(sellerId).and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
                 groupOperation,
-                Aggregation.sort(Sort.Direction.DESC, TOTAL_QUANTITY),
-                Aggregation.limit(1)
+                Aggregation.sort(Sort.Direction.DESC, TOTAL_QUANTITY)
         );
 
-        AggregationResults<TopProduct> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, TopProduct.class);
-        return results.getMappedResults();
+        AggregationResults<TopProduct> groupedResults = mongoTemplate.aggregate(aggregation, ORDER_ITEM, TopProduct.class);
+        List<TopProduct> results = groupedResults.getMappedResults();
+
+        if (!results.isEmpty()) {
+            int maxQuantity = results.get(0).getTotalQuantity();
+            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     public Double getTotalSumItemPriceByBuyerId(String buyerId) {
@@ -68,9 +81,9 @@ public class OrderItemRepositoryCustom {
                 Aggregation.match(Criteria.where("buyerId").is(buyerId)
                         .and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
                 Aggregation.project()
-                        .andExpression("itemPrice * quantity").as("priceTimesQuantity"),
+                        .andExpression("itemPrice * quantity").as(PRICE_TIMES_QUANTITY),
                 Aggregation.group()
-                        .sum("priceTimesQuantity").as(TOTAL_ITEM_PRICE)
+                        .sum(PRICE_TIMES_QUANTITY).as(TOTAL_ITEM_PRICE)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, Document.class);
@@ -84,9 +97,9 @@ public class OrderItemRepositoryCustom {
                 Aggregation.match(Criteria.where("sellerId").is(sellerId)
                         .and(STATUS_CODE).is(OrderStatus.CONFIRMED)),
                 Aggregation.project()
-                        .andExpression("itemPrice * quantity").as("priceTimesQuantity"),
+                        .andExpression("itemPrice * quantity").as(PRICE_TIMES_QUANTITY),
                 Aggregation.group()
-                        .sum("priceTimesQuantity").as(TOTAL_ITEM_PRICE)
+                        .sum(PRICE_TIMES_QUANTITY).as(TOTAL_ITEM_PRICE)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, ORDER_ITEM, Document.class);

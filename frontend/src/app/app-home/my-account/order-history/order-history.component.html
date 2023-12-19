@@ -5,7 +5,7 @@
     <span class="role">{{ role }}</span>
     <h1 mat-dialog-title class="title">My Order Transactions</h1>
   </div>
-
+  <app-search (searchTextChanged)="setSearchText($event)"></app-search>
   <!--CLIENT-->
   <div *ngIf="role === 'CLIENT'">
     <div class="row">
@@ -15,15 +15,18 @@
     </div>
   
     <hr>
-   
-    <div class="row" *ngFor="let order of allTrans">
-      <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
-      <div class="status">{{ order.status_code }}</div>
-      <div class="action">
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'" (click)="cancelOrder(order.order_id)">Cancel</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CONFIRMED'" (click)="redoOrder(order.order_id)">Redo</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'" (click)="removeOrder(order.order_id)">Remove</button>
+    
+    <div class="row" *ngFor="let order of (allTrans$ | async)">
+      <div class="row-items" *ngIf="shouldShowClientOrders(order)">
+        <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
+        <div class="status">{{ order.status_code }}</div>
+        <div class="action">
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'" (click)="cancelOrder(order.order_id)">Cancel</button>
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CONFIRMED'" (click)="redoOrder(order.order_id)">Redo</button>
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'" (click)="removeOrder(order.order_id)">Remove</button>
+        </div>
       </div>
+     
     </div>
   </div>
 
@@ -38,16 +41,18 @@
   
     <hr>
    
-    <div class="row" *ngFor="let item of allTrans">
-      <div class="order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
-      <div class="product-name">{{ item.name }}</div>
-      <div class="status">{{ item.status_code }}</div>
-      <div class="action">
-        <div *ngIf="item.status_code === 'CREATED'">
-          <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CONFIRMED')">Confirm</button>
-          <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CANCELLED')">Cancel</button>
+    <div class="row" *ngFor="let item of (allTrans$ | async)">
+      <div class="row-items" *ngIf="shouldShowSellerOrderItems(item)">
+        <div class="order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
+        <div class="product-name">{{ item.name }}</div>
+        <div class="status">{{ item.status_code }}</div>
+        <div class="action">
+          <div *ngIf="item.status_code === 'CREATED'">
+            <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CONFIRMED')">Confirm</button>
+            <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CANCELLED')">Cancel</button>
+          </div>
+          <div *ngIf="item.status_code !== 'CREATED'"></div>
         </div>
-        <div *ngIf="item.status_code !== 'CREATED'"></div>
       </div>
     </div>
   </div>
