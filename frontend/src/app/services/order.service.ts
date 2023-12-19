@@ -14,6 +14,10 @@ export class OrderService {
   private cart: Cart = new Cart();
   private clientOrders: ClientOrder[];
 
+  // Observable for seller update order item status 
+  private isUpdateOrderItemStatusSubject = new BehaviorSubject<boolean>(false);
+  isUpdateOrderItemStatus$ = this.isUpdateOrderItemStatusSubject.asObservable();
+
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
@@ -104,5 +108,10 @@ export class OrderService {
     const options = { headers: headers };
   
     return this.httpClient.post<string[]>(`${environment.redoOrderUrl}`, orderId, options);
+  }
+
+  // Emit cancel order to subscribers
+  isUpdateOrderItemStatus(): void {
+    this.isUpdateOrderItemStatusSubject.next(true); 
   }
 }

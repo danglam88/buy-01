@@ -42,8 +42,6 @@ export class OrderDetailsComponent implements OnInit {
     } else if (this.dialogData.role === 'SELLER') {
       this.totalSum = this.dialogData.order.item_price * this.dialogData.order.quantity;
     }
-
-    
   }
 
   cancelOrderItemByClient(item: any): void {
@@ -70,7 +68,7 @@ export class OrderDetailsComponent implements OnInit {
                   // todo: make it "async"
                   console.log("Order after cancel: ", result);
                   this.dialogData.order = result;
-                  this.orderItemService.isCancelItem(item.order_id);
+                  this.orderItemService.isCancelItem(item.order_id)
                 },
                 error: (error) => {
                   console.log(error);
