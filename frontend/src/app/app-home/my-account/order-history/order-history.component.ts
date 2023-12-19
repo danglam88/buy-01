@@ -8,6 +8,7 @@ import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 import { Cart } from 'src/app/Models/Cart';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-order-history',
@@ -15,7 +16,7 @@ import { Cart } from 'src/app/Models/Cart';
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent {
-  allTrans: any[] = [];
+  allTrans$: Observable<any>;
   role: string = '';
 
   constructor(
@@ -40,11 +41,11 @@ export class OrderHistoryComponent {
       this.getSellerOrderItems();
     } 
 
-   
-  }
-
-  ngOnChanges(){
-    console.log("onchanges", this.orderService.getClientOrderArr())
+    this.orderItemService.itemCancelledId$.subscribe((isItemCancelled) => {
+      if (isItemCancelled) {
+        this.getClientOrders();
+      }
+    });
   }
 
     // Opens product detail modal
@@ -61,14 +62,14 @@ export class OrderHistoryComponent {
    getClientOrders() {
     this.orderService.getClientOrders().subscribe((res) => {
       console.log(res);
-      this.allTrans = res.orders;
+      this.allTrans$ = of(res.orders);
     });
    }
 
    getSellerOrderItems() {
     this.orderService.getSellerOrderItems().subscribe((res) => {
       console.log(res);
-      this.allTrans = res.items;
+      this.allTrans$ = of(res.items);
     });
    }
 

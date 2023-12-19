@@ -1,13 +1,9 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Product } from 'src/app/Models/Product';
 import { OrderItemService } from 'src/app/services/order-item.service';
 import { OrderService } from 'src/app/services/order.service';
 import { CartService } from 'src/app/services/cart.service';
-import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
-import { ToastrService } from 'ngx-toastr';
-import { OrderItemService } from 'src/app/services/order-item.service';
-import { OrderService } from 'src/app/services/order.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
@@ -33,6 +29,7 @@ export class OrderDetailsComponent implements OnInit {
     ) {
       console.log("OrderDetails data: ", data);
       this.dialogData = data;
+
     }
 
   ngOnInit(): void {
@@ -45,20 +42,8 @@ export class OrderDetailsComponent implements OnInit {
     } else if (this.dialogData.role === 'SELLER') {
       this.totalSum = this.dialogData.order.item_price * this.dialogData.order.quantity;
     }
-  }
 
-  ngAfterViewInit(){
-    this.orderItemService.isItemCancelled$.subscribe((itemId)=>{
-      if (itemId){
-        this.orderItems = this.orderService.getClientOrderArr()
-        console.log("what is this?", this.orderItems.items);
-        this.dialogData.order.items = this.orderItems;
-      }
-    })
-  }
-
-  ngOnChanges(){
-    console.log("onchanges", this.orderService.getClientOrderArr()) 
+    
   }
 
   cancelOrderItemByClient(item: any): void {
@@ -73,29 +58,29 @@ export class OrderDetailsComponent implements OnInit {
         confirmationText: 'Cancel this order item?'
       }
     });
+
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
         console.log('Order Item cancelled');
         this.orderItemService.cancelOrderItem(item.item_id, data).subscribe({
           next: () => {
-            this.orderService.getOrderByOrderId(item.order_id).subscribe({
-              next: (result) => {
-                console.log("Order detail after item cancelled: ", result);
-                // todo: make it "async"
-                this.orderService.setClientOrdersArr(result)
-                this.orderItemService.isCancelItem(item.order_id);
-              },
-              error: (error) => {
-                console.log(error);
-              }
-            });
+            setTimeout(() => {
+              this.orderService.getOrderByOrderId(item.order_id).subscribe({
+                next: (result) => {
+                  // todo: make it "async"
+                  console.log("Order after cancel: ", result);
+                  this.dialogData.order = result;
+                  this.orderItemService.isCancelItem(item.order_id);
+                },
+                error: (error) => {
+                  console.log(error);
+                }
+              });
+            }, 250);
           },
           error: (error) => {
             console.log(error);
           },
-          complete: () => {
-            this.toastr.success('Order item cancelled successfully', 'Success');
-          }
         });
       }
     });

@@ -16,7 +16,7 @@
   
     <hr>
    
-    <div class="row" *ngFor="let order of allTrans">
+    <div class="row" *ngFor="let order of (allTrans$ | async)">
       <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
       <div class="status">{{ order.status_code }}</div>
       <div class="action">
@@ -38,7 +38,7 @@
   
     <hr>
    
-    <div class="row" *ngFor="let item of allTrans">
+    <div class="row" *ngFor="let item of (allTrans$ | async)">
       <div class="order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
       <div class="product-name">{{ item.name }}</div>
       <div class="status">{{ item.status_code }}</div>

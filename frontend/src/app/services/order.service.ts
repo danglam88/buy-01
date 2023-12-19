@@ -95,16 +95,6 @@ export class OrderService {
     return this.httpClient.delete(`${environment.orderUrl}/${orderId}`, { headers });
   }
 
-  // Set client orders
-  setClientOrdersArr(clientOrders: ClientOrder[]){
-    this.clientOrders = clientOrders;
-  }
-
-  // Get filtered fund array
-  getClientOrderArr(): ClientOrder[] {
-    return this.clientOrders;
-  }
-
   redoOrder(orderId: string): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {

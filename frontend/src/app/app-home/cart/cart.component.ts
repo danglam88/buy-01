@@ -7,6 +7,7 @@ import { OrderService } from "src/app/services/order.service";
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
 import { UserService } from 'src/app/services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: "app-cart",
@@ -27,7 +28,9 @@ export class CartComponent implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private dialog: MatDialog,
-    private userService: UserService) {
+    private userService: UserService,
+    private toastr: ToastrService
+    ) {
 
     this.setCart();
   }
@@ -117,6 +120,9 @@ export class CartComponent implements OnInit {
             },
             error: (error: any) => {
               console.error("Error fetching order data", error);
+              this.toastr.error('Order cannot be created');
+              this.router.navigate(["home"]);
+              
             },
           });
         }, 250);
