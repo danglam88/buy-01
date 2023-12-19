@@ -7,7 +7,7 @@ import { OrderItemService } from 'src/app/services/order-item.service';
 import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, of } from 'rxjs';
+import { Observable, forkJoin, map, mergeMap, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-order-history',
@@ -67,11 +67,41 @@ export class OrderHistoryComponent {
 
    // Get client's orders
    getClientOrders() {
-    this.orderService.getClientOrders().subscribe((res) => {
-      console.log("Get Client Orders: ", res);
-      this.allTrans$ = of(res.orders);
+    this.orderService.getClientOrders().pipe(
+      switchMap((res) => {
+        const itemObservables = res.orders.map((order: any) =>
+          forkJoin(
+            order.items.map((item: any) =>
+              this.userService.getUserById(item.seller_id).pipe(
+                map((sellerInfo) => ({
+                  ...item,
+                  sellerInfo: {
+                    name: sellerInfo["name"],
+                    email: sellerInfo["email"],
+                  },
+                }))
+              )
+            )
+          ).pipe(
+            map((itemsWithSellerInfo) => ({
+              ...order,
+              items: itemsWithSellerInfo,
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((ordersWithSellerInfo) => ({
+            ...res,
+            orders: ordersWithSellerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Client Orders: ", result);
+      this.allTrans$ = of(result.orders);
     });
-   }
+  }
 
     // Get seller's order items
    getSellerOrderItems() {
