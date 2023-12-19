@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Repository
@@ -49,7 +48,7 @@ public class OrderItemRepositoryCustom {
 
         if (!results.isEmpty()) {
             int maxQuantity = results.get(0).getTotalQuantity();
-            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).collect(Collectors.toList());
+            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).toList();
         }
         return Collections.emptyList();
     }
@@ -71,7 +70,7 @@ public class OrderItemRepositoryCustom {
 
         if (!results.isEmpty()) {
             int maxQuantity = results.get(0).getTotalQuantity();
-            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).collect(Collectors.toList());
+            return results.stream().filter(p -> p.getTotalQuantity() == maxQuantity).toList();
         }
         return Collections.emptyList();
     }
