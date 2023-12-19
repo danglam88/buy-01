@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
 import { UserService } from 'src/app/services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { Observable, forkJoin, map } from "rxjs";
 
 @Component({
   selector: "app-cart",
@@ -109,13 +110,18 @@ export class CartComponent implements OnInit {
           this.orderService.getOrderByOrderId(orderId).subscribe({
             next: (orderData: any) => {
               console.log("getOrderByOrderId data: ", orderData);
-              this.dialog.open(OrderDetailsComponent, {
-                data: {
-                  order: orderData,
-                  view: 'cart',
-                  role: this.role
-                },
+
+              this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
+                console.log("Order Data with Seller Info: ", updatedOrderData);
+                this.dialog.open(OrderDetailsComponent, {
+                  data: {
+                    order: updatedOrderData,
+                    view: 'cart',
+                    role: this.role
+                  },
+                });
               });
+              
               this.router.navigate(["home"]);
             },
             error: (error: any) => {
@@ -134,10 +140,25 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // get totalPrice(): number {
-  //   let totalPrice = 0;
-  //   this.items.forEach(items => {
-  //       totalPrice += items.price;
-  //   });
-  //   return totalPrice;
+  getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
+    const itemObservables = orderData.items.map((item: any) =>
+      this.userService.getUserById(item.seller_id).pipe(
+        map((sellerInfo) => ({
+          ...item,
+          sellerInfo: {
+            name: sellerInfo["name"],
+            email: sellerInfo["email"],
+          },
+        }))
+      )
+    );
+  
+    forkJoin(itemObservables).subscribe((itemsWithSellerInfo) => {
+      const updatedOrderData = {
+        ...orderData,
+        items: itemsWithSellerInfo,
+      };
+      callback(updatedOrderData);
+    });
+  }
 }

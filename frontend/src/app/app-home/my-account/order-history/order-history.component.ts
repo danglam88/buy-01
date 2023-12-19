@@ -44,14 +44,6 @@ export class OrderHistoryComponent {
         this.getClientOrders();
       }
     });
-
-    // Subscribe to client update order item status event
-    this.orderService.isUpdateOrderItemStatus$.subscribe((isUpdateOrderItemStatus) => {
-      if (isUpdateOrderItemStatus) {
-        console.log("Update order item status event received")
-        this.getSellerOrderItems();
-      }
-    });
   }
 
     // Opens product detail modal
@@ -105,9 +97,30 @@ export class OrderHistoryComponent {
 
     // Get seller's order items
    getSellerOrderItems() {
-    this.orderService.getSellerOrderItems().subscribe((res) => {
-      console.log("Get Seller Order Items: ", res);
-      this.allTrans$ = of(res.items);
+    this.orderService.getSellerOrderItems().pipe(
+      switchMap((res) => {
+        const itemObservables = res.items.map((item: any) =>
+          this.userService.getUserById(item.buyer_id).pipe(
+            map((buyerInfo) => ({
+              ...item,
+              buyerInfo: {
+                name: buyerInfo["name"],
+                email: buyerInfo["email"],
+              },
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((itemsWithBuyerInfo) => ({
+            ...res,
+            items: itemsWithBuyerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Seller Order Items: ", result);
+      this.allTrans$ = of(result.items);
     });
    }
 
@@ -125,9 +138,7 @@ export class OrderHistoryComponent {
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
-        console.log('Order cancelled');
         this.orderService.cancelOrder(orderId, orderData).subscribe((res) => {
-          console.log("Client Cancel Order: ", res);
           this.getClientOrders();
         });
       }
@@ -142,7 +153,6 @@ export class OrderHistoryComponent {
           setTimeout(() => {
             this.cartService.getCartItem(itemId).subscribe({
               next: (result) => {
-                console.log("Cart item after redo: ", result);
                 this.cartService.setItemId(itemId);
               },
               error: (error) => {

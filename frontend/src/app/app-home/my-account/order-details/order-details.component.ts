@@ -6,6 +6,8 @@ import { OrderService } from 'src/app/services/order.service';
 import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
+import { UserService } from 'src/app/services/user.service';
+import { forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-order-details',
@@ -25,7 +27,8 @@ export class OrderDetailsComponent implements OnInit {
     private orderService: OrderService,
     private cartService: CartService,
     private dialog: MatDialog,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private userService: UserService
     ) {
       console.log("OrderDetails data: ", data);
       this.dialogData = data;
@@ -67,7 +70,11 @@ export class OrderDetailsComponent implements OnInit {
                 next: (result) => {
                   // todo: make it "async"
                   console.log("Order after cancel: ", result);
-                  this.dialogData.order = result;
+
+                  this.getOrderDataWithSellerInfo(result, (updatedOrderData) => {
+                    this.dialogData.order = updatedOrderData;
+                  });
+                  
                   this.orderItemService.isCancelItem(item.order_id)
                 },
                 error: (error) => {
@@ -83,6 +90,29 @@ export class OrderDetailsComponent implements OnInit {
       }
     });
   }
+
+  getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
+    const itemObservables = orderData.items.map((item: any) =>
+      this.userService.getUserById(item.seller_id).pipe(
+        map((sellerInfo) => ({
+          ...item,
+          sellerInfo: {
+            name: sellerInfo["name"],
+            email: sellerInfo["email"],
+          },
+        }))
+      )
+    );
+  
+    forkJoin(itemObservables).subscribe((itemsWithSellerInfo) => {
+      const updatedOrderData = {
+        ...orderData,
+        items: itemsWithSellerInfo,
+      };
+      callback(updatedOrderData);
+    });
+  }
+
 
   redoOrderItem(item: any): void {
     const data = {
