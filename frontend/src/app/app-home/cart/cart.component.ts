@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
 import { UserService } from 'src/app/services/user.service';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, forkJoin, map } from "rxjs";
+import { forkJoin, map } from "rxjs";
 
 @Component({
   selector: "app-cart",
@@ -58,7 +58,6 @@ export class CartComponent implements OnInit {
           cartItem.quantity = item.quantity;
           cartItem.price = item.item_price;
           cartItem.itemId = item.itemId;
-          //console.log(cartItem.product.id);
           return cartItem;
         });
       },
@@ -104,24 +103,19 @@ export class CartComponent implements OnInit {
     };
     this.orderService.createOrder(orderData).subscribe({
       next: (orderId: string) => {
-        console.log("createOrder orderId: ", orderId);
-
         setTimeout(() => {
           this.orderService.getOrderByOrderId(orderId).subscribe({
             next: (orderData: any) => {
-              console.log("getOrderByOrderId data: ", orderData);
-
-              this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
-                console.log("Order Data with Seller Info: ", updatedOrderData);
-                this.dialog.open(OrderDetailsComponent, {
-                  data: {
-                    order: updatedOrderData,
-                    view: 'cart',
-                    role: this.role
-                  },
+                this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
+                  console.log("Order Data with Seller Info: ", updatedOrderData);
+                  this.dialog.open(OrderDetailsComponent, {
+                    data: {
+                      order: updatedOrderData,
+                      view: 'cart',
+                      role: 'CLIENT'
+                    },
+                  });
                 });
-              });
-              
               this.router.navigate(["home"]);
             },
             error: (error: any) => {

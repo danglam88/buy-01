@@ -32,7 +32,7 @@ export class OrderHistoryComponent {
     this.userService.userInfoRole$.subscribe((role) => {
       this.role = role;
       if (this.role === 'CLIENT') {
-        this.getClientOrders();
+        this.getClientOrdersWithSellerInfo();
       } else if (this.role === 'SELLER') {
         this.getSellerOrderItems();
       } 
@@ -41,7 +41,7 @@ export class OrderHistoryComponent {
     // Subscribe to item cancelled event
     this.orderItemService.itemCancelledId$.subscribe((isItemCancelled) => {
       if (isItemCancelled) {
-        this.getClientOrders();
+        this.getClientOrdersWithSellerInfo();
       }
     });
   }
@@ -58,7 +58,11 @@ export class OrderHistoryComponent {
    }
 
    // Get client's orders
-   getClientOrders() {
+  //  getClientOrders() {
+  //   this.getClientOrdersWithSellerInfo();
+  // }
+
+  getClientOrdersWithSellerInfo(){
     this.orderService.getClientOrders().pipe(
       switchMap((res) => {
         const itemObservables = res.orders.map((order: any) =>
@@ -93,7 +97,7 @@ export class OrderHistoryComponent {
       console.log("Get Client Orders: ", result);
       this.allTrans$ = of(result.orders);
     });
-  }
+  } 
 
     // Get seller's order items
    getSellerOrderItems() {
@@ -139,7 +143,8 @@ export class OrderHistoryComponent {
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
         this.orderService.cancelOrder(orderId, orderData).subscribe((res) => {
-          this.getClientOrders();
+          //this.getClientOrders();
+          this.getClientOrdersWithSellerInfo();
         });
       }
     });
@@ -176,7 +181,41 @@ export class OrderHistoryComponent {
    removeOrder(orderId: string) {
     this.orderService.removeOrder(orderId).subscribe((res) => {
       console.log(res);
-      this.getClientOrders();
+     // this.getClientOrdersWithSellerInfo();
+     this.orderService.getClientOrders().pipe(
+      switchMap((res) => {
+        const itemObservables = res.orders.map((order: any) =>
+          forkJoin(
+            order.items.map((item: any) =>
+              this.userService.getUserById(item.seller_id).pipe(
+                map((sellerInfo) => ({
+                  ...item,
+                  sellerInfo: {
+                    name: sellerInfo["name"],
+                    email: sellerInfo["email"],
+                  },
+                }))
+              )
+            )
+          ).pipe(
+            map((itemsWithSellerInfo) => ({
+              ...order,
+              items: itemsWithSellerInfo,
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((ordersWithSellerInfo) => ({
+            ...res,
+            orders: ordersWithSellerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Client Orders: ", result);
+      this.allTrans$ = of(result.orders);
+    });
       this.toastr.success("Order removed successfully");
     });
    }
@@ -200,8 +239,9 @@ export class OrderHistoryComponent {
       if (confirm) {
         this.orderItemService.updateOrderItemStatus(item.item_id, itemData).subscribe({
           next: () => {
+               setTimeout(() => {
                 this.getSellerOrderItems();
-            this.orderService.isUpdateOrderItemStatus();
+               }, 250);
           },
           error: (error) => {
             console.log(error);
