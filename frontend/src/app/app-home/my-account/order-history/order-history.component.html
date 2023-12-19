@@ -5,7 +5,7 @@
     <span class="role">{{ role }}</span>
     <h1 mat-dialog-title class="title">My Order Transactions</h1>
   </div>
-
+  <app-search (searchTextChanged)="setSearchText($event)"></app-search>
   <!--CLIENT-->
   <div *ngIf="role === 'CLIENT'">
     <div class="row">
@@ -17,13 +17,16 @@
     <hr>
     
     <div class="row" *ngFor="let order of (allTrans$ | async)">
-      <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
-      <div class="status">{{ order.status_code }}</div>
-      <div class="action">
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'" (click)="cancelOrder(order.order_id)">Cancel</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CONFIRMED'" (click)="redoOrder(order.order_id)">Redo</button>
-          <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'" (click)="removeOrder(order.order_id)">Remove</button>
+      <div class="row-items" *ngIf="shouldShowClientsOrder(order)">
+        <div class="order-no" (click)="openProductDetail(order)"><a>{{ order.order_id }}</a></div>
+        <div class="status">{{ order.status_code }}</div>
+        <div class="action">
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CREATED'" (click)="cancelOrder(order.order_id)">Cancel</button>
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CONFIRMED'" (click)="redoOrder(order.order_id)">Redo</button>
+            <button mat-button color="primary" class="view-button" *ngIf="order.status_code=='CANCELLED'" (click)="removeOrder(order.order_id)">Remove</button>
+        </div>
       </div>
+     
     </div>
   </div>
 

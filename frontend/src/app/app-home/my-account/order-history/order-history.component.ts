@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
@@ -17,7 +17,7 @@ import { Observable, forkJoin, map, mergeMap, of, switchMap } from 'rxjs';
 export class OrderHistoryComponent {
   allTrans$: Observable<any>;
   role: string = '';
-
+  @Input() searchText: string[] = [];
   constructor(
     private userService: UserService,
     private dialog: MatDialog,
@@ -56,11 +56,6 @@ export class OrderHistoryComponent {
        },
      });
    }
-
-   // Get client's orders
-  //  getClientOrders() {
-  //   this.getClientOrdersWithSellerInfo();
-  // }
 
   getClientOrdersWithSellerInfo(){
     this.orderService.getClientOrders().pipe(
@@ -253,4 +248,14 @@ export class OrderHistoryComponent {
       }
     });
    }
+
+   setSearchText(value: string[]){
+    this.searchText = value;
+ }
+  shouldShowClientsOrder(order){
+    if (this.searchText?.length === 0) {
+      return true;
+    }
+    return this.searchText?.some(keyword => order.items.some(item => item.name.toLowerCase().includes(keyword.toLowerCase())));
+  }
 }
