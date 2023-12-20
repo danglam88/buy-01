@@ -14,10 +14,15 @@ export class CartService {
   private currentCart: Cart;
   private cart: Cart = new Cart();
   cartItemsLength: number;
-  private cartItemsSubject: BehaviorSubject<number> =
-    new BehaviorSubject<number>(0);
+  
+  private cartItemsSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
+
   private itemId = new BehaviorSubject<object>({itemId: ""});
   itemId$ = this.itemId.asObservable();
+
+  private cartUpdateSubject = new BehaviorSubject<boolean>(false);
+  cartUpdate$ = this.cartUpdateSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient,
@@ -108,21 +113,12 @@ export class CartService {
     );
   }
 
-  getNumberOfCartItems(): number {
-    this.cartItemsLength = this.cart.items.length;
-    return this.cartItemsLength;
-  }
-
-  getCartItemsObservable(): Observable<number> {
-    return this.cartItemsSubject.asObservable();
-  }
-
-  private updateCartItemsCount(): void {
-    this.cartItemsLength = this.cart.items.length;
-    this.cartItemsSubject.next(this.cartItemsLength);
-  }
-
   setItemId(itemId: any): void {
     this.itemId.next(itemId);
+  }
+
+  isItemAddedToCart(added: boolean): void {
+    this.cartUpdateSubject.next(added);
+    
   }
 }

@@ -39,14 +39,19 @@ export class HeaderComponent {
     if (this.role === "CLIENT") {
       this.getCartItemsNumber();
     }
-    // this.subscribeToCartItemsChanges();
+
+    // Subscribe to isAddedToCart$ observable
+    this.cartService.cartUpdate$.subscribe((isAddedToCart) => {
+      if (isAddedToCart) {
+        this.getCartItemsNumber();
+      }
+    });
   }
 
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
-    // this.cartItemsSubscription.unsubscribe();
   }
 
   get role(): string {
@@ -80,23 +85,17 @@ export class HeaderComponent {
   }
 
   getCartItemsNumber() {
-    this.cartService.getCart().subscribe({
-      next: (items: any) => {
-        this.cartItems = items.length;
-      },
-      error: (error) => {
-        console.error("Error fetching cart data", error);
-      },
-    });
+    setTimeout(() => {
+      this.cartService.getCart().subscribe({
+        next: (items: any) => {
+          this.cartItems = items.length;
+        },
+        error: (error) => {
+          console.error("Error fetching cart data", error);
+        },
+      });
+    }, 250);
   }
-
-  // private subscribeToCartItemsChanges(): void {
-  //   this.cartItemsSubscription = this.cartService
-  //     .getCartItemsObservable()
-  //     .subscribe((count: number) => {
-  //       this.cartItems = count;
-  //     });
-  // }
 
   // Opens create product modal
   openCreateProduct(): void {
