@@ -35,18 +35,18 @@
           <select
             class="product-quantity"
             #quantitySelect
+            [(ngModel)]="cartItem.quantity"
             (change)="changeQuantity(cartItem, quantitySelect.value)"
           >
             <option
-              *ngFor="let _ of getQuantityOptions(cartItem.product.quantity)"
+              *ngFor="let quantity of getQuantityOptions(cartItem.product.quantity)"
+              [value]="quantity"
             >
-              {{ _ }}
-            </option>
+              {{ quantity }}
+            </option>  
           </select>
         </div>
-
-        <div class="product-quantity">{{ cartItem.itemId }}</div>
-        <div class="product-line-price">{{ cartItem.price }}</div>
+        <div class="product-line-price">{{ cartItem.itemPrice }}</div>
         <button class="remove-button" (click)="removeFromCart(cartItem)">
           Remove
         </button>

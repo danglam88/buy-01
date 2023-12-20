@@ -16,14 +16,13 @@ import { forkJoin, map } from "rxjs";
   styleUrls: ["./cart.component.css"],
 })
 export class CartComponent implements OnInit {
-  //@Output() orderConfirmation: EventEmitter<Cart> = new EventEmitter<Cart>();
   isCashOnDelivery: boolean = false;
   products: any[] = [];
   cart: Cart = new Cart();
   @Input() productAdded: any;
   itemId: any;
   role: string = '';
-
+ 
   constructor(
     private cartService: CartService,
     private router: Router,
@@ -39,12 +38,15 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     this.userService.userInfoRole$.subscribe((role) => {
       this.role = role;
-      console.log("role at ngOnInit: ", this.role);
     });
+
     this.cartService.itemId$.subscribe((itemId) => {
       this.itemId = itemId;
       console.log("itemId at ngOnInit: ", this.itemId);
     });
+
+
+    console.log("Cart at ngOnInit: ", this.cart);
   }
 
   setCart() {
@@ -58,6 +60,7 @@ export class CartComponent implements OnInit {
           cartItem.quantity = item.quantity;
           cartItem.price = item.item_price;
           cartItem.itemId = item.itemId;
+          cartItem.itemPrice = item.itemPrice;
           return cartItem;
         });
       },
@@ -91,7 +94,7 @@ export class CartComponent implements OnInit {
       },
     });
   }
-
+    
   getQuantityOptions(quantity: number): number[] {
     return new Array(quantity).fill(0).map((_, index) => index + 1);
   }
