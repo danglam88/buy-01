@@ -185,11 +185,9 @@ export class ProductDetailComponent implements OnInit {
   getMediaArray(productId:string): void{
     this.mediaArray$ = this.mediaService.getImageByProductId(productId).pipe(
       switchMap((result) => {
-        console.log("product detail getImageByProductId result: ", result);
         const mediaObservables = Object.keys(result).map((key) =>
           this.mediaService.getImageByMediaId(result[key]).pipe(
             switchMap((image) => {
-              console.log("product detail getImageByMediaId image: ", image)
               return new Observable<Media>((observer) => {
                 const reader = new FileReader();
                 reader.onload = () => {
@@ -466,15 +464,31 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  //TODO: Add to cart button needs to be disabled when the product was added
-  //TODO: Instead of using isAddingToCart boolean to disable the add to cart button, use smth else
+  //TODO: Add to cart button needs to be disabled when the product quantity is 0
+  // TODO: Show in view template 'Out of Stock' when product quantity is 0
   addToCart() {
     this.isAddingToCart = true;
     if (this.product) {
       this.cartService.addToCart(this.product).subscribe({
         next: (result) => {
-          //console.log("itemId added to current cart: ", result);
-          this.cartService.setItemId(result);
+          console.log("add to cart result: ", result);
+          console.log("add to cart result.toString(): ", result.toString());
+
+          setTimeout(() => {
+            this.cartService.getCartItem(result.toString()).subscribe({
+              next: (result) => {
+                console.log("Cart item after adding: ", result);
+                this.cartService.isItemAddedToCart(true);
+              },
+              error: (error) => {
+                console.log(error);
+                this.toastr.error('Item is out of stock');
+              },
+              complete: () => {
+                this.toastr.success('Added to Cart');
+              }
+            });
+          }, 250);
         },
         error: (error) => {
           if (this.errorService.isAuthError(error.status)) {
@@ -483,10 +497,7 @@ export class ProductDetailComponent implements OnInit {
           } else if (this.errorService.is400Error(error.status)) {
             this.errorService.handleBadRequestError(error);
           }
-        },
-        complete: () => {
-          this.toastr.success("Added to Cart");
-        },
+        }
       });
     }
 

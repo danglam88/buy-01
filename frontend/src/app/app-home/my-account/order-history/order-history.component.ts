@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
@@ -7,6 +7,7 @@ import { OrderItemService } from 'src/app/services/order-item.service';
 import { CartService } from 'src/app/services/cart.service';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
+import { Observable, forkJoin, map, mergeMap, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-order-history',
@@ -14,29 +15,35 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent {
-  allTrans: any[] = [];
+  allTrans$: Observable<any>;
   role: string = '';
-
+  @Input() searchText: string[] = [];
   constructor(
     private userService: UserService,
     private dialog: MatDialog,
     private orderService: OrderService,
+    private toastr: ToastrService,
     private orderItemService: OrderItemService,
-    private cartService: CartService,
-    private toastr: ToastrService
+    private cartService: CartService
+  
   ) { }
 
   ngOnInit(): void {
     this.userService.userInfoRole$.subscribe((role) => {
       this.role = role;
-      // Do something with the updated role, for example, update your view
+      if (this.role === 'CLIENT') {
+        this.getClientOrdersWithSellerInfo();
+      } else if (this.role === 'SELLER') {
+        this.getSellerOrderItems();
+      } 
     });
 
-    if (this.role === 'CLIENT') {
-      this.getClientOrders();
-    } else if (this.role === 'SELLER') {
-      this.getSellerOrderItems();
-    }
+    // Subscribe to item cancelled event
+    this.orderItemService.itemCancelledId$.subscribe((isItemCancelled) => {
+      if (isItemCancelled) {
+        this.getClientOrdersWithSellerInfo();
+      }
+    });
   }
 
     // Opens product detail modal
@@ -50,20 +57,73 @@ export class OrderHistoryComponent {
      });
    }
 
-   getClientOrders() {
-    this.orderService.getClientOrders().subscribe((res) => {
-      console.log(res);
-      this.allTrans = res.orders;
+  getClientOrdersWithSellerInfo(){
+    this.orderService.getClientOrders().pipe(
+      switchMap((res) => {
+        const itemObservables = res.orders.map((order: any) =>
+          forkJoin(
+            order.items.map((item: any) =>
+              this.userService.getUserById(item.seller_id).pipe(
+                map((sellerInfo) => ({
+                  ...item,
+                  sellerInfo: {
+                    name: sellerInfo["name"],
+                    email: sellerInfo["email"],
+                  },
+                }))
+              )
+            )
+          ).pipe(
+            map((itemsWithSellerInfo) => ({
+              ...order,
+              items: itemsWithSellerInfo,
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((ordersWithSellerInfo) => ({
+            ...res,
+            orders: ordersWithSellerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Client Orders: ", result);
+      this.allTrans$ = of(result.orders);
     });
-   }
+  } 
 
+    // Get seller's order items
    getSellerOrderItems() {
-    this.orderService.getSellerOrderItems().subscribe((res) => {
-      console.log(res);
-      this.allTrans = res.items;
+    this.orderService.getSellerOrderItems().pipe(
+      switchMap((res) => {
+        const itemObservables = res.items.map((item: any) =>
+          this.userService.getUserById(item.buyer_id).pipe(
+            map((buyerInfo) => ({
+              ...item,
+              buyerInfo: {
+                name: buyerInfo["name"],
+                email: buyerInfo["email"],
+              },
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((itemsWithBuyerInfo) => ({
+            ...res,
+            items: itemsWithBuyerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Seller Order Items: ", result);
+      this.allTrans$ = of(result.items);
     });
    }
 
+   // Cancel client's order
    cancelOrder(orderId: any) {
     const orderData = {
       order_status : "CANCELLED",
@@ -77,25 +137,22 @@ export class OrderHistoryComponent {
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
-        console.log('Order cancelled');
         this.orderService.cancelOrder(orderId, orderData).subscribe((res) => {
-          console.log(res);
-          this.getClientOrders();
+          //this.getClientOrders();
+          this.getClientOrdersWithSellerInfo();
         });
       }
     });
    }
 
+   // Redo client's order
    redoOrder(orderId: string) {
     this.orderService.redoOrder(orderId).subscribe({
       next: (result) => {
         result.forEach((itemId) => {
-
           setTimeout(() => {
             this.cartService.getCartItem(itemId).subscribe({
               next: (result) => {
-                console.log("Cart item after redo: ", result);
-  
                 this.cartService.setItemId(itemId);
               },
               error: (error) => {
@@ -115,14 +172,50 @@ export class OrderHistoryComponent {
     });
    }
 
+   // Remove client's order
    removeOrder(orderId: string) {
     this.orderService.removeOrder(orderId).subscribe((res) => {
       console.log(res);
-      this.getClientOrders();
+     // this.getClientOrdersWithSellerInfo();
+     this.orderService.getClientOrders().pipe(
+      switchMap((res) => {
+        const itemObservables = res.orders.map((order: any) =>
+          forkJoin(
+            order.items.map((item: any) =>
+              this.userService.getUserById(item.seller_id).pipe(
+                map((sellerInfo) => ({
+                  ...item,
+                  sellerInfo: {
+                    name: sellerInfo["name"],
+                    email: sellerInfo["email"],
+                  },
+                }))
+              )
+            )
+          ).pipe(
+            map((itemsWithSellerInfo) => ({
+              ...order,
+              items: itemsWithSellerInfo,
+            }))
+          )
+        );
+        return forkJoin(itemObservables).pipe(
+          map((ordersWithSellerInfo) => ({
+            ...res,
+            orders: ordersWithSellerInfo,
+          }))
+        );
+      }),
+      mergeMap((result) => of(result))
+    ).subscribe((result) => {
+      console.log("Get Client Orders: ", result);
+      this.allTrans$ = of(result.orders);
+    });
       this.toastr.success("Order removed successfully");
     });
    }
 
+   // Update order item status (seller)
    updateOrderItemStatus(item: any, status: string) {
     const itemData = {
       "productId": item.product_id,
@@ -139,11 +232,11 @@ export class OrderHistoryComponent {
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
-        console.log('Order Item ' + status.toLowerCase());
         this.orderItemService.updateOrderItemStatus(item.item_id, itemData).subscribe({
           next: () => {
-            this.getSellerOrderItems();
-            // todo: make it "async"
+               setTimeout(() => {
+                this.getSellerOrderItems();
+               }, 250);
           },
           error: (error) => {
             console.log(error);
@@ -155,4 +248,21 @@ export class OrderHistoryComponent {
       }
     });
    }
+
+   setSearchText(value: string[]){
+    this.searchText = value;
+ }
+  shouldShowClientOrders(order){
+    if (this.searchText?.length === 0) {
+      return true;
+    }
+    return this.searchText?.some(keyword => order.items.some(item => item.name.toLowerCase().includes(keyword.toLowerCase())));
+  }
+
+  shouldShowSellerOrderItems(item){
+    if (this.searchText?.length === 0) {
+      return true;
+    }
+    return this.searchText?.some(keyword => item.name.toLowerCase().includes(keyword.toLowerCase()));
+  }
 }
