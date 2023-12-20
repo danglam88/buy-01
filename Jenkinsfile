@@ -188,6 +188,18 @@ pipeline {
             }
         }*/
 
+        stage('Deploy JAR Artifacts to Nexus') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh '''
+                    cd backend
+                    mvn clean deploy -DskipTests
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
             steps {
@@ -257,7 +269,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Artifacts to Nexus') {
+        /*stage('Deploy Artifacts to Nexus') {
             agent { label 'build-agent' }
             steps {
                 script {
@@ -287,7 +299,7 @@ pipeline {
                     );
                 }
             }
-        }
+        }*/
         
         stage('Deploy') {
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
