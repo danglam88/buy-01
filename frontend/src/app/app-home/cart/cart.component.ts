@@ -21,7 +21,6 @@ export class CartComponent implements OnInit {
   cart: Cart = new Cart();
   @Input() productAdded: any;
   itemId: any;
-  role: string = '';
  
   constructor(
     private cartService: CartService,
@@ -31,28 +30,21 @@ export class CartComponent implements OnInit {
     private userService: UserService,
     private toastr: ToastrService
     ) {
-
-    this.setCart();
   }
 
   ngOnInit(): void {
-    this.userService.userInfoRole$.subscribe((role) => {
-      this.role = role;
-    });
-
     this.cartService.itemId$.subscribe((itemId) => {
       this.itemId = itemId;
-      console.log("itemId at ngOnInit: ", this.itemId);
     });
 
-
-    console.log("Cart at ngOnInit: ", this.cart);
+    // Display cart items
+    this.setCart();
   }
 
+  // Get order cart items and set it to cart variable
   setCart() {
     this.cartService?.getCart().subscribe({
       next: (data: any) => {
-        console.log(data);
         this.cart = new Cart();
         this.cart.items = data.map((item: any) => {
           let cartItem = new CartItems(item.product);
@@ -70,10 +62,30 @@ export class CartComponent implements OnInit {
     });
   }
 
+  // Get quantity options for each product to display on select
+  getQuantityOptions(quantity: number): number[] {
+    return new Array(quantity).fill(0).map((_, index) => index + 1);
+  }
+
+  // Display updated total price of each items when quantity is changed
+  changeQuantity(cartItem: CartItems, quantityInString: string) {
+    const quantity = parseInt(quantityInString);
+    this.cartService?.changeQuantity(cartItem.itemId, cartItem.product.id, quantity).subscribe({
+      next: (data: any) => {
+        this.setCart();
+      },
+      error: (error: any) => {
+        console.error("Error changing quantity", error);
+      },
+    });
+  }
+
+  // Remove items from order cart
   removeFromCart(cartItem: CartItems) {
     this.cartService.removeFromCart(cartItem.itemId).subscribe({
       next: (data: any) => {
         console.log(data);
+        this.cartService.isItemAddedToCart(true);
         this.setCart();
       },
       error: (error: any) => {
@@ -82,23 +94,7 @@ export class CartComponent implements OnInit {
     });
   }
 
-  changeQuantity(cartItem: CartItems, quantityInString: string) {
-    const quantity = parseInt(quantityInString);
-    this.cartService?.changeQuantity(cartItem.itemId, cartItem.product.id, quantity).subscribe({
-      next: (data: any) => {
-        console.log(data);
-        this.setCart();
-      },
-      error: (error: any) => {
-        console.error("Error changing quantity", error);
-      },
-    });
-  }
-    
-  getQuantityOptions(quantity: number): number[] {
-    return new Array(quantity).fill(0).map((_, index) => index + 1);
-  }
-
+  // Add order items to order 
   checkOut() {
     const orderData = {
       order_status : "CREATED",
@@ -109,8 +105,8 @@ export class CartComponent implements OnInit {
         setTimeout(() => {
           this.orderService.getOrderByOrderId(orderId).subscribe({
             next: (orderData: any) => {
+              // Get seller info for each product/item before sending to order details component
                 this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
-                  console.log("Order Data with Seller Info: ", updatedOrderData);
                   this.dialog.open(OrderDetailsComponent, {
                     data: {
                       order: updatedOrderData,
@@ -137,6 +133,7 @@ export class CartComponent implements OnInit {
     });
   }
 
+  // Get seller info for each product in order cart
   getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
     const itemObservables = orderData.items.map((item: any) =>
       this.userService.getUserById(item.seller_id).pipe(

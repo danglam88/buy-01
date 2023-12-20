@@ -119,6 +119,5 @@ export class CartService {
 
   isItemAddedToCart(added: boolean): void {
     this.cartUpdateSubject.next(added);
-    
   }
 }

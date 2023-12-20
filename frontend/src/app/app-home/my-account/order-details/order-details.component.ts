@@ -47,6 +47,40 @@ export class OrderDetailsComponent implements OnInit {
     }
   }
 
+  // Add item to cart
+  redoOrderItem(item: any): void {
+    const data = {
+      "itemId": item.item_id,
+      "orderId": item.order_id,
+      "productId": item.product_id,
+      "quantity": item.quantity
+    };
+    this.orderItemService.redoOrderItem(data).subscribe({
+      next: (itemId) => {
+        setTimeout(() => {
+          this.cartService.getCartItem(itemId).subscribe({
+            next: (result) => {
+              console.log("Cart item after redo: ", result);
+              this.cartService.setItemId(itemId);
+              this.cartService.isItemAddedToCart(true);
+            },
+            error: (error) => {
+              console.log(error);
+              this.toastr.error('Item is out of stock');
+            },
+            complete: () => {
+              this.toastr.success('Added to Cart');
+            }
+          });
+        }, 250);
+      },
+      error: (error) => {
+        this.toastr.error('Item is out of stock');
+      }
+    });
+  }
+
+  // Cancel individual item
   cancelOrderItemByClient(item: any): void {
     const data = {
       "productId": item.product_id,
@@ -54,12 +88,14 @@ export class OrderDetailsComponent implements OnInit {
       "statusCode": "CANCELLED"
     };
 
+    // Show confirmation dialog for user to confirm cancellation
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         confirmationText: 'Cancel this order item?'
       }
     });
 
+    // If user confirms cancellation, cancel order item
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
         console.log('Order Item cancelled');
@@ -68,13 +104,9 @@ export class OrderDetailsComponent implements OnInit {
             setTimeout(() => {
               this.orderService.getOrderByOrderId(item.order_id).subscribe({
                 next: (result) => {
-                  // todo: make it "async"
-                  console.log("Order after cancel: ", result);
-
                   this.getOrderDataWithSellerInfo(result, (updatedOrderData) => {
                     this.dialogData.order = updatedOrderData;
                   });
-                  
                   this.orderItemService.isCancelItem(item.order_id)
                 },
                 error: (error) => {
@@ -91,6 +123,7 @@ export class OrderDetailsComponent implements OnInit {
     });
   }
 
+  // Get seller info for each product/item 
   getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
     const itemObservables = orderData.items.map((item: any) =>
       this.userService.getUserById(item.seller_id).pipe(
@@ -113,43 +146,8 @@ export class OrderDetailsComponent implements OnInit {
     });
   }
 
-
-  redoOrderItem(item: any): void {
-    const data = {
-      "itemId": item.item_id,
-      "orderId": item.order_id,
-      "productId": item.product_id,
-      "quantity": item.quantity
-    };
-
-    this.orderItemService.redoOrderItem(data).subscribe({
-      next: (itemId) => {
-        console.log("Redo order itemId: ", itemId);
-
-        setTimeout(() => {
-          this.cartService.getCartItem(itemId).subscribe({
-            next: (result) => {
-              console.log("Cart item after redo: ", result);
-
-              this.cartService.setItemId(itemId);
-            },
-            error: (error) => {
-              console.log(error);
-            },
-            complete: () => {
-              this.toastr.success('Added to Cart');
-            }
-          });
-        }, 250);
-
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });
-  }
-   // Close modal
-   closeModal(): void {
+  // Close modal
+  closeModal(): void {
     this.dialogRef.close();
   }
 }
