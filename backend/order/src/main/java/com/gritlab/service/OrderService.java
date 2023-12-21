@@ -233,7 +233,7 @@ public class OrderService {
             List<OrderItem> items = order.getItems();
 
             for (OrderItem orderItem: items) {
-                if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+                if (orderItem.getStatusCode() == OrderStatus.CREATED || orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
 
                     // Serialize newItem to JSON
                     String jsonMessage = orderItemService.convertFromOrderItemToJson(orderItem);
@@ -249,7 +249,7 @@ public class OrderService {
             order.setStatusCode(data.getStatusCode());
             orderRepository.save(order);
         } else {
-            throw new InvalidParamException("You can only CANCEL a CREATED order");
+            throw new InvalidParamException(order.getStatusCode().toString());
         }
     }
 
