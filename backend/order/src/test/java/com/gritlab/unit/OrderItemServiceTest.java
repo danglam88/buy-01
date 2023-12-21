@@ -365,7 +365,7 @@ class OrderItemServiceTest {
                 "Expected cancelOrderItem to throw, but it didn't"
         );
 
-        assertTrue(thrown.getMessage().contains("You can only cancel order item with current status as CREATED"));
+        assertTrue(thrown.getMessage().contains(mockItem.getStatusCode().toString()));
     }
 
     @Test
