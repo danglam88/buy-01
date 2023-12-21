@@ -89,7 +89,6 @@ export class OrderHistoryComponent {
       }),
       mergeMap((result) => of(result))
     ).subscribe((result) => {
-      console.log("Get Client Orders: ", result);
       this.allTrans$ = of(result.orders);
     });
   } 
@@ -118,7 +117,6 @@ export class OrderHistoryComponent {
       }),
       mergeMap((result) => of(result))
     ).subscribe((result) => {
-      console.log("Get Seller Order Items: ", result);
       this.allTrans$ = of(result.items);
     });
    }
@@ -137,9 +135,17 @@ export class OrderHistoryComponent {
     });
     dialogRef.afterClosed().subscribe((confirm: boolean) => {
       if (confirm) {
-        this.orderService.cancelOrder(orderId, orderData).subscribe((res) => {
-          //this.getClientOrders();
-          this.getClientOrdersWithSellerInfo();
+        this.orderService.cancelOrder(orderId, orderData).subscribe({
+          next: () => {
+            this.getClientOrdersWithSellerInfo();
+          },
+          error: (error) => {
+            console.log(error);
+            if (error.error.message) {
+              this.toastr.info('Order has already been ' + error.error.message.toLowerCase() + ' before');
+              this.getClientOrdersWithSellerInfo();
+            }
+          },
         });
       }
     });
@@ -154,6 +160,7 @@ export class OrderHistoryComponent {
             this.cartService.getCartItem(itemId).subscribe({
               next: (result) => {
                 this.cartService.setItemId(itemId);
+                this.cartService.isItemAddedToCart(true);
               },
               error: (error) => {
                 console.log(error);
@@ -163,7 +170,6 @@ export class OrderHistoryComponent {
               }
             });
           }, 250);
-
         });
       },
       error: (error) => {
@@ -240,6 +246,10 @@ export class OrderHistoryComponent {
           },
           error: (error) => {
             console.log(error);
+            if (error.error.message) {
+              this.toastr.info('Order item has already been ' + error.error.message.toLowerCase() + ' before');
+              this.getSellerOrderItems();
+            }
           },
           complete: () => {
             this.toastr.success('Order item ' + status.toLowerCase() + ' successfully', 'Success');
