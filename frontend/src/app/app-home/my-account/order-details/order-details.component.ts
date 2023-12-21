@@ -117,6 +117,19 @@ export class OrderDetailsComponent implements OnInit {
           },
           error: (error) => {
             console.log(error);
+            if (error.error.message) {
+              this.toastr.info('Order item has already been ' + error.error.message.toLowerCase() + ' before');
+              this.orderService.getOrderByOrderId(item.order_id).subscribe({
+                next: (result) => {
+                  this.getOrderDataWithSellerInfo(result, (updatedOrderData) => {
+                    this.dialogData.order = updatedOrderData;
+                  });
+                },
+                error: (error) => {
+                  console.log(error);
+                }
+              });
+            }
           },
         });
       }
