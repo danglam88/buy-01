@@ -4,8 +4,13 @@ services:
   nexus:
     image: nexus-image
     container_name: nexus
+    expose:
+      - 9001
+      - 8081
+      - 8083
     ports:
       - "9001:8081"
+      - "8083:8083"
     volumes:
       - nexus-data:/nexus-data
       - nexus-logs:/var/log/nexus

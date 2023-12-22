@@ -12,11 +12,11 @@ pipeline {
     }
 
     environment {
-        USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
-        PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
-        MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
-        ORDER_MICROSERVICE_IMAGE = 'danglamgritlab/order-microservice:latest'
-        FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
+        USER_MICROSERVICE_IMAGE = '142.93.175.42:8083/user-microservice:latest'
+        PRODUCT_MICROSERVICE_IMAGE = '142.93.175.42:8083/product-microservice:latest'
+        MEDIA_MICROSERVICE_IMAGE = '142.93.175.42:8083/media-microservice:latest'
+        ORDER_MICROSERVICE_IMAGE = '142.93.175.42:8083/order-microservice:latest'
+        FRONTEND_IMAGE = '142.93.175.42:8083/frontend:latest'
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "142.93.175.42:9001"

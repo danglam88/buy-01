@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   user-microservice:
-    image: danglamgritlab/user-microservice:latest
+    image: 142.93.175.42:8083/user-microservice:latest
     container_name: user-microservice-container
     ports:
       - "8443:8443"
@@ -20,7 +20,7 @@ services:
     restart: on-failure
 
   product-microservice:
-    image: danglamgritlab/product-microservice:latest
+    image: 142.93.175.42:8083/product-microservice:latest
     container_name: product-microservice-container
     ports:
       - "8444:8444"
@@ -38,7 +38,7 @@ services:
     restart: on-failure
 
   media-microservice:
-    image: danglamgritlab/media-microservice:latest
+    image: 142.93.175.42:8083/media-microservice:latest
     container_name: media-microservice-container
     ports:
       - "8445:8445"
@@ -56,7 +56,7 @@ services:
     restart: on-failure
 
   order-microservice:
-    image: danglamgritlab/order-microservice:latest
+    image: 142.93.175.42:8083/order-microservice:latest
     container_name: order-microservice-container
     ports:
       - "8446:8446"
@@ -74,7 +74,7 @@ services:
     restart: on-failure
 
   frontend:
-    image: danglamgritlab/frontend:latest
+    image: 142.93.175.42:8083/frontend:latest
     container_name: frontend-container
     ports:
       - "4200:4200"
