@@ -344,7 +344,7 @@ pipeline {
                             // If deploy fails, the rollback commands are executed
                             // Extract version number from saved image filename
                             sh '''
-                            VERSION_NUMBER=$(ls ~/backup/*-microservice-*.tar | sed 's/.*-microservice-\(.*\).tar/\1/')
+                            VERSION_NUMBER=$(ls ~/backup/*-microservice-*.tar | sed 's/.*-microservice-\\(.*\\).tar/\\1/')
                             export VERSION_NUMBER
 
                             echo "Error: ${err.getMessage()}"
