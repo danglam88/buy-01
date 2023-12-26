@@ -333,13 +333,13 @@ pipeline {
                             // If deploy fails, the rollback commands are executed
                             // Read version number from the version_number file
                             sh '''
-                            VERSION_NUMBER=$(cat ~/version_number)
-                            export VERSION_NUMBER
-
                             echo "Error: ${err.getMessage()}"
                             echo "Deployment failed. Executing rollback commands."
-                            echo "Rolling back to version $VERSION_NUMBER"
-                            
+
+                            SUCCESS_VERSION=$(cat ~/version_number)
+                            echo "Rolling back to version $SUCCESS_VERSION"
+
+                            export VERSION_NUMBER=$SUCCESS_VERSION
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
                             export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
                             export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
@@ -355,11 +355,11 @@ pipeline {
                             fi
                             docker system prune -a -f --volumes
 
-                            docker pull $USER_MICROSERVICE_IMAGE:$VERSION_NUMBER
-                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$VERSION_NUMBER
-                            docker pull $MEDIA_MICROSERVICE_IMAGE:$VERSION_NUMBER
-                            docker pull $ORDER_MICROSERVICE_IMAGE:$VERSION_NUMBER
-                            docker pull $FRONTEND_IMAGE:$VERSION_NUMBER
+                            docker pull $USER_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $MEDIA_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $ORDER_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $FRONTEND_IMAGE:$SUCCESS_VERSION
 
                             docker-compose up -d
                             '''
