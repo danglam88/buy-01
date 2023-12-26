@@ -377,19 +377,18 @@
         <!-- ADD TO CART FEATURE -->
         <div
           class="addToCartDiv"
-          *ngIf="!noProductsAvailble; else noProductsTemplate"
+          *ngIf="!noProductsAvailble ; else noProductsTemplate"
         >
           <!-- Content for when the condition is true -->
           <button
             class="addtocart"
             *ngIf="userRole === 'CLIENT'"
-            [disabled]="noProductsAvailble"
           >
             <div class="pretext" (click)="addToCart()">
               <i class="fas fa-cart-plus"></i> ADD TO CART
             </div>
             <!-- Disable this button when Add to cart is clicked -->
-            <div class="pretext" *ngIf="isAddingToCart" id="addedToCart">
+            <div class="pretext" *ngIf="isProductInCart" id="addedToCart">
               <i class="fas fa-check"></i> ADDED TO CART
             </div>
           </button>

@@ -1,24 +1,20 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Cart } from "../Models/Cart";
 import { Product } from "../Models/Product";
 import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "../../environments/environment";
 import { EncryptionService } from "./encryption.service";
 import { Router } from "@angular/router";
+import { CartItems } from "../Models/CartItems";
 
 @Injectable({
   providedIn: "root",
 })
 export class CartService {
-  private currentCart: Cart;
-  private cart: Cart = new Cart();
   cartItemsLength: number;
-  
-  private cartItemsSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  cart: CartItems[] = [];
 
-
-  private itemId = new BehaviorSubject<object>({itemId: ""});
+  private itemId = new BehaviorSubject<object>({ itemId: "" });
   itemId$ = this.itemId.asObservable();
 
   private cartUpdateSubject = new BehaviorSubject<boolean>(false);
@@ -98,7 +94,9 @@ export class CartService {
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
     }
-    return this.httpClient.get(`${environment.orderItemUrl}` + `/${itemId}`, { headers });
+    return this.httpClient.get(`${environment.orderItemUrl}` + `/${itemId}`, {
+      headers,
+    });
   }
 
   //remove a product from cart
@@ -119,5 +117,20 @@ export class CartService {
 
   isItemAddedToCart(added: boolean): void {
     this.cartUpdateSubject.next(added);
+  }
+
+  setCartItems(cartItems: Iterable<CartItems>): void {
+    for (const item of cartItems) {
+      this.cart.push(item);
+    }
+
+  }
+
+  getCartItems(): CartItems[] {
+    return this.cart;
+  }
+
+  removeCartItems(cartItemId: string): void {
+    this.cart = this.cart.filter((item) => item.itemId !== cartItemId);
   }
 }

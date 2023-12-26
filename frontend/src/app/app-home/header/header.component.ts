@@ -44,8 +44,10 @@ export class HeaderComponent {
     this.cartService.cartUpdate$.subscribe((isAddedToCart) => {
       if (isAddedToCart) {
         this.getCartItemsNumber();
+        
       }
     });
+
   }
 
   ngOnDestroy() {
@@ -89,6 +91,7 @@ export class HeaderComponent {
       this.cartService.getCart().subscribe({
         next: (items: any) => {
           this.cartItems = items.length;
+          this.cartService.setCartItems(items);
         },
         error: (error) => {
           console.error("Error fetching cart data", error);

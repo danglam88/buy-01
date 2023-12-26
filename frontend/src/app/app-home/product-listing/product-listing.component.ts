@@ -6,6 +6,8 @@ import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { Cart } from 'src/app/Models/Cart';
+import { CartService } from 'src/app/services/cart.service';
 
 @Component({
   selector: 'app-product-listing',
@@ -22,16 +24,22 @@ export class ProductListingComponent implements OnInit {
   totalProductUnder300: number = 0;
   totalProductUnder400: number = 0;
   totalProductAbove400: number = 0;
+  isProductInCart: boolean = false;
+  cartItems: Cart[] = [];
+
   constructor( 
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
+    private cartService: CartService,
     ) {
      // get the total number of products under 100 from object Product
     }
   
   ngOnInit(): void {
     this.getAllProducts();
+    // console.log('get all cart', this.cartService.getCartItems());
+
 
     if (this.productService.productCreated) {
       this.productService.productCreated.subscribe((productCreated) => {

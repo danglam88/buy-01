@@ -86,9 +86,9 @@ export class CartComponent implements OnInit {
 
   // Remove items from order cart
   removeFromCart(cartItem: CartItems) {
+    this.cartService.removeCartItems(cartItem.itemId);
     this.cartService.removeFromCart(cartItem.itemId).subscribe({
       next: (data: any) => {
-        console.log(data);
         this.cartService.isItemAddedToCart(true);
         this.setCart();
       },

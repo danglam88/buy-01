@@ -50,7 +50,7 @@ export class ProductDetailComponent implements OnInit {
   isAddingImages = false;
   isDeletingImages = false;
   isEditingImages = false;
-  isAddingToCart = false;
+  isProductInCart = false;
   noProductsAvailble = false;
   currentIndexOfImageSlider = 0;
   imgPlaceholder = "../../../../assets/images/uploadPhoto.jpg";
@@ -75,7 +75,7 @@ export class ProductDetailComponent implements OnInit {
     private cartService: CartService
   ) {
     this.product = data.product; // get product details from product-listing component
-    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+      //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
     // Handles product media updates and get product images again from media service
     if (this.mediaService.mediaUpload) {
@@ -111,6 +111,12 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cartService.getCartItems().forEach((item) => {
+      if (item.product.id === this.product.id) {
+        this.isProductInCart = true;
+      }
+    }
+    );
     // Creates a productDetail form for updating with validation.
     // Only seller of that product can update
     this.productDetailForm = this.builder.group({
@@ -148,6 +154,8 @@ export class ProductDetailComponent implements OnInit {
           Validators.maxLength(1000),
         ],
       ],
+
+
     });
     this.getProductImages();
 
@@ -473,8 +481,8 @@ export class ProductDetailComponent implements OnInit {
       this.noProductsAvailble = true;
       return;
     }
+    this.isProductInCart = true;
 
-    this.isAddingToCart = true;
     if (this.product) {
       this.cartService.addToCart(this.product).subscribe({
         next: (result) => {
