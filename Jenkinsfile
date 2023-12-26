@@ -305,7 +305,6 @@ pipeline {
                             docker pull $FRONTEND_IMAGE:$BUILD_NUMBER
 
                             docker-compose up -d
-                            exit 1
                             '''
 
                             def allContainersRunning = true
