@@ -27,8 +27,8 @@ import { ErrorService } from "src/app/services/error.service";
 import { Product } from "../../Models/Product";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { CartService } from "src/app/services/cart.service";
-import { Observable, catchError, forkJoin, of, switchMap } from 'rxjs';
-import { Media } from 'src/app/Models/Media';
+import { Observable, catchError, forkJoin, of, switchMap } from "rxjs";
+import { Media } from "src/app/Models/Media";
 
 @Component({
   selector: "product-detail",
@@ -38,7 +38,7 @@ import { Media } from 'src/app/Models/Media';
 export class ProductDetailComponent implements OnInit {
   @Input() product: Product;
   @Output() mediaArray$: Observable<Media[]>;
-  view: string = '';
+  view: string = "";
   @Output() productAdded = new EventEmitter();
   editingField: string | null = null;
   productImages: any = {};
@@ -83,12 +83,12 @@ export class ProductDetailComponent implements OnInit {
         this.getProductImages();
         this.currentIndexOfImageSlider = this.noOfImages;
       });
-    } 
+    }
 
     if (this.mediaService.mediaDeleted) {
       this.mediaService.mediaDeleted.subscribe(() => {
         this.getProductImages();
-        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+        if (this.currentIndexOfImageSlider === this.noOfImages - 1) {
           this.currentIndexOfImageSlider = 0;
         }
       });
@@ -149,21 +149,21 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
-    this.getProductImages();  
+    this.getProductImages();
 
-      // Handles product media updates and get product images again from media service
-      
+    // Handles product media updates and get product images again from media service
+
     if (this.mediaService.mediaUpload) {
       this.mediaService.mediaUpload.subscribe(() => {
         this.getProductImages();
         this.currentIndexOfImageSlider = this.noOfImages;
       });
-    } 
+    }
 
     if (this.mediaService.mediaDeleted) {
       this.mediaService.mediaDeleted.subscribe(() => {
         this.getProductImages();
-        if (this.currentIndexOfImageSlider === this.noOfImages -1 ) {
+        if (this.currentIndexOfImageSlider === this.noOfImages - 1) {
           this.currentIndexOfImageSlider = 0;
         }
       });
@@ -175,14 +175,17 @@ export class ProductDetailComponent implements OnInit {
     this.mediaArray$.subscribe((result) => {
       for (const key in result) {
         if (result.hasOwnProperty(key)) {
-          this.productImages[key] = { data: result[key].imageData, mediaId: result[key].mediaId };
-        }  
+          this.productImages[key] = {
+            data: result[key].imageData,
+            mediaId: result[key].mediaId,
+          };
+        }
       }
       this.noOfImages = result.length;
     });
   }
 
-  getMediaArray(productId:string): void{
+  getMediaArray(productId: string): void {
     this.mediaArray$ = this.mediaService.getImageByProductId(productId).pipe(
       switchMap((result) => {
         const mediaObservables = Object.keys(result).map((key) =>
@@ -253,7 +256,7 @@ export class ProductDetailComponent implements OnInit {
           this.mediaService.deleteMedia(currentImage.mediaId).subscribe({
             next: (result) => {
               this.mediaService.mediaDeleted.emit(true);
-              this.toastr.success('Image deleted');
+              this.toastr.success("Image deleted");
             },
             error: (error) => {
               console.log(error);
@@ -280,7 +283,7 @@ export class ProductDetailComponent implements OnInit {
         "Image Limit Exceeded: You can only add a maximum of 5 images"
       );
     } else {
-      this.saveEachSelectedFile(this.product.id, 0)
+      this.saveEachSelectedFile(this.product.id, 0);
       this.mediaService.mediaUpload.emit(true);
     }
   }
@@ -437,7 +440,7 @@ export class ProductDetailComponent implements OnInit {
       formData.append("file", file);
 
       this.mediaService.uploadMedia(formData).subscribe({
-        next: (result) => {;
+        next: (result) => {
           this.getProductImages();
           this.saveEachSelectedFile(productId, index + 1);
           this.selectedFiles = [];
@@ -464,9 +467,13 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  //TODO: Add to cart button needs to be disabled when the product quantity is 0
-  // TODO: Show in view template 'Out of Stock' when product quantity is 0
+  //TODO: Add to cart button needs to be disabled when product is already in cart
   addToCart() {
+    if (this.product.quantity === 0) {
+      this.noProductsAvailble = true;
+      return;
+    }
+
     this.isAddingToCart = true;
     if (this.product) {
       this.cartService.addToCart(this.product).subscribe({
@@ -482,11 +489,11 @@ export class ProductDetailComponent implements OnInit {
               },
               error: (error) => {
                 console.log(error);
-                this.toastr.error('Item is out of stock');
+                this.toastr.error("Item is out of stock");
               },
               complete: () => {
-                this.toastr.success('Added to Cart');
-              }
+                this.toastr.success("Added to Cart");
+              },
             });
           }, 250);
         },
@@ -497,12 +504,8 @@ export class ProductDetailComponent implements OnInit {
           } else if (this.errorService.is400Error(error.status)) {
             this.errorService.handleBadRequestError(error);
           }
-        }
+        },
       });
-    }
-
-    if (this.product.quantity === 0) {
-      this.noProductsAvailble = true;
     }
   }
 
