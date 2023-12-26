@@ -12,16 +12,11 @@ pipeline {
     }
 
     environment {
-        USER_MICROSERVICE_IMAGE = '142.93.175.42:8083/user-microservice:latest'
-        PRODUCT_MICROSERVICE_IMAGE = '142.93.175.42:8083/product-microservice:latest'
-        MEDIA_MICROSERVICE_IMAGE = '142.93.175.42:8083/media-microservice:latest'
-        ORDER_MICROSERVICE_IMAGE = '142.93.175.42:8083/order-microservice:latest'
-        FRONTEND_IMAGE = '142.93.175.42:8083/frontend:latest'
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "142.93.175.42:9001"
-        NEXUS_REPOSITORY = "maven-snapshots"
-        NEXUS_CREDENTIAL_ID = "nexus-creds"
+        USER_MICROSERVICE_IMAGE = '142.93.175.42:8083/user-microservice'
+        PRODUCT_MICROSERVICE_IMAGE = '142.93.175.42:8083/product-microservice'
+        MEDIA_MICROSERVICE_IMAGE = '142.93.175.42:8083/media-microservice'
+        ORDER_MICROSERVICE_IMAGE = '142.93.175.42:8083/order-microservice'
+        FRONTEND_IMAGE = '142.93.175.42:8083/frontend'
     }
 
     stages {
@@ -33,7 +28,6 @@ pipeline {
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'order-mongodb-creds', usernameVariable: 'ORDER_DB_USERNAME', passwordVariable: 'ORDER_DB_PASSWORD'),
-                        usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD'),
                         string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
@@ -44,8 +38,6 @@ pipeline {
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.ORDER_DB_USERNAME = ORDER_DB_USERNAME
                         env.ORDER_DB_PASSWORD = ORDER_DB_PASSWORD
-                        env.NEXUS_USERNAME = NEXUS_USERNAME
-                        env.NEXUS_PASSWORD = NEXUS_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
@@ -225,42 +217,42 @@ pipeline {
 
                         cd backend
 
-                        docker build -t user-microservice -f user/Dockerfile \
+                        docker build -t user-microservice:$BUILD_NUMBER -f user/Dockerfile \
                             --build-arg USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME \
                             --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag user-microservice $USER_MICROSERVICE_IMAGE
-                        docker push $USER_MICROSERVICE_IMAGE
+                        docker tag user-microservice:$BUILD_NUMBER $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t product-microservice -f product/Dockerfile \
+                        docker build -t product-microservice:$BUILD_NUMBER -f product/Dockerfile \
                             --build-arg PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME \
                             --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag product-microservice $PRODUCT_MICROSERVICE_IMAGE
-                        docker push $PRODUCT_MICROSERVICE_IMAGE
+                        docker tag product-microservice:$BUILD_NUMBER $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t media-microservice -f media/Dockerfile \
+                        docker build -t media-microservice:$BUILD_NUMBER -f media/Dockerfile \
                             --build-arg MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME \
                             --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag media-microservice $MEDIA_MICROSERVICE_IMAGE
-                        docker push $MEDIA_MICROSERVICE_IMAGE
+                        docker tag media-microservice:$BUILD_NUMBER $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t order-microservice -f order/Dockerfile \
+                        docker build -t order-microservice:$BUILD_NUMBER -f order/Dockerfile \
                             --build-arg ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME \
                             --build-arg ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag order-microservice $ORDER_MICROSERVICE_IMAGE
-                        docker push $ORDER_MICROSERVICE_IMAGE
+                        docker tag order-microservice:$BUILD_NUMBER $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
                         cd ../frontend
-                        docker build -t frontend .
-                        docker tag frontend $FRONTEND_IMAGE
-                        docker push $FRONTEND_IMAGE
+                        docker build -t frontend:$BUILD_NUMBER .
+                        docker tag frontend:$BUILD_NUMBER $FRONTEND_IMAGE:$BUILD_NUMBER
+                        docker push $FRONTEND_IMAGE:$BUILD_NUMBER
 
                         docker system prune -a -f --volumes
                         '''
@@ -268,38 +260,6 @@ pipeline {
                 }
             }
         }
-
-        /*stage('Deploy Artifacts to Nexus') {
-            agent { label 'build-agent' }
-            steps {
-                script {
-                    sh '''
-                    cd backend/user
-                    ls -la .
-                    ls -la target
-                    '''
-                    nexusArtifactUploader(
-                        nexusVersion: NEXUS_VERSION,
-                        protocol: NEXUS_PROTOCOL,
-                        nexusUrl: NEXUS_URL,
-                        groupId: "com.gritlab",
-                        version: "1.0-SNAPSHOT",
-                        repository: NEXUS_REPOSITORY,
-                        credentialsId: NEXUS_CREDENTIAL_ID,
-                        artifacts: [
-                            [artifactId: "user",
-                            classifier: '',
-                            file: "backend/user/target/user.jar",
-                            type: "jar"],
-                            [artifactId: "user",
-                            classifier: '',
-                            file: "backend/user/pom.xml",
-                            type: "pom"]
-                        ]
-                    );
-                }
-            }
-        }*/
         
         stage('Deploy') {
             agent { label 'deploy-agent' } // This stage will be executed on the 'deploy' agent
@@ -330,6 +290,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export VERSION_NUMBER=$BUILD_NUMBER
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
@@ -337,11 +298,11 @@ pipeline {
                             fi
                             docker system prune -a -f --volumes
 
-                            docker pull $USER_MICROSERVICE_IMAGE
-                            docker pull $PRODUCT_MICROSERVICE_IMAGE
-                            docker pull $MEDIA_MICROSERVICE_IMAGE
-                            docker pull $ORDER_MICROSERVICE_IMAGE
-                            docker pull $FRONTEND_IMAGE
+                            docker pull $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $FRONTEND_IMAGE:$BUILD_NUMBER
 
                             docker-compose up -d
                             '''
@@ -363,16 +324,17 @@ pipeline {
                             sh '''
                             echo "Deployment passed. Executing backup."
 
-                            docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
-                            docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
-                            docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
-                            docker save -o ~/order-microservice.tar $ORDER_MICROSERVICE_IMAGE
-                            docker save -o ~/frontend.tar $FRONTEND_IMAGE
+                            docker save -o ~/user-microservice-${BUILD_NUMBER}.tar $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker save -o ~/product-microservice-${BUILD_NUMBER}.tar $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker save -o ~/media-microservice-${BUILD_NUMBER}.tar $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker save -o ~/order-microservice-${BUILD_NUMBER}.tar $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker save -o ~/frontend-${BUILD_NUMBER}.tar $FRONTEND_IMAGE:$BUILD_NUMBER
 
                             if [ ! -d "~/backup" ]; then
                                 mkdir -p ~/backup
                             fi
 
+                            rm -f ~/backup/*.tar
                             mv ~/*.tar ~/backup/
                             '''
                         }
@@ -380,9 +342,14 @@ pipeline {
                         // Use maskPasswords with named arguments
                         maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                             // If deploy fails, the rollback commands are executed
+                            // Extract version number from saved image filename
                             sh '''
+                            VERSION_NUMBER=$(ls ~/backup/*-microservice-*.tar | sed 's/.*-microservice-\(.*\).tar/\1/')
+                            export VERSION_NUMBER
+
                             echo "Error: ${err.getMessage()}"
                             echo "Deployment failed. Executing rollback."
+                            echo "Rolling back to version $VERSION_NUMBER"
                             
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
                             export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
@@ -401,11 +368,11 @@ pipeline {
 
                             cp ~/backup/*.tar ~/
 
-                            docker load -i ~/user-microservice.tar
-                            docker load -i ~/product-microservice.tar
-                            docker load -i ~/media-microservice.tar
-                            docker load -i ~/order-microservice.tar
-                            docker load -i ~/frontend.tar
+                            docker load -i ~/user-microservice-${VERSION_NUMBER}.tar
+                            docker load -i ~/product-microservice-${VERSION_NUMBER}.tar
+                            docker load -i ~/media-microservice-${VERSION_NUMBER}.tar
+                            docker load -i ~/order-microservice-${VERSION_NUMBER}.tar
+                            docker load -i ~/frontend-${VERSION_NUMBER}.tar
 
                             docker-compose up -d
                             '''
