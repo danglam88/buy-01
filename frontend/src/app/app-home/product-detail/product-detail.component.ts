@@ -77,6 +77,11 @@ export class ProductDetailComponent implements OnInit {
     this.product = data.product; // get product details from product-listing component
       //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
+      if (this.product.quantity === 0) {
+        this.noProductsAvailble = true;
+        return;
+      }
+
     // Handles product media updates and get product images again from media service
     if (this.mediaService.mediaUpload) {
       this.mediaService.mediaUpload.subscribe(() => {
@@ -111,6 +116,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+
+
     this.cartService.getCartItems().forEach((item) => {
       if (item.product.id === this.product.id) {
         this.isProductInCart = true;
@@ -477,10 +485,6 @@ export class ProductDetailComponent implements OnInit {
 
   //TODO: Add to cart button needs to be disabled when product is already in cart
   addToCart() {
-    if (this.product.quantity === 0) {
-      this.noProductsAvailble = true;
-      return;
-    }
     this.isProductInCart = true;
 
     if (this.product) {

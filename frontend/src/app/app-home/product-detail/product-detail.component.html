@@ -382,7 +382,7 @@
           <!-- Content for when the condition is true -->
           <button
             class="addtocart"
-            *ngIf="userRole === 'CLIENT'"
+            *ngIf="userRole === 'CLIENT' && !noProductsAvailble"
           >
             <div class="pretext" (click)="addToCart()">
               <i class="fas fa-cart-plus"></i> ADD TO CART
