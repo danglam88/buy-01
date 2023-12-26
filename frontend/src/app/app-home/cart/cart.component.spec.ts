@@ -12,7 +12,7 @@ import { CartComponent } from "./cart.component";
 import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { UserService } from "src/app/services/user.service";
-import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
+import { OrderDetailsComponent } from "../my-orders/order-details/order-details.component";
 import { Cart } from "src/app/Models/Cart";
 import { CartItems } from "src/app/Models/CartItems";
 import { Product } from "src/app/Models/Product";

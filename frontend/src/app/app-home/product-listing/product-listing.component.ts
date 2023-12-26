@@ -8,6 +8,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Cart } from 'src/app/Models/Cart';
 import { CartService } from 'src/app/services/cart.service';
+import { EncryptionService } from 'src/app/services/encryption.service';
 
 @Component({
   selector: 'app-product-listing',
@@ -31,7 +32,7 @@ export class ProductListingComponent implements OnInit {
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
-    private cartService: CartService,
+    private encryptionService: EncryptionService,
     ) {
      // get the total number of products under 100 from object Product
     }

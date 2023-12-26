@@ -1,0 +1,25 @@
+<!-- app.component.html -->
+
+<app-header></app-header>
+<div class="my-account-container">
+  <!-- Navigation Bar -->
+  <div class="navigation-bar">
+    <button mat-button class="active" (click)="showOrderSection()">
+      Orders
+    </button>
+    <button mat-button class="active" (click)="showStatsSection()">
+      Stats
+    </button>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    <div *ngIf="view === 'orders'">
+      <app-order-history [role]="role"></app-order-history>
+    </div>
+    <div *ngIf="view === 'stats'">
+      <app-stats [role]="role"></app-stats>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

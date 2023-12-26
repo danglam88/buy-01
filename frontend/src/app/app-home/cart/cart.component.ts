@@ -5,7 +5,7 @@ import { CartItems } from "src/app/Models/CartItems";
 import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { MatDialog } from "@angular/material/dialog";
-import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
+import { OrderDetailsComponent } from "../my-orders/order-details/order-details.component";
 import { UserService } from "src/app/services/user.service";
 import { ToastrService } from "ngx-toastr";
 import { forkJoin, map } from "rxjs";
