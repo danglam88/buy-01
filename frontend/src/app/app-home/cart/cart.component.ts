@@ -4,10 +4,10 @@ import { Cart } from "src/app/Models/Cart";
 import { CartItems } from "src/app/Models/CartItems";
 import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog } from "@angular/material/dialog";
 import { OrderDetailsComponent } from "../my-account/order-details/order-details.component";
-import { UserService } from 'src/app/services/user.service';
-import { ToastrService } from 'ngx-toastr';
+import { UserService } from "src/app/services/user.service";
+import { ToastrService } from "ngx-toastr";
 import { forkJoin, map } from "rxjs";
 
 @Component({
@@ -21,7 +21,7 @@ export class CartComponent implements OnInit {
   cart: Cart = new Cart();
   @Input() productAdded: any;
   itemId: any;
- 
+
   constructor(
     private cartService: CartService,
     private router: Router,
@@ -29,8 +29,7 @@ export class CartComponent implements OnInit {
     private dialog: MatDialog,
     private userService: UserService,
     private toastr: ToastrService
-    ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cartService.itemId$.subscribe((itemId) => {
@@ -70,14 +69,19 @@ export class CartComponent implements OnInit {
   // Display updated total price of each items when quantity is changed
   changeQuantity(cartItem: CartItems, quantityInString: string) {
     const quantity = parseInt(quantityInString);
-    this.cartService?.changeQuantity(cartItem.itemId, cartItem.product.id, quantity).subscribe({
-      next: (data: any) => {
-        this.setCart();
-      },
-      error: (error: any) => {
-        console.error("Error changing quantity", error);
-      },
-    });
+
+    this.cartService
+      ?.changeQuantity(cartItem.itemId, cartItem.product.id, quantity)
+      .subscribe({
+        next: (data: any) => {
+          setTimeout(() => {
+            this.setCart();
+          }, 250);
+        },
+        error: (error: any) => {
+          console.error("Error changing quantity", error);
+        },
+      });
   }
 
   // Remove items from order cart
@@ -94,11 +98,11 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // Add order items to order 
+  // Add order items to order
   checkOut() {
     const orderData = {
-      order_status : "CREATED",
-      payment_code : "CASH",
+      order_status: "CREATED",
+      payment_code: "CASH",
     };
     this.orderService.createOrder(orderData).subscribe({
       next: (orderId: string) => {
@@ -106,26 +110,24 @@ export class CartComponent implements OnInit {
           this.orderService.getOrderByOrderId(orderId).subscribe({
             next: (orderData: any) => {
               // Get seller info for each product/item before sending to order details component
-                this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
-                  this.dialog.open(OrderDetailsComponent, {
-                    data: {
-                      order: updatedOrderData,
-                      view: 'cart',
-                      role: 'CLIENT'
-                    },
-                  });
+              this.getOrderDataWithSellerInfo(orderData, (updatedOrderData) => {
+                this.dialog.open(OrderDetailsComponent, {
+                  data: {
+                    order: updatedOrderData,
+                    view: "cart",
+                    role: "CLIENT",
+                  },
                 });
+              });
               this.router.navigate(["home"]);
             },
             error: (error: any) => {
               console.error("Error fetching order data", error);
-              this.toastr.error('Order cannot be created');
+              this.toastr.error("Order cannot be created");
               this.router.navigate(["home"]);
-              
             },
           });
         }, 250);
-
       },
       error: (error: any) => {
         console.error("Error creating order", error);
@@ -134,7 +136,10 @@ export class CartComponent implements OnInit {
   }
 
   // Get seller info for each product in order cart
-  getOrderDataWithSellerInfo(orderData: any, callback: (updatedOrderData: any) => void): void {
+  getOrderDataWithSellerInfo(
+    orderData: any,
+    callback: (updatedOrderData: any) => void
+  ): void {
     const itemObservables = orderData.items.map((item: any) =>
       this.userService.getUserById(item.seller_id).pipe(
         map((sellerInfo) => ({
@@ -146,7 +151,7 @@ export class CartComponent implements OnInit {
         }))
       )
     );
-  
+
     forkJoin(itemObservables).subscribe((itemsWithSellerInfo) => {
       const updatedOrderData = {
         ...orderData,

@@ -1,7 +1,5 @@
 import { Injectable } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
-import { Router } from "@angular/router";
-import { EncryptionService } from "./encryption.service";
 import { AuthenticationService } from "./authentication.service";
 
 @Injectable({
@@ -10,17 +8,12 @@ import { AuthenticationService } from "./authentication.service";
 export class ErrorService {
   constructor(
     private toastr: ToastrService,
-    private router: Router,
-    private encryptionService: EncryptionService,
     private authService: AuthenticationService
   ) {}
 
   handleSessionExpirationError(): void {
     this.toastr.error("Session expired. Log-in again.");
-    this.authService.logout(
-      
-    );
-
+    this.authService.logout();
   }
 
   handleBadRequestError(error: any): void {
