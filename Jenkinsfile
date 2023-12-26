@@ -333,13 +333,11 @@ pipeline {
                             // If deploy fails, the rollback commands are executed
                             // Read version number from the version_number file
                             sh '''
-                            echo "Error: ${err.getMessage()}"
                             echo "Deployment failed. Executing rollback commands."
 
                             SUCCESS_VERSION=$(cat ~/version_number)
                             echo "Rolling back to version $SUCCESS_VERSION"
 
-                            export VERSION_NUMBER=$SUCCESS_VERSION
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
                             export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
                             export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
@@ -348,6 +346,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export VERSION_NUMBER=$SUCCESS_VERSION
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
