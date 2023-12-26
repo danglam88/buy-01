@@ -322,33 +322,21 @@ pipeline {
                             }
                             
                             sh '''
-                            echo "Deployment passed. Executing backup."
-
-                            docker save -o ~/user-microservice-${BUILD_NUMBER}.tar $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
-                            docker save -o ~/product-microservice-${BUILD_NUMBER}.tar $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
-                            docker save -o ~/media-microservice-${BUILD_NUMBER}.tar $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
-                            docker save -o ~/order-microservice-${BUILD_NUMBER}.tar $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
-                            docker save -o ~/frontend-${BUILD_NUMBER}.tar $FRONTEND_IMAGE:$BUILD_NUMBER
-
-                            if [ ! -d "~/backup" ]; then
-                                mkdir -p ~/backup
-                            fi
-
-                            rm -f ~/backup/*.tar
-                            mv ~/*.tar ~/backup/
+                            echo "Deployment passed. Saving $BUILD_NUMBER to the version_number file."
+                            echo $BUILD_NUMBER > ~/version_number
                             '''
                         }
                     } catch (err) {
                         // Use maskPasswords with named arguments
                         maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                             // If deploy fails, the rollback commands are executed
-                            // Extract version number from saved image filename
+                            // Read version number from the version_number file
                             sh '''
-                            VERSION_NUMBER=$(ls ~/backup/*-microservice-*.tar | sed 's/.*-microservice-\\(.*\\).tar/\\1/')
+                            VERSION_NUMBER=$(cat ~/version_number)
                             export VERSION_NUMBER
 
                             echo "Error: ${err.getMessage()}"
-                            echo "Deployment failed. Executing rollback."
+                            echo "Deployment failed. Executing rollback commands."
                             echo "Rolling back to version $VERSION_NUMBER"
                             
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
@@ -366,13 +354,11 @@ pipeline {
                             fi
                             docker system prune -a -f --volumes
 
-                            cp ~/backup/*.tar ~/
-
-                            docker load -i ~/user-microservice-${VERSION_NUMBER}.tar
-                            docker load -i ~/product-microservice-${VERSION_NUMBER}.tar
-                            docker load -i ~/media-microservice-${VERSION_NUMBER}.tar
-                            docker load -i ~/order-microservice-${VERSION_NUMBER}.tar
-                            docker load -i ~/frontend-${VERSION_NUMBER}.tar
+                            docker pull $USER_MICROSERVICE_IMAGE:$VERSION_NUMBER
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$VERSION_NUMBER
+                            docker pull $MEDIA_MICROSERVICE_IMAGE:$VERSION_NUMBER
+                            docker pull $ORDER_MICROSERVICE_IMAGE:$VERSION_NUMBER
+                            docker pull $FRONTEND_IMAGE:$VERSION_NUMBER
 
                             docker-compose up -d
                             '''
