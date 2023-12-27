@@ -133,4 +133,8 @@ export class CartService {
   removeCartItems(cartItemId: string): void {
     this.cart = this.cart.filter((item) => item.itemId !== cartItemId);
   }
+
+  clearCart(): void {
+    this.cart = [];
+  }
 }

@@ -25,14 +25,12 @@ export class ProductListingComponent implements OnInit {
   totalProductUnder300: number = 0;
   totalProductUnder400: number = 0;
   totalProductAbove400: number = 0;
-  isProductInCart: boolean = false;
   cartItems: Cart[] = [];
 
   constructor( 
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
-    private encryptionService: EncryptionService,
     ) {
      // get the total number of products under 100 from object Product
     }

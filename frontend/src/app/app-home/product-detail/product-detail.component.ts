@@ -75,12 +75,12 @@ export class ProductDetailComponent implements OnInit {
     private cartService: CartService
   ) {
     this.product = data.product; // get product details from product-listing component
-      //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
 
-      if (this.product.quantity === 0) {
-        this.noProductsAvailble = true;
-        return;
-      }
+    if (this.product.quantity === 0) {
+      this.noProductsAvailble = true;
+      return;
+    }
 
     // Handles product media updates and get product images again from media service
     if (this.mediaService.mediaUpload) {
@@ -115,16 +115,10 @@ export class ProductDetailComponent implements OnInit {
     return "";
   }
 
+
   ngOnInit(): void {
-
-
-
-    this.cartService.getCartItems().forEach((item) => {
-      if (item.product.id === this.product.id) {
-        this.isProductInCart = true;
-      }
-    }
-    );
+    // Check if product is in cart
+    this.checkProductInCart();
     // Creates a productDetail form for updating with validation.
     // Only seller of that product can update
     this.productDetailForm = this.builder.group({
@@ -162,8 +156,6 @@ export class ProductDetailComponent implements OnInit {
           Validators.maxLength(1000),
         ],
       ],
-
-
     });
     this.getProductImages();
 
@@ -199,6 +191,21 @@ export class ProductDetailComponent implements OnInit {
       }
       this.noOfImages = result.length;
     });
+  }
+
+  checkProductInCart() { 
+    const cartItems = this.cartService.getCartItems();
+    if (cartItems.length === 0) {
+      this.isProductInCart = false;
+    }
+
+    console.log("cartItems: ", cartItems.length);
+  
+    for (const item of cartItems) {
+      if (item.product.id === this.product.id) {
+        this.isProductInCart = true; 
+      }
+    }
   }
 
   getMediaArray(productId: string): void {

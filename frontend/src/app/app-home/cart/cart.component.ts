@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { Router } from "@angular/router";
 import { Cart } from "src/app/Models/Cart";
 import { CartItems } from "src/app/Models/CartItems";
@@ -20,6 +20,7 @@ export class CartComponent implements OnInit {
   products: any[] = [];
   cart: Cart = new Cart();
   @Input() productAdded: any;
+  @Output() checkoutEvent = new EventEmitter();
   itemId: any;
 
   constructor(
@@ -119,7 +120,7 @@ export class CartComponent implements OnInit {
                   },
                 });
               });
-              this.router.navigate(["home"]);
+              this.cartService.clearCart();
             },
             error: (error: any) => {
               console.error("Error fetching order data", error);
@@ -131,6 +132,9 @@ export class CartComponent implements OnInit {
       },
       error: (error: any) => {
         console.error("Error creating order", error);
+      },
+      complete: () => {
+        this.router.navigate(["home"]);
       },
     });
   }
