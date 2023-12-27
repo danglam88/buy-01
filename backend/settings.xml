@@ -1,0 +1,28 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+<servers>
+    <server>
+        <id>nexus-snapshots</id>
+        <username>${NEXUS_USERNAME}</username>
+        <password>${NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+        <id>nexus-releases</id>
+        <username>${NEXUS_USERNAME}</username>
+        <password>${NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+        <id>nexus</id>
+        <username>${NEXUS_USERNAME}</username>
+        <password>${NEXUS_PASSWORD}</password>
+    </server>
+</servers>
+<mirrors>
+  <mirror>
+  <!--This sends everything else to /public -->
+  <id>nexus</id>
+  <mirrorOf>*</mirrorOf>
+  <url>http://142.93.175.42:9001/repository/maven-proxy/</url>
+  </mirror>
+</mirrors>
+</settings>

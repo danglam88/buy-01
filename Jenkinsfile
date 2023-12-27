@@ -28,6 +28,7 @@ pipeline {
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'order-mongodb-creds', usernameVariable: 'ORDER_DB_USERNAME', passwordVariable: 'ORDER_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD'),
                         string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
@@ -38,6 +39,8 @@ pipeline {
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.ORDER_DB_USERNAME = ORDER_DB_USERNAME
                         env.ORDER_DB_PASSWORD = ORDER_DB_PASSWORD
+                        env.NEXUS_USERNAME = NEXUS_USERNAME
+                        env.NEXUS_PASSWORD = NEXUS_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
                     }
@@ -206,6 +209,8 @@ pipeline {
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD],
                         [var: 'ORDER_DB_USERNAME', password: env.ORDER_DB_USERNAME],
                         [var: 'ORDER_DB_PASSWORD', password: env.ORDER_DB_PASSWORD],
+                        [var: 'NEXUS_USERNAME', password: env.NEXUS_USERNAME],
+                        [var: 'NEXUS_PASSWORD', password: env.NEXUS_PASSWORD],
                         [var: 'JWT_SECRET_VALUE', password: env.JWT_SECRET_VALUE]
                     ]
 
@@ -220,6 +225,8 @@ pipeline {
                         docker build -t user-microservice:$BUILD_NUMBER -f user/Dockerfile \
                             --build-arg USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME \
                             --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag user-microservice:$BUILD_NUMBER $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -228,6 +235,8 @@ pipeline {
                         docker build -t product-microservice:$BUILD_NUMBER -f product/Dockerfile \
                             --build-arg PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME \
                             --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag product-microservice:$BUILD_NUMBER $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -236,6 +245,8 @@ pipeline {
                         docker build -t media-microservice:$BUILD_NUMBER -f media/Dockerfile \
                             --build-arg MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME \
                             --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag media-microservice:$BUILD_NUMBER $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -244,6 +255,8 @@ pipeline {
                         docker build -t order-microservice:$BUILD_NUMBER -f order/Dockerfile \
                             --build-arg ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME \
                             --build-arg ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag order-microservice:$BUILD_NUMBER $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
