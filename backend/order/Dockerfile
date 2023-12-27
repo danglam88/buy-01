@@ -14,7 +14,7 @@ COPY order/src/main/resources/*.pem /usr/local/share/ca-certificates/
 COPY order/src/main/resources/*.p12 /usr/local/share/ca-certificates/
 COPY order/src/main/resources/*.crt /usr/local/share/ca-certificates/
 COPY order/src/main/resources/*.jks /usr/local/share/ca-certificates/
-COPY ~/.m2/settings.xml /root/.m2/settings.xml
+COPY /home/danglam/.m2/settings.xml /root/.m2/
 
 # Import the certificate into the java truststore
 RUN keytool -import -trustcacerts -noprompt -storepass changeit -alias mycert -file /usr/local/share/ca-certificates/order.crt -keystore ${JAVA_HOME}/lib/security/cacerts
