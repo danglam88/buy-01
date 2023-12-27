@@ -52,6 +52,7 @@ export class ProductDetailComponent implements OnInit {
   isEditingImages = false;
   isProductInCart = false;
   noProductsAvailble = false;
+  disableSpamButton = false;
   currentIndexOfImageSlider = 0;
   imgPlaceholder = "../../../../assets/images/uploadPhoto.jpg";
   selectedQuantity = 1;
@@ -306,6 +307,7 @@ export class ProductDetailComponent implements OnInit {
         "Image Limit Exceeded: You can only add a maximum of 5 images"
       );
     } else {
+      this.disableSpamButton = true;
       this.saveEachSelectedFile(this.product.id, 0);
       this.mediaService.mediaUpload.emit(true);
     }

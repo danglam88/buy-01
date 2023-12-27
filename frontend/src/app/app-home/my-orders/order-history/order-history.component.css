@@ -67,26 +67,49 @@ mat-card {
   }
   /* Example styling for individual elements within the row */
   .row .order-no {
-    /* Add your specific styles for Order No here */
+    width: 50%;
+    overflow-wrap: break-word;
   }
-  
-  .row .total-amount {
-    /* Add your specific styles for Total Amount here */
-  }
-  
+
   .row .status {
-    /* Add your specific styles for Status here */
+    width: 30%;
+    overflow-wrap: break-word;
   }
   
   .row .action {
-    /* Add your specific styles for Action here */
     display: contents;
+    width: 20%;
+    overflow-wrap: break-word;
   }
   @media (max-width: 767px) {
     .mat-card {
-      width: 100%;
       margin: 0 !important;
       padding: 0 !important;
       justify-content: center;
     }
+
+
+    .row .order-no {
+      width: 20%;
+      overflow-wrap: break-word;
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+
+    .row .row-items {
+     width: max-content;
+     justify-content: left;
+    }
+
+    .row .order-no {
+      max-width: 30%;
+      overflow-wrap: break-word;
+    }
+
+    .row .status {
+      max-width: 25%;
+      overflow-wrap: break-word;
+    }
+    
   }
