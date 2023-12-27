@@ -70,9 +70,9 @@
       <label>Items in Cart: </label>
       <div id="cart-subtotal"> {{ cart.items.length }}</div>
     </div>
-    <div class="totals-item totals-item-total">
+    <div class="totals-item">
       <label>Grand Total: </label>
-      <!-- <div class="totals-value" id="cart-total">{{ cart.totalPrice }}</div> -->
+      <div id="cart-total">{{ calculateGrandTotal() }}</div>
     </div>
   </div>
   <!-- create checkbox for cash payment</div> -->

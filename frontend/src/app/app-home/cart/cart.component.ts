@@ -164,4 +164,8 @@ export class CartComponent implements OnInit {
       callback(updatedOrderData);
     });
   }
+
+  calculateGrandTotal(): number {
+    return this.cart.items.reduce((total, cartItem) => total + cartItem.itemPrice, 0);
+  }
 }
