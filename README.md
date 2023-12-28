@@ -383,7 +383,7 @@ Jenkins: http://164.90.178.137:8080
 
 SonarQube: http://209.38.204.141:9000
 
-Nexus: http://142.93.175.42:9001
+Nexus: http://209.38.204.141:8081
 
 Application: https://164.92.252.125:4200
 

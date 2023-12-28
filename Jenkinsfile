@@ -12,11 +12,11 @@ pipeline {
     }
 
     environment {
-        USER_MICROSERVICE_IMAGE = '142.93.175.42:8083/user-microservice'
-        PRODUCT_MICROSERVICE_IMAGE = '142.93.175.42:8083/product-microservice'
-        MEDIA_MICROSERVICE_IMAGE = '142.93.175.42:8083/media-microservice'
-        ORDER_MICROSERVICE_IMAGE = '142.93.175.42:8083/order-microservice'
-        FRONTEND_IMAGE = '142.93.175.42:8083/frontend'
+        USER_MICROSERVICE_IMAGE = '209.38.204.141:8083/user-microservice'
+        PRODUCT_MICROSERVICE_IMAGE = '209.38.204.141:8083/product-microservice'
+        MEDIA_MICROSERVICE_IMAGE = '209.38.204.141:8083/media-microservice'
+        ORDER_MICROSERVICE_IMAGE = '209.38.204.141:8083/order-microservice'
+        FRONTEND_IMAGE = '209.38.204.141:8083/frontend'
     }
 
     stages {
@@ -333,7 +333,7 @@ pipeline {
                             if (!allContainersRunning) {
                                 error("Not all containers are running as expected.")
                             }
-                            
+
                             sh '''
                             echo "Deployment passed. Saving $BUILD_NUMBER to the version_number file."
                             echo $BUILD_NUMBER > ~/version_number
@@ -374,10 +374,26 @@ pipeline {
 
                             docker-compose up -d
                             '''
-                        }
 
-                        // Re-throw the error so that the pipeline fails
-                        throw err
+                            def allContainersRunning = true
+                            for (container in expectedContainers) {
+                                def status = sh(script: "docker inspect --format='{{.State.Status}}' ${container}", returnStdout: true).trim()
+                                if (status != 'running') {
+                                    echo "Container ${container} is not running. Status: ${status}"
+                                    allContainersRunning = false
+                                    break
+                                }
+                            }
+
+                            if (!allContainersRunning) {
+                                error("Not all containers are running as expected.")
+                            }
+
+                            sh '''
+                            echo "Rollback passed. Re-throwing the error so that the pipeline fails."
+                            '''
+                            throw err
+                        }
                     }
                 }
             }

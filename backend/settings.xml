@@ -12,7 +12,7 @@
         <password>${NEXUS_PASSWORD}</password>
     </server>
     <server>
-        <id>nexus</id>
+        <id>nexus-proxy</id>
         <username>${NEXUS_USERNAME}</username>
         <password>${NEXUS_PASSWORD}</password>
     </server>
@@ -20,9 +20,9 @@
 <mirrors>
   <mirror>
   <!--This sends everything else to /public -->
-  <id>nexus</id>
+  <id>nexus-proxy</id>
   <mirrorOf>*</mirrorOf>
-  <url>http://142.93.175.42:9001/repository/maven-proxy/</url>
+  <url>http://209.38.204.141:8081/repository/maven-proxy/</url>
   </mirror>
 </mirrors>
 </settings>
