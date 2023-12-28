@@ -116,7 +116,6 @@ export class ProductDetailComponent implements OnInit {
     return "";
   }
 
-
   ngOnInit(): void {
     // Check if product is in cart
     this.checkProductInCart();
@@ -194,17 +193,17 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  checkProductInCart() { 
+  checkProductInCart() {
     const cartItems = this.cartService.getCartItems();
     if (cartItems.length === 0) {
       this.isProductInCart = false;
     }
 
     console.log("cartItems: ", cartItems.length);
-  
+
     for (const item of cartItems) {
       if (item.product.id === this.product.id) {
-        this.isProductInCart = true; 
+        this.isProductInCart = true;
       }
     }
   }
@@ -302,12 +301,12 @@ export class ProductDetailComponent implements OnInit {
 
   // Save newly uploaded images
   saveEditedImages() {
+    this.disableSpamButton = true;
     if (this.noOfImages + this.selectedFiles.length > 5) {
       this.toastr.error(
         "Image Limit Exceeded: You can only add a maximum of 5 images"
       );
     } else {
-      this.disableSpamButton = true;
       this.saveEachSelectedFile(this.product.id, 0);
       this.mediaService.mediaUpload.emit(true);
     }

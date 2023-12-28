@@ -81,6 +81,11 @@ mat-card {
     width: 20%;
     overflow-wrap: break-word;
   }
+
+  .row .product-name {
+    margin-left: 20px;
+    overflow-wrap: break-word;
+  }
   @media (max-width: 767px) {
     .mat-card {
       margin: 0 !important;
