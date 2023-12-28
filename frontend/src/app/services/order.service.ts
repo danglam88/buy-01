@@ -36,7 +36,7 @@ export class OrderService {
     return "";
   }
 
-  // Creates order
+  // Create order
   createOrder(order: any) {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -81,7 +81,7 @@ export class OrderService {
     return this.httpClient.get(`${environment.sellerOrderUrl}`, { headers });
   }
 
-  // Cancels client's order
+  // Cancel client's order
   cancelOrder(orderId: string, orderData: Object): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -91,7 +91,7 @@ export class OrderService {
     return this.httpClient.put(`${environment.orderUrl}/${orderId}`, orderData, { headers });
   }
 
-  // Removes client's order
+  // Remove client's order
   removeOrder(orderId: string): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {

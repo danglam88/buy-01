@@ -31,6 +31,7 @@ export class OrderHistoryComponent {
   ) {}
 
   ngOnInit(): void {
+    // Get orders/order items depending on role of logged in user
     if (this.role === "CLIENT") {
       this.getClientOrdersWithSellerInfo();
     } else if (this.role === "SELLER") {
@@ -56,6 +57,7 @@ export class OrderHistoryComponent {
     });
   }
 
+  // Get seller info and add to client order response
   getClientOrdersWithSellerInfo() {
     this.orderService
       .getClientOrders()
@@ -280,9 +282,12 @@ export class OrderHistoryComponent {
     });
   }
 
+  // Set search value
   setSearchText(value: string[]) {
     this.searchText = value;
   }
+
+  // Show client orders based on search text
   shouldShowClientOrders(order) {
     if (this.searchText?.length === 0) {
       return true;
@@ -294,6 +299,7 @@ export class OrderHistoryComponent {
     );
   }
 
+  // Show seller order items based on search text
   shouldShowSellerOrderItems(item) {
     if (this.searchText?.length === 0) {
       return true;

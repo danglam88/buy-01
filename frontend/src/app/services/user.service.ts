@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+
+import { EncryptionService } from '../services/encryption.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({

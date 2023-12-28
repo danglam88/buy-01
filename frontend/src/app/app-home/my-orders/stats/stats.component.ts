@@ -15,7 +15,7 @@ export class StatsComponent {
   ) { }
 
   ngOnInit(): void {
-   
+    // Display stats accordingly based on logged in user role
     if (this.role === 'CLIENT') {
       this.getClientStats();
     } else if (this.role === 'SELLER') {
@@ -23,6 +23,7 @@ export class StatsComponent {
     }
   }
 
+  // Display client stats
   getClientStats() {
     this.orderService.getClientOrders().subscribe((res) => {
       console.log(res);
@@ -31,6 +32,7 @@ export class StatsComponent {
     });
   }
 
+  // Display seller stats
   getSellerStats() {
     this.orderService.getSellerOrderItems().subscribe((res) => {
       console.log(res);

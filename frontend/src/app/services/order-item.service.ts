@@ -65,6 +65,7 @@ export class OrderItemService {
     return this.httpClient.post(`${environment.redoOrderItemUrl}`, itemData, options);
   }
 
+  // Update order item status
   updateOrderItemStatus(itemId: string, itemData: Object): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {

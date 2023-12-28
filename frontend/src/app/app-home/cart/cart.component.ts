@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input} from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { ToastrService } from "ngx-toastr";
@@ -10,7 +10,6 @@ import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { OrderDetailsComponent } from "../my-orders/order-details/order-details.component";
 import { UserService } from "src/app/services/user.service";
-
 
 @Component({
   selector: "app-cart",

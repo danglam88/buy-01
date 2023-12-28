@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { FormBuilder, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
-import { EncryptionService } from "src/app/services/encryption.service";
 import { MatDialogRef, MatDialog } from "@angular/material/dialog";
+
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { EncryptionService } from "src/app/services/encryption.service";
 import { UserService } from "src/app/services/user.service";
 
 @Component({
@@ -23,9 +24,9 @@ export class LogInComponent implements OnInit {
     private userService: UserService
   ) {
     this.toastr.toastrConfig.positionClass = "toast-bottom-right";
-    //console.log("sessionStorage", encryptionService.decrypt(sessionStorage.getItem("loggedIn")));
+
+    // Go to home when user is logged in
     if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
-      console.log("User is logged in in login component");
       this.router.navigate(["../home"]);
     } else {
       sessionStorage.clear();

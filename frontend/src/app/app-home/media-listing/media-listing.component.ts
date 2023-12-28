@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Observable, catchError, of, switchMap } from 'rxjs';
+
 import { MediaService } from 'src/app/services/media.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { Product } from 'src/app/Models/Product';
-import { Observable, catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-media-listing',
@@ -20,14 +21,17 @@ export class MediaListingComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Get all product images
     this.getProductImages(this.product.id);
 
+    // Subscribe to check if there is any media upload 
     this.mediaService.mediaUpload.subscribe((mediaCreated) => {
       if (mediaCreated) {
         this.getProductImages(this.product.id);
       }
     });
 
+    // Subscribe to check if there is any media delete
     this.mediaService.mediaDeleted.subscribe((mediaDeleted) => {
       if (mediaDeleted) {
         this.getProductImages(this.product.id);

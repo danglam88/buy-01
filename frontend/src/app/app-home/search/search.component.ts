@@ -21,17 +21,14 @@ export class SearchComponent {
 
   updateSearchText() {
     const inputValue = this.searchInputEl.nativeElement.value;
-
-    // Split the input value into an array of words
     const words = inputValue
       .split(" ")
       .filter((word: string) => word.trim() !== "");
 
-    // Use a Set to store unique words and convert it back to an array
     this.searchText = Array.from(new Set(words));
-
     this.searchTextChanged.emit(this.searchText);
   }
+  
   cancelSearch(item: string) {
     this.searchText = this.searchText.filter((word: string) => word != item);
     this.searchTextChanged.emit(this.searchText);

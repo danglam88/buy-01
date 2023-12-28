@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
-import { ProductDetailComponent } from '../product-detail/product-detail.component';
-import { ProductService } from 'src/app/services/product.service';
-import { ErrorService } from 'src/app/services/error.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
+import { Product } from '../../Models/Product';
+import { ProductDetailComponent } from '../product-detail/product-detail.component';
+import { ProductService } from 'src/app/services/product.service';
+import { ErrorService } from 'src/app/services/error.service';
 
 @Component({
   selector: 'app-product-dashboard',
@@ -34,6 +34,7 @@ export class ProductDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.getSellerProducts();
 
+    // Subscribe to check if seller creates new product. If so, get sellerProducts
     if (this.productService.productCreated) {
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
@@ -45,6 +46,7 @@ export class ProductDashboardComponent implements OnInit {
       });
     }
 
+    // Subscribe to check if seller deletes product. If so, get sellerProducts
     if (this.productService.productDeleted) {
       this.productService.productDeleted.subscribe((productDeleted) => {
         if (productDeleted) {
@@ -86,10 +88,12 @@ export class ProductDashboardComponent implements OnInit {
     });
   }
 
+  // Set search text
   setSearchText(value: string[]){
     this.searchText = value;
  }
 
+ // Set filter
  onFilterChanged(value: string){
   this.selectedFilterRadioButton = value;
 }

@@ -11,7 +11,6 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
 
 import { UserService } from 'src/app/services/user.service';
 
-
 @Component({
   selector: 'app-order-details',
   templateUrl: './order-details.component.html',
