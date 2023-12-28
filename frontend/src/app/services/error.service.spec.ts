@@ -1,26 +1,27 @@
 import { TestBed } from '@angular/core/testing';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { RouterTestingModule } from '@angular/router/testing'; 
-import { Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { ErrorService } from './error.service';
+import { AuthenticationService } from './authentication.service';
 
 describe('ErrorService', () => {
   let toastrService: ToastrService;
   let errorService: ErrorService;
-  let router: Router;
-
   beforeEach(() => {
+
     TestBed.configureTestingModule({
-      imports: [ToastrModule.forRoot(), RouterTestingModule], // Add RouterTestingModule
+      imports: [ToastrModule.forRoot(), HttpClientTestingModule], 
       providers: [
         ErrorService,
         ToastrService,
+        AuthenticationService
       ],
     });
-   router = TestBed.inject(Router);
+
     errorService = TestBed.inject(ErrorService);
-    toastrService = TestBed.inject(ToastrService); // Initialize toastrService
-    spyOn(toastrService, 'error').and.stub(); // Use and.stub() to prevent actual method calls
+    toastrService = TestBed.inject(ToastrService); 
+    spyOn(toastrService, 'error').and.stub(); 
   });
 
   it('should be created', () => {
@@ -28,13 +29,8 @@ describe('ErrorService', () => {
   });
 
   it('should handle session expiration error', () => {
-    
-    spyOn(router, 'navigate');
-
     errorService.handleSessionExpirationError();
-
     expect(toastrService.error).toHaveBeenCalledWith('Session expired. Log-in again.');
-    expect(router.navigate).toHaveBeenCalledWith(['../login']);
   });
 
   it('should handle bad request error with specific error messages', () => {

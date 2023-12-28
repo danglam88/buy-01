@@ -7,8 +7,6 @@ import { ErrorService } from 'src/app/services/error.service';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Cart } from 'src/app/Models/Cart';
-import { CartService } from 'src/app/services/cart.service';
-import { EncryptionService } from 'src/app/services/encryption.service';
 
 @Component({
   selector: 'app-product-listing',
@@ -32,13 +30,10 @@ export class ProductListingComponent implements OnInit {
     private productService: ProductService,
     private errorService: ErrorService,
     ) {
-     // get the total number of products under 100 from object Product
     }
   
   ngOnInit(): void {
     this.getAllProducts();
-    // console.log('get all cart', this.cartService.getCartItems());
-
 
     if (this.productService.productCreated) {
       this.productService.productCreated.subscribe((productCreated) => {

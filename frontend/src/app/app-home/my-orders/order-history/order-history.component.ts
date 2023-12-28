@@ -1,13 +1,16 @@
 import { Component, Input } from "@angular/core";
-import { UserService } from "src/app/services/user.service";
 import { MatDialog } from "@angular/material/dialog";
-import { OrderDetailsComponent } from "../order-details/order-details.component";
+import { ToastrService } from "ngx-toastr";
+import { Observable, forkJoin, map, mergeMap, of, switchMap } from "rxjs";
+
+import { UserService } from "src/app/services/user.service";
 import { OrderService } from "src/app/services/order.service";
 import { OrderItemService } from "src/app/services/order-item.service";
 import { CartService } from "src/app/services/cart.service";
+
+import { OrderDetailsComponent } from "../order-details/order-details.component";
 import { ConfirmationDialogComponent } from "../../confirmation-dialog/confirmation-dialog.component";
-import { ToastrService } from "ngx-toastr";
-import { Observable, forkJoin, map, mergeMap, of, switchMap } from "rxjs";
+
 
 @Component({
   selector: "app-order-history",

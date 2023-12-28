@@ -11,11 +11,13 @@ export class ErrorService {
     private authService: AuthenticationService
   ) {}
 
+  // Log out user if session expires
   handleSessionExpirationError(): void {
     this.toastr.error("Session expired. Log-in again.");
     this.authService.logout();
   }
 
+  // Display error message for bad request errors
   handleBadRequestError(error: any): void {
     if (error.error.message) {
       this.toastr.error(error.error.message);
@@ -26,6 +28,7 @@ export class ErrorService {
     }
   }
 
+  // Checks for 401 or 403 errors
   isAuthError(status: number): boolean {
     return status === 401 || status === 403;
   }

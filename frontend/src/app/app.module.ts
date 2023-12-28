@@ -43,7 +43,6 @@ import { MyOrdersComponent } from './app-home/my-orders/my-orders.component';
 import { OrderHistoryComponent } from './app-home/my-orders/order-history/order-history.component';
 import { OrderDetailsComponent } from './app-home/my-orders/order-details/order-details.component';
 import { CartComponent } from './app-home/cart/cart.component';
-import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
 import { StatsComponent } from './app-home/my-orders/stats/stats.component';
 
 @NgModule({
@@ -72,7 +71,6 @@ import { StatsComponent } from './app-home/my-orders/stats/stats.component';
     OrderHistoryComponent,
     OrderDetailsComponent,
     CartComponent,
-    OrderConfirmationComponent,
     StatsComponent
   ],
   imports: [

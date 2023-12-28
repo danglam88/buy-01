@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { OrderService } from 'src/app/services/order.service';
-import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-stats',
@@ -12,7 +11,6 @@ export class StatsComponent {
   totalAmount: number = 0;
   @Input() role: string = "";
   constructor(
-    private userService: UserService,
     private orderService: OrderService
   ) { }
 
