@@ -82,10 +82,26 @@ mat-card {
     overflow-wrap: break-word;
   }
 
-  .row .product-name {
-    margin-left: 20px;
+  .row .seller-product-name {
+    max-width: 20%;
     overflow-wrap: break-word;
   }
+
+  .row .seller-order-no {
+    width: 20%;
+    overflow-wrap: break-word;
+  }
+
+  .row .seller-status {
+    width: 20%;
+    overflow-wrap: break-word;
+  }
+
+  .row .seller-action {
+    width: 20%;
+    overflow-wrap: break-word;
+  }
+
   @media (max-width: 767px) {
     .mat-card {
       margin: 0 !important;
@@ -100,21 +116,59 @@ mat-card {
     }
   }
 
+  @media screen and (max-width: 425px) {
+    .seller-product-name#hidden {
+      display: none;
+    }
+
+    .seller-status {
+      max-width: max-content;
+      overflow-wrap: break-word;
+    }
+
+    #label {
+      max-width: 35% !important;
+      padding-left: 20px;
+    }
+  }
+
   @media screen and (max-width: 375px) {
 
-    .row .row-items {
+    .row-items {
      width: max-content;
      justify-content: left;
     }
 
-    .row .order-no {
+    .row .order-no, .seller-order-no {
       max-width: 30%;
       overflow-wrap: break-word;
     }
 
-    .row .status {
+    .row .status{
       max-width: 25%;
       overflow-wrap: break-word;
     }
+
+    .seller-status {
+      max-width: max-content;
+      overflow-wrap: break-word;
+    }
+
+    #label {
+      max-width: 26% !important;
+      overflow-wrap: break-word;
+    }
+
+    .seller-action {
+      max-width: 20%;
+      overflow-wrap: break-word;
+    }
+
+    .seller-product-name#hidden {
+      display: none;
+    }
     
   }
+
+
+ 
