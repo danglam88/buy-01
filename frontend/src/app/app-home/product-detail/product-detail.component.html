@@ -366,15 +366,6 @@
             </div>
           </div>
         </div>
-        <div class="ekart-product-detail-addtoCart">
-          <button
-            class="delete-button"
-            *ngIf="userRole === 'SELLER' && product?.editable === true"
-            (click)="deleteProduct()"
-          >
-            <span class="text"> Delete Product </span>
-          </button>
-        </div>
         <!-- ADD TO CART FEATURE -->
         <div
           class="addToCartDiv"
@@ -399,6 +390,15 @@
           <!-- Content for when the condition is false -->
           <div>Out of Stock</div>
         </ng-template>
+        <div class="ekart-product-detail-addtoCart">
+          <button
+            class="delete-button"
+            *ngIf="userRole === 'SELLER' && product?.editable === true"
+            (click)="deleteProduct()"
+          >
+            <span class="text"> Delete Product </span>
+          </button>
+        </div>
       </div>
     </form>
   </mat-dialog-content>
