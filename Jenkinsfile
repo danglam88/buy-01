@@ -166,14 +166,14 @@ pipeline {
             }
         }
 
-        /*stage("Quality Gate for Frontend") {
+        stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
                 sh 'find . -name "report-task.txt" -exec rm {} +'
                 echo "Quality Gate for Frontend has been completed."
             }
-        }*/
+        }
 
         stage('Frontend Unit Tests') {
             agent { label 'build-agent' }
