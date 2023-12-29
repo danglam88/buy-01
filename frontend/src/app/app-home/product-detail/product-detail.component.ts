@@ -505,7 +505,6 @@ export class ProductDetailComponent implements OnInit {
       this.cartService.addToCart(this.product).subscribe({
         next: (result) => {
           console.log("add to cart result: ", result);
-          console.log("add to cart result.toString(): ", result.toString());
 
           setTimeout(() => {
             this.cartService.getCartItem(result.toString()).subscribe({
