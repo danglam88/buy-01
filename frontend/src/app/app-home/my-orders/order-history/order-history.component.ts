@@ -193,7 +193,6 @@ export class OrderHistoryComponent {
   removeOrder(orderId: string) {
     this.orderService.removeOrder(orderId).subscribe((res) => {
       console.log(res);
-      // this.getClientOrdersWithSellerInfo();
       this.orderService
         .getClientOrders()
         .pipe(
