@@ -30,7 +30,8 @@ export class MediaService {
     }
     return '';
   }
- 
+  
+  // Get media by product id
   getImageByProductId(productId: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -40,6 +41,7 @@ export class MediaService {
     return this.httpClient.get(`${environment.productMediaUrl}` + productId,  { headers });
   }
 
+  // Get image by media id
   getImageByMediaId(mediaId: any): Observable<Blob> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -49,6 +51,7 @@ export class MediaService {
     
   }
 
+  // Upload media
   uploadMedia(media: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -57,6 +60,7 @@ export class MediaService {
     return this.httpClient.post(`${environment.mediaUrl}`,  media, { headers });
   }
 
+  // Delete media
   deleteMedia(mediaId: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {

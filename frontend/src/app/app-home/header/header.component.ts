@@ -1,11 +1,13 @@
 import { Component } from "@angular/core";
 import { Router, NavigationEnd } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
+import { ToastrService } from "ngx-toastr";
+import { Subscription } from "rxjs";
+
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EncryptionService } from "src/app/services/encryption.service";
 import { CreateProductComponent } from "../create-product/create-product.component";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
+
 import { CartService } from "src/app/services/cart.service";
 
 @Component({
@@ -44,8 +46,10 @@ export class HeaderComponent {
     this.cartService.cartUpdate$.subscribe((isAddedToCart) => {
       if (isAddedToCart) {
         this.getCartItemsNumber();
+        
       }
     });
+
   }
 
   ngOnDestroy() {
@@ -84,11 +88,13 @@ export class HeaderComponent {
     }
   }
 
+  // Display length of cart items 
   getCartItemsNumber() {
     setTimeout(() => {
       this.cartService.getCart().subscribe({
         next: (items: any) => {
           this.cartItems = items.length;
+          this.cartService.setCartItems(items);
         },
         error: (error) => {
           console.error("Error fetching cart data", error);

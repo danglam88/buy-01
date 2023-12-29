@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+
+import { EncryptionService } from '../services/encryption.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -86,5 +87,19 @@ export class UserService {
     this.userInfoRoleSource.next(role);
   }
 
+  getUserInfoRole(): string {
+    const encryptedSecret = sessionStorage.getItem("srt");
+    if (encryptedSecret) {
+      try {
+        const role = JSON.parse(
+          this.encryptionService.decrypt(encryptedSecret)
+        )["role"];
+        return role;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return "";
+  }
 }
 

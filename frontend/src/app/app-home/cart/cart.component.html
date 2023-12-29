@@ -4,106 +4,102 @@
 />
 <app-header></app-header>
 
-<section class="shoppingcart-container">
-  <!-- IF THERE IS NO PRODUCTS -->
-  <!-- <div *ngIf="cart?.items.length === 0" class="empty-product">
-    <a class="alert">There are no products in your cart.</a>
-    <button class="shopping-btn" routerLink="../home">
-      <div class="pretext">Shop Now</div>
-    </button>
-  </div> -->
-  <!-- IF THERE IS PRODUCTS -->
-  <div class="cart-heading">
-    <a class="">Your Shopping Cart</a>
-  </div>
-  <div class="shopping-cart">
-    <!-- Column labels -->
-    <div>
-      <div class="column-labels">
-        <label class="product-title">Product</label>
-        <label class="product-price">Price</label>
-        <label class="product-quantity">Quantity</label>
-        <label class="product-line-price">Total</label>
-        <label class="product-remove">Remove</label>
-      </div>
-      <div class="product" *ngFor="let cartItem of cart?.items">
-        <div class="product-details">
-          <div class="product-title">{{ cartItem.product.name }}</div>
-        </div>
-        <div class="product-price">{{ cartItem.product.price }}</div>
-        <div class="product-quantity">
-          <select
-            class="product-quantity"
-            #quantitySelect
-            [(ngModel)]="cartItem.quantity"
-            (change)="changeQuantity(cartItem, quantitySelect.value)"
-          >
-            <option
-              *ngFor="let quantity of getQuantityOptions(cartItem.product.quantity)"
-              [value]="quantity"
-            >
-              {{ quantity }}
-            </option>  
-          </select>
-        </div>
-        <div class="product-line-price">{{ cartItem.itemPrice }}</div>
-        <button class="remove-button" (click)="removeFromCart(cartItem)">
-          Remove
-        </button>
-      </div>
+<!-- IF THERE IS NO PRODUCTS -->
+<div *ngIf="cart?.items.length === 0" class="empty-product">
+  <a class="alert">There are no products in your cart.</a>
+  <button class="shopping-btn" routerLink="../home">
+    <div class="pretext">Shop Now</div>
+  </button>
+</div>
 
-      <!-- <div class="product">
-        <div class="product-title">Dingo Dog Bones</div>
+<!-- IF THERE IS PRODUCTS -->
 
-        <div class="product-price">12.99</div>
-        <div class="product-quantity">
-          <select>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-          </select>
-        </div>
+<div class="cart-heading" *ngIf="cart?.items.length > 0">
+  <p>Your Shopping Cart</p>
+</div>
 
-        <div class="product-line-price">25.98</div>
-        <div class="product-removal">
-          <button class="remove-product">Remove</button>
-        </div>
-      </div> -->
+<section class="wrapper" *ngIf="cart?.items.length > 0">
+  <main class="row title">
+    <ul>
+      <li id="product-name">Product</li>
+      <li class="title-hide" id="product-price">Price</li>
+      <li id="info">Quantity</li>
+      <li id="info">Total</li>
+      <li id="info">Remove</li>
+      <!-- <li class="title-hide" id="performance">Currency</li> -->
+    </ul>
+  </main>
 
-      <div class="totals">
-        <div class="totals-item">
-          <label>Items in Cart</label>
-          <div id="cart-subtotal">{{ cart.items.length }}</div>
-        </div>
-        <div class="totals-item totals-item-total">
-          <label>Grand Total</label>
-          <!-- <div class="totals-value" id="cart-total">{{ cart.totalPrice }}</div> -->
-        </div>
-      </div>
-      <!-- create checkbox for cash payment</div> -->
-      <div class="payment">
-        <div>Payment Method</div>
-      </div>
-      <div class="payment">
-        <input
-          type="checkbox"
-          name="payment"
-          value="cash"
-          [(ngModel)]="isCashOnDelivery"
-        />
-        Cash on Delivery
-      </div>
-
-      <div>
-        <button
-          class="checkout"
-          (click)="checkOut()"
-          [disabled]="!isCashOnDelivery || cart.items.length === 0"
+  <article class="row nfl" *ngFor="let cartItem of cart?.items">
+    <ul>
+      <li id="product-name">
+        <div>{{ cartItem.product.name }}</div>
+      </li>
+      <li class="title-hide" id="product-price">
+        <div >{{ cartItem.product.price }}</div>
+      </li>
+      <li id="info">
+        <select onfocus='this.size=6;' onblur='this.size=6;' onfocusout='this.size=null;' onchange='this.size=6; this.blur();'
+        class="dropdown-menu"
+          #quantitySelect
+          [(ngModel)]="cartItem.quantity"
+          (change)="changeQuantity(cartItem, quantitySelect.value)"
         >
-          Checkout
-        </button>
-      </div>
+          <option
+          class="dropdown-item"
+            *ngFor="
+              let quantity of getQuantityOptions(cartItem.product.quantity)
+            "
+            [value]="quantity"
+          >
+            {{ quantity }}
+          </option>
+        </select>
+      </li>
+      <li id="info">
+        <div>{{ cartItem.itemPrice }}</div>
+      </li>
+      <li id="info">
+          <i (click)="removeFromCart(cartItem)" class="fa-solid fa-trash-can"></i>
+      </li>
+    </ul>
+  </article>
+
+  <div class="totals">
+    <div class="totals-item">
+      <label>Items in Cart: </label>
+      <div id="cart-subtotal"> {{ cart.items.length }}</div>
+    </div>
+    <div class="totals-item">
+      <label>Grand Total: </label>
+      <div id="cart-total">{{ calculateGrandTotal() }}</div>
     </div>
   </div>
+  <!-- create checkbox for cash payment</div> -->
+  <div class="payment">
+    <div>Payment Method</div>
+  </div>
+  <div class="payment-info">
+    * Click the checkbox to enable the checkout button
+  </div>
+  <div class="payment">
+    <input
+      type="checkbox"
+      name="payment"
+      value="cash"
+      [(ngModel)]="isCashOnDelivery"
+    />
+    Cash on Delivery
+  </div>
+
+  <div>
+    <button
+      class="checkout"
+      (click)="checkOut()"
+      [disabled]="!isCashOnDelivery || cart.items.length === 0"
+    >
+      Checkout
+    </button>
+  </div>
 </section>
+<app-footer></app-footer>

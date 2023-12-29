@@ -1,8 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { EncryptionService } from '../services/encryption.service';
 import { Router } from '@angular/router';
+
+import { EncryptionService } from '../services/encryption.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -30,6 +31,7 @@ export class ProductService {
     return '';
   }
 
+  // Get all product info
   getAllProductsInfo(): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -38,6 +40,7 @@ export class ProductService {
      return this.httpClient.get(`${environment.productUrl}`, { headers });
   }
 
+  // Get seller's products
   getSellerProductsInfo(): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -46,6 +49,7 @@ export class ProductService {
      return this.httpClient.get(`${environment.sellerProductUrl}`, { headers });
   }
 
+  // Create product
   createProduct(product: any): Observable<Object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -54,6 +58,7 @@ export class ProductService {
     return this.httpClient.post(`${environment.productUrl}`, product, { headers });
   }
 
+  // Update product
   updateProduct(product: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -62,6 +67,7 @@ export class ProductService {
     return this.httpClient.put(`${environment.productUrl}/` + product.id, product, { headers });
   }
 
+  // Delete product
   deleteProduct(user: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {

@@ -1,11 +1,13 @@
 import { Component, Input, OnInit  } from '@angular/core';
-import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+
+import { Product } from '../../Models/Product';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
-import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Cart } from 'src/app/Models/Cart';
 
 @Component({
   selector: 'app-product-listing',
@@ -22,17 +24,19 @@ export class ProductListingComponent implements OnInit {
   totalProductUnder300: number = 0;
   totalProductUnder400: number = 0;
   totalProductAbove400: number = 0;
+  cartItems: Cart[] = [];
+
   constructor( 
     private dialog: MatDialog, 
     private productService: ProductService,
     private errorService: ErrorService,
     ) {
-     // get the total number of products under 100 from object Product
     }
   
   ngOnInit(): void {
     this.getAllProducts();
 
+    // Subscribe to check if product is created and getAllProducts
     if (this.productService.productCreated) {
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
@@ -42,6 +46,7 @@ export class ProductListingComponent implements OnInit {
     }
   }
 
+  // Display all products and assign product price accordingly for filter
   getAllProducts(){
     this.allProducts$ = this.productService.getAllProductsInfo().pipe(  
       tap((products: Product[]) => {
@@ -68,11 +73,13 @@ export class ProductListingComponent implements OnInit {
       },
     });
   }
- 
+  
+  // Set search text
   setSearchText(value: string[]){
      this.searchText = value;
   }
 
+  // Set filter
   onFilterChanged(value: string){
     this.selectedFilterRadioButton = value;
   }

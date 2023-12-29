@@ -1,6 +1,6 @@
 <div class="search--product">
     <div class="search-product-form">
-        <input class="search-product-input" #searchInput (keyup.enter)="updateSearchText()">
+        <input class="search-product-input" #searchInput (keyup.enter)="updateSearchText()"  maxlength="200">
         <button class="btn btn-search" (click)="updateSearchText()">Search</button>
         <div class="search-result-for" *ngIf="searchText.length > 0">
             <p><strong>Search result for:</strong></p>
