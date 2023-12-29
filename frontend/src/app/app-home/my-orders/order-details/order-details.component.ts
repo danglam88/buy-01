@@ -75,6 +75,7 @@ export class OrderDetailsComponent implements OnInit {
         }, 250);
       },
       error: (error) => {
+        console.log(error);
         this.toastr.error('Item is out of stock');
       }
     });

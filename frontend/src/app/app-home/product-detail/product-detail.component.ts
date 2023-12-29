@@ -491,7 +491,6 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  //TODO: Add to cart button needs to be disabled when product is already in cart
   addToCart() {
     this.isProductInCart = true;
 

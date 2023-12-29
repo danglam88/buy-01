@@ -165,11 +165,13 @@ export class OrderHistoryComponent {
           setTimeout(() => {
             this.cartService.getCartItem(itemId).subscribe({
               next: (result) => {
+                console.log("Cart item after redo: ", result);
                 this.cartService.setItemId(itemId);
                 this.cartService.isItemAddedToCart(true);
               },
               error: (error) => {
                 console.log(error);
+                this.toastr.error('Item is out of stock');
               },
               complete: () => {
                 this.toastr.success("Added to Cart");
@@ -180,6 +182,7 @@ export class OrderHistoryComponent {
       },
       error: (error) => {
         console.log(error);
+        this.toastr.error('Item is out of stock');
       },
     });
   }
