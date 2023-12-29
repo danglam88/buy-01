@@ -12,15 +12,12 @@ pipeline {
     }
 
     environment {
-        USER_MICROSERVICE_IMAGE = '209.38.204.141:8083/user-microservice'
-        PRODUCT_MICROSERVICE_IMAGE = '209.38.204.141:8083/product-microservice'
-        MEDIA_MICROSERVICE_IMAGE = '209.38.204.141:8083/media-microservice'
-        ORDER_MICROSERVICE_IMAGE = '209.38.204.141:8083/order-microservice'
-        FRONTEND_IMAGE = '209.38.204.141:8083/frontend'
+        NEXUS_DOCKER_REPOSITORY = '209.38.204.141:8083'
+        NEXUS_SERVER = 'http://209.38.204.141:8081'
     }
 
     stages {
-        stage('Setup Credentials') {
+        stage('Setup Environment Variables') {
             steps {
                 script {
                     withCredentials([
@@ -43,6 +40,11 @@ pipeline {
                         env.NEXUS_PASSWORD = NEXUS_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
+                        env.USER_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/user-microservice"
+                        env.PRODUCT_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/product-microservice"
+                        env.MEDIA_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/media-microservice"
+                        env.ORDER_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/order-microservice"
+                        env.FRONTEND_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/frontend"
                     }
                 }
             }
@@ -189,7 +191,7 @@ pipeline {
                 script {
                     sh '''
                     cd backend
-                    mvn clean deploy -Drevision=1.0-${BUILD_NUMBER}-SNAPSHOT -DskipTests
+                    mvn clean deploy -Drevision=1.0-${BUILD_NUMBER}-SNAPSHOT -Dnexusserver=${env.NEXUS_SERVER} -DskipTests
                     '''
                 }
             }
@@ -227,6 +229,7 @@ pipeline {
                             --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
                             --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
                             --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag user-microservice:$BUILD_NUMBER $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -237,6 +240,7 @@ pipeline {
                             --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
                             --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
                             --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag product-microservice:$BUILD_NUMBER $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -247,6 +251,7 @@ pipeline {
                             --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
                             --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
                             --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag media-microservice:$BUILD_NUMBER $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -257,6 +262,7 @@ pipeline {
                             --build-arg ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD \
                             --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
                             --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
                         docker tag order-microservice:$BUILD_NUMBER $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
@@ -303,6 +309,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export NEXUS_DOCKER_REPOSITORY=$NEXUS_DOCKER_REPOSITORY
                             export VERSION_NUMBER=$BUILD_NUMBER
 
                             if [ "$(docker ps -aq)" != "" ]; then
@@ -358,6 +365,7 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export NEXUS_DOCKER_REPOSITORY=$NEXUS_DOCKER_REPOSITORY
                             export VERSION_NUMBER=$SUCCESS_VERSION
 
                             if [ "$(docker ps -aq)" != "" ]; then

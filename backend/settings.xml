@@ -22,7 +22,7 @@
   <!--This sends everything else to /public -->
   <id>nexus-proxy</id>
   <mirrorOf>*</mirrorOf>
-  <url>http://209.38.204.141:8081/repository/maven-proxy/</url>
+  <url>${NEXUS_SERVER}/repository/maven-proxy/</url>
   </mirror>
 </mirrors>
 </settings>

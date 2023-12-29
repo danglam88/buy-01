@@ -4,10 +4,12 @@ FROM maven:3.8.3-openjdk-17 as builder
 # Accept build arguments
 ARG NEXUS_USERNAME
 ARG NEXUS_PASSWORD
+ARG NEXUS_SERVER
 
 # Set arguments as environment variables for buildtime
 ENV NEXUS_USERNAME=${NEXUS_USERNAME}
 ENV NEXUS_PASSWORD=${NEXUS_PASSWORD}
+ENV NEXUS_SERVER=${NEXUS_SERVER}
 
 # Set the working directory in the container
 WORKDIR /app
