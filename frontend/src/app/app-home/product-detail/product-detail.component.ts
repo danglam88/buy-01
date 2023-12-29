@@ -504,10 +504,10 @@ export class ProductDetailComponent implements OnInit {
     if (this.product) {
       this.cartService.addToCart(this.product).subscribe({
         next: (result) => {
-          console.log("add to cart result: ", result);
+          console.log("add to cart result: ", JSON.parse(JSON.stringify(result)));
 
           setTimeout(() => {
-            this.cartService.getCartItem(result.toString()).subscribe({
+            this.cartService.getCartItem(JSON.parse(JSON.stringify(result))).subscribe({
               next: (result) => {
                 console.log("Cart item after adding: ", result);
                 this.cartService.isItemAddedToCart(true);
