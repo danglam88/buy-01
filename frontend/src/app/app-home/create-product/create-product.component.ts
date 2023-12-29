@@ -71,7 +71,6 @@ export class CreateProductComponent {
 
   // Create a product and handles errors, including validation errors from createProductForm
   createProduct() {
-    this.isCreatingProduct = true;
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
       const formData = new FormData();
       for (const selectedFile of this.selectedFiles) {
@@ -84,7 +83,8 @@ export class CreateProductComponent {
       formData.append('description', this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim());
 
       this.productService.createProduct(formData).subscribe({
-        next: (result) => {
+        next: () => {
+          this.isCreatingProduct = true;
           this.productService.productCreated.emit(true);
         },
         error: (error) => {

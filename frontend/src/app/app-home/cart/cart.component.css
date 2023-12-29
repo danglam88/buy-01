@@ -83,27 +83,26 @@
 /* Totals section */
 .totals {
   margin-left: 290px;
-  .totals-item {
-    float: right;
+}
+
+.totals-item, .totals-item-1 {
+  float: left;
+  clear: both;
+  width: 100%;
+  margin: 10px 0px 0px 0px;
+
+  label {
+    float: left;
     clear: both;
-    width: 100%;
-    margin: 10px 0px 0px 0px;
-
-    label {
-      float: left;
-      clear: both;
-      width: 79%;
-      text-align: right;
-      font-size: 15px;
-      margin-right: 5px;
-    }
-
-    .totals-value {
-      float: right;
-      width: 21%;
-      text-align: right;
-    }
+    width: 79%;
+    text-align: right;
+    font-size: 15px;
+    margin-right: 5px;
   }
+}
+
+.totals-item-1 {
+  margin-left: -10px;
 }
 
 .checkout {

@@ -36,7 +36,7 @@
         <div>{{ cartItem.product.name }}</div>
       </li>
       <li class="title-hide" id="product-price">
-        <div >{{ cartItem.product.price }}</div>
+        <div >€ {{ cartItem.product.price }}</div>
       </li>
       <li id="info">
         <select onfocus='this.size=6;' onblur='this.size=6;' onfocusout='this.size=null;' onchange='this.size=6; this.blur();'
@@ -57,7 +57,7 @@
         </select>
       </li>
       <li id="info">
-        <div>{{ cartItem.itemPrice }}</div>
+        <div>€ {{ cartItem.itemPrice }}</div>
       </li>
       <li id="info">
           <i (click)="removeFromCart(cartItem)" class="fa-solid fa-trash-can"></i>
@@ -70,9 +70,9 @@
       <label>Items in Cart: </label>
       <div id="cart-subtotal"> {{ cart.items.length }}</div>
     </div>
-    <div class="totals-item">
+    <div class="totals-item-1">
       <label>Grand Total: </label>
-      <div id="cart-total">{{ calculateGrandTotal() }}</div>
+      <div id="cart-total">€ {{ calculateGrandTotal() }}</div>
     </div>
   </div>
   <!-- create checkbox for cash payment</div> -->
