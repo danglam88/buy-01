@@ -166,7 +166,7 @@ pipeline {
             }
         }
 
-        /*stage("Quality Gate for Frontend") {
+        stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
@@ -183,7 +183,7 @@ pipeline {
                 ng test --watch=false --browsers ChromeHeadless
                 '''
             }
-        }*/
+        }
 
         stage('Deploy JAR Artifacts to Nexus') {
             agent { label 'build-agent' }
