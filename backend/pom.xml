@@ -15,7 +15,7 @@
   <packaging>pom</packaging>
 
     <name>buy01-app</name>
-  <url>https://164.92.252.125:4200/</url>
+    <url>https://164.92.252.125:4200/</url>
     <modules>
       <module>user</module>
       <module>product</module>
@@ -23,11 +23,12 @@
       <module>order</module>
     </modules>
 
-    <properties>
+  <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <spring.boot.maven.plugin.version>3.1.2</spring.boot.maven.plugin.version>
+    <nexus.server.url>http://nexus-server-url</nexus.server.url>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -179,11 +180,11 @@
   <distributionManagement>
     <snapshotRepository>
       <id>nexus-snapshots</id>
-      <url>http://209.38.204.141:8081/repository/maven-snapshots/</url>
+      <url>${nexus.server.url}/repository/maven-snapshots/</url>
     </snapshotRepository>
     <repository>
       <id>nexus-releases</id>
-      <url>http://209.38.204.141:8081/repository/maven-releases/</url>
+      <url>${nexus.server.url}/repository/maven-releases/</url>
     </repository>
   </distributionManagement>
 

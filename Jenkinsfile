@@ -191,7 +191,7 @@ pipeline {
                 script {
                     sh '''
                     cd backend
-                    mvn clean deploy -Drevision=1.0-${BUILD_NUMBER}-SNAPSHOT -DskipTests
+                    mvn clean deploy -Drevision=1.0-${BUILD_NUMBER}-SNAPSHOT -DskipTests -Dnexus.server.url=${NEXUS_SERVER}
                     '''
                 }
             }
