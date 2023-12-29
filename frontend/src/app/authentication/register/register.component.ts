@@ -1,8 +1,9 @@
 import { Component, ViewChild, ElementRef  } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { RegistrationService } from '../../services/registration.service'
 import { Router } from '@angular/router';
+
+import { RegistrationService } from '../../services/registration.service';
 import { ValidationService } from 'src/app/services/validation.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { EncryptionService } from 'src/app/services/encryption.service';

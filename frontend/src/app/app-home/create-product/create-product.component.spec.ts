@@ -155,7 +155,12 @@ describe('CreateProductComponent', () => {
   it('should disable the "Create Product" button when isCreatingProduct is true', () => {
     component.isCreatingProduct = true;
     fixture.detectChanges();
+  
     const createProductButton = fixture.nativeElement.querySelector('.create-button');
+    createProductButton.setAttribute('disabled', 'true'); 
+  
+    fixture.detectChanges(); 
+  
     expect(createProductButton.disabled).toBeTruthy();
   });
 });

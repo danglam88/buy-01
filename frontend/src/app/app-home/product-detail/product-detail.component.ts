@@ -75,8 +75,8 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
     private cartService: CartService
   ) {
-    this.product = data.product; // get product details from product-listing component
-    //this.toastr.toastrConfig.positionClass = 'toast-bottom-right';
+    // get product details from product-listing component
+    this.product = data.product; 
 
     if (this.product.quantity === 0) {
       this.noProductsAvailble = true;
@@ -91,6 +91,7 @@ export class ProductDetailComponent implements OnInit {
       });
     }
 
+    // Subscribe to check if seller deletes media
     if (this.mediaService.mediaDeleted) {
       this.mediaService.mediaDeleted.subscribe(() => {
         this.getProductImages();
@@ -157,10 +158,11 @@ export class ProductDetailComponent implements OnInit {
         ],
       ],
     });
+
+    // Display product images
     this.getProductImages();
 
-    // Handles product media updates and get product images again from media service
-
+    // Subscribe to check if seller updates media and getProductImages. Set index of image slider to the last image
     if (this.mediaService.mediaUpload) {
       this.mediaService.mediaUpload.subscribe(() => {
         this.getProductImages();
@@ -168,6 +170,7 @@ export class ProductDetailComponent implements OnInit {
       });
     }
 
+    // Subscribe to check if seller deletes media and getProductImages. Set index of image slider to the last image
     if (this.mediaService.mediaDeleted) {
       this.mediaService.mediaDeleted.subscribe(() => {
         this.getProductImages();
@@ -178,6 +181,7 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  // Display product images
   getProductImages(): void {
     this.getMediaArray(this.product.id);
     this.mediaArray$.subscribe((result) => {
@@ -383,11 +387,13 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  // Show previous image in slider
   previousSlide() {
     this.currentIndexOfImageSlider =
       (this.currentIndexOfImageSlider - 1 + this.noOfImages) % this.noOfImages;
   }
 
+  // Show next image in slider
   nextSlide() {
     this.currentIndexOfImageSlider =
       (this.currentIndexOfImageSlider + 1) % this.noOfImages;
@@ -491,6 +497,7 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  // Add product to cart
   addToCart() {
     this.isProductInCart = true;
 

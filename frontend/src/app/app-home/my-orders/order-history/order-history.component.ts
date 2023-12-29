@@ -1,13 +1,16 @@
 import { Component, Input } from "@angular/core";
-import { UserService } from "src/app/services/user.service";
 import { MatDialog } from "@angular/material/dialog";
-import { OrderDetailsComponent } from "../order-details/order-details.component";
+import { ToastrService } from "ngx-toastr";
+import { Observable, forkJoin, map, mergeMap, of, switchMap } from "rxjs";
+
+import { UserService } from "src/app/services/user.service";
 import { OrderService } from "src/app/services/order.service";
 import { OrderItemService } from "src/app/services/order-item.service";
 import { CartService } from "src/app/services/cart.service";
+
+import { OrderDetailsComponent } from "../order-details/order-details.component";
 import { ConfirmationDialogComponent } from "../../confirmation-dialog/confirmation-dialog.component";
-import { ToastrService } from "ngx-toastr";
-import { Observable, forkJoin, map, mergeMap, of, switchMap } from "rxjs";
+
 
 @Component({
   selector: "app-order-history",
@@ -28,6 +31,7 @@ export class OrderHistoryComponent {
   ) {}
 
   ngOnInit(): void {
+    // Get orders/order items depending on role of logged in user
     if (this.role === "CLIENT") {
       this.getClientOrdersWithSellerInfo();
     } else if (this.role === "SELLER") {
@@ -53,6 +57,7 @@ export class OrderHistoryComponent {
     });
   }
 
+  // Get seller info and add to client order response
   getClientOrdersWithSellerInfo() {
     this.orderService
       .getClientOrders()
@@ -191,7 +196,6 @@ export class OrderHistoryComponent {
   removeOrder(orderId: string) {
     this.orderService.removeOrder(orderId).subscribe((res) => {
       console.log(res);
-      // this.getClientOrdersWithSellerInfo();
       this.orderService
         .getClientOrders()
         .pipe(
@@ -280,9 +284,12 @@ export class OrderHistoryComponent {
     });
   }
 
+  // Set search value
   setSearchText(value: string[]) {
     this.searchText = value;
   }
+
+  // Show client orders based on search text
   shouldShowClientOrders(order) {
     if (this.searchText?.length === 0) {
       return true;
@@ -294,6 +301,7 @@ export class OrderHistoryComponent {
     );
   }
 
+  // Show seller order items based on search text
   shouldShowSellerOrderItems(item) {
     if (this.searchText?.length === 0) {
       return true;

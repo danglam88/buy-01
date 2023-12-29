@@ -16,10 +16,12 @@ export class MyOrdersComponent {
     this.role = this.userService.getUserInfoRole();
   }
 
+  // Display orders section when clicked
   showOrderSection(): void {
     this.view = "orders";
   }
 
+  // Display stats section when clicked
   showStatsSection(): void {
     this.view = "stats";
   }

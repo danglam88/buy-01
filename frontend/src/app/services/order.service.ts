@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Cart } from '../Models/Cart';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { EncryptionService } from './encryption.service';
 import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import {ClientOrder} from '../Models/ClientOrder'
+
+import { environment } from 'src/environments/environment';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-  private cart: Cart = new Cart();
-  private clientOrders: ClientOrder[];
 
   // Observable for seller update order item status 
   private isUpdateOrderItemStatusSubject = new BehaviorSubject<boolean>(false);
@@ -39,21 +36,22 @@ export class OrderService {
     return "";
   }
 
+  // Create order
   createOrder(order: any) {
     let headers = new HttpHeaders();
     if (this.token) {
       headers = headers.set("Authorization", `Bearer ${this.token}`);
     }
   
-    // Specify the responseType as 'text'
     const options = {
       headers: headers,
-      responseType: 'text' as 'json' // This 'as json' casting is required due to Angular's typing
+      responseType: 'text' as 'json' 
     };
   
     return this.httpClient.post(`${environment.orderUrl}`, order, options);
   }
 
+  // Get order by orderId
   getOrderByOrderId(orderId: string): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -63,6 +61,7 @@ export class OrderService {
     return this.httpClient.get(`${environment.orderUrl}/${orderId}`, { headers });
   }
 
+  // Get client orders
   getClientOrders(): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -72,6 +71,7 @@ export class OrderService {
     return this.httpClient.get(`${environment.clientOrderUrl}`, { headers });
   }
 
+  // Get seller orders
   getSellerOrderItems(): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -81,6 +81,7 @@ export class OrderService {
     return this.httpClient.get(`${environment.sellerOrderUrl}`, { headers });
   }
 
+  // Cancel client's order
   cancelOrder(orderId: string, orderData: Object): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -90,6 +91,7 @@ export class OrderService {
     return this.httpClient.put(`${environment.orderUrl}/${orderId}`, orderData, { headers });
   }
 
+  // Remove client's order
   removeOrder(orderId: string): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -99,6 +101,7 @@ export class OrderService {
     return this.httpClient.delete(`${environment.orderUrl}/${orderId}`, { headers });
   }
 
+  // Redo order (by cient)
   redoOrder(orderId: string): Observable<any> {
     let headers = new HttpHeaders();
     if (this.token) {
