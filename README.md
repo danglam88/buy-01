@@ -27,6 +27,8 @@ This is a Java project that develops and end-to-end e-commerce platform with Spr
 - Homepage `/home` - Once a user is authenticated, he/she will be directed to homepage. A simple view to display all products.
 - Seller Product Management `/product-dashboard` - If a user is authenticated as seller, he/she will be able to create products and manage their products.
 - User Profile `/user-dashboard` - Users can view and update their information.
+- My Orders `/my-orders` - Sellers and users can use this page to view, manage, and check the status and history of their orders. Sellers can confirm or cancel their requested orders, while users can cancel, view, and redo their successful orders.
+- Cart `/cart` - Users have the ability to add products from the home page to their cart. In the cart, users can view the added products, their prices, change product quantities, and see the total price. Users can then choose home delivery and proceed to checkout. The cart is sent to sellers and awaits approval. During this pending process, users can cancel the order on the `/my-orders` page. Once the order is fulfilled, users cannot cancel their order anymore.
 
 ## Back-end Specifications
 
