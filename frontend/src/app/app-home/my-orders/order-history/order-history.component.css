@@ -1,174 +1,178 @@
 mat-card {
-    margin: 0 auto;
-    box-shadow: 0 4px 6px #778da9;
-    min-height: 250px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 35px;
-    border: 1px solid #778da9;
-    border-radius: 20px;
-    background-color: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(15px);
-    min-width: 350px;
-    justify-items: center;
-    max-width: 800px;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-top: 25px;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px #778da9;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 35px;
+  border: 1px solid #778da9;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(15px);
+  min-width: 350px;
+  justify-items: center;
+  max-width: 800px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 25px;
+}
+
+a {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+}
+
+.role {
+  color: #231e39;
+  background-color: #febb0b;
+  border-radius: 5px;
+  font-size: 14px;
+
+  padding: 6px 10px;
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.title {
+  margin: 0;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px; /* Adjust as needed */
+}
+
+.row div {
+  flex: 1;
+  margin-right: 10px; /* Adjust as needed */
+}
+
+.row-items {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Example styling for individual elements within the row */
+.row .order-no {
+  max-width: 300px;
+  overflow-wrap: break-word;
+}
+
+.row .status {
+  width: 30%;
+  overflow-wrap: break-word;
+}
+
+.row .action {
+  display: contents;
+  width: 20%;
+  overflow-wrap: break-word;
+}
+
+.row .seller-product-name {
+  max-width: 20%;
+  overflow-wrap: break-word;
+}
+
+.row .seller-order-no {
+  width: 20%;
+  overflow-wrap: break-word;
+}
+
+.row .seller-status {
+  width: 20%;
+  overflow-wrap: break-word;
+}
+
+.row .seller-action {
+  width: 20%;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .mat-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: center;
   }
 
-  a {
-    text-decoration: underline;
-    color: blue;
-    cursor: pointer;
-  }
-
-  .role {
-    color: #231E39;
-      background-color: #FEBB0B;
-      border-radius: 5px;
-      font-size: 14px;
-  
-      padding: 6px 10px;
-      position: absolute;
-      top: 40px;
-      left: 40px;
-  }
-  
-  .title {
-    margin: 0;
-    font-weight: bold;
-    flex-grow: 1;
-    text-align: center;
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px; /* Adjust as needed */
-  }
-  
-  .row div {
-    flex: 1;
-    margin-right: 10px; /* Adjust as needed */
-  }
-  
-  .row-items{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  /* Example styling for individual elements within the row */
   .row .order-no {
-    width: 50%;
+    max-width: 280px;
+    overflow-wrap: break-word;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .seller-product-name#hidden {
+    display: none;
+  }
+
+  .seller-status {
+    max-width: max-content;
+    overflow-wrap: break-word;
+  }
+
+  #label {
+    max-width: 35% !important;
+    padding-left: 20px;
+  }
+
+  .row .order-no, .seller-order-no{
+    max-width: 120px;
+    overflow-wrap: break-word;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .row-items {
+    width: max-content;
+    justify-content: left;
+  }
+
+  .row .order-no {
+    max-width: 90px;
+    overflow-wrap: break-word;
+  }
+
+  .seller-order-no {
+    max-width: 100px;
     overflow-wrap: break-word;
   }
 
   .row .status {
-    width: 30%;
-    overflow-wrap: break-word;
-  }
-  
-  .row .action {
-    display: contents;
-    width: 20%;
+    margin-left: 0px;
     overflow-wrap: break-word;
   }
 
-  .row .seller-product-name {
+  .seller-status {
+    max-width: max-content;
+    overflow-wrap: break-word;
+  }
+
+  #label {
+    max-width: 26% !important;
+    overflow-wrap: break-word;
+  }
+
+  .seller-action {
     max-width: 20%;
     overflow-wrap: break-word;
   }
 
-  .row .seller-order-no {
-    width: 20%;
-    overflow-wrap: break-word;
+  .seller-product-name#hidden {
+    display: none;
   }
-
-  .row .seller-status {
-    width: 20%;
-    overflow-wrap: break-word;
-  }
-
-  .row .seller-action {
-    width: 20%;
-    overflow-wrap: break-word;
-  }
-
-  @media (max-width: 767px) {
-    .mat-card {
-      margin: 0 !important;
-      padding: 0 !important;
-      justify-content: center;
-    }
-
-
-    .row .order-no {
-      width: 20%;
-      overflow-wrap: break-word;
-    }
-  }
-
-  @media screen and (max-width: 425px) {
-    .seller-product-name#hidden {
-      display: none;
-    }
-
-    .seller-status {
-      max-width: max-content;
-      overflow-wrap: break-word;
-    }
-
-    #label {
-      max-width: 35% !important;
-      padding-left: 20px;
-    }
-  }
-
-  @media screen and (max-width: 375px) {
-
-    .row-items {
-     width: max-content;
-     justify-content: left;
-    }
-
-    .row .order-no, .seller-order-no {
-      max-width: 30%;
-      overflow-wrap: break-word;
-    }
-
-    .row .status{
-      max-width: 25%;
-      overflow-wrap: break-word;
-    }
-
-    .seller-status {
-      max-width: max-content;
-      overflow-wrap: break-word;
-    }
-
-    #label {
-      max-width: 26% !important;
-      overflow-wrap: break-word;
-    }
-
-    .seller-action {
-      max-width: 20%;
-      overflow-wrap: break-word;
-    }
-
-    .seller-product-name#hidden {
-      display: none;
-    }
-    
-  }
-
-
- 
+}
