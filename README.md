@@ -359,7 +359,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
 The whole process of the project has been automated using Jenkins. The process consists of the following stages:
 
 -  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
--  Setup Credentials: all MongoDB credentials and JWT secret are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
+-  Setup Environment Variables: all MongoDB credentials, Nexus credentials, JWT secret, NodeJS path and Docker images are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
 -  Clean Workspace: all old quality-check report-tasks are removed from the workspace.
 -  SonarQube Analysis: this stage is performed for each and every backend microservice as well as frontend.
    +  If any of the analyses has been failed, the Post Actions stage will be triggered (Quality Gate, Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
@@ -385,16 +385,15 @@ The whole process of the project has been automated using Jenkins. The process c
    +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
       ```json
       {
-         "insecure-registries": ["209.38.204.141:8083"]
+         "insecure-registries": ["142.93.175.42:8083"]
       }
       ```
-   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker
-   +  Copy settings.xml file from the backend directory to under ~/.m2 directory on the build-server.
-   +  From ~/.m2/settings.xml file on the build-server, change ${NEXUS_USERNAME} to nexusUser and ${NEXUS_PASSWORD} to some pre-defined password.
+   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker.
+   +  From ~/.m2/settings.xml file on the build-server, put nexusUser to <username> and a pre-defined password to <password>.
 
 -  Configure Nexus Server:
-   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the test-server (at 209.38.204.141).
-   +  Run ./setup.sh to install a Sonatype Nexus Repository server on the test-server at port 8081.
+   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the nexus-server (at 142.93.175.42).
+   +  Run ./setup.sh to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
    +  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
    +  Change admin password to something really strong.
    +  Don't allow anonymous users to access the server.
@@ -405,19 +404,19 @@ The whole process of the project has been automated using Jenkins. The process c
    +  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
    +  Add maven-proxy repository to the list of member-repositories of maven-public group.
 
--  Add to the pom.xml file of each and every microservice as well as of the parent project the following section:
-```xml
-<distributionManagement>
-   <snapshotRepository>
-      <id>nexus-snapshots</id>
-      <url>http://209.38.204.141:8081/repository/maven-snapshots/</url>
-   </snapshotRepository>
-   <repository>
-      <id>nexus-releases</id>
-      <url>http://209.38.204.141:8081/repository/maven-releases/</url>
-   </repository>
-</distributionManagement>
-```
+-  Add to the pom.xml file of each and every microservice as well as of the parent project the following section (with ${nexus.server.url} resolved to http://142.93.175.42:8081 in this case):
+   ```xml
+   <distributionManagement>
+      <snapshotRepository>
+         <id>nexus-snapshots</id>
+         <url>${nexus.server.url}/repository/maven-snapshots/</url>
+      </snapshotRepository>
+      <repository>
+         <id>nexus-releases</id>
+         <url>${nexus.server.url}/repository/maven-releases/</url>
+      </repository>
+   </distributionManagement>
+   ```
 
 ## Dashboard URLs
 
@@ -425,7 +424,7 @@ Jenkins: http://164.90.178.137:8080
 
 SonarQube: http://209.38.204.141:9000
 
-Nexus: http://209.38.204.141:8081
+Nexus: http://142.93.175.42:8081
 
 Application: https://164.92.252.125:4200
 
