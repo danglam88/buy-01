@@ -120,6 +120,7 @@ export class ProductDetailComponent implements OnInit {
   ngOnInit(): void {
     // Check if product is in cart
     this.checkProductInCart();
+
     // Creates a productDetail form for updating with validation.
     // Only seller of that product can update
     this.productDetailForm = this.builder.group({
@@ -199,7 +200,9 @@ export class ProductDetailComponent implements OnInit {
 
   checkProductInCart() {
     const cartItems = this.cartService.getCartItems();
-    if (cartItems.length === 0) {
+    const cartLength = this.cartService.getCartItems().length;
+
+    if (cartLength === 0) {
       this.isProductInCart = false;
     }
 

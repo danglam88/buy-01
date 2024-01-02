@@ -19,6 +19,7 @@ export class ProductListingComponent implements OnInit {
   @Input() product: Product;
   @Input() searchText: string[] = [];
   @Input() selectedFilterRadioButton: string = "all";
+  totalNumberOfProducts: number = 0;
   totalProductUnder100: number = 0;
   totalProductUnder200: number = 0;
   totalProductUnder300: number = 0;
@@ -55,6 +56,7 @@ export class ProductListingComponent implements OnInit {
         this.totalProductUnder300 = products.filter((product) => product.price >= 200 && product.price < 300).length;
         this.totalProductUnder400 = products.filter((product) => product.price >= 300 && product.price < 400).length;
         this.totalProductAbove400 = products.filter((product) => product.price >= 400).length;
+        this.totalNumberOfProducts = products.length;
       }), 
       catchError((error) => {
         if (this.errorService.isAuthError(error.status)) {
