@@ -53,9 +53,12 @@
 
 .product-button {
   flex-shrink: 0;
-  cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.fa-pen-to-square {
+  cursor: pointer;
 }
 
 .button-container {
@@ -313,11 +316,6 @@ right: -11px;
 
 .fa-cart-plus{
   background:#778da9;
-}
-
-
-.fa-check{
-  background:gray;
 }
 
 #addedToCart {

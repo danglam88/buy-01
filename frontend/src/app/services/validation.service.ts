@@ -12,6 +12,17 @@ export class ValidationService {
     };
   }
 
+  // Check if number for seller is >= 0
+  greaterOrEqualThanZeroValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = parseFloat(control.value);
+      if (isNaN(value) || value < 0) {
+        return { greaterOrEqualThanZero : true };
+      }
+      return null;
+    };
+  }
+
   // Check if file is image file
    isImageFile(file: File): boolean {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];

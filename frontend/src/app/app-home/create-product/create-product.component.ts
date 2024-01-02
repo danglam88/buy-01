@@ -56,7 +56,7 @@ export class CreateProductComponent {
         Validators.required,
         Validators.pattern(/^[0-9]+$/),
         Validators.max(999999999),
-        this.validationService.greaterThanZeroValidator(), 
+        this.validationService.greaterThanZeroValidator(), // Custom validator for quantity
       ],
     ],
     description: [
