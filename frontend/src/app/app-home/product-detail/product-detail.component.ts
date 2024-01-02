@@ -118,6 +118,11 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Display 'out of stock' if product quantity is 0
+    if (+this.product.quantity === 0) {
+      this.noProductsAvailble = true;
+    }
+
     // Check if product is in cart
     this.checkProductInCart();
 
@@ -257,6 +262,11 @@ export class ProductDetailComponent implements OnInit {
     this.product[field] = this.productDetailForm.controls[field].value;
     this.productService.updateProduct(this.product).subscribe({
       next: (result) => {
+        if (field === "quantity" && +this.product[field] === 0) {
+          this.noProductsAvailble = true;
+        } else if (field === "quantity" && +this.product[field] > 0) {
+          this.noProductsAvailble = false;
+        }
         this.toastr.success(`Product ${field} updated`);
         this.editingField = null;
       },
