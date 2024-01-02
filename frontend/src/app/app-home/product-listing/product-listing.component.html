@@ -11,6 +11,7 @@
     <div *ngIf="(allProducts$ | async)?.length > 0">
       <app-search (searchTextChanged)="setSearchText($event)"></app-search>
       <app-filter
+        [all]="totalNumberOfProducts"
         [under100]="totalProductUnder100" 
         [under200]="totalProductUnder200"
         [under300]="totalProductUnder300"
