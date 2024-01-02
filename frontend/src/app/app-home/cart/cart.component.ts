@@ -1,4 +1,4 @@
-import { Component, OnInit, Input} from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { ToastrService } from "ngx-toastr";
@@ -10,6 +10,7 @@ import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { OrderDetailsComponent } from "../my-orders/order-details/order-details.component";
 import { UserService } from "src/app/services/user.service";
+import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-cart",
@@ -87,17 +88,28 @@ export class CartComponent implements OnInit {
 
   // Remove items from order cart
   removeFromCart(cartItem: CartItems) {
-    this.cartService.removeCartItems(cartItem.itemId);
-    this.cartService.removeFromCart(cartItem.itemId).subscribe({
-      next: (data: any) => {
-        this.cartService.isItemAddedToCart(true);
-        this.setCart();
-      },
-      error: (error: any) => {
-        console.error("Error removing item from cart", error);
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        confirmationText: "Delete this item?",
       },
     });
-
+    dialogRef.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.cartService.removeCartItems(cartItem.itemId);
+        this.cartService.removeFromCart(cartItem.itemId).subscribe({
+          next: (data: any) => {
+            this.cartService.isItemAddedToCart(true);
+            this.setCart();
+          },
+          error: (error: any) => {
+            console.error("Error removing item from cart", error);
+          },
+          complete: () => {
+            this.toastr.success("Item removed from cart");
+          },
+        });
+      }
+    });
   }
 
   // Add order items to order
@@ -167,6 +179,9 @@ export class CartComponent implements OnInit {
   }
 
   calculateGrandTotal(): number {
-    return this.cart.items.reduce((total, cartItem) => total + cartItem.itemPrice, 0);
+    return this.cart.items.reduce(
+      (total, cartItem) => total + cartItem.itemPrice,
+      0
+    );
   }
 }

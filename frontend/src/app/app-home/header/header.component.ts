@@ -94,7 +94,6 @@ export class HeaderComponent {
       this.cartService.getCart().subscribe({
         next: (items: any) => {
           this.cartItems = items.length;
-          console.log('cart length', this.cartItems);
           this.cartService.setCartItems(items);
         },
         error: (error) => {

@@ -210,6 +210,12 @@
     width: max-content;
   }
 
+  @media screen and (max-width: 425px) {
+    .totals {
+      margin-left: 0px;
+    }
+  }
+
   @media screen and (max-width: 375px) {
     .nfl {
       margin: 0;
@@ -236,6 +242,9 @@
 
   .totals-item {
     display: none;
+  }
+  .totals {
+    display:none;
   }
 }
 }
