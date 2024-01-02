@@ -136,7 +136,7 @@ export class ProductDetailComponent implements OnInit {
         [
           Validators.required,
           Validators.pattern(/^\d+(\.\d+)?$/),
-          Validators.maxLength(10),
+          Validators.max(999999999.99),
           this.validationService.greaterThanZeroValidator(), // Custom validator for price
         ],
       ],
@@ -145,7 +145,7 @@ export class ProductDetailComponent implements OnInit {
         [
           Validators.required,
           Validators.pattern(/^[0-9]+$/),
-          Validators.maxLength(10),
+          Validators.max(999999999),
           this.validationService.greaterOrEqualThanZeroValidator(), // Custom validator for quantity
         ],
       ],

@@ -13,6 +13,7 @@ describe('ValidationService', () => {
     validationService = TestBed.inject(ValidationService);
     formGroup = new FormGroup({
       value: new FormControl('', [validationService.greaterThanZeroValidator()]),
+      value2: new FormControl('', [validationService.greaterOrEqualThanZeroValidator()]),
     });
   });
 
@@ -46,6 +47,7 @@ describe('ValidationService', () => {
 
   it('should return null for valid values', () => {
     formGroup.get('value').setValue('1');
+    formGroup.get('value2').setValue('0');
     expect(formGroup.valid).toBe(true);
   });
 
@@ -57,14 +59,24 @@ describe('ValidationService', () => {
     expect(formGroup.hasError('greaterThanZero')).toBe(false);
   });
 
+  it('should return an error for values less than 0', () => {
+    formGroup.get('value2').setValue('-1');
+    expect(formGroup.hasError('greaterOrEqualThanZero')).toBe(false);
+  });
   
   it('should return an error for non-numeric values', () => {
     formGroup.get('value').setValue('abc');
     expect(formGroup.hasError('greaterThanZero')).toBe(false);
+
+    formGroup.get('value2').setValue('abc');
+    expect(formGroup.hasError('greaterOrEqualThanZero')).toBe(false);
   });
 
   it('should return an error for empty input', () => {
     formGroup.get('value').setValue('');
     expect(formGroup.hasError('greaterThanZero')).toBe(false);
+
+    formGroup.get('value2').setValue('');
+    expect(formGroup.hasError('greaterOrEqualThanZero')).toBe(false);
   });
 });
