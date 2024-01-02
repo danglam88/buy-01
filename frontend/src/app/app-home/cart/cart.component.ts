@@ -97,6 +97,7 @@ export class CartComponent implements OnInit {
         console.error("Error removing item from cart", error);
       },
     });
+
   }
 
   // Add order items to order

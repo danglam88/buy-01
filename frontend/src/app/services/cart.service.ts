@@ -122,7 +122,12 @@ export class CartService {
 
   setCartItems(cartItems: Iterable<CartItems>): void {
     for (const item of cartItems) {
-      this.cart.push(item);
+    //If the item is already in the cart, do not push
+      if (this.cart.find((cartItem) => cartItem.itemId === item.itemId)) {
+        continue;
+      } else {
+        this.cart.push(item);
+      }
     }
   }
 
