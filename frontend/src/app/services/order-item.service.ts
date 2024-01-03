@@ -26,7 +26,7 @@ export class OrderItemService {
   ) {}
 
   get token(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(

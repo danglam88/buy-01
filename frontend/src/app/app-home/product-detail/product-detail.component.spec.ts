@@ -91,14 +91,14 @@ describe('ProductDetailComponent', () => {
   });
 
   it('should return the user role', () => {   
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.returnValue(decryptedSecret);
-    sessionStorage.getItem('srt');
+    localStorage.getItem('srt');
     expect( component.userRole).toEqual('SELLER');
   });
 
   it('should return an empty string when no encrypted secret is stored', () => {
-      spyOn(sessionStorage, 'getItem').and.returnValue(null); 
+      spyOn(localStorage, 'getItem').and.returnValue(null); 
       const userRole = component.userRole;
       expect(userRole).toEqual('');
   });

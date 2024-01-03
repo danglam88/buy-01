@@ -26,10 +26,10 @@ export class LogInComponent implements OnInit {
     this.toastr.toastrConfig.positionClass = "toast-bottom-right";
 
     // Go to home when user is logged in
-    if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
+    if (this.encryptionService.decrypt(localStorage.getItem("loggedIn")) === "true") {
       this.router.navigate(["../home"]);
     } else {
-      sessionStorage.clear();
+      localStorage.clear();
     }
   }
 
@@ -54,7 +54,7 @@ export class LogInComponent implements OnInit {
         const encryptedObj = this.encryptionService.encrypt(
           JSON.stringify(result)
         );
-        sessionStorage.setItem("srt", encryptedObj);
+        localStorage.setItem("srt", encryptedObj);
       },
       error: (error) => {
         if (error.status == 400) {
@@ -74,7 +74,7 @@ export class LogInComponent implements OnInit {
       complete: () => {
         this.authService.login();
         const encryptedLoggedIn = this.encryptionService.encrypt("true");
-        sessionStorage.setItem("loggedIn", encryptedLoggedIn);
+        localStorage.setItem("loggedIn", encryptedLoggedIn);
         this.router.navigate(["../home"]);
       },
     });

@@ -37,7 +37,7 @@ export class AuthenticationService {
     }
 
     logout() {
-        sessionStorage.setItem('loggedIn', this.encryptionService.encrypt('false'));
+        localStorage.setItem('loggedIn', this.encryptionService.encrypt('false'));
         this.router.navigate(['login']);
     }
 }

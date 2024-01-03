@@ -11,8 +11,8 @@ export const AuthenticateGuard: CanActivateFn = () => {
   const router = inject(Router);
   const encryptionService = inject(EncryptionService);
 
-  // Decrypt the loggedIn value from sessionStorage
-  const encryptedLoggedIn = sessionStorage.getItem("loggedIn");
+  // Decrypt the loggedIn value from localStorage
+  const encryptedLoggedIn = localStorage.getItem("loggedIn");
   if (encryptedLoggedIn) {
    
     const loggedIn = encryptionService.decrypt(encryptedLoggedIn);

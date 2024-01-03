@@ -32,7 +32,7 @@ export class RegisterComponent  {
     private validationService: ValidationService,
     private errorService: ErrorService,
     private router: Router) {
-      if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
+      if (this.encryptionService.decrypt(localStorage.getItem("loggedIn")) === "true") {
         console.log("User is logged in in reigistration component");
         this.router.navigate(["../home"]);
       } 

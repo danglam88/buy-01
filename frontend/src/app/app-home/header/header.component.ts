@@ -59,7 +59,7 @@ export class HeaderComponent {
   }
 
   get role(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const role = JSON.parse(

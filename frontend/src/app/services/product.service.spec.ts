@@ -36,7 +36,7 @@ describe('ProductService', () => {
     const encryptedSecret = 'str';
     const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
       
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
     const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate'); 
 
@@ -51,7 +51,7 @@ describe('ProductService', () => {
   it('should navigate to login when the secret is invalid', () => {
     const encryptedSecret = 'str';
   
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
   
     const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate'); 
@@ -67,7 +67,7 @@ describe('ProductService', () => {
   it('should navigate to login when the secret is invalid', () => {
     const encryptedSecret = 'str';
   
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
     const navigateSpy = spyOn(router, 'navigate'); 
@@ -79,7 +79,7 @@ describe('ProductService', () => {
   });
   
   it('should return an empty string when no token is available', () => {
-    spyOn(sessionStorage, 'getItem').and.returnValue(null);
+    spyOn(localStorage, 'getItem').and.returnValue(null);
     spyOn(encryptionService, 'decrypt'); 
     const navigateSpy = spyOn(router, 'navigate'); 
   

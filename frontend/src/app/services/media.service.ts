@@ -19,7 +19,7 @@ export class MediaService {
   ) { }
 
   get token() : string {
-    const encryptedSecret = sessionStorage.getItem('srt');
+    const encryptedSecret = localStorage.getItem('srt');
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
