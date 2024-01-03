@@ -162,7 +162,7 @@ public class OrderItemService {
         }
 
         Optional<OrderItem> itemOptional =
-                orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
+                orderItemRepository.findByBuyerIdAndProductIdAndOrderIdIsNull(buyerId, data.getProductId());
 
         if (itemOptional.isEmpty()) {
             OrderItem item = OrderItem.builder()
