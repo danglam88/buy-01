@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CartService } from './cart.service';
 import { Product } from '../Models/Product';
+import { environment } from 'src/environments/environment';
 
 describe('CartService', () => {
   let cartService: CartService;
@@ -38,7 +39,7 @@ describe('CartService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item');
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}`);
     expect(req.request.method).toEqual('POST');
   });
 
@@ -49,7 +50,7 @@ describe('CartService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item');
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}`);
     expect(req.request.method).toEqual('GET');
   });
 
@@ -62,7 +63,7 @@ describe('CartService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item/' + itemId);
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}` + `/${itemId}`);
     expect(req.request.method).toEqual('PUT');
   });
 
@@ -75,7 +76,7 @@ describe('CartService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item/' + itemId);
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}` + `/${itemId}`);
     expect(req.request.method).toEqual('DELETE');
   });
 })

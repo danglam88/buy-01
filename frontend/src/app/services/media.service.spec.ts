@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { EncryptionService } from '../services/encryption.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { environment } from '../../environments/environment';
+
 import { MediaService } from './media.service';
+import { EncryptionService } from '../services/encryption.service';
 
 describe('MediaService', () => {
   let mediaService: MediaService;
@@ -50,8 +52,7 @@ describe('MediaService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
   
     const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
-  
+    const navigateSpy = spyOn(router, 'navigate'); 
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
     const token = mediaService.token;
@@ -66,7 +67,7 @@ describe('MediaService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = mediaService.token;
   
@@ -76,8 +77,8 @@ describe('MediaService', () => {
   
   it('should return an empty string when no token is available', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(null);
-    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    spyOn(encryptionService, 'decrypt'); 
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = mediaService.token;
   
@@ -87,13 +88,13 @@ describe('MediaService', () => {
 
   it('should get image by product ID', () => {
     const productId = "1";
-    const imageIDs = ["1", "2"]; // Replace with your dummy data
+    const imageIDs = ["1", "2"]; 
 
     mediaService.getImageByProductId(productId).subscribe((data) => {
       expect(data).toEqual(imageIDs);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8082/media/product/' + productId);
+    const req = httpTestingController.expectOne(`${environment.productMediaUrl}` + productId);
     expect(req.request.method).toBe('GET');
   });
 
@@ -105,7 +106,7 @@ describe('MediaService', () => {
       expect(data).toEqual(imageBlob);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8082/media/' + mediaId);
+    const req = httpTestingController.expectOne(`${environment.mediaUrl}/` + mediaId);
     expect(req.request.method).toBe('GET');
   });
 
@@ -121,7 +122,7 @@ describe('MediaService', () => {
       expect(data).toEqual(response);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8082/media');
+    const req = httpTestingController.expectOne(`${environment.mediaUrl}`);
     expect(req.request.method).toBe('POST');
   });
 
@@ -133,7 +134,7 @@ describe('MediaService', () => {
       expect(data).toEqual(response);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8082/media/' + mediaId);
+    const req = httpTestingController.expectOne(`${environment.mediaUrl}/` + mediaId);
     expect(req.request.method).toBe('DELETE');
   });
 });

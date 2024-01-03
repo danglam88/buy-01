@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
+
 import { UserService } from './user.service';
 import { EncryptionService } from '../services/encryption.service';
-import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
+
 
 describe('UserService', () => {
   let userService: UserService;
@@ -52,7 +55,7 @@ describe('UserService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
   
     const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
@@ -68,7 +71,7 @@ describe('UserService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = userService.token;
   
@@ -78,9 +81,8 @@ describe('UserService', () => {
   
   it('should return an empty string when no token is available', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(null);
-    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
-  
+    spyOn(encryptionService, 'decrypt'); 
+    const navigateSpy = spyOn(router, 'navigate'); 
     const token = userService.token;
   
     expect(token).toBe('');
@@ -88,27 +90,27 @@ describe('UserService', () => {
   });
 
    it('should get user information', () => {
-    const mockUserInfo = { /* Provide mock user info here */ };
+    const mockUserInfo = {  };
 
     userService.getUserInfo().subscribe((userInfo) => {
       expect(userInfo).toEqual(mockUserInfo);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/users/userInfo');
+    const req = httpTestingController.expectOne(`${environment.userInfoUrl}`);
     expect(req.request.method).toBe('GET');
 
     req.flush(mockUserInfo);
   });
 
   it('should update a user', () => {
-    const mockUser = { /* Provide mock user data here */ };
-    const userId = '123'; // Replace with an actual user ID
+    const mockUser = {  };
+    const userId = '123'; 
 
     userService.updateUser(mockUser, userId).subscribe((response) => {
       expect(response).toBeTruthy();
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/users/' + userId);
+    const req = httpTestingController.expectOne(`${environment.userUrl}` + userId);
     expect(req.request.method).toBe('PUT');
 
     req.flush({});
@@ -123,24 +125,23 @@ describe('UserService', () => {
       expect(response).toBeTruthy();
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/users/' + mockUser.id);
+    const req = httpTestingController.expectOne(`${environment.userUrl}` + mockUser.id);
     expect(req.request.method).toBe('DELETE');
 
     req.flush({});
   });
 
   it('should retrieve a user avatar', () => {
-    const userId = '123'; // Replace with an actual user ID
+    const userId = '123'; 
 
     userService.getUserAvatar(userId).subscribe((avatarBlob) => {
       expect(avatarBlob).toBeTruthy();
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/users/avatar/' + userId);
+    const req = httpTestingController.expectOne(`${environment.avatarUserUrl}` + userId);
     expect(req.request.method).toBe('GET');
 
-    // Provide a mock blob as the response
-    const blob = new Blob([/* Provide binary data here */]);
+    const blob = new Blob([]);
     req.flush(blob);
   });
 });

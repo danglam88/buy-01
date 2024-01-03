@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { RegistrationService } from './registration.service';
+import { environment } from '../../environments/environment';
 
 describe('RegistrationService', () => {
   let registrationService: RegistrationService;
@@ -32,7 +33,7 @@ describe('RegistrationService', () => {
       expect(data).toEqual(mockUser);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/reg');
+    const req = httpTestingController.expectOne(`${environment.regUrl}`);
     expect(req.request.method).toBe('POST');
 
     req.flush(mockUser);

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { OrderItemService } from './order-item.service';
 import { EncryptionService} from './encryption.service';
+import { environment } from 'src/environments/environment';
 
 describe('OrderItemService', () => {
   let orderItemService: OrderItemService;
@@ -48,7 +49,7 @@ describe('OrderItemService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
   
     const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
@@ -64,7 +65,7 @@ describe('OrderItemService', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = orderItemService.token;
   
@@ -74,8 +75,8 @@ describe('OrderItemService', () => {
   
   it('should return an empty string when no token is available', () => {
     spyOn(sessionStorage, 'getItem').and.returnValue(null);
-    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    spyOn(encryptionService, 'decrypt'); 
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = orderItemService.token;
   
@@ -97,7 +98,7 @@ describe('OrderItemService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item/cancel/' + itemId);
+    const req = httpTestingController.expectOne(`${environment.cancelOrderItemUrl}/${itemId}`);
     expect(req.request.method).toEqual('PUT');
   })
 
@@ -114,7 +115,7 @@ describe('OrderItemService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item/redo');
+    const req = httpTestingController.expectOne(`${environment.redoOrderItemUrl}`);
     expect(req.request.method).toEqual('POST');
   })
 
@@ -131,7 +132,7 @@ describe('OrderItemService', () => {
       expect(response).toEqual(mockedResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8083/order/item/status/' + itemId);
+    const req = httpTestingController.expectOne(`${environment.statusOrderItemUrl}/${itemId}`);
     expect(req.request.method).toEqual('PUT');
   });
 
