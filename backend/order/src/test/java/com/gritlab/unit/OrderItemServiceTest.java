@@ -103,7 +103,7 @@ class OrderItemServiceTest {
         data.setQuantity(1);
         data.setProductId("product-id");
 
-        when(orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId())).thenReturn(Optional.empty());
+        when(orderItemRepository.findByBuyerIdAndProductIdAndOrderIdIsNull(buyerId, data.getProductId())).thenReturn(Optional.empty());
         when(orderItemRepository.save(any(OrderItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         assertDoesNotThrow(() -> orderItemService.addOrderItem(buyerId, data));
@@ -139,7 +139,7 @@ class OrderItemServiceTest {
         existingItem.setQuantity(1);
         existingItem.setItemId("existing-item-id");
 
-        when(orderItemRepository.findByProductIdAndOrderIdIsNull(existingProductId))
+        when(orderItemRepository.findByBuyerIdAndProductIdAndOrderIdIsNull(buyerId, existingProductId))
                 .thenReturn(Optional.of(existingItem));
         when(orderItemRepository.save(any(OrderItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
