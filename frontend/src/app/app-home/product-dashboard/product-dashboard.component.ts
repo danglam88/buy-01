@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import { Product } from '../../Models/Product';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
@@ -19,6 +19,7 @@ export class ProductDashboardComponent implements OnInit {
   @Input() product: Product;
   @Input() searchText: string[] = [];
   @Input() selectedFilterRadioButton: string = "all";
+  totalNumberOfProducts: number = 0;
   totalProductUnder100: number = 0;
   totalProductUnder200: number = 0;
   totalProductUnder300: number = 0;
@@ -62,6 +63,14 @@ export class ProductDashboardComponent implements OnInit {
   // Get all of the seller products
   getSellerProducts(): void {
     this.sellerProducts$ = this.productService.getSellerProductsInfo().pipe(
+      tap((products: Product[]) => {
+        this.totalProductUnder100 = products.filter((product) => product.price < 100).length;
+        this.totalProductUnder200 = products.filter((product) => product.price >= 100 && product.price < 200).length;
+        this.totalProductUnder300 = products.filter((product) => product.price >= 200 && product.price < 300).length;
+        this.totalProductUnder400 = products.filter((product) => product.price >= 300 && product.price < 400).length;
+        this.totalProductAbove400 = products.filter((product) => product.price >= 400).length;
+        this.totalNumberOfProducts = products.length;
+      }),
       map((result: any) => {
         if (Array.isArray(result)) {
           return result.map(product => ({ ...product, editable: true }));
