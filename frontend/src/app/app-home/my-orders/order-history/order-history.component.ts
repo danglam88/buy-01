@@ -59,8 +59,9 @@ export class OrderHistoryComponent {
 
   // Get seller info and add to client order response
   getClientOrdersWithSellerInfo() {
-    this.orderService
-      .getClientOrders()
+    const clientOrders$ = this.orderService.getClientOrders();
+    if (clientOrders$) {
+      clientOrders$
       .pipe(
         switchMap((res) => {
           const itemObservables = res.orders.map((order: any) =>
@@ -95,12 +96,14 @@ export class OrderHistoryComponent {
       .subscribe((result) => {
         this.allTrans$ = of(result.orders);
       });
+    }
   }
 
   // Get seller's order items
   getSellerOrderItems() {
-    this.orderService
-      .getSellerOrderItems()
+    const sellerOrderItems$ = this.orderService.getSellerOrderItems();
+    if (sellerOrderItems$) {
+      sellerOrderItems$
       .pipe(
         switchMap((res) => {
           const itemObservables = res.items.map((item: any) =>
@@ -126,6 +129,7 @@ export class OrderHistoryComponent {
       .subscribe((result) => {
         this.allTrans$ = of(result.items);
       });
+    }
   }
 
   // Cancel client's order

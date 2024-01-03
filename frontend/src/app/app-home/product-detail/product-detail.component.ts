@@ -23,6 +23,7 @@ import { MediaService } from "src/app/services/media.service";
 import { EncryptionService } from "src/app/services/encryption.service";
 import { ValidationService } from "src/app/services/validation.service";
 import { ErrorService } from "src/app/services/error.service";
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 import { Product } from "../../Models/Product";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
@@ -72,8 +73,8 @@ export class ProductDetailComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private encryptionService: EncryptionService,
-    private router: Router,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthenticationService
   ) {
     // get product details from product-listing component
     this.product = data.product; 
@@ -103,7 +104,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   get userRole(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(
@@ -111,7 +112,7 @@ export class ProductDetailComponent implements OnInit {
         )["role"];
         return currentToken;
       } catch (error) {
-        this.router.navigate(["../login"]);
+        this.authService.logout();
       }
     }
     return "";

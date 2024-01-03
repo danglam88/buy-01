@@ -51,11 +51,11 @@ export class ProductListingComponent implements OnInit {
   getAllProducts(){
     this.allProducts$ = this.productService.getAllProductsInfo().pipe(  
       tap((products: Product[]) => {
-        this.totalProductUnder100 = products.filter((product) => product.price < 100).length;
-        this.totalProductUnder200 = products.filter((product) => product.price >= 100 && product.price < 200).length;
-        this.totalProductUnder300 = products.filter((product) => product.price >= 200 && product.price < 300).length;
-        this.totalProductUnder400 = products.filter((product) => product.price >= 300 && product.price < 400).length;
-        this.totalProductAbove400 = products.filter((product) => product.price >= 400).length;
+        this.totalProductUnder100 = products.filter((product) => product.price < 100000).length;
+        this.totalProductUnder200 = products.filter((product) => product.price >= 100000 && product.price < 200000).length;
+        this.totalProductUnder300 = products.filter((product) => product.price >= 200000 && product.price < 300000).length;
+        this.totalProductUnder400 = products.filter((product) => product.price >= 300000 && product.price < 400000).length;
+        this.totalProductAbove400 = products.filter((product) => product.price >= 400000).length;
         this.totalNumberOfProducts = products.length;
       }), 
       catchError((error) => {

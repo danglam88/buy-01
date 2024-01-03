@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
-import { Router } from '@angular/router';
+import { AuthenticationService } from '../services/authentication.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -14,18 +14,18 @@ export class MediaService {
 
   constructor(
     private httpClient: HttpClient,
-    private encryptionService: EncryptionService, 
-    private router: Router,
+    private encryptionService: EncryptionService,
+    private authService: AuthenticationService
   ) { }
 
   get token() : string {
-    const encryptedSecret = sessionStorage.getItem('srt');
+    const encryptedSecret = localStorage.getItem('srt');
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
         return currentToken;
       } catch (error) {
-        this.router.navigate(['../login']);
+        this.authService.logout();
       }
     }
     return '';

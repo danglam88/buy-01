@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import { ToastrModule } from 'ngx-toastr';
 
 import { MyOrdersComponent } from './my-orders.component';
 import { SearchComponent } from '../search/search.component';
@@ -21,11 +21,6 @@ class MatDialogMock {
   }
 }
 
-class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
-}
-
 describe('MyOrdersComponent', () => {
   let component: MyOrdersComponent;
   let fixture: ComponentFixture<MyOrdersComponent>;
@@ -33,18 +28,16 @@ describe('MyOrdersComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, AngularMaterialModule],
+      imports: [HttpClientTestingModule, AngularMaterialModule, ToastrModule.forRoot()],
       providers: [
         UserService, 
         { provide: MatDialog, useClass: MatDialogMock },
-        { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       declarations: [MyOrdersComponent, HeaderComponent, FooterComponent, OrderHistoryComponent, StatsComponent, SearchComponent]
     });
     fixture = TestBed.createComponent(MyOrdersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    dialog = TestBed.inject(MatDialog);
   });
 
   it('should create', () => {

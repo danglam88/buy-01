@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { EncryptionService } from './encryption.service';
 import { environment } from 'src/environments/environment';
-
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +22,11 @@ export class OrderItemService {
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
-    private router: Router
+    private authService: AuthenticationService
   ) {}
 
   get token(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(
@@ -35,7 +34,7 @@ export class OrderItemService {
         )["token"];
         return currentToken;
       } catch (error) {
-        this.router.navigate(["../login"]);
+        this.authService.logout();
       }
     }
     return "";

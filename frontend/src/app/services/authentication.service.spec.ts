@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AuthenticationService } from './authentication.service';
+import { environment } from '../../environments/environment';
 
 describe('AuthenticationService', () => {
   let authService: AuthenticationService;
@@ -35,7 +36,7 @@ describe('AuthenticationService', () => {
       expect(response).toEqual(mockResponse);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8080/auth');
+    const req = httpTestingController.expectOne(`${environment.authUrl}`);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
   });

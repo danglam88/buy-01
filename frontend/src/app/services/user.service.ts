@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
 import { EncryptionService } from '../services/encryption.service';
 import { environment } from '../../environments/environment';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +15,18 @@ export class UserService {
   
   constructor(
     private httpClient: HttpClient,
-    private encryptionService: EncryptionService, 
-    private router: Router,
-    ) {}
+    private encryptionService: EncryptionService,
+    private authService: AuthenticationService
+  ) {}
   
     get token() : string {
-      const encryptedSecret = sessionStorage.getItem('srt');
+      const encryptedSecret = localStorage.getItem('srt');
       if (encryptedSecret) {
         try {
           const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
           return currentToken;
         } catch (error) {
-          this.router.navigate(['../login']);
+          this.authService.logout();
         }
       }
       return '';
@@ -88,7 +88,7 @@ export class UserService {
   }
 
   getUserInfoRole(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const role = JSON.parse(

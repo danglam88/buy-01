@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { ProductService } from './product.service';
 import { EncryptionService } from '../services/encryption.service';
+import { environment } from '../../environments/environment';
 
 describe('ProductService', () => {
   let productService: ProductService;
@@ -24,7 +25,7 @@ describe('ProductService', () => {
   });
 
   afterEach(() => {
-    httpTestingController.verify(); // Verify that there are no pending requests
+    httpTestingController.verify(); 
   });
 
   it('should be created', () => {
@@ -35,7 +36,7 @@ describe('ProductService', () => {
     const encryptedSecret = 'str';
     const decryptedSecret = JSON.stringify({ token: 'mockedToken' });
       
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
     const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate'); 
 
@@ -50,10 +51,10 @@ describe('ProductService', () => {
   it('should navigate to login when the secret is invalid', () => {
     const encryptedSecret = 'str';
   
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
   
     const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigate'); // Create a spy for router.navigate
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
@@ -66,10 +67,10 @@ describe('ProductService', () => {
   it('should navigate to login when the secret is invalid', () => {
     const encryptedSecret = 'str';
   
-    spyOn(sessionStorage, 'getItem').and.returnValue(encryptedSecret);
+    spyOn(localStorage, 'getItem').and.returnValue(encryptedSecret);
     spyOn(encryptionService, 'decrypt').and.throwError('Invalid decryption');
   
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = productService.token;
   
@@ -78,9 +79,9 @@ describe('ProductService', () => {
   });
   
   it('should return an empty string when no token is available', () => {
-    spyOn(sessionStorage, 'getItem').and.returnValue(null);
-    spyOn(encryptionService, 'decrypt'); // Mock the encryptionService.decrypt method
-    const navigateSpy = spyOn(router, 'navigate'); // Mock the router.navigate method
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+    spyOn(encryptionService, 'decrypt'); 
+    const navigateSpy = spyOn(router, 'navigate'); 
   
     const token = productService.token;
   
@@ -95,7 +96,7 @@ describe('ProductService', () => {
       expect(data).toEqual(mockProducts);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/products');
+    const req = httpTestingController.expectOne(`${environment.productUrl}`);
     expect(req.request.method).toBe('GET');
 
     req.flush(mockProducts);
@@ -108,7 +109,7 @@ describe('ProductService', () => {
       expect(data).toEqual(mockProducts);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/products/seller');
+    const req = httpTestingController.expectOne(`${environment.sellerProductUrl}`);
     expect(req.request.method).toBe('GET');
 
     req.flush(mockProducts);
@@ -121,7 +122,7 @@ describe('ProductService', () => {
       expect(data).toEqual(mockProduct);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/products');
+    const req = httpTestingController.expectOne(`${environment.productUrl}`);
     expect(req.request.method).toBe('POST');
 
     req.flush(mockProduct);
@@ -134,7 +135,7 @@ describe('ProductService', () => {
       expect(data).toEqual(mockProduct);
     });
 
-    const req = httpTestingController.expectOne(`http://localhost:8081/products/${mockProduct.id}`);
+    const req = httpTestingController.expectOne(`${environment.productUrl}/${mockProduct.id}`);
     expect(req.request.method).toBe('PUT');
 
     req.flush(mockProduct);
@@ -147,7 +148,7 @@ describe('ProductService', () => {
       expect(data).toEqual(mockProduct);
     });
 
-    const req = httpTestingController.expectOne(`http://localhost:8081/products/${mockProduct.id}`);
+    const req = httpTestingController.expectOne(`${environment.productUrl}/${mockProduct.id}`);
     expect(req.request.method).toBe('DELETE');
 
     req.flush(mockProduct);
