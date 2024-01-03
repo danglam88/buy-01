@@ -16,7 +16,7 @@
     [(ngModel)]="selectedFilterRadioButton"
     (change)="onSelectedFilterRadioButtonChanged()"
   />
-  <span>{{ "€0-99 (" + under100 + ")" }}</span>
+  <span>{{ "€0 - €100k (" + under100 + ")" }}</span>
 
   <input
     type="radio"
@@ -25,7 +25,7 @@
     [(ngModel)]="selectedFilterRadioButton"
     (change)="onSelectedFilterRadioButtonChanged()"
   />
-  <span>{{ "€100-199 (" + under200 + ")" }}</span>
+  <span>{{ "€100k - €200k (" + under200 + ")" }}</span>
 
   <input
     type="radio"
@@ -34,7 +34,7 @@
     [(ngModel)]="selectedFilterRadioButton"
     (change)="onSelectedFilterRadioButtonChanged()"
   />
-  <span>{{ "€200-299 (" + under300 + ")" }}</span>
+  <span>{{ "€200k - €300k (" + under300 + ")" }}</span>
 
   <input
     type="radio"
@@ -43,7 +43,7 @@
     [(ngModel)]="selectedFilterRadioButton"
     (change)="onSelectedFilterRadioButtonChanged()"
   />
-  <span>{{ "€300-399 (" + under400 + ")" }}</span>
+  <span>{{ "€300k - €400k (" + under400 + ")" }}</span>
 
   <input
     type="radio"
@@ -52,5 +52,5 @@
     [(ngModel)]="selectedFilterRadioButton"
     (change)="onSelectedFilterRadioButtonChanged()"
   />
-  <span>{{ "€400+ (" + above400 + ")" }}</span>
+  <span>{{ "€400k+ (" + above400 + ")" }}</span>
 </div>
