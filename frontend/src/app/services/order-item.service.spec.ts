@@ -82,4 +82,57 @@ describe('OrderItemService', () => {
     expect(token).toBe('');
     expect(navigateSpy).not.toHaveBeenCalled();
   });
+
+  it('should cancel order item', () => {
+    const itemId = 'mockedItemId';
+    const mockedResponse = { message: 'mockedMessage' };
+    const itemData = {
+      "productId": "123",
+      "orderId": "456",
+      "statusCode": "CANCELLED"
+    };
+
+
+    orderItemService.cancelOrderItem(itemId, itemData).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/item/cancel/' + itemId);
+    expect(req.request.method).toEqual('PUT');
+  })
+
+  it('should redo order item', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+    const itemData = {
+      "itemId": "123",
+      "orderId": "345",
+      "productId": "678",
+      "quantity":5
+    };
+
+    orderItemService.redoOrderItem(itemData).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/item/redo');
+    expect(req.request.method).toEqual('POST');
+  })
+
+  it('should update order item status', () => {
+    const itemId = 'mockedItemId';
+    const mockedResponse = { message: 'mockedMessage' };
+    const itemData = {
+      "productId": "123",
+      "orderId": "456",
+      "statusCode": "CANCELLED"
+    };
+
+    orderItemService.updateOrderItemStatus(itemId, itemData).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/item/status/' + itemId);
+    expect(req.request.method).toEqual('PUT');
+  });
+
 });
