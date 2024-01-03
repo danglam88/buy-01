@@ -1,12 +1,12 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { Router } from "@angular/router";
 
 import { Product } from "../Models/Product";
 import { environment } from "../../environments/environment";
 import { EncryptionService } from "./encryption.service";
 import { CartItems } from "../Models/CartItems";
+import { AuthenticationService } from "./authentication.service";
 
 @Injectable({
   providedIn: "root",
@@ -24,7 +24,7 @@ export class CartService {
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
-    private router: Router
+    private authService: AuthenticationService
   ) {}
 
   get token(): string {
@@ -36,7 +36,7 @@ export class CartService {
         )["token"];
         return currentToken;
       } catch (error) {
-        this.router.navigate(["../login"]);
+        this.authService.logout();
       }
     }
     return "";
