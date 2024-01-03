@@ -1,24 +1,18 @@
-import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
-import { AngularMaterialModule } from 'src/app/angular-material.module';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ToastrService } from 'ngx-toastr';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OrderHistoryComponent } from './order-history.component';
-import { OrderDetailsComponent } from '../order-details/order-details.component';
-import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { ToastrModule } from 'ngx-toastr';
+import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { SearchComponent } from '../../search/search.component';
 
 import { UserService } from 'src/app/services/user.service';
 import { OrderService } from 'src/app/services/order.service';
 import { OrderItemService } from 'src/app/services/order-item.service';
 import { CartService } from 'src/app/services/cart.service';
-import { of } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
-
-class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
-}
+import { OrderDetailsComponent } from '../order-details/order-details.component';
+import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 
 describe('OrderHistoryComponent', () => {
   let component: OrderHistoryComponent;
@@ -27,38 +21,33 @@ describe('OrderHistoryComponent', () => {
   let orderItemService: jasmine.SpyObj<OrderItemService>;
   let cartService: jasmine.SpyObj<CartService>;
   let userService: jasmine.SpyObj<UserService>;
-  let toastrService: ToastrService;
   let dialog: jasmine.SpyObj<MatDialog>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     orderService = jasmine.createSpyObj('OrderService', ['getClientOrders', 'getSellerOrderItems', 'cancelOrder', 'redoOrder', 'removeOrder']);
     orderItemService = jasmine.createSpyObj('OrderItemService', ['updateOrderItemStatus']);
     orderItemService.itemCancelledId$ = of("false");
     cartService = jasmine.createSpyObj('CartService', ['getCartItem', 'setItemId', 'isItemAddedToCart']);
     userService = jasmine.createSpyObj('UserService', ['getUserById']);
  
-    TestBed.configureTestingModule({
-      declarations: [
-        OrderHistoryComponent, 
-        OrderDetailsComponent, 
-        ConfirmationDialogComponent,
-        SearchComponent
-      ],
+    orderService = jasmine.createSpyObj('OrderService', ['getClientOrders', 'redoOrder', 'getSellerOrderItems', 'cancelOrder', 'removeOrder']);
+
+    await TestBed.configureTestingModule({
+      declarations: [OrderHistoryComponent, SearchComponent, OrderDetailsComponent, ConfirmationDialogComponent],
+      imports: [MatDialogModule, ToastrModule.forRoot(), HttpClientTestingModule, AngularMaterialModule],
       providers: [
-        UserService, 
-        OrderService, 
-        OrderItemService,
-        { provide: ToastrService, useClass: ToastrServiceStub },
         { provide: OrderService, useValue: orderService },
         { provide: OrderItemService, useValue: orderItemService },
         { provide: CartService, useValue: cartService },
         { provide: UserService, useValue: userService },
       ],
-      imports: [AngularMaterialModule, HttpClientTestingModule]
-    });
+    }).compileComponents();
+  });
+  
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(OrderHistoryComponent);
     component = fixture.componentInstance;
-    toastrService = TestBed.inject(ToastrService);
     fixture.detectChanges();
     spyOn(component, 'getClientOrdersWithSellerInfo').and.callThrough();
     spyOn(component, 'getSellerOrderItems').and.callThrough();
@@ -66,7 +55,7 @@ describe('OrderHistoryComponent', () => {
     spyOn(dialog, 'open').and.callThrough();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
@@ -128,6 +117,7 @@ describe('OrderHistoryComponent', () => {
     component.searchText = ['nonMatchingKeyword'];
     expect(component.shouldShowClientOrders(mockOrder)).toBe(false);
   });
+
   it('should show seller order items based on search text', () => {
 
     component.searchText = ['keyword1'];
@@ -203,5 +193,5 @@ describe('OrderHistoryComponent', () => {
       ]);
     });
   });
-  
+
 });
