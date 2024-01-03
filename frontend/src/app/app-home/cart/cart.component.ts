@@ -137,7 +137,8 @@ export class CartComponent implements OnInit {
             },
             error: (error: any) => {
               console.error("Error fetching order data", error);
-              this.toastr.error("Order cannot be created");
+              this.toastr.error("Order cannot be created due to insufficient stock");
+              this.cartService.clearCart();
               this.router.navigate(["home"]);
             },
           });
@@ -145,6 +146,9 @@ export class CartComponent implements OnInit {
       },
       error: (error: any) => {
         console.error("Error creating order", error);
+        this.toastr.error("Order cannot be created due to insufficient stock");
+        this.cartService.clearCart();
+        this.router.navigate(["home"]);
       },
       complete: () => {
         this.router.navigate(["home"]);
