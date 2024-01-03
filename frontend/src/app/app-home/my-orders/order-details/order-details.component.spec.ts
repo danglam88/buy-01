@@ -1,8 +1,6 @@
 import {
   ComponentFixture,
-  TestBed,
-  tick,
-  fakeAsync,
+  TestBed
 } from "@angular/core/testing";
 import {
   MatDialog,
@@ -11,8 +9,8 @@ import {
   MatDialogRef,
 } from "@angular/material/dialog";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { of, throwError } from "rxjs";
-import { ToastrService } from "ngx-toastr";
+import { of } from "rxjs";
+import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
@@ -32,17 +30,9 @@ class MatDialogMock {
   }
 }
 
-class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
-}
-
 describe("OrderDetailsComponent", () => {
   let component: OrderDetailsComponent;
   let fixture: ComponentFixture<OrderDetailsComponent>;
-  let toastrService: ToastrService;
-  let orderItemService: OrderItemService;
-  let cartService: CartService;
 
   const mockDialogRef = {
     open: jasmine.createSpy("open"),
@@ -58,7 +48,6 @@ describe("OrderDetailsComponent", () => {
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MatDialog, useClass: MatDialogMock },
-        { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       declarations: [OrderDetailsComponent, ConfirmationDialogComponent],
       imports: [
@@ -67,13 +56,11 @@ describe("OrderDetailsComponent", () => {
         MatDialogModule,
         MatIconModule,
         MatInputModule,
+        ToastrModule.forRoot()
       ],
     });
     fixture = TestBed.createComponent(OrderDetailsComponent);
     component = fixture.componentInstance;
-    toastrService = TestBed.inject(ToastrService);
-    orderItemService = TestBed.inject(OrderItemService);
-    cartService = TestBed.inject(CartService);
     fixture.detectChanges();
   });
 

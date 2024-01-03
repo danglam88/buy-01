@@ -19,7 +19,6 @@ import { OrderDetailsComponent } from "../my-orders/order-details/order-details.
 import { CartService } from "src/app/services/cart.service";
 import { OrderService } from "src/app/services/order.service";
 import { UserService } from "src/app/services/user.service";
-import { CartItems } from "src/app/Models/CartItems";
 import { ToastrService } from "ngx-toastr";
 
 describe("CartComponent", () => {

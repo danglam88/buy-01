@@ -6,8 +6,7 @@ import { MediaService } from 'src/app/services/media.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { MediaListingComponent } from './media-listing.component';
 import { MediaComponent } from './media/media.component';
-import { of, Observable } from 'rxjs';
-import { Product } from 'src/app/Models/Product';
+import { Observable } from 'rxjs';
 
 class ToastrServiceStub {
   error(message: string) {
@@ -50,39 +49,6 @@ describe('MediaListingComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  /*it('should call getProductImages() and retrive product images', fakeAsync(() => {
-    const mockProduct: Product = { 
-      id: '123', 
-      name: 'mock',
-      description: 'mock',
-      price: 1,
-      quantity: 1,
-      editable: false,
-      productMedia: []
-    };
-    const mockProductId = '123'; 
-    const mockProductMediaIDs = ['1', '2'];
-    const mockProductMediaData = new Blob([''], { type: 'image/jpeg' });
-    const mockProductImageResult = [mockProductMediaData, mockProductMediaData];
-    spyOn(component, 'getProductImages').and.callThrough();
-    mediaService.getImageByProductId.and.returnValue(of(mockProductMediaIDs));
-    mediaService.getImageByMediaId.and.returnValue(of(mockProductImageResult[0]));
-    
-    component.product = mockProduct;
-    component.ngOnInit();
-
-    component.getProductImages(mockProductId);
-
-    tick(250);
-
-    expect(mediaService.getImageByProductId).toHaveBeenCalledWith(mockProductId);
-    component.mediaImageData$.subscribe((data) => {
-      expect(mediaService.getImageByProductId).toHaveBeenCalledWith(mockProductId);
-      expect(mediaService.getImageByProductId).toHaveBeenCalledWith(mockProductMediaIDs);
-      expect(mediaService.getImageByMediaId).toHaveBeenCalledWith(mockProductImageResult[0]);
-    });
-  }));*/
 
   it('should handle error with status 403 for getImageByProductId', fakeAsync(() => {
     const mockProductId = '123';
