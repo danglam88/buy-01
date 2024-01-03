@@ -83,4 +83,108 @@ describe('OrderService', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
+  it('should create an order', () => {
+    const order = {
+      order_status: "CREATED",
+      payment_code: "CASH",
+    };
+
+    const mockedResponse = { message: 'mockedMessage' };
+
+    orderService.createOrder(order).subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order');
+    expect(req.request.method).toEqual('POST');
+  })
+
+ it('should get order by orderId', () => {
+    const orderId = 'mockedOrderId';
+    const mockedResponse = { message: 'mockedMessage' };
+
+    orderService.getOrderByOrderId(orderId).subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/' + orderId);
+    expect(req.request.method).toEqual('GET');
+  })
+
+  it('should get client orders', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+
+    orderService.getClientOrders().subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/client');
+    expect(req.request.method).toEqual('GET');
+  })
+
+  it('should get seller orders', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+
+    orderService.getSellerOrderItems().subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/seller');
+    expect(req.request.method).toEqual('GET');
+  })
+
+  it('should cancel client order', () => {
+    const orderId = 'mockedOrderId';
+    const mockedResponse = { message: 'mockedMessage' };
+    const orderData = {
+      order_status: "CANCELLED",
+      payment_code: "CASH",
+    };
+
+    orderService.cancelOrder(orderId, orderData).subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/' + orderId);
+    expect(req.request.method).toEqual('PUT');
+  })
+
+  it('should remove order', () => {
+    const orderId = 'mockedOrderId';
+    const mockedResponse = { message: 'mockedMessage' };
+
+    orderService.removeOrder(orderId).subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/' + orderId);
+    expect(req.request.method).toEqual('DELETE');
+  })
+
+  it('should redo order', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+    const orderId = 'mockedOrderId';
+
+    orderService.redoOrder(orderId).subscribe(
+      response => {
+        expect(response).toEqual(mockedResponse);
+      }
+    );
+
+    const req = httpTestingController.expectOne('http://localhost:8083/order/redo');
+    expect(req.request.method).toEqual('POST');
+  })
+
 });
