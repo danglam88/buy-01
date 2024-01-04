@@ -217,6 +217,7 @@ export class UserDashboardComponent implements OnInit {
           this.cancelUploadImage();
           if (updateField === 'email' || updateField === 'password') {
             this.authService.logout();
+            this.router.navigate(['login']);
           }
         },
       });

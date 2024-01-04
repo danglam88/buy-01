@@ -23,6 +23,7 @@ import { EncryptionService } from "src/app/services/encryption.service";
 import { ValidationService } from "src/app/services/validation.service";
 import { ErrorService } from "src/app/services/error.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { Router } from "@angular/router";
 
 import { Product } from "../../Models/Product";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
@@ -73,7 +74,8 @@ export class ProductDetailComponent implements OnInit {
     private dialog: MatDialog,
     private encryptionService: EncryptionService,
     private cartService: CartService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) {
     // get product details from product-listing component
     this.product = data.product; 
@@ -112,6 +114,7 @@ export class ProductDetailComponent implements OnInit {
         return currentToken;
       } catch (error) {
         this.authService.logout();
+        this.router.navigate(['login']);
       }
     }
     return "";

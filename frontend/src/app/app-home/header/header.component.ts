@@ -77,6 +77,7 @@ export class HeaderComponent {
   // Logs user out
   logout() {
     this.authService.logout();
+    this.router.navigate(['login']);
   }
 
   // Throws user out if token is expired or corrupted

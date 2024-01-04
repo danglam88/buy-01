@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { EncryptionService } from './encryption.service';
 import { environment } from 'src/environments/environment';
 import { AuthenticationService } from './authentication.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class OrderItemService {
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) {}
 
   get token(): string {
@@ -35,6 +37,7 @@ export class OrderItemService {
         return currentToken;
       } catch (error) {
         this.authService.logout();
+        this.router.navigate(['login']);
       }
     }
     return "";

@@ -4,6 +4,7 @@ import { EncryptionService } from '../services/encryption.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class MediaService {
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) { }
 
   get token() : string {
@@ -26,6 +28,7 @@ export class MediaService {
         return currentToken;
       } catch (error) {
         this.authService.logout();
+        this.router.navigate(['login']);
       }
     }
     return '';
