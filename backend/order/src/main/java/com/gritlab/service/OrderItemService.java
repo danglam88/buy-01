@@ -59,13 +59,11 @@ public class OrderItemService {
                 item.getName(), item.getDescription(),
                 item.getItemPrice(), item.getMaxQuantity(), item.getSellerId());
 
-        CartItemResponse responseItem = CartItemResponse.builder()
+        return CartItemResponse.builder()
                 .itemId(item.getItemId())
                 .quantity(item.getQuantity())
                 .itemPrice(item.getItemPrice() * item.getQuantity())
                 .product(product).build();
-
-        return responseItem;
     }
 
     public OrderItem convertFromJsonToOrderItem(String jsonMessage) {
@@ -164,7 +162,7 @@ public class OrderItemService {
         }
 
         Optional<OrderItem> itemOptional =
-                orderItemRepository.findByProductIdAndOrderIdIsNull(data.getProductId());
+                orderItemRepository.findByBuyerIdAndProductIdAndOrderIdIsNull(buyerId, data.getProductId());
 
         if (itemOptional.isEmpty()) {
             OrderItem item = OrderItem.builder()
@@ -274,7 +272,7 @@ public class OrderItemService {
                         sellerId, data.getProductId(), data.getOrderId()).orElseThrow();
 
         if (item.getStatusCode() != OrderStatus.CREATED) {
-            throw new InvalidParamException("You can only update status of order item with current status as CREATED");
+            throw new InvalidParamException(item.getStatusCode().toString());
         }
 
         OrderItem updatedItem = OrderItem.builder()
@@ -304,7 +302,7 @@ public class OrderItemService {
                         buyerId, data.getProductId(), data.getOrderId()).orElseThrow();
 
         if (item.getStatusCode() != OrderStatus.CREATED) {
-            throw new InvalidParamException("You can only cancel order item with current status as CREATED");
+            throw new InvalidParamException(item.getStatusCode().toString());
         }
 
         OrderItem updatedItem = OrderItem.builder()

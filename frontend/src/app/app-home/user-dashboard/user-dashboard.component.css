@@ -1,6 +1,7 @@
 
 mat-card {
   margin: 0 auto;
+  margin-top: 40px;
   box-shadow: 0 4px 6px #778da9;
   min-height: 250px;
   display: flex;

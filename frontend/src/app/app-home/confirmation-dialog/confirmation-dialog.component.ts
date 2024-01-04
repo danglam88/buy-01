@@ -9,7 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export class ConfirmationDialogComponent {
 
-  // Confirmation dialogue used for when deleting product, product image, and user account
+  // Confirmation dialogue used for when deleting product, product image, delete order & order items, and user account
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>, 
     @Inject(MAT_DIALOG_DATA) public data: { confirmationText: string }) {}

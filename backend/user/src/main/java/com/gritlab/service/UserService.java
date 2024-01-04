@@ -233,12 +233,12 @@ public class UserService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = getUserByEmail(userDetails.getUsername());
 
-        if (user.isEmpty() || (selfCheck && userId != null && !user.get().getId().equals(userId))) {
-            throw new BadCredentialsException("Operation is not allowed");
+        if (user.isPresent() && !selfCheck && userId != null) {
+            return userRepository.findById(userId).orElseThrow();
         }
 
-        if (!selfCheck) {
-            return userRepository.findById(userId).orElseThrow();
+        if (user.isEmpty() || (selfCheck && userId != null && !user.get().getId().equals(userId))) {
+            throw new BadCredentialsException("Operation is not allowed");
         }
 
         return user.get();

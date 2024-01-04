@@ -27,7 +27,7 @@ public class ProductDTO {
     private Double price;
 
     @NotNull(message = "Quantity is required")
-    @Min(value = 1, message = "Quantity must be greater than 0")
+    @Min(value = 0, message = "Quantity must be greater than or equal to 0")
     @Max(value = 999999999, message = "Quantity must be less than or equal to 999999999")
     private Integer quantity;
 }

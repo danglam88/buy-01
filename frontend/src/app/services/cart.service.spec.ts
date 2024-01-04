@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CartService } from './cart.service';
 import { Product } from '../Models/Product';
+import { environment } from 'src/environments/environment';
 
 describe('CartService', () => {
   let cartService: CartService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -13,72 +15,68 @@ describe('CartService', () => {
     });
 
     cartService = TestBed.inject(CartService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should be created', () => {
     expect(cartService).toBeTruthy();
   });
 
-  /*it('should add product to cart', () => {
-    const product: Product = {
+  it('should add product to cart', () => {
+    const mockProduct: Product = {
       id: '1',
       name: 'Test Product',
       description: 'Product for testing',
       price: 10,
       quantity: 5,
-      editable: true
+      editable: true, 
+      productMedia: []
     };
 
-    cartService.addToCart(product);
+    const mockedResponse = { message: 'mockedMessage' };
 
-    const cart = cartService.getCart();
-    expect(cart.items.length).toBe(1);
-    expect(cart.items[0].product).toEqual(product);
+    cartService.addToCart(mockProduct).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}`);
+    expect(req.request.method).toEqual('POST');
+  });
+
+  it('should get cart', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+
+    cartService.getCart().subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}`);
+    expect(req.request.method).toEqual('GET');
+  });
+
+  it('should update product quantity in cart', () => {
+    const mockedResponse = { message: 'mockedMessage' };
+    const itemId = '123';
+    
+
+    cartService.changeQuantity(itemId, "456", 5).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
+
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}` + `/${itemId}`);
+    expect(req.request.method).toEqual('PUT');
   });
 
   it('should remove product from cart', () => {
-    const productId = '1';
-    const product: Product = {
-      id: productId,
-      name: 'Test Product',
-      description: 'Product for testing',
-      price: 10,
-      quantity: 5,
-      editable: true
-    };
+    const mockedResponse = { message: 'mockedMessage' };
+    const itemId = '123';
+    
 
-    cartService.addToCart(product);
+    cartService.removeFromCart(itemId).subscribe(response => {
+      expect(response).toEqual(mockedResponse);
+    });
 
-    let cart = cartService.getCart();
-    expect(cart.items.length).toBe(1);
-
-    cartService.removeFromCart(productId);
-
-    cart = cartService.getCart();
-    expect(cart.items.length).toBe(0);
+    const req = httpTestingController.expectOne(`${environment.orderItemUrl}` + `/${itemId}`);
+    expect(req.request.method).toEqual('DELETE');
   });
-
-  it('should change quantity of product in cart', () => {
-    const productId = '1';
-    const product: Product = {
-      id: productId,
-      name: 'Test Product',
-      description: 'Product for testing',
-      price: 10,
-      quantity: 5,
-      editable: true
-    };
-
-    cartService.addToCart(product);
-
-    let cart = cartService.getCart();
-    expect(cart.items.length).toBe(1);
-
-    const newQuantity = 3;
-    cartService.changeQuantity(productId, newQuantity);
-
-    cart = cartService.getCart();
-    expect(cart.items[0].quantity).toBe(newQuantity);
-  });*/
-
-});
+})

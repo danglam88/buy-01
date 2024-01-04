@@ -15,12 +15,7 @@ import { SearchComponent } from '../search/search.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ValidationService } from 'src/app/services/validation.service';
 import { ErrorService } from 'src/app/services/error.service';
-import { ToastrService } from 'ngx-toastr';
-
-class ToastrServiceStub {
-  error(message: string) {}
-  success(message: string) {}
-}
+import { ToastrModule } from 'ngx-toastr';
 
 class MatDialogMock {
   open() {
@@ -54,18 +49,17 @@ describe('ProductDashboardComponent', () => {
         ErrorService,
         { provide: ProductService, useValue: spy },
         { provide: MatDialog, useClass: MatDialogMock },
-        { provide: ToastrService, useClass: ToastrServiceStub },
       ],
       imports: [
         HttpClientTestingModule,
         AngularMaterialModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        ToastrModule.forRoot()
       ]
     });
     fixture = TestBed.createComponent(ProductDashboardComponent);
     component = fixture.componentInstance;
     productService = TestBed.inject(ProductService) as jasmine.SpyObj<ProductService>;
-    errorService = TestBed.inject(ErrorService);
     dialog = TestBed.inject(MatDialog);
     spyOn(component, 'getSellerProducts').and.callThrough();
    });

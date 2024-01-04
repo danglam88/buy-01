@@ -8,4 +8,5 @@ export class CartItems {
    quantity:number=1;
    price:number=0;
    itemId:string="";
+   itemPrice: number;
 }

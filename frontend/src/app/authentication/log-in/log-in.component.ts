@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { FormBuilder, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
-import { EncryptionService } from "src/app/services/encryption.service";
 import { MatDialogRef, MatDialog } from "@angular/material/dialog";
+
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { EncryptionService } from "src/app/services/encryption.service";
 import { UserService } from "src/app/services/user.service";
 
 @Component({
@@ -23,12 +24,12 @@ export class LogInComponent implements OnInit {
     private userService: UserService
   ) {
     this.toastr.toastrConfig.positionClass = "toast-bottom-right";
-    //console.log("sessionStorage", encryptionService.decrypt(sessionStorage.getItem("loggedIn")));
-    if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
-      console.log("User is logged in in login component");
+
+    // Go to home when user is logged in
+    if (this.encryptionService.decrypt(localStorage.getItem("loggedIn")) === "true") {
       this.router.navigate(["../home"]);
     } else {
-      sessionStorage.clear();
+      localStorage.clear();
     }
   }
 
@@ -53,7 +54,7 @@ export class LogInComponent implements OnInit {
         const encryptedObj = this.encryptionService.encrypt(
           JSON.stringify(result)
         );
-        sessionStorage.setItem("srt", encryptedObj);
+        localStorage.setItem("srt", encryptedObj);
       },
       error: (error) => {
         if (error.status == 400) {
@@ -73,7 +74,7 @@ export class LogInComponent implements OnInit {
       complete: () => {
         this.authService.login();
         const encryptedLoggedIn = this.encryptionService.encrypt("true");
-        sessionStorage.setItem("loggedIn", encryptedLoggedIn);
+        localStorage.setItem("loggedIn", encryptedLoggedIn);
         this.router.navigate(["../home"]);
       },
     });

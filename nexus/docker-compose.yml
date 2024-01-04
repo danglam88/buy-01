@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  nexus:
+    image: nexus-image
+    container_name: nexus
+    expose:
+      - 8081
+      - 8083
+    ports:
+      - "8081:8081"
+      - "8083:8083"
+    volumes:
+      - nexus-data:/nexus-data
+      - nexus-logs:/var/log/nexus
+      - nexus-blobs:/nexus-blobs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
+    user: "nexus:nexus"
+
+volumes:
+  nexus-data:
+    external: true
+  nexus-logs:
+    external: true
+  nexus-blobs:
+    external: true

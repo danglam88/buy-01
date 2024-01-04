@@ -3,10 +3,12 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
+
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { UserService } from 'src/app/services/user.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { ValidationService } from 'src/app/services/validation.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -35,7 +37,8 @@ export class UserDashboardComponent implements OnInit {
     private builder: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private validationService: ValidationService 
+    private validationService: ValidationService,
+    private authService: AuthenticationService,
   ) {  }
 
   ngOnInit(): void {
@@ -213,7 +216,8 @@ export class UserDashboardComponent implements OnInit {
           this.cancelFieldEdit();
           this.cancelUploadImage();
           if (updateField === 'email' || updateField === 'password') {
-            this.router.navigate(['../login']);
+            this.authService.logout();
+            this.router.navigate(['login']);
           }
         },
       });
@@ -300,7 +304,7 @@ export class UserDashboardComponent implements OnInit {
           },
           complete: () => {
             this.toastr.success('User deleted');
-            this.router.navigate(['../login']);
+            this.errorService.handleSessionExpirationError();
           }
         });
       }

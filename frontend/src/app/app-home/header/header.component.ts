@@ -1,11 +1,13 @@
 import { Component } from "@angular/core";
 import { Router, NavigationEnd } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
+import { ToastrService } from "ngx-toastr";
+import { Subscription } from "rxjs";
+
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EncryptionService } from "src/app/services/encryption.service";
 import { CreateProductComponent } from "../create-product/create-product.component";
-import { ToastrService } from "ngx-toastr";
-import { Subscription } from "rxjs";
+
 import { CartService } from "src/app/services/cart.service";
 
 @Component({
@@ -39,18 +41,25 @@ export class HeaderComponent {
     if (this.role === "CLIENT") {
       this.getCartItemsNumber();
     }
-    // this.subscribeToCartItemsChanges();
+
+    // Subscribe to isAddedToCart$ observable
+    this.cartService.cartUpdate$.subscribe((isAddedToCart) => {
+      if (isAddedToCart) {
+        this.getCartItemsNumber();
+        
+      }
+    });
+
   }
 
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
-    // this.cartItemsSubscription.unsubscribe();
   }
 
   get role(): string {
-    const encryptedSecret = sessionStorage.getItem("srt");
+    const encryptedSecret = localStorage.getItem("srt");
     if (encryptedSecret) {
       try {
         const role = JSON.parse(
@@ -68,7 +77,7 @@ export class HeaderComponent {
   // Logs user out
   logout() {
     this.authService.logout();
-    this.router.navigate(["login"]);
+    this.router.navigate(['login']);
   }
 
   // Throws user out if token is expired or corrupted
@@ -79,24 +88,20 @@ export class HeaderComponent {
     }
   }
 
+  // Display length of cart items 
   getCartItemsNumber() {
-    this.cartService.getCart().subscribe({
-      next: (items: any) => {
-        this.cartItems = items.length;
-      },
-      error: (error) => {
-        console.error("Error fetching cart data", error);
-      },
-    });
+    setTimeout(() => {
+      this.cartService.getCart().subscribe({
+        next: (items: any) => {
+          this.cartItems = items.length;
+          this.cartService.setCartItems(items);
+        },
+        error: (error) => {
+          console.error("Error fetching cart data", error);
+        },
+      });
+    }, 250);
   }
-
-  // private subscribeToCartItemsChanges(): void {
-  //   this.cartItemsSubscription = this.cartService
-  //     .getCartItemsObservable()
-  //     .subscribe((count: number) => {
-  //       this.cartItems = count;
-  //     });
-  // }
 
   // Opens create product modal
   openCreateProduct(): void {

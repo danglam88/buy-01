@@ -2,6 +2,7 @@ import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
 import { ProductService } from 'src/app/services/product.service';
 import { ValidationService } from 'src/app/services/validation.service';  
 import { ErrorService } from 'src/app/services/error.service';
@@ -55,7 +56,7 @@ export class CreateProductComponent {
         Validators.required,
         Validators.pattern(/^[0-9]+$/),
         Validators.max(999999999),
-        this.validationService.greaterThanZeroValidator(), 
+        this.validationService.greaterThanZeroValidator(), // Custom validator for quantity
       ],
     ],
     description: [
@@ -71,6 +72,7 @@ export class CreateProductComponent {
   // Create a product and handles errors, including validation errors from createProductForm
   createProduct() {
     if (this.createProductForm.valid && this.selectedFiles.length > 0) {
+      this.isCreatingProduct = true;
       const formData = new FormData();
       for (const selectedFile of this.selectedFiles) {
         const file = selectedFile.file;
@@ -82,9 +84,8 @@ export class CreateProductComponent {
       formData.append('description', this.createProductForm.controls.description.value.replace(/\s+/g, ' ').trim());
 
       this.productService.createProduct(formData).subscribe({
-        next: (result) => {
+        next: () => {
           this.productService.productCreated.emit(true);
-          this.isCreatingProduct = true;
         },
         error: (error) => {
           if (this.errorService.is400Error(error.status)) {

@@ -209,6 +209,10 @@ public class ProductService {
                 orderItem.setProductId(null);
             } else {
                 orderItem.setMaxQuantity(product.get().getQuantity());
+
+                // Reduce product quantity when order item is created
+                product.get().setQuantity(product.get().getQuantity() - orderItem.getQuantity());
+                productRepository.save(product.get());
             }
         }
 
@@ -256,20 +260,15 @@ public class ProductService {
         assert orderItem != null;
         Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
-        if (product.isEmpty() || product.get().getQuantity() <= 0) {
+        if (product.isEmpty()) {
             orderItem.setStatusCode(OrderStatus.CANCELLED);
         } else {
             orderItem.setName(product.get().getName());
             orderItem.setDescription(product.get().getDescription());
-            orderItem.setMaxQuantity(product.get().getQuantity());
 
-            if (orderItem.getQuantity() > product.get().getQuantity()) {
-                orderItem.setStatusCode(OrderStatus.CANCELLED);
-            }
-
-            if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
-                // Reduce product quantity when order item is confirmed
-                product.get().setQuantity(product.get().getQuantity() - orderItem.getQuantity());
+            if (orderItem.getStatusCode() == OrderStatus.CANCELLED) {
+                // Increase product quantity when order item is cancelled
+                product.get().setQuantity(product.get().getQuantity() + orderItem.getQuantity());
                 productRepository.save(product.get());
             }
         }
@@ -286,7 +285,7 @@ public class ProductService {
         OrderItem orderItem = convertFromJsonToOrderItem(message);
 
         assert orderItem != null;
-        if (orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
+        if (orderItem.getStatusCode() == OrderStatus.CREATED || orderItem.getStatusCode() == OrderStatus.CONFIRMED) {
             Optional<Product> product = productRepository.findById(orderItem.getProductId());
 
             if (product.isPresent()) {

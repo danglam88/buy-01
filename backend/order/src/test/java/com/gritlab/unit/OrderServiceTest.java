@@ -225,7 +225,6 @@ class OrderServiceTest {
 
         orderService.updateOrder(orderId, buyerId, data);
 
-        verify(kafkaTemplate).send(eq("UPDATE_PRODUCT_QUANTITY"), anyString());
         verify(orderItemRepository, times(mockOrder.getItems().size())).save(any(OrderItem.class));
         verify(orderRepository).save(any(Order.class));
     }

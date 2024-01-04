@@ -29,13 +29,19 @@
                     <h2>Order Quantity: {{ item.quantity }}</h2>
                 </div>
                 <div>
+                    <h2>Seller Name: {{ item.sellerInfo.name }}</h2>
+                </div>
+                <div>
+                    <h2>Seller Email: {{ item.sellerInfo.email }}</h2>
+                </div>
+                <div>
                     <h2>Total Price: {{ item.item_price * item.quantity }}</h2>
                 </div>
                 <div>
                     <h2>Status: {{ item.status_code }}</h2>
                 </div>
-                <button *ngIf="item.status_code === 'CONFIRMED'" (click)="redoOrderItem(item)">Redo</button>
-                <button *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)">Cancel</button>
+                <button class="order-btns" *ngIf="item.status_code === 'CONFIRMED'" (click)="redoOrderItem(item)">Redo</button>
+                <button class="order-btns" *ngIf="item.status_code === 'CREATED'" (click)="cancelOrderItemByClient(item)">Cancel</button>
                 <hr>
             </div>
             <div class="product-value">
@@ -61,6 +67,12 @@
                 </div>
                 <div>
                     <h2>Order Quantity: {{ dialogData.order.quantity }}</h2>
+                </div>
+                <div>
+                    <h2>Buyer Name: {{ dialogData.order.buyerInfo.name }}</h2>
+                </div>
+                <div>
+                    <h2>Buyer Email: {{ dialogData.order.buyerInfo.email }}</h2>
                 </div>
                 <div>
                     <h2>Total Price: {{ totalSum }}</h2>

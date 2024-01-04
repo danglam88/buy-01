@@ -1,9 +1,10 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { EncryptionService } from '../services/encryption.service';
-import { Router } from '@angular/router';
+import { AuthenticationService } from '../services/authentication.service';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -14,23 +15,26 @@ export class MediaService {
 
   constructor(
     private httpClient: HttpClient,
-    private encryptionService: EncryptionService, 
-    private router: Router,
+    private encryptionService: EncryptionService,
+    private authService: AuthenticationService,
+    private router: Router
   ) { }
 
   get token() : string {
-    const encryptedSecret = sessionStorage.getItem('srt');
+    const encryptedSecret = localStorage.getItem('srt');
     if (encryptedSecret) {
       try {
         const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
         return currentToken;
       } catch (error) {
-        this.router.navigate(['../login']);
+        this.authService.logout();
+        this.router.navigate(['login']);
       }
     }
     return '';
   }
- 
+  
+  // Get media by product id
   getImageByProductId(productId: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -40,6 +44,7 @@ export class MediaService {
     return this.httpClient.get(`${environment.productMediaUrl}` + productId,  { headers });
   }
 
+  // Get image by media id
   getImageByMediaId(mediaId: any): Observable<Blob> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -49,6 +54,7 @@ export class MediaService {
     
   }
 
+  // Upload media
   uploadMedia(media: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
@@ -57,6 +63,7 @@ export class MediaService {
     return this.httpClient.post(`${environment.mediaUrl}`,  media, { headers });
   }
 
+  // Delete media
   deleteMedia(mediaId: any): Observable<object> {
     let headers = new HttpHeaders();
     if (this.token) {
