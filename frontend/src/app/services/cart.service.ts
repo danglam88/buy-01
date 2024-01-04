@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { Router } from "@angular/router";
 
 import { Product } from "../Models/Product";
 import { environment } from "../../environments/environment";
@@ -24,7 +25,8 @@ export class CartService {
   constructor(
     private httpClient: HttpClient,
     private encryptionService: EncryptionService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) {}
 
   get token(): string {
@@ -37,6 +39,7 @@ export class CartService {
         return currentToken;
       } catch (error) {
         this.authService.logout();
+        this.router.navigate(['login']);
       }
     }
     return "";

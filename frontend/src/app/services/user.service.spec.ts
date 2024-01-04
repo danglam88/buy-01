@@ -62,7 +62,7 @@ describe('UserService', () => {
     const token = userService.token;
   
     expect(token).toBe('');
-    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+    expect(navigateSpy).toHaveBeenCalledWith(['login']);
   });
   
   it('should navigate to login when the secret is invalid', () => {
@@ -76,7 +76,7 @@ describe('UserService', () => {
     const token = userService.token;
   
     expect(token).toBe('');
-    expect(navigateSpy).toHaveBeenCalledWith(['../login']);
+    expect(navigateSpy).toHaveBeenCalledWith(['login']);
   });
   
   it('should return an empty string when no token is available', () => {
