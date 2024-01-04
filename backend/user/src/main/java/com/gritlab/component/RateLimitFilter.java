@@ -17,7 +17,7 @@ import java.io.IOException;
 @Order(1)
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private final RateLimiter rateLimiter = RateLimiter.create(150);
+    private final RateLimiter rateLimiter = RateLimiter.create(50);
 
     @Override
     protected void doFilterInternal(
