@@ -383,30 +383,31 @@ The whole process of the project has been automated using Jenkins. The process c
 
 ## Artifact Management (using Nexus)
 
--  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
-   +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
-      ```json
-      {
-         "insecure-registries": ["142.93.175.42:8083"]
-      }
-      ```
-   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker.
-   +  From ~/.m2/settings.xml file on the build-server, put nexusUser to <username> and a pre-defined password to <password>.
-
 -  Configure Nexus Server:
-   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the nexus-server (at 142.93.175.42).
+   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the nexus-server (at 209.38.204.141).
    +  Run ./setup.sh to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
    +  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
    +  Change admin password to something really strong.
    +  Don't allow anonymous users to access the server.
    +  Create a Nexus Role named nx-docker with all Docker-related privileges.
    +  Transfer the Docker Bearer Token Realm to the Active Realms.
-   +  Create an active user called nexusUser (password can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
+   +  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
    +  Create a docker-hosted repository named nx-docker at port 8083.
    +  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
    +  Add maven-proxy repository to the list of member-repositories of maven-public group.
 
--  Add to the pom.xml file of each and every microservice as well as of the parent project the following section (with ${nexus.server.url} resolved to http://142.93.175.42:8081 in this case):
+-  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
+   +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
+      ```json
+      {
+         "insecure-registries": ["209.38.204.141:8083"]
+      }
+      ```
+   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker.
+   +  From ~/.m2/settings.xml file on the build-server, put nexusUser to <username> and a pre-defined password to <password>.
+   +  Run "docker login 209.38.204.141:8083 -u nexusUser -p <password>" (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
+
+-  Add to the pom.xml file of each and every microservice as well as of the parent project the following section (with ${nexus.server.url} resolved to http://209.38.204.141:8081 in this case):
    ```xml
    <distributionManagement>
       <snapshotRepository>
@@ -426,7 +427,7 @@ Jenkins: http://164.90.178.137:8080
 
 SonarQube: http://209.38.204.141:9000
 
-Nexus: http://142.93.175.42:8081
+Nexus: http://209.38.204.141:8081
 
 Application: https://164.92.252.125:4200
 
