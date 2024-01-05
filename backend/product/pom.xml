@@ -6,14 +6,19 @@
     <parent>
         <groupId>com.gritlab</groupId>
         <artifactId>buy01-app</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <packaging>jar</packaging>
+
     <artifactId>product</artifactId>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <nexus.server.url>http://nexus-server-url</nexus.server.url>
     </properties>
 
     <dependencies>
@@ -23,6 +28,17 @@
             <version>1.27</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>${nexus.server.url}/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus-releases</id>
+            <url>${nexus.server.url}/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <finalName>product</finalName>

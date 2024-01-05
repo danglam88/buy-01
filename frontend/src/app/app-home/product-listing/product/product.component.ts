@@ -18,19 +18,18 @@ export class ProductComponent {
     return this.searchText?.some(keyword => product.name.toLowerCase().includes(keyword.toLowerCase()));
   }
 
-  //TODO: change the range of price
   shouldShowProductBasedOnFilter(product: Product, filter: string): boolean {
     switch (filter) {
       case 'under100':
-        return product.price < 100;
+        return product.price < 100000;
       case 'under200':
-        return product.price >= 100 && product.price < 200;
+        return product.price >= 100000 && product.price < 200000;
       case 'under300':
-        return product.price >= 200 && product.price < 300;
+        return product.price >= 200000 && product.price < 300000;
       case 'under400':
-        return product.price >= 300 && product.price < 400;
+        return product.price >= 300000 && product.price < 400000;
       case 'above400':
-        return product.price >= 400;
+        return product.price >= 400000;
       default:
         return true; 
     }

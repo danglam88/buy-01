@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+
 import { EncryptionService } from '../services/encryption.service';
-import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { AuthenticationService } from './authentication.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -14,18 +16,20 @@ export class UserService {
   
   constructor(
     private httpClient: HttpClient,
-    private encryptionService: EncryptionService, 
-    private router: Router,
-    ) {}
+    private encryptionService: EncryptionService,
+    private authService: AuthenticationService,
+    private router: Router
+  ) {}
   
     get token() : string {
-      const encryptedSecret = sessionStorage.getItem('srt');
+      const encryptedSecret = localStorage.getItem('srt');
       if (encryptedSecret) {
         try {
           const currentToken = JSON.parse(this.encryptionService.decrypt(encryptedSecret))["token"];
           return currentToken;
         } catch (error) {
-          this.router.navigate(['../login']);
+          this.authService.logout();
+          this.router.navigate(['login']);
         }
       }
       return '';
@@ -86,5 +90,19 @@ export class UserService {
     this.userInfoRoleSource.next(role);
   }
 
+  getUserInfoRole(): string {
+    const encryptedSecret = localStorage.getItem("srt");
+    if (encryptedSecret) {
+      try {
+        const role = JSON.parse(
+          this.encryptionService.decrypt(encryptedSecret)
+        )["role"];
+        return role;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return "";
+  }
 }
 

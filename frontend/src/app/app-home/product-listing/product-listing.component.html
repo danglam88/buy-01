@@ -1,16 +1,10 @@
 <app-header></app-header>
 <div class="productlist--container">
   <div class="page-container">
-    <mat-paginator class="page"
-      [length]="(allProducts$ | async)?.length"
-      [pageSize]="21"
-      [pageSizeOptions]="[7, 14, 21]"
-      aria-label="Select page"
-      #paginator>
-    </mat-paginator> 
     <div *ngIf="(allProducts$ | async)?.length > 0">
       <app-search (searchTextChanged)="setSearchText($event)"></app-search>
       <app-filter
+        [all]="totalNumberOfProducts"
         [under100]="totalProductUnder100" 
         [under200]="totalProductUnder200"
         [under300]="totalProductUnder300"
@@ -22,7 +16,7 @@
     <p *ngIf="(allProducts$ | async)?.length == 0">There are no products!</p> 
   </div>
   <ng-container *ngIf="(allProducts$ | async) as products">
-    <ng-container *ngFor="let product of products.slice((paginator.pageIndex * paginator.pageSize), (paginator.pageIndex + 1) * paginator.pageSize)">
+    <ng-container *ngFor="let product of products">
       <app-product  
         [product]="product" 
         [searchText]="searchText"

@@ -35,6 +35,7 @@
   height: auto;
 }
 .remove-image {
+cursor: pointer;
 display: none;
 position: absolute;
 top: -10px;

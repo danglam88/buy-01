@@ -19,10 +19,4 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app.title).toEqual('Buy-01');
   });
-
-  xit('should hide tool bar', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.isToolbarVisible).toBeTrue();
-  });
 });

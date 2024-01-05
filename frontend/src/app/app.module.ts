@@ -16,7 +16,7 @@ import { LogInComponent } from './authentication/log-in/log-in.component';
 import { RegisterComponent } from './authentication/register/register.component';
 import { HeaderComponent } from './app-home/header/header.component';
 import { FooterComponent } from './app-home/footer/footer.component';
-import { UserDashboardComponent } from './app-home/my-account/user-dashboard/user-dashboard.component';
+import { UserDashboardComponent } from './app-home/user-dashboard/user-dashboard.component';
 import { ProductDashboardComponent } from './app-home/product-dashboard/product-dashboard.component';
 import { ProductListingComponent } from './app-home/product-listing/product-listing.component';
 import { AppHomeComponent } from './app-home/app-home.component';
@@ -39,12 +39,11 @@ import { ValidationService } from './services/validation.service';
 import { ErrorService } from './services/error.service';
 import { SearchComponent } from './app-home/search/search.component';
 import { FilterComponent } from './app-home/product-listing/filter/filter.component';
-import { MyAccountComponent } from './app-home/my-account/my-account.component';
-import { OrderHistoryComponent } from './app-home/my-account/order-history/order-history.component';
-import { OrderDetailsComponent } from './app-home/my-account/order-details/order-details.component';
+import { MyOrdersComponent } from './app-home/my-orders/my-orders.component';
+import { OrderHistoryComponent } from './app-home/my-orders/order-history/order-history.component';
+import { OrderDetailsComponent } from './app-home/my-orders/order-details/order-details.component';
 import { CartComponent } from './app-home/cart/cart.component';
-import { OrderConfirmationComponent } from './app-home/order-confirmation/order-confirmation.component';
-import { StatsComponent } from './app-home/my-account/stats/stats.component';
+import { StatsComponent } from './app-home/my-orders/stats/stats.component';
 
 @NgModule({
   declarations: [
@@ -68,11 +67,10 @@ import { StatsComponent } from './app-home/my-account/stats/stats.component';
     MediaComponent,
     SearchComponent,
     FilterComponent,
-    MyAccountComponent,
+    MyOrdersComponent,
     OrderHistoryComponent,
     OrderDetailsComponent,
     CartComponent,
-    OrderConfirmationComponent,
     StatsComponent
   ],
   imports: [

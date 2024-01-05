@@ -2,16 +2,16 @@
 <mat-card>
   <!--HEADER-->
   <div class="header">
-    <span class="role">{{ role }}</span>
+ 
     <h1 mat-dialog-title class="title">My Order Transactions</h1>
   </div>
   <app-search (searchTextChanged)="setSearchText($event)"></app-search>
   <!--CLIENT-->
   <div *ngIf="role === 'CLIENT'">
     <div class="row">
-      <div>Order #</div>
-      <div>Status</div>
-      <div>Action</div>
+      <div class="order-no">Order #</div>
+      <div class="status">Status</div>
+      <div class="action">Action</div>
     </div>
   
     <hr>
@@ -33,20 +33,20 @@
   <!--SELLER-->
   <div *ngIf="role === 'SELLER'">
     <div class="row">
-      <div>Order Item #</div>
-      <div>Product Name</div>
-      <div>Status</div>
-      <div>Action</div>
+      <div class="seller-order-no">Order Item #</div>
+      <div class="seller-product-name" id="hidden">Product Name</div>
+      <div class="seller-status" >Status</div>
+      <div class="seller-action" id="label">Action</div>
     </div>
   
     <hr>
    
     <div class="row" *ngFor="let item of (allTrans$ | async)">
       <div class="row-items" *ngIf="shouldShowSellerOrderItems(item)">
-        <div class="order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
-        <div class="product-name">{{ item.name }}</div>
-        <div class="status">{{ item.status_code }}</div>
-        <div class="action">
+        <div class="seller-order-no" (click)="openProductDetail(item)"><a>{{ item.item_id }}</a></div>
+        <div class="seller-product-name" id="hidden">{{ item.name }}</div>
+        <div class="seller-status">{{ item.status_code }}</div>
+        <div class="seller-action">
           <div *ngIf="item.status_code === 'CREATED'">
             <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CONFIRMED')">Confirm</button>
             <button mat-button color="primary" class="view-button" (click)="updateOrderItemStatus(item, 'CANCELLED')">Cancel</button>

@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AngularMaterialModule } from 'src/app/angular-material.module';
-
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
-
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'; 
-
 
 describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;

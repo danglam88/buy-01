@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Product } from '../../Models/Product';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+
+import { Product } from '../../Models/Product';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from 'src/app/services/product.service';
 import { ErrorService } from 'src/app/services/error.service';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-product-dashboard',
@@ -19,6 +19,7 @@ export class ProductDashboardComponent implements OnInit {
   @Input() product: Product;
   @Input() searchText: string[] = [];
   @Input() selectedFilterRadioButton: string = "all";
+  totalNumberOfProducts: number = 0;
   totalProductUnder100: number = 0;
   totalProductUnder200: number = 0;
   totalProductUnder300: number = 0;
@@ -34,6 +35,7 @@ export class ProductDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.getSellerProducts();
 
+    // Subscribe to check if seller creates new product. If so, get sellerProducts
     if (this.productService.productCreated) {
       this.productService.productCreated.subscribe((productCreated) => {
         if (productCreated) {
@@ -45,6 +47,7 @@ export class ProductDashboardComponent implements OnInit {
       });
     }
 
+    // Subscribe to check if seller deletes product. If so, get sellerProducts
     if (this.productService.productDeleted) {
       this.productService.productDeleted.subscribe((productDeleted) => {
         if (productDeleted) {
@@ -60,6 +63,14 @@ export class ProductDashboardComponent implements OnInit {
   // Get all of the seller products
   getSellerProducts(): void {
     this.sellerProducts$ = this.productService.getSellerProductsInfo().pipe(
+      tap((products: Product[]) => {
+        this.totalProductUnder100 = products.filter((product) => product.price < 100000).length;
+        this.totalProductUnder200 = products.filter((product) => product.price >= 100000 && product.price < 200000).length;
+        this.totalProductUnder300 = products.filter((product) => product.price >= 200000 && product.price < 300000).length;
+        this.totalProductUnder400 = products.filter((product) => product.price >= 300000 && product.price < 400000).length;
+        this.totalProductAbove400 = products.filter((product) => product.price >= 400000).length;
+        this.totalNumberOfProducts = products.length;
+      }),
       map((result: any) => {
         if (Array.isArray(result)) {
           return result.map(product => ({ ...product, editable: true }));
@@ -86,10 +97,12 @@ export class ProductDashboardComponent implements OnInit {
     });
   }
 
+  // Set search text
   setSearchText(value: string[]){
     this.searchText = value;
  }
 
+ // Set filter
  onFilterChanged(value: string){
   this.selectedFilterRadioButton = value;
 }

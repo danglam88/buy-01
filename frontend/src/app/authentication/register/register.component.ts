@@ -1,8 +1,9 @@
 import { Component, ViewChild, ElementRef  } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { RegistrationService } from '../../services/registration.service'
 import { Router } from '@angular/router';
+
+import { RegistrationService } from '../../services/registration.service';
 import { ValidationService } from 'src/app/services/validation.service';
 import { ErrorService } from 'src/app/services/error.service';
 import { EncryptionService } from 'src/app/services/encryption.service';
@@ -31,7 +32,7 @@ export class RegisterComponent  {
     private validationService: ValidationService,
     private errorService: ErrorService,
     private router: Router) {
-      if (this.encryptionService.decrypt(sessionStorage.getItem("loggedIn")) === "true") {
+      if (this.encryptionService.decrypt(localStorage.getItem("loggedIn")) === "true") {
         console.log("User is logged in in reigistration component");
         this.router.navigate(["../home"]);
       } 

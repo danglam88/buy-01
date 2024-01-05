@@ -12,15 +12,12 @@ pipeline {
     }
 
     environment {
-        USER_MICROSERVICE_IMAGE = 'danglamgritlab/user-microservice:latest'
-        PRODUCT_MICROSERVICE_IMAGE = 'danglamgritlab/product-microservice:latest'
-        MEDIA_MICROSERVICE_IMAGE = 'danglamgritlab/media-microservice:latest'
-        ORDER_MICROSERVICE_IMAGE = 'danglamgritlab/order-microservice:latest'
-        FRONTEND_IMAGE = 'danglamgritlab/frontend:latest'
+        NEXUS_DOCKER_REPOSITORY = '209.38.204.141:8083'
+        NEXUS_SERVER = 'http://209.38.204.141:8081'
     }
 
     stages {
-        stage('Setup Credentials') {
+        stage('Setup Environment Variables') {
             steps {
                 script {
                     withCredentials([
@@ -28,6 +25,7 @@ pipeline {
                         usernamePassword(credentialsId: 'product-mongodb-creds', usernameVariable: 'PRODUCT_DB_USERNAME', passwordVariable: 'PRODUCT_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'media-mongodb-creds', usernameVariable: 'MEDIA_DB_USERNAME', passwordVariable: 'MEDIA_DB_PASSWORD'),
                         usernamePassword(credentialsId: 'order-mongodb-creds', usernameVariable: 'ORDER_DB_USERNAME', passwordVariable: 'ORDER_DB_PASSWORD'),
+                        usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD'),
                         string(credentialsId: 'jwt-secret-creds', variable: 'JWT_SECRET')
                     ]) {
                         env.USER_DB_USERNAME = USER_DB_USERNAME
@@ -38,8 +36,15 @@ pipeline {
                         env.MEDIA_DB_PASSWORD = MEDIA_DB_PASSWORD
                         env.ORDER_DB_USERNAME = ORDER_DB_USERNAME
                         env.ORDER_DB_PASSWORD = ORDER_DB_PASSWORD
+                        env.NEXUS_USERNAME = NEXUS_USERNAME
+                        env.NEXUS_PASSWORD = NEXUS_PASSWORD
                         env.JWT_SECRET_VALUE = JWT_SECRET
                         env.PATH = "/home/danglam/.nvm/versions/node/v18.10.0/bin:${env.PATH}"
+                        env.USER_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/user-microservice"
+                        env.PRODUCT_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/product-microservice"
+                        env.MEDIA_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/media-microservice"
+                        env.ORDER_MICROSERVICE_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/order-microservice"
+                        env.FRONTEND_IMAGE = "${env.NEXUS_DOCKER_REPOSITORY}/frontend"
                     }
                 }
             }
@@ -161,7 +166,7 @@ pipeline {
             }
         }
 
-        /*stage("Quality Gate for Frontend") {
+        stage("Quality Gate for Frontend") {
             agent { label 'build-agent' }
             steps {
                 waitForQualityGate abortPipeline: true
@@ -178,7 +183,19 @@ pipeline {
                 ng test --watch=false --browsers ChromeHeadless
                 '''
             }
-        }*/
+        }
+
+        stage('Deploy JAR Artifacts to Nexus') {
+            agent { label 'build-agent' }
+            steps {
+                script {
+                    sh '''
+                    cd backend
+                    mvn clean deploy -Drevision=1.0-${BUILD_NUMBER}-SNAPSHOT -DskipTests -Dnexus.server.url=${NEXUS_SERVER}
+                    '''
+                }
+            }
+        }
 
         stage('Build') {
             agent { label 'build-agent' } // This stage will be executed on the 'build' agent
@@ -194,6 +211,8 @@ pipeline {
                         [var: 'MEDIA_DB_PASSWORD', password: env.MEDIA_DB_PASSWORD],
                         [var: 'ORDER_DB_USERNAME', password: env.ORDER_DB_USERNAME],
                         [var: 'ORDER_DB_PASSWORD', password: env.ORDER_DB_PASSWORD],
+                        [var: 'NEXUS_USERNAME', password: env.NEXUS_USERNAME],
+                        [var: 'NEXUS_PASSWORD', password: env.NEXUS_PASSWORD],
                         [var: 'JWT_SECRET_VALUE', password: env.JWT_SECRET_VALUE]
                     ]
 
@@ -205,42 +224,54 @@ pipeline {
 
                         cd backend
 
-                        docker build -t user-microservice -f user/Dockerfile \
+                        docker build -t user-microservice:$BUILD_NUMBER -f user/Dockerfile \
                             --build-arg USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME \
                             --build-arg USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag user-microservice $USER_MICROSERVICE_IMAGE
-                        docker push $USER_MICROSERVICE_IMAGE
+                        docker tag user-microservice:$BUILD_NUMBER $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t product-microservice -f product/Dockerfile \
+                        docker build -t product-microservice:$BUILD_NUMBER -f product/Dockerfile \
                             --build-arg PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME \
                             --build-arg PRODUCT_DB_CREDENTIALS_PASSWORD=$PRODUCT_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag product-microservice $PRODUCT_MICROSERVICE_IMAGE
-                        docker push $PRODUCT_MICROSERVICE_IMAGE
+                        docker tag product-microservice:$BUILD_NUMBER $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t media-microservice -f media/Dockerfile \
+                        docker build -t media-microservice:$BUILD_NUMBER -f media/Dockerfile \
                             --build-arg MEDIA_DB_CREDENTIALS_USERNAME=$MEDIA_DB_USERNAME \
                             --build-arg MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag media-microservice $MEDIA_MICROSERVICE_IMAGE
-                        docker push $MEDIA_MICROSERVICE_IMAGE
+                        docker tag media-microservice:$BUILD_NUMBER $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
-                        docker build -t order-microservice -f order/Dockerfile \
+                        docker build -t order-microservice:$BUILD_NUMBER -f order/Dockerfile \
                             --build-arg ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME \
                             --build-arg ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD \
+                            --build-arg NEXUS_USERNAME=$NEXUS_USERNAME \
+                            --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD \
+                            --build-arg NEXUS_SERVER=$NEXUS_SERVER \
                             --build-arg JWT_SECRET=$JWT_SECRET_VALUE \
                             .
-                        docker tag order-microservice $ORDER_MICROSERVICE_IMAGE
-                        docker push $ORDER_MICROSERVICE_IMAGE
+                        docker tag order-microservice:$BUILD_NUMBER $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                        docker push $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
 
                         cd ../frontend
-                        docker build -t frontend .
-                        docker tag frontend $FRONTEND_IMAGE
-                        docker push $FRONTEND_IMAGE
+                        docker build -t frontend:$BUILD_NUMBER .
+                        docker tag frontend:$BUILD_NUMBER $FRONTEND_IMAGE:$BUILD_NUMBER
+                        docker push $FRONTEND_IMAGE:$BUILD_NUMBER
 
                         docker system prune -a -f --volumes
                         '''
@@ -278,6 +309,8 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export NEXUS_DOCKER_REPOSITORY=$NEXUS_DOCKER_REPOSITORY
+                            export VERSION_NUMBER=$BUILD_NUMBER
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
@@ -285,11 +318,11 @@ pipeline {
                             fi
                             docker system prune -a -f --volumes
 
-                            docker pull $USER_MICROSERVICE_IMAGE
-                            docker pull $PRODUCT_MICROSERVICE_IMAGE
-                            docker pull $MEDIA_MICROSERVICE_IMAGE
-                            docker pull $ORDER_MICROSERVICE_IMAGE
-                            docker pull $FRONTEND_IMAGE
+                            docker pull $USER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $MEDIA_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $ORDER_MICROSERVICE_IMAGE:$BUILD_NUMBER
+                            docker pull $FRONTEND_IMAGE:$BUILD_NUMBER
 
                             docker-compose up -d
                             '''
@@ -307,31 +340,23 @@ pipeline {
                             if (!allContainersRunning) {
                                 error("Not all containers are running as expected.")
                             }
-                            
+
                             sh '''
-                            echo "Deployment passed. Executing backup."
-
-                            docker save -o ~/user-microservice.tar $USER_MICROSERVICE_IMAGE
-                            docker save -o ~/product-microservice.tar $PRODUCT_MICROSERVICE_IMAGE
-                            docker save -o ~/media-microservice.tar $MEDIA_MICROSERVICE_IMAGE
-                            docker save -o ~/order-microservice.tar $ORDER_MICROSERVICE_IMAGE
-                            docker save -o ~/frontend.tar $FRONTEND_IMAGE
-
-                            if [ ! -d "~/backup" ]; then
-                                mkdir -p ~/backup
-                            fi
-
-                            mv ~/*.tar ~/backup/
+                            echo "Deployment passed. Saving $BUILD_NUMBER to the version_number file."
+                            echo $BUILD_NUMBER > ~/version_number
                             '''
                         }
                     } catch (err) {
                         // Use maskPasswords with named arguments
                         maskPasswords(scope: 'GLOBAL', varPasswordPairs: maskVars) {
                             // If deploy fails, the rollback commands are executed
+                            // Read version number from the version_number file
                             sh '''
-                            echo "Error: ${err.getMessage()}"
-                            echo "Deployment failed. Executing rollback."
-                            
+                            echo "Deployment failed. Executing rollback commands."
+
+                            SUCCESS_VERSION=$(cat ~/version_number)
+                            echo "Rolling back to version $SUCCESS_VERSION"
+
                             export USER_DB_CREDENTIALS_USERNAME=$USER_DB_USERNAME
                             export USER_DB_CREDENTIALS_PASSWORD=$USER_DB_PASSWORD
                             export PRODUCT_DB_CREDENTIALS_USERNAME=$PRODUCT_DB_USERNAME
@@ -340,6 +365,8 @@ pipeline {
                             export MEDIA_DB_CREDENTIALS_PASSWORD=$MEDIA_DB_PASSWORD
                             export ORDER_DB_CREDENTIALS_USERNAME=$ORDER_DB_USERNAME
                             export ORDER_DB_CREDENTIALS_PASSWORD=$ORDER_DB_PASSWORD
+                            export NEXUS_DOCKER_REPOSITORY=$NEXUS_DOCKER_REPOSITORY
+                            export VERSION_NUMBER=$SUCCESS_VERSION
 
                             if [ "$(docker ps -aq)" != "" ]; then
                                 docker ps -aq | xargs -n 1 -I {} sh -c 'docker inspect --format="{{.State.Status}}" $1 | grep -q running && docker stop $1 || true' -- {}
@@ -347,20 +374,35 @@ pipeline {
                             fi
                             docker system prune -a -f --volumes
 
-                            cp ~/backup/*.tar ~/
-
-                            docker load -i ~/user-microservice.tar
-                            docker load -i ~/product-microservice.tar
-                            docker load -i ~/media-microservice.tar
-                            docker load -i ~/order-microservice.tar
-                            docker load -i ~/frontend.tar
+                            docker pull $USER_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $PRODUCT_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $MEDIA_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $ORDER_MICROSERVICE_IMAGE:$SUCCESS_VERSION
+                            docker pull $FRONTEND_IMAGE:$SUCCESS_VERSION
 
                             docker-compose up -d
                             '''
-                        }
 
-                        // Re-throw the error so that the pipeline fails
-                        throw err
+                            def allContainersRunning = true
+                            for (container in expectedContainers) {
+                                def status = sh(script: "docker inspect --format='{{.State.Status}}' ${container}", returnStdout: true).trim()
+                                if (status != 'running') {
+                                    echo "Container ${container} is not running. Status: ${status}"
+                                    allContainersRunning = false
+                                    break
+                                }
+                            }
+
+                            if (!allContainersRunning) {
+                                error("Not all containers are running as expected.")
+                            }
+
+                            sh '''
+                            echo "Rollback passed. Re-throwing the error so that the pipeline fails."
+                            '''
+
+                            throw err
+                        }
                     }
                 }
             }

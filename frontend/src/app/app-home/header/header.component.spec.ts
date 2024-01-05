@@ -1,13 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HeaderComponent } from './header.component';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { EncryptionService } from 'src/app/services/encryption.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router, NavigationEnd } from '@angular/router';
 import { ToastrModule } from 'ngx-toastr';
 import { of } from 'rxjs';
+
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { EncryptionService } from 'src/app/services/encryption.service';
+import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;

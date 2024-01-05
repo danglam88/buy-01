@@ -1,6 +1,16 @@
 # Stage 1: Build the application
 FROM maven:3.8.3-openjdk-17 as builder
 
+# Accept build arguments
+ARG NEXUS_USERNAME
+ARG NEXUS_PASSWORD
+ARG NEXUS_SERVER
+
+# Set arguments as environment variables for buildtime
+ENV NEXUS_USERNAME=${NEXUS_USERNAME}
+ENV NEXUS_PASSWORD=${NEXUS_PASSWORD}
+ENV NEXUS_SERVER=${NEXUS_SERVER}
+
 # Set the working directory in the container
 WORKDIR /app
 
@@ -14,6 +24,7 @@ COPY product/src/main/resources/*.pem /usr/local/share/ca-certificates/
 COPY product/src/main/resources/*.p12 /usr/local/share/ca-certificates/
 COPY product/src/main/resources/*.crt /usr/local/share/ca-certificates/
 COPY product/src/main/resources/*.jks /usr/local/share/ca-certificates/
+COPY settings.xml /root/.m2/
 
 # Import the certificate into the java truststore
 RUN keytool -import -trustcacerts -noprompt -storepass changeit -alias mycert -file /usr/local/share/ca-certificates/product.crt -keystore ${JAVA_HOME}/lib/security/cacerts

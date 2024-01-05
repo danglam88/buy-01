@@ -1,168 +1,386 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<!-- BOOTSTRAP CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <!-- FONT AWESOME CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<!-- AJAX JQUERY SCRIPT -->
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
 
 <div class="product--details--info scroll">
-    <div class="header">
-        <h1 mat-dialog-title class="title">Product Information</h1>
-        <div class="create-product-close">
-            <i class="fa fa-times" aria-hidden="true" (click)="closeModal()"></i>
-        </div>
+  <div class="header">
+    <h1 mat-dialog-title class="title">Product Information</h1>
+    <div class="create-product-close">
+      <i class="fa fa-times" aria-hidden="true" (click)="closeModal()"></i>
     </div>
-    <mat-dialog-content>
-        <form [formGroup]="productDetailForm">
-            <div class="product-detail-image">
-                <!-- Image Slider -->
-                <div class="image-slider" *ngIf="editingField !== 'addImages'">
-                    <button mat-icon-button *ngIf="noOfImages > 1" (click)="previousSlide()">
-                    <mat-icon>chevron_left</mat-icon>
-                    </button>
-                    <div class="image-container">
-                        <img [src]="currentImage?.url" class="slider-image" alt="Current image">
-                    <a
-                        class="remove-image" 
-                        *ngIf="editingField === 'deleteImages' && userRole === 'SELLER' && product?.editable === true && noOfImages > 1"
-                        (click)="deleteImage(currentImage)"
-                        style="display: inline;"
-                    >
-                    &#215;
-                    </a>
-                    </div>
-                    <button mat-icon-button *ngIf="noOfImages > 1" (click)="nextSlide()">
-                    <mat-icon>chevron_right</mat-icon>
-                    </button>
-                </div>
-                <!-- Add Images: slider will change to placeholder -->
-                <div *ngIf="editingField === 'addImages'">
-                    <div class="product-image">
-                        <div *ngIf="selectedFiles.length > 0">
-                            <app-image-slider [images]="selectedFiles" (imageRemoved)="onImageRemoved($event)"></app-image-slider>
-                        </div>
-                        <div *ngIf="selectedFiles.length === 0">
-                            <img [src]="previewUrl ? previewUrl : imgPlaceholder" class="preview-image" alt="Preview image or Imageplaceholder">
-        
-                        </div>
-                    </div>
-                </div>
-                <!-- Delete or Add Image Buttons + Upload and Cancel -->
-                <div class="edit-button">
-                     <!-- Delete and Add Images Buttons -->
-                    <div class="button-container">
-                        <div *ngIf="userRole === 'SELLER' && product?.editable === true ">
-                        <button class="editImages-button" (click)="editProfileField('deleteImages')" *ngIf="!isAddingImages && !isEditingImages && noOfImages > 1">Delete Images</button>
-                        </div>
-                        <div *ngIf="userRole === 'SELLER' && product?.editable === true ">
-                        <button class="addImages-button" (click)="editProfileField('addImages')" *ngIf="!isDeletingImages && !isEditingImages">Add Images</button>
-                        </div>
-                    </div>
-                    <!-- Upload new images and Cancel buttons -->
-                    <div class="upload-cancel-container">
-                        <div *ngIf="selectedFiles.length === 0 && editingField === 'addImages'">
-                            <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none" #fileInput multiple>
-                            <button class="upload-button" (click)="fileInput.click()" *ngIf="!previewUrl">Upload Image</button>
-                        </div>
-                        <button class="cancel-button" *ngIf="isEditingImages" (click)="cancelFieldEdit()">Cancel</button>
-                        <button class="save-button" *ngIf="editingField === 'addImages' && selectedFiles.length > 0 && isAddingImages && isEditingImages" (click)="saveEditedImages()">Save</button>
-                    </div>
-                </div>                  
+  </div>
+  <mat-dialog-content>
+    <form [formGroup]="productDetailForm">
+      <div class="product-detail-image">
+        <!-- Image Slider -->
+        <div class="image-slider" *ngIf="editingField !== 'addImages'">
+          <button
+            mat-icon-button
+            *ngIf="noOfImages > 1"
+            (click)="previousSlide()"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <div class="image-container">
+            <img
+              [src]="currentImage?.url"
+              class="slider-image"
+              alt="Current image"
+            />
+            <a
+              class="remove-image"
+              *ngIf="
+                editingField === 'deleteImages' &&
+                userRole === 'SELLER' &&
+                product?.editable === true &&
+                noOfImages > 1
+              "
+              (click)="deleteImage(currentImage)"
+              style="display: inline"
+            >
+              &#215;
+            </a>
+          </div>
+          <button mat-icon-button *ngIf="noOfImages > 1" (click)="nextSlide()">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+        <!-- Add Images: slider will change to placeholder -->
+        <div *ngIf="editingField === 'addImages'">
+          <div class="product-image">
+            <div *ngIf="selectedFiles.length > 0">
+              <app-image-slider
+                [images]="selectedFiles"
+                (imageRemoved)="onImageRemoved($event)"
+              ></app-image-slider>
             </div>
-            <div class="product-detail">
-                <!--Name-->
-                <div class="product-detail-name">
-                    <div class="product-value" *ngIf="editingField !== 'name'">
-                        <h1><strong>{{product?.name}}</strong></h1>
-                    </div>
-                    <div class="product-value" *ngIf="editingField == 'name' && userRole === 'SELLER'">
-                        <div class="field input-field" *ngIf="editingField === 'name'">
-                        <input matInput placeholder="Product Name" formControlName="name" #nameInput>
-                        </div>
-                    </div>
-                    <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('name')" *ngIf="editingField !== 'name' && userRole === 'SELLER' && product?.editable === true "><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i> </button>
-                        <button class="confirm-button" *ngIf="editingField === 'name'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
-                        <button class="confirm-button" *ngIf="editingField === 'name'" (click) = "updateField('name')"><i class="fa-solid fa-check fa-xl"  style="color: #45c33c;"></i></button>
-                    </div>
-                </div>
-                <!--Price-->
-                <div class="product-detail-price">
-                    <div class="product-value" *ngIf="editingField !== 'price'">
-                        <h2>€ {{product?.price}}</h2>
-                    </div>
-                    <div class="product-value" *ngIf="editingField == 'price' && userRole === 'SELLER'">
-                        <div class="field input-field" *ngIf="editingField === 'price'">
-                        <input matInput placeholder="Product Price" formControlName="price" #priceInput>
-                        </div>
-                    </div>
-                    <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('price')" *ngIf="editingField !== 'price' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-                        <button class="confirm-button" *ngIf="editingField === 'price'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
-                        <button class="confirm-button"  *ngIf="editingField === 'price'" (click) = "updateField('price')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
-                    </div>
-                </div>
-                 <!--Quantity-->
-                 <div class="product-detail-price" >
-                    <div class="product-value" *ngIf="editingField !== 'quantity'">
-                        <h2>Quantity: {{product?.quantity}}</h2>
-                    </div>
-                    <div class="product-value" *ngIf="editingField == 'quantity' && userRole === 'SELLER'">
-                        <div class="field input-field" *ngIf="editingField === 'quantity'">
-                        <input matInput placeholder="Product quantity" formControlName="quantity" #quantityInput>
-                        </div>
-                    </div>
-                    <div class="product-button">
-                        <button class="edit-button" (click)="editProfileField('quantity')" *ngIf="editingField !== 'quantity' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-                        <button class="confirm-button" *ngIf="editingField === 'quantity'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
-                        <button class="confirm-button"  *ngIf="editingField === 'quantity'" (click) = "updateField('quantity')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
-                    </div>
-                </div>
-                <!--Desc-->
-                <div class="product-detail-desc">
-                    <div class="product-detail-desc-heading" style="padding: 5px 0px;border-bottom: #ccc 2px solid">
-                        <div style="margin-top: 8px;"class="product-value">
-                            <h2>Product Description</h2>
-                        </div>
-                        <div class="product-button">
-                            <button class="edit-button" (click)="editProfileField('desc')" *ngIf="editingField !== 'desc' && userRole === 'SELLER' && product?.editable === true"><i class="fa-regular fa-pen-to-square fa-lg"  aria-hidden="true" style="color: #4f71ab;"></i></button>
-                            <button class="confirm-button" *ngIf="editingField === 'desc'" (click)="cancelFieldEdit()"><i class="fa-solid fa-xmark fa-xl" style="color: #d13535;"></i></button>
-                            <button class="confirm-button" *ngIf="editingField === 'desc'" (click) = "updateField('description')"><i class="fa-solid fa-check fa-xl" style="color: #45c33c;"></i></button>
-                        </div>
-                    </div>
-                    <div *ngIf="editingField !== 'desc'">
-                        <p>{{product?.description}}</p>
-                    </div>
-                    <div style="margin-top: 20px" *ngIf="editingField == 'desc' && userRole === 'SELLER' && product?.editable === true">
-                        <div class="field input-field">
-                            <input matInput placeholder="Description" formControlName="description" #descriptionInput>
-                        </div>
-                    </div>                 
-                </div>
-                <div class="ekart-product-detail-addtoCart">
-                    <button class="delete-button" *ngIf="userRole === 'SELLER' && product?.editable === true" (click) ="deleteProduct()">
-                        <span class="text">
-                            Delete Product
-                        </span>
-                    </button>
-                </div>
-                <!-- ADD TO CART FEATURE -->
-                <div class="addToCartDiv" *ngIf="!noProductsAvailble">
-                    <button class="addtocart" *ngIf="userRole === 'CLIENT'" [disabled]="isAddingToCart">
-                        <div class="pretext" (click)="addToCart()">
-                          <i class="fas fa-cart-plus"></i> ADD TO CART
-                        </div>
-                        <!-- Disable this button when Add to cart is clicked -->
-                        <div class="pretext" *ngIf="isAddingToCart" id="addedToCart">
-                            <i class="fas fa-check"></i> ADDED TO CART
-                          </div>
-                    </button>
-                </div>
+            <div *ngIf="selectedFiles.length === 0">
+              <img
+                [src]="previewUrl ? previewUrl : imgPlaceholder"
+                class="preview-image"
+                alt="Preview image or Imageplaceholder"
+              />
             </div>
-        </form>
-    </mat-dialog-content>
+          </div>
+        </div>
+        <!-- Delete or Add Image Buttons + Upload and Cancel -->
+        <div class="edit-button">
+          <!-- Delete and Add Images Buttons -->
+          <div class="button-container">
+            <div *ngIf="userRole === 'SELLER' && product?.editable === true">
+              <button
+                class="editImages-button"
+                (click)="editProfileField('deleteImages')"
+                *ngIf="!isAddingImages && !isEditingImages && noOfImages > 1"
+              >
+                Delete Images
+              </button>
+            </div>
+            <div *ngIf="userRole === 'SELLER' && product?.editable === true">
+              <button
+                class="addImages-button"
+                (click)="editProfileField('addImages')"
+                *ngIf="!isDeletingImages && !isEditingImages"
+              >
+                Add Images
+              </button>
+            </div>
+          </div>
+          <!-- Upload new images and Cancel buttons -->
+          <div class="upload-cancel-container">
+            <div
+              *ngIf="selectedFiles.length === 0 && editingField === 'addImages'"
+            >
+              <input
+                type="file"
+                (change)="onFileSelected($event)"
+                accept="image/*"
+                style="display: none"
+                #fileInput
+                multiple
+              />
+              <button
+                class="upload-button"
+                (click)="fileInput.click()"
+                *ngIf="!previewUrl"
+              >
+                Upload Image
+              </button>
+            </div>
+            <button
+              class="cancel-button"
+              *ngIf="isEditingImages"
+              (click)="cancelFieldEdit()"
+            >
+              Cancel
+            </button>
+            <button
+              class="save-button"
+              *ngIf="
+                editingField === 'addImages' &&
+                selectedFiles.length > 0 &&
+                isAddingImages &&
+                isEditingImages
+              "
+              (click)="saveEditedImages()"
+              [disabled]="disableSpamButton"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="product-detail">
+        <!--Name-->
+        <div class="product-detail-name">
+          <div class="product-value" *ngIf="editingField !== 'name'">
+            <h1>
+              <strong>{{ product?.name }}</strong>
+            </h1>
+          </div>
+          <div
+            class="product-value"
+            *ngIf="editingField == 'name' && userRole === 'SELLER'"
+          >
+            <div class="field input-field" *ngIf="editingField === 'name'">
+              <input
+                matInput
+                placeholder="Product Name"
+                formControlName="name"
+                #nameInput
+              />
+            </div>
+          </div>
+          <div class="product-button">
+            <button
+              class="edit-button"
+              (click)="editProfileField('name')"
+              *ngIf="
+                editingField !== 'name' &&
+                userRole === 'SELLER' &&
+                product?.editable === true
+              "
+            >
+              <i
+                class="fa-regular fa-pen-to-square fa-lg"
+                aria-hidden="true"
+                style="color: #4f71ab"
+              ></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'name'"
+              (click)="cancelFieldEdit()"
+            >
+              <i class="fa-solid fa-xmark fa-xl" style="color: #d13535"></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'name'"
+              (click)="updateField('name')"
+            >
+              <i class="fa-solid fa-check fa-xl" style="color: #45c33c"></i>
+            </button>
+          </div>
+        </div>
+        <!--Price-->
+        <div class="product-detail-price">
+          <div class="product-value" *ngIf="editingField !== 'price'">
+            <h2>€ {{ product?.price }}</h2>
+          </div>
+          <div
+            class="product-value"
+            *ngIf="editingField == 'price' && userRole === 'SELLER'"
+          >
+            <div class="field input-field" *ngIf="editingField === 'price'">
+              <input
+                matInput
+                placeholder="Product Price"
+                formControlName="price"
+                #priceInput
+              />
+            </div>
+          </div>
+          <div class="product-button">
+            <button
+              class="edit-button"
+              (click)="editProfileField('price')"
+              *ngIf="
+                editingField !== 'price' &&
+                userRole === 'SELLER' &&
+                product?.editable === true
+              "
+            >
+              <i
+                class="fa-regular fa-pen-to-square fa-lg"
+                aria-hidden="true"
+                style="color: #4f71ab"
+              ></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'price'"
+              (click)="cancelFieldEdit()"
+            >
+              <i class="fa-solid fa-xmark fa-xl" style="color: #d13535"></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'price'"
+              (click)="updateField('price')"
+            >
+              <i class="fa-solid fa-check fa-xl" style="color: #45c33c"></i>
+            </button>
+          </div>
+        </div>
+        <!--Quantity-->
+        <div class="product-detail-price">
+          <div class="product-value" *ngIf="editingField !== 'quantity'">
+            <h2>Quantity: {{ product?.quantity }}</h2>
+          </div>
+          <div
+            class="product-value"
+            *ngIf="editingField == 'quantity' && userRole === 'SELLER'"
+          >
+            <div class="field input-field" *ngIf="editingField === 'quantity'">
+              <input
+                matInput
+                placeholder="Product quantity"
+                formControlName="quantity"
+                #quantityInput
+              />
+            </div>
+          </div>
+          <div class="product-button">
+            <button
+              class="edit-button"
+              (click)="editProfileField('quantity')"
+              *ngIf="
+                editingField !== 'quantity' &&
+                userRole === 'SELLER' &&
+                product?.editable === true
+              "
+            >
+              <i
+                class="fa-regular fa-pen-to-square fa-lg"
+                aria-hidden="true"
+                style="color: #4f71ab"
+              ></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'quantity'"
+              (click)="cancelFieldEdit()"
+            >
+              <i class="fa-solid fa-xmark fa-xl" style="color: #d13535"></i>
+            </button>
+            <button
+              class="confirm-button"
+              *ngIf="editingField === 'quantity'"
+              (click)="updateField('quantity')"
+            >
+              <i class="fa-solid fa-check fa-xl" style="color: #45c33c"></i>
+            </button>
+          </div>
+        </div>
+        <!--Desc-->
+        <div class="product-detail-desc">
+          <div
+            class="product-detail-desc-heading"
+            style="padding: 5px 0px; border-bottom: #ccc 2px solid"
+          >
+            <div style="margin-top: 8px" class="product-value">
+              <h2>Product Description</h2>
+            </div>
+            <div class="product-button">
+              <button
+                class="edit-button"
+                (click)="editProfileField('desc')"
+                *ngIf="
+                  editingField !== 'desc' &&
+                  userRole === 'SELLER' &&
+                  product?.editable === true
+                "
+              >
+                <i
+                  class="fa-regular fa-pen-to-square fa-lg"
+                  aria-hidden="true"
+                  style="color: #4f71ab"
+                ></i>
+              </button>
+              <button
+                class="confirm-button"
+                *ngIf="editingField === 'desc'"
+                (click)="cancelFieldEdit()"
+              >
+                <i class="fa-solid fa-xmark fa-xl" style="color: #d13535"></i>
+              </button>
+              <button
+                class="confirm-button"
+                *ngIf="editingField === 'desc'"
+                (click)="updateField('description')"
+              >
+                <i class="fa-solid fa-check fa-xl" style="color: #45c33c"></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="editingField !== 'desc'">
+            <p>{{ product?.description }}</p>
+          </div>
+          <div
+            style="margin-top: 20px"
+            *ngIf="
+              editingField == 'desc' &&
+              userRole === 'SELLER' &&
+              product?.editable === true
+            "
+          >
+            <div class="field input-field">
+              <input
+                matInput
+                placeholder="Description"
+                formControlName="description"
+                #descriptionInput
+              />
+            </div>
+          </div>
+        </div>
+        <!-- ADD TO CART FEATURE -->
+        <div
+          class="addToCartDiv"
+          *ngIf="!noProductsAvailble ; else noProductsTemplate"
+        >
+          <!-- Content for when the condition is true -->
+          <button
+            class="addtocart"
+            *ngIf="userRole === 'CLIENT' && !noProductsAvailble"
+          >
+            <div class="pretext" (click)="addToCart()">
+              <i class="fas fa-cart-plus"></i> ADD TO CART
+            </div>
+            <!-- Disable this button when Add to cart is clicked -->
+            <div class="pretext" *ngIf="isProductInCart" id="addedToCart">
+              <i class="fas fa-check"></i> ADDED TO CART
+            </div>
+          </button>
+        </div>
+
+        <ng-template #noProductsTemplate>
+          <!-- Content for when the condition is false -->
+          <div>Out of Stock</div>
+        </ng-template>
+        <div class="ekart-product-detail-addtoCart">
+          <button
+            class="delete-button"
+            *ngIf="userRole === 'SELLER' && product?.editable === true"
+            (click)="deleteProduct()"
+          >
+            <span class="text"> Delete Product </span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
 </div>
-
-
-

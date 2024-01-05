@@ -5,6 +5,7 @@
 - [Front-end Specifications](#front-end-specifications)
 - [Back-end Specifications](#back-end-specifications)
 - [CI/CD Pipeline (using Jenkins)](#cicd-pipeline-using-jenkins)
+- [Artifact Management (using Nexus)](#artifact-management-using-nexus)
 - [Dashboard URLs](#dashboard-urls)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -22,10 +23,12 @@ This is a Java project that develops and end-to-end e-commerce platform with Spr
 
 ## Front-end Specifications
 
-- Sign-In/ Up Pages: `/login` and `/register` - Authentication views. 
-- Homepage `/home` - Once a user is authenticated, he/she will be directed to homepage. A simple view to display all products. 
+- Sign-In/ Up Pages: `/login` and `/register` - Authentication views.
+- Homepage `/home` - Once a user is authenticated, he/she will be directed to homepage. A simple view to display all products.
 - Seller Product Management `/product-dashboard` - If a user is authenticated as seller, he/she will be able to create products and manage their products.
 - User Profile `/user-dashboard` - Users can view and update their information.
+- My Orders `/my-orders` - Sellers and users can use this page to view, manage, and check the status and history of their orders. Sellers can confirm or cancel their requested orders, while users can cancel, view, and redo their successful orders.
+- Cart `/cart` - Users have the ability to add products from the home page to their cart. In the cart, users can view the added products, their prices, change product quantities, and see the total price. Users can then choose home delivery and proceed to checkout. The cart is sent to sellers and awaits approval. During this pending process, users can cancel the order on the `/my-orders` page. Once the order is fulfilled, users cannot cancel their order anymore.
 
 ## Back-end Specifications
 
@@ -358,7 +361,7 @@ The list of REST APIs to perform CRUD operations on Order (https://164.92.252.12
 The whole process of the project has been automated using Jenkins. The process consists of the following stages:
 
 -  Source Code Management (SCM): source code of the project is cloned and checked out to the build-server (at 139.59.159.95).
--  Setup Credentials: all MongoDB credentials and JWT secret are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
+-  Setup Environment Variables: all MongoDB credentials, Nexus credentials, JWT secret, NodeJS path and Docker images are set to Jenkinsfile environment variables and are accessible in different stages of the pipeline.
 -  Clean Workspace: all old quality-check report-tasks are removed from the workspace.
 -  SonarQube Analysis: this stage is performed for each and every backend microservice as well as frontend.
    +  If any of the analyses has been failed, the Post Actions stage will be triggered (Quality Gate, Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
@@ -366,22 +369,65 @@ The whole process of the project has been automated using Jenkins. The process c
    +  If any of the quality-gates has been failed, the Post Actions stage will be triggered (Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
 -  Frontend Unit Tests: the unit-tests for frontend are performed at the build-server.
    +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
--  Build: once all the unit-tests have been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server.
-   +  If all the builds are passed, the produced Docker images will then be pushed to a Docker Hub and are ready to be deployed.
+-  Deploy JAR Artifacts to Nexus: once all the unit-tests have been passed, all the artifacts (JAR, POM, etc.) of each and every microservice as well as of the parent project will be pushed to a Nexus Maven Snapshot repository.
+-  Build: once deploying of all the artifacts has been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server. All the dependencies of each and every microservice as well as of the parent project will be downloaded from a Nexus Maven Proxy repository.
+   +  If all the builds are passed, the produced Docker images will then be tagged with the current build-number and pushed to a Nexus Docker repository and are ready to be deployed.
    +  If any of the builds has been failed, the Post Actions stage will be triggered (the Deploy stage will be marked as failed in this case).
--  Deploy: once all the frontend and backend Docker images are available in the Docker Hub, they will be pulled to the deploy-server (at 164.92.252.125) and the deployment starts.
+-  Deploy: once all the frontend and backend Docker images are available in the Nexus Docker repository, they will be pulled to the deploy-server (at 164.92.252.125) and the deployment starts.
    +  Other necessary Docker images such as Zookeeper, Kafka and MongoDB are also pulled to the deploy-server.
    +  A separate Docker container is configured for each of the Docker images.
-   +  If the deployment is passed, all the Docker containers are started and all the Docker images for frontend and backend are saved into a backup directory on the deploy-server. 
-   +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful Docker images are fetched from the backup directory on the deploy-server. All the Docker containers are started with those latest successful Docker images. 
+   +  If the deployment is passed, all the Docker containers are started and the current build-number is saved into the version_number file on the deploy-server.
+   +  Rollback: If the deployment is failed, all the Docker containers are stopped and removed. All the Docker images for frontend and backend are also removed and the latest successful build-number is read from the version_number file on the deploy-server. All the latest successful Docker images (tagged with that latest successful build-number) are pulled from Nexus Docker repository and all the Docker containers are started with those latest successful Docker images.
 -  Post Actions:
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
+
+## Artifact Management (using Nexus)
+
+-  Configure Nexus Server:
+   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the nexus-server (at 209.38.204.141).
+   +  Run ./setup.sh to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
+   +  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
+   +  Change admin password to something really strong.
+   +  Don't allow anonymous users to access the server.
+   +  Create a Nexus Role named nx-docker with all Docker-related privileges.
+   +  Transfer the Docker Bearer Token Realm to the Active Realms.
+   +  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
+   +  Create a docker-hosted repository named nx-docker at port 8083.
+   +  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
+   +  Add maven-proxy repository to the list of member-repositories of maven-public group.
+
+-  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
+   +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
+      ```json
+      {
+         "insecure-registries": ["209.38.204.141:8083"]
+      }
+      ```
+   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker.
+   +  From ~/.m2/settings.xml file on the build-server, put nexusUser to <username> and a pre-defined password to <password>.
+   +  Run "docker login 209.38.204.141:8083 -u nexusUser -p <password>" (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
+
+-  Add to the pom.xml file of each and every microservice as well as of the parent project the following section (with ${nexus.server.url} resolved to http://209.38.204.141:8081 in this case):
+   ```xml
+   <distributionManagement>
+      <snapshotRepository>
+         <id>nexus-snapshots</id>
+         <url>${nexus.server.url}/repository/maven-snapshots/</url>
+      </snapshotRepository>
+      <repository>
+         <id>nexus-releases</id>
+         <url>${nexus.server.url}/repository/maven-releases/</url>
+      </repository>
+   </distributionManagement>
+   ```
 
 ## Dashboard URLs
 
 Jenkins: http://164.90.178.137:8080
 
-SonarQube Server: http://209.38.204.141:9000
+SonarQube: http://209.38.204.141:9000
+
+Nexus: http://209.38.204.141:8081
 
 Application: https://164.92.252.125:4200
 
