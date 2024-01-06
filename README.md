@@ -420,8 +420,8 @@ The whole process of the project has been automated using Jenkins. The process c
    
    </pre>
    
-   <pre> Before proceeding, complete the configuration for build-server and deploy-server by following the steps provided under `Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125)``.
-   </pre>
+   > Before proceeding, complete the configuration for build-server and deploy-server by following the steps provided under `Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125)``.
+   
    8.  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95). By configuring Nexus to operate under a dedicated "nexus" user enhances security by following the principle of least privilege, mitigating security risks, and providing isolation in case of vulnerabilities or attacks. It aligns with best practices for securing applications and is particularly important in containerized environments.
    <pre>
 
