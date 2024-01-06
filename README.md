@@ -392,35 +392,35 @@ The whole process of the project has been automated using Jenkins. The process c
    <img width="1440" alt="Screenshot 2024-01-07 at 0 19 12" src="https://github.com/danglam88/buy-01/assets/100776787/44b78d4d-9b15-4420-94de-b61c33ea6cfd">
 
    </pre>
-   2.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
+   1.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 29 01" src="https://github.com/danglam88/buy-01/assets/100776787/6009b47e-0e52-4c2f-ba75-9002da68a16d">
 
    </pre>
-   3.  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
-   4.  Follow on-screen instructions to change admin password to something really strong. 
+   1.  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
+   1.  Follow on-screen instructions to change admin password to something really strong. 
    - You can use a strong password generator like this: https://www.f-secure.com/en/password-generator
-   5.  Disable allow anonymous users to access the server by following on-screen instructions or by accessing in Sonatype Nexus Repository by navigating to Administration → Security → Anonymous Access. Anonymous users won't be able to access Nexus instance and attempt to download components.
+   1.  Disable allow anonymous users to access the server by following on-screen instructions or by accessing in Sonatype Nexus Repository by navigating to Administration → Security → Anonymous Access. Anonymous users won't be able to access Nexus instance and attempt to download components.
    <pre>
 
    <img width="955" alt="Screenshot+2023-04-12+at+11 34 09+AM" src="https://github.com/danglam88/buy-01/assets/100776787/d2c98b10-bdea-418c-9ab3-ba6c49c19701">
 
    </pre>
-   6.  Create a Nexus Role named nx-docker with all Docker-related privileges. Follow the setups as shown in the below picture.
+   1.  Create a Nexus Role named nx-docker with all Docker-related privileges. Follow the setups as shown in the below picture.
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 37 23" src="https://github.com/danglam88/buy-01/assets/100776787/d09d44bd-46d9-4f8e-8723-41287af72c7b">
    
    </pre>
-   7.  Transfer the Docker Bearer Token Realm to the Active Realms. Realms define a Sonatype Nexus Repository user's authentication source (e.g., Local Authentication, LDAP Realm, etc.). This realm is required to access Docker repositories through a Docker client or other container image manager (e.g., Docker Desktop, Docker Engine, Podman, etc.).
+   1.  Transfer the Docker Bearer Token Realm to the Active Realms. Realms define a Sonatype Nexus Repository user's authentication source (e.g., Local Authentication, LDAP Realm, etc.). This realm is required to access Docker repositories through a Docker client or other container image manager (e.g., Docker Desktop, Docker Engine, Podman, etc.).
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 38 06" src="https://github.com/danglam88/buy-01/assets/100776787/4593ab28-58c7-4311-bcc3-9992222bf66c">
    
    </pre>
    > Before proceeding, complete the configuration for build-server and deploy-server by following the steps provided under `Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125)``.
-   8.  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95). By configuring Nexus to operate under a dedicated "nexus" user enhances security by following the principle of least privilege, mitigating security risks, and providing isolation in case of vulnerabilities or attacks. It aligns with best practices for securing applications and is particularly important in containerized environments.
+   1.  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95). By configuring Nexus to operate under a dedicated "nexus" user enhances security by following the principle of least privilege, mitigating security risks, and providing isolation in case of vulnerabilities or attacks. It aligns with best practices for securing applications and is particularly important in containerized environments.
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 38 49" src="https://github.com/danglam88/buy-01/assets/100776787/8e83d155-cdc8-41a4-8e3d-e95b0c11b26a">
@@ -432,18 +432,18 @@ The whole process of the project has been automated using Jenkins. The process c
    <img width="1377" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
    
    </pre>
-   9.  Create a docker-hosted repository named nx-docker at port 8083.
+   1.  Create a docker-hosted repository named nx-docker at port 8083.
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 50 21" src="https://github.com/danglam88/buy-01/assets/100776787/ce2ab701-4795-4103-a28f-7648085b52a0">
    
    </pre>
-   10.  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
+   1.  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 55 08" src="https://github.com/danglam88/buy-01/assets/100776787/258f624c-b1a6-453e-a069-efffe9da0a30">
    </pre>
-   11. Add maven-proxy repository to the list of member-repositories of maven-public group.
+   1. Add maven-proxy repository to the list of member-repositories of maven-public group.
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 57 17" src="https://github.com/danglam88/buy-01/assets/100776787/aa312427-80f2-428f-a511-f3214f730729">
