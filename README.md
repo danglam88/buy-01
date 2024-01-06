@@ -383,7 +383,7 @@ The whole process of the project has been automated using Jenkins. The process c
 
 ## Artifact Management (using Nexus)
 -  Configure Nexus Server:
-   [U+200E]1.  Copy the following files from the nexus directory in the buy-01 project folder to the nexus-server (at 209.38.204.141):
+   1.  Copy the following files from the nexus directory in the buy-01 project folder to the nexus-server (at 209.38.204.141):
    - ``Docker-compose.yml`` sets up a Nexus repository manager/ Nexus server using the specified image and provides essential configurations for its deployment.
    - ``Dockerfile`` is used to build a custom Docker image based on the official Sonatype Nexus 3 image (sonatype/nexus3). It switches to root user to create a directory at /nexus-blobs and sets the ownership to the user and group "nexus:nexus." This step is necessary for Nexus to have the appropriate permissions to manage and store artifacts in blobs store. After that,  it switches back to the "nexus" user. This is the user that the Nexus service runs as for security reasons. Running the Nexus service as a non-root user enhances security by minimizing potential vulnerabilities.
    - ``setup.sh``: Script to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
