@@ -382,21 +382,25 @@ The whole process of the project has been automated using Jenkins. The process c
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
 
 ## Artifact Management (using Nexus)
-
+<pre>
 -  Configure Nexus Server:
-   1. Copy the following files from the nexus directory in the buy-01 project folder to the nexus-server (at 209.38.204.141):
+   1.  Copy the following files from the nexus directory in the buy-01 project folder to the nexus-server (at 209.38.204.141):
    + ``Docker-compose.yml`` sets up a Nexus repository manager/ Nexus server using the specified image and provides essential configurations for its deployment.
    + ``Dockerfile`` is used to build a custom Docker image based on the official Sonatype Nexus 3 image (sonatype/nexus3). It switches to root user to create a directory at /nexus-blobs and sets the ownership to the user and group "nexus:nexus." This step is necessary for Nexus to have the appropriate permissions to manage and store artifacts in blobs store. After that,  it switches back to the "nexus" user. This is the user that the Nexus service runs as for security reasons. Running the Nexus service as a non-root user enhances security by minimizing potential vulnerabilities.
    + ``setup.sh``: Script to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
-   <pre>
-   <img width="1440" alt="Screenshot 2024-01-07 at 0 19 12" src="https://github.com/danglam88/buy-01/assets/100776787/44b78d4d-9b15-4420-94de-b61c33ea6cfd">
    
-   </pre>
-   2. Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
+   <img width="1440" alt="Screenshot 2024-01-07 at 0 19 12" src="https://github.com/danglam88/buy-01/assets/100776787/44b78d4d-9b15-4420-94de-b61c33ea6cfd">
+
+   
+   2.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
+
    <img width="1440" alt="Screenshot 2024-01-07 at 0 29 01" src="https://github.com/danglam88/buy-01/assets/100776787/6009b47e-0e52-4c2f-ba75-9002da68a16d">
+
    3.  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
+
    4.  Follow on-screen instructions to change admin password to something really strong. 
    + You can use a strong password generator like this: https://www.f-secure.com/en/password-generator
+
    5.  Disable allow anonymous users to access the server by following on-screen instructions or by accessing in Sonatype Nexus Repository by navigating to Administration → Security → Anonymous Access. Anonymous users won't be able to access Nexus instance and attempt to download components.
    <img width="955" alt="Screenshot+2023-04-12+at+11 34 09+AM" src="https://github.com/danglam88/buy-01/assets/100776787/d2c98b10-bdea-418c-9ab3-ba6c49c19701">
    6.  Create a Nexus Role named nx-docker with all Docker-related privileges. Follow the setups as shown in the below picture.
@@ -414,6 +418,8 @@ The whole process of the project has been automated using Jenkins. The process c
    <img width="1440" alt="Screenshot 2024-01-07 at 0 55 08" src="https://github.com/danglam88/buy-01/assets/100776787/258f624c-b1a6-453e-a069-efffe9da0a30">
    11.  Add maven-proxy repository to the list of member-repositories of maven-public group.
    <img width="1440" alt="Screenshot 2024-01-07 at 0 57 17" src="https://github.com/danglam88/buy-01/assets/100776787/aa312427-80f2-428f-a511-f3214f730729">
+
+</pre>
 
 -  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
    +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
