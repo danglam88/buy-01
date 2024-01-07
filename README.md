@@ -7,8 +7,6 @@
 - [CI/CD Pipeline (using Jenkins)](#cicd-pipeline-using-jenkins)
 - [Artifact Management (using Nexus)](#artifact-management-using-nexus)
 - [Dashboard URLs](#dashboard-urls)
-- [Installation](#installation)
-- [Usage](#usage)
 - [License](#license)
 - [Contributing](#contributing)
 - [Authors](#authors)
@@ -369,7 +367,7 @@ The whole process of the project has been automated using Jenkins. The process c
    +  If any of the quality-gates has been failed, the Post Actions stage will be triggered (Frontend Unit Tests, Build and Deploy stages will be marked as failed in this case).
 -  Frontend Unit Tests: the unit-tests for frontend are performed at the build-server.
    +  If any of the unit-tests has been failed, the Post Actions stage will be triggered (Build and Deploy stages will be marked as failed in this case).
--  Deploy JAR Artifacts to Nexus: once all the unit-tests have been passed, all the artifacts (JAR, POM, etc.) of each and every microservice as well as of the parent project will be pushed to a Nexus Maven Snapshot repository.
+-  Deploy JAR and POM Artifacts to Nexus: once all the unit-tests have been passed, all the artifacts (JAR, POM, etc.) of each and every microservice as well as of the parent project will be pushed to a Nexus Maven Snapshot repository.
 -  Build: once deploying of all the artifacts has been passed, the builds will be performed for both frontend and backend microservices (producing Docker images) at the build-server. All the dependencies of each and every microservice as well as of the parent project will be downloaded from a Nexus Maven Proxy repository.
    +  If all the builds are passed, the produced Docker images will then be tagged with the current build-number and pushed to a Nexus Docker repository and are ready to be deployed.
    +  If any of the builds has been failed, the Post Actions stage will be triggered (the Deploy stage will be marked as failed in this case).
@@ -382,44 +380,145 @@ The whole process of the project has been automated using Jenkins. The process c
    +  Email Notifications: If deployment is passed, a success email will also be sent to all the team members. If the pipeline failed at any stage, the following stages will be skipped and a failure email will also be sent to all the team members as well as the ones whose commits broke the pipeline.
 
 ## Artifact Management (using Nexus)
+-  Project Setup:
+   1.  Copy the following files from the ``nexus`` directory under the ``buy-01`` project root folder to the nexus-server (at 209.38.204.141):
+   - ``docker-compose.yml`` sets up a Nexus repository manager/ Nexus server using the specified image and provides essential configurations for its deployment.
+   - ``Dockerfile`` is used to build a custom Docker image based on the official Sonatype Nexus 3 image (sonatype/nexus3). It switches to root user to create a directory at /nexus-blobs and sets the ownership to the user and group "nexus:nexus" This step is necessary for Nexus to have the appropriate permissions to manage and store artifacts in blobs store. After that, it switches back to the "nexus" user. This is the user that the Nexus service runs as for security reasons. Running the Nexus service as a non-root user enhances security by minimizing potential vulnerabilities.
+   - ``setup.sh`` installs a Sonatype Nexus Repository server on the nexus-server at port 8081 by creating external volumes (if not already exist), building nexus-image using the above ``Dockerfile`` and running nexus-container using the above ``docker-compose.yml``.
+   <pre>
 
--  Configure Nexus Server:
-   +  Copy docker-compose.yml, Dockerfile and setup.sh from the nexus directory to the nexus-server (at 209.38.204.141).
-   +  Run ./setup.sh to install a Sonatype Nexus Repository server on the nexus-server at port 8081.
-   +  Login to the installed Nexus server with credentials as admin/<password> (<password> can be found at /nexus-data/admin.password within the Nexus Docker container).
-   +  Change admin password to something really strong.
-   +  Don't allow anonymous users to access the server.
-   +  Create a Nexus Role named nx-docker with all Docker-related privileges.
-   +  Transfer the Docker Bearer Token Realm to the Active Realms.
-   +  Create an active user with credentials as nexusUser/<password> (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
-   +  Create a docker-hosted repository named nx-docker at port 8083.
-   +  Create a maven2-proxy repository named maven-proxy with permissive layout-policy.
-   +  Add maven-proxy repository to the list of member-repositories of maven-public group.
+   <img width="1440" alt="Screenshot 2024-01-07 at 0 19 12" src="https://github.com/danglam88/buy-01/assets/100776787/44b78d4d-9b15-4420-94de-b61c33ea6cfd">
 
--  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
-   +  Create a daemon.json file under /etc/docker directory of build-server and deploy-server with the following content:
-      ```json
-      {
-         "insecure-registries": ["209.38.204.141:8083"]
-      }
+   </pre>
+   2.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
+   <pre>
+
+   <img width="1440" alt="Screenshot 2024-01-07 at 0 29 01" src="https://github.com/danglam88/buy-01/assets/100776787/6009b47e-0e52-4c2f-ba75-9002da68a16d">
+
+   </pre>
+
+-  Configuration Steps:
+   -  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
+      1.  Create a ``daemon.json`` file under ``/etc/docker`` directory of build-server and deploy-server with the following content:
+         ```json
+         {
+            "insecure-registries": ["209.38.204.141:8083"]
+         }
+         ```
+      2.  Restart Docker on both build-server and deploy-server after the changes by the following command: ``sudo systemctl restart docker``
+      3.  Create a file called ``settings.xml`` under the ``~/.m2`` directory on the build-server, put ``nexusUser`` to ``<username>`` and a pre-defined password (for e.g. ``nexusPassword``) to ``<password>`` as follows:
+      <pre>
+
+      <img width="990" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
+      
+      </pre>
+      4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
+
+   -  Configure Nexus Server:
+      1.  Login to the installed Nexus server with credentials as ``admin/adminPassword`` (``adminPassword`` can be found at ``/nexus-data/admin.password`` within the nexus-container).
+      2.  Follow on-screen instructions to change ``adminPassword`` to something really strong.
+      - You can use a strong password generator like this: https://www.f-secure.com/en/password-generator
+      3.  Disable allowing anonymous users to access the server by following on-screen instructions or by accessing in Sonatype Nexus Repository by navigating to ``Administration → Security → Anonymous Access``. Anonymous users won't be able to access Nexus instance and attempt to download components.
+      <pre>
+
+      <img width="990" alt="Screenshot+2023-04-12+at+11 34 09+AM" src="https://github.com/danglam88/buy-01/assets/100776787/d2c98b10-bdea-418c-9ab3-ba6c49c19701">
+
+      </pre>
+      4.  Create a ``Nexus Role`` named ``nx-docker`` with all Docker-related privileges. Follow the setups as shown in the below picture.
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 37 23" src="https://github.com/danglam88/buy-01/assets/100776787/d09d44bd-46d9-4f8e-8723-41287af72c7b">
+      
+      </pre>
+      5.  Transfer the ``Docker Bearer Token Realm`` to the ``Active Realms``. Realms define a Sonatype Nexus Repository user's authentication source (e.g., ``Local Authentication``, ``LDAP Realm``, etc.). This realm is required to access Docker repositories through a Docker client or other container image manager (e.g., ``Docker Desktop``, ``Docker Engine``, ``Podman``, etc.).
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 38 06" src="https://github.com/danglam88/buy-01/assets/100776787/4593ab28-58c7-4311-bcc3-9992222bf66c">
+      
+      </pre>
+      6.  Create an ``active user`` with credentials as ``nexusUser/nexusPassword`` (``nexusPassword`` can be found from ``settings.xml`` file under ``~/.m2`` directory on the build-server at 139.59.159.95). By configuring Nexus to operate under a dedicated "nexus" user enhances security by following the principle of least privilege, mitigating security risks, and providing isolation in case of vulnerabilities or attacks. It aligns with best practices for securing applications and is particularly important in containerized environments.
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 38 49" src="https://github.com/danglam88/buy-01/assets/100776787/8e83d155-cdc8-41a4-8e3d-e95b0c11b26a">
+
+      </pre>
+      7.  Create a ``docker-hosted`` repository named ``nx-docker`` at port ``8083``.
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 50 21" src="https://github.com/danglam88/buy-01/assets/100776787/ce2ab701-4795-4103-a28f-7648085b52a0">
+      
+      </pre>
+      8.  Create a ``maven2-proxy`` repository named ``maven-proxy`` with ``permissive layout-policy``.
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 55 08" src="https://github.com/danglam88/buy-01/assets/100776787/258f624c-b1a6-453e-a069-efffe9da0a30">
+      </pre>
+      9.  Add ``maven-proxy`` repository to the list of ``member-repositories`` of ``maven-public`` group.
+      <pre>
+
+      <img width="1440" alt="Screenshot 2024-01-07 at 0 57 17" src="https://github.com/danglam88/buy-01/assets/100776787/aa312427-80f2-428f-a511-f3214f730729">
+
+      </pre>
+
+   -  Configure additional settings in the project:
+      1.  Add to the ``pom.xml`` file of each and every microservice as well as of the parent project the following section (with ``${revision}`` resolved to the current pipeline build-number and ``${nexus.server.url}`` resolved to http://209.38.204.141:8081 in this case):
+      ```xml
+      ...
+      <version>${revision}</version>
+      ...
+      <properties>
+         ...
+         <nexus.server.url>http://nexus-server-url</nexus.server.url>
+         ...
+      </properties>
+      ...
+      <distributionManagement>
+         <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>${nexus.server.url}/repository/maven-snapshots/</url>
+         </snapshotRepository>
+         <repository>
+            <id>nexus-releases</id>
+            <url>${nexus.server.url}/repository/maven-releases/</url>
+         </repository>
+      </distributionManagement>
+      ...
       ```
-   +  Restart Docker on both build-server and deploy-server after the changes by the following command: sudo systemctl restart docker.
-   +  From ~/.m2/settings.xml file on the build-server, put nexusUser to <username> and a pre-defined password to <password>.
-   +  Run "docker login 209.38.204.141:8083 -u nexusUser -p <password>" (<password> can be found from settings.xml file under ~/.m2 directory on the build-server at 139.59.159.95).
+      The above settings in the ``pom.xml`` files will be used for versioning of the ``JAR`` artifacts and pointing to the locations of ``mven-snapshots`` and ``maven-releases`` repositories on the nexus-server.
 
--  Add to the pom.xml file of each and every microservice as well as of the parent project the following section (with ${nexus.server.url} resolved to http://209.38.204.141:8081 in this case):
-   ```xml
-   <distributionManagement>
-      <snapshotRepository>
-         <id>nexus-snapshots</id>
-         <url>${nexus.server.url}/repository/maven-snapshots/</url>
-      </snapshotRepository>
-      <repository>
-         <id>nexus-releases</id>
-         <url>${nexus.server.url}/repository/maven-releases/</url>
-      </repository>
-   </distributionManagement>
+      2.  Create a file called ``settings.xml`` under the ``backend`` directory of the ``buy-01`` project root folder (with ``${NEXUS_USERNAME}`` resolved to ``nexusUser``, ``${NEXUS_PASSWORD}`` resolved to ``nexusPassword`` and ``${NEXUS_SERVER}`` resolved to http://209.38.204.141:8081 in this case) as follows:
+      <pre>
+
+      <img width="1440" alt="proxy" src="https://github.com/danglam88/buy-01/assets/119531235/a3ff75ca-19a1-4225-9164-eebe4ec526ad">
+
+      </pre>
+      The above ``settings.xml`` file will be used in the ``Dockerfile`` of each and every microservice during the execution of the ``docker build`` commands in the Build stage of the Jenkins pipeline in order to fetch the dependencies using ``maven-proxy`` repository on the nexus-server.
+
+-  Usage Instructions:
+   1.  Clone the project repository to your local machine using the following command:
+   ```bash
+   git clone git@github.com:danglam88/buy-01.git
    ```
+   2.  Navigate to the project root directory, switch to nexus branch, make some changes, commit the changes then push them to nexus branch of the remote repository. After that, make a pull request to main branch, review the changes then approve and merge them to main branch. The Jenkins pipeline will be triggered shortly (using Webhooks in Github) for main branch. Different artifacts can be found on the nexus-server at different stages of the pipeline as follows:
+   -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
+   <pre>
+
+   <img width="220" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/cafc8405-ef57-44d6-baa7-41a4ee3e160f">
+
+   </pre>
+   -  ``JAR`` and ``POM`` artifacts can be found in ``maven-snapshots`` repository after ``Deploy JAR and POM Artifacts to Nexus`` stage is done:
+   <pre>
+
+   <img width="440" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
+
+   </pre>
+   -  Docker images can be found in ``nx-docker`` repository after ``Build`` stage is done:
+   <pre>
+
+   <img width="1440" alt="docker" src="https://github.com/danglam88/buy-01/assets/119531235/1d76669d-4f22-4142-8cab-14fbc876b1c6">
+
+   </pre>
+   3.  Finally, the application is accessible at https://164.92.252.125:4200 after the whole Jenkins pipeline has been completed.
 
 ## Dashboard URLs
 
@@ -430,20 +529,6 @@ SonarQube: http://209.38.204.141:9000
 Nexus: http://209.38.204.141:8081
 
 Application: https://164.92.252.125:4200
-
-## Installation
-
-To install the project, clone the repository to your local machine.
-
-```bash
-git clone git@github.com:danglam88/buy-01.git
-```
-
-## Usage
-
-To run the project, navigate to the project root directory, make some changes, then push them to the main branch of the project repository. The CI/CD pipeline will be triggered (using Webhooks in Github) after that. Finally, the application is accessible at https://164.92.252.125:4200 after the pipeline process has been completed.
-
-Postman is a great tool for testing REST APIs. You can download it [here](https://www.postman.com/downloads/).
 
 ## License
 
