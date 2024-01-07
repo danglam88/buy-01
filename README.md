@@ -503,7 +503,7 @@ The whole process of the project has been automated using Jenkins. The process c
    -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
-   <img width="440" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/6dbce74d-3e33-4f33-8506-cdd87e3a1f3f">
+   <img width="440" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/cafc8405-ef57-44d6-baa7-41a4ee3e160f">
 
    </pre>
    -  ``JAR`` and ``POM`` artifacts can be found in ``maven-snapshots`` repository after ``Deploy JAR and POM Artifacts to Nexus`` stage is done:
