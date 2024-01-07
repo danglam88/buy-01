@@ -409,7 +409,7 @@ The whole process of the project has been automated using Jenkins. The process c
       3.  Create a file called ``settings.xml`` under the ``~/.m2`` directory on the build-server, put ``nexusUser`` to ``<username>`` and a pre-defined password (for e.g. ``nexusPassword``) to ``<password>`` as follows:
       <pre>
 
-      <img width="955" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
+      <img width="990" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
       
       </pre>
       4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
@@ -421,7 +421,7 @@ The whole process of the project has been automated using Jenkins. The process c
       3.  Disable allowing anonymous users to access the server by following on-screen instructions or by accessing in Sonatype Nexus Repository by navigating to ``Administration → Security → Anonymous Access``. Anonymous users won't be able to access Nexus instance and attempt to download components.
       <pre>
 
-      <img width="955" alt="Screenshot+2023-04-12+at+11 34 09+AM" src="https://github.com/danglam88/buy-01/assets/100776787/d2c98b10-bdea-418c-9ab3-ba6c49c19701">
+      <img width="990" alt="Screenshot+2023-04-12+at+11 34 09+AM" src="https://github.com/danglam88/buy-01/assets/100776787/d2c98b10-bdea-418c-9ab3-ba6c49c19701">
 
       </pre>
       4.  Create a ``Nexus Role`` named ``nx-docker`` with all Docker-related privileges. Follow the setups as shown in the below picture.
@@ -503,13 +503,13 @@ The whole process of the project has been automated using Jenkins. The process c
    -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
-   <img width="955" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/6dbce74d-3e33-4f33-8506-cdd87e3a1f3f">
+   <img width="440" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/6dbce74d-3e33-4f33-8506-cdd87e3a1f3f">
 
    </pre>
    -  ``JAR`` and ``POM`` artifacts can be found in ``maven-snapshots`` repository after ``Deploy JAR and POM Artifacts to Nexus`` stage is done:
    <pre>
 
-   <img width="955" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
+   <img width="770" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
 
    </pre>
    -  Docker images can be found in ``nx-docker`` repository after ``Build`` stage is done:
