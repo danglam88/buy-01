@@ -509,7 +509,7 @@ The whole process of the project has been automated using Jenkins. The process c
    -  ``JAR`` and ``POM`` artifacts can be found in ``maven-snapshots`` repository after ``Deploy JAR and POM Artifacts to Nexus`` stage is done:
    <pre>
 
-   <img width="770" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
+   <img width="440" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
 
    </pre>
    -  Docker images can be found in ``nx-docker`` repository after ``Build`` stage is done:
