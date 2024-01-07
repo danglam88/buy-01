@@ -381,7 +381,7 @@ The whole process of the project has been automated using Jenkins. The process c
 
 ## Artifact Management (using Nexus)
 -  Project Setup:
-   1.  Copy the following files from the nexus directory in the buy-01 project folder to the nexus-server (at 209.38.204.141):
+   1.  Copy the following files from the ``nexus`` directory under the ``buy-01`` project root folder to the nexus-server (at 209.38.204.141):
    - ``docker-compose.yml`` sets up a Nexus repository manager/ Nexus server using the specified image and provides essential configurations for its deployment.
    - ``Dockerfile`` is used to build a custom Docker image based on the official Sonatype Nexus 3 image (sonatype/nexus3). It switches to root user to create a directory at /nexus-blobs and sets the ownership to the user and group "nexus:nexus" This step is necessary for Nexus to have the appropriate permissions to manage and store artifacts in blobs store. After that, it switches back to the "nexus" user. This is the user that the Nexus service runs as for security reasons. Running the Nexus service as a non-root user enhances security by minimizing potential vulnerabilities.
    - ``setup.sh`` installs a Sonatype Nexus Repository server on the nexus-server at port 8081 by creating external volumes (if not already exist), building nexus-image using the above ``Dockerfile`` and running nexus-container using the above ``docker-compose.yml``.
@@ -409,7 +409,7 @@ The whole process of the project has been automated using Jenkins. The process c
       3.  Create a file called ``settings.xml`` under the ``~/.m2`` directory on the build-server, put ``nexusUser`` to ``<username>`` and a pre-defined password (for e.g. ``nexusPassword``) to ``<password>`` as follows:
       <pre>
 
-      <img width="1377" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
+      <img width="955" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
       
       </pre>
       4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
@@ -485,7 +485,8 @@ The whole process of the project has been automated using Jenkins. The process c
       ...
       ```
       The above settings in the ``pom.xml`` files will be used for versioning of the ``JAR`` artifacts and pointing to the locations of ``mven-snapshots`` and ``maven-releases`` repositories on the nexus-server.
-      2.  Create a file called ``settings.xml`` under the ``buy-01/backend`` directory of the project as follows (with ``${NEXUS_USERNAME}`` resolved to ``nexusUser``, ``${NEXUS_PASSWORD}`` resolved to ``nexusPassword`` and ``${NEXUS_SERVER}`` resolved to http://209.38.204.141:8081 in this case):
+
+      2.  Create a file called ``settings.xml`` under the ``backend`` directory of the ``buy-01`` project root folder (with ``${NEXUS_USERNAME}`` resolved to ``nexusUser``, ``${NEXUS_PASSWORD}`` resolved to ``nexusPassword`` and ``${NEXUS_SERVER}`` resolved to http://209.38.204.141:8081 in this case) as follows:
       <pre>
 
       <img width="1440" alt="proxy" src="https://github.com/danglam88/buy-01/assets/119531235/a3ff75ca-19a1-4225-9164-eebe4ec526ad">
@@ -502,13 +503,13 @@ The whole process of the project has been automated using Jenkins. The process c
    -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
-   <img width="1440" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/6dbce74d-3e33-4f33-8506-cdd87e3a1f3f">
+   <img width="955" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/6dbce74d-3e33-4f33-8506-cdd87e3a1f3f">
 
    </pre>
    -  ``JAR`` and ``POM`` artifacts can be found in ``maven-snapshots`` repository after ``Deploy JAR and POM Artifacts to Nexus`` stage is done:
    <pre>
 
-   <img width="1440" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
+   <img width="955" alt="snapshots" src="https://github.com/danglam88/buy-01/assets/119531235/62d58916-25d9-402c-af95-2d1b82b9b966">
 
    </pre>
    -  Docker images can be found in ``nx-docker`` repository after ``Build`` stage is done:
