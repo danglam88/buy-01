@@ -518,7 +518,7 @@ The whole process of the project has been automated using Jenkins. The process c
    -  Frontend dependencies can be found in ``npm-proxy`` repository after ``SonarQube Analysis for Frontend`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
-   <img width="1440" src="assets/instruction4.png">
+   <img width="440" src="assets/instruction4.png">
 
    </pre>
    -  Backend dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
