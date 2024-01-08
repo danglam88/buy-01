@@ -8,15 +8,13 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-COPY .npmrc /root/
-RUN npm config list
-RUN npm install --ignore-scripts
 
 # Copy the codebase into the image
 COPY src src
 COPY nginx.conf ./
 COPY sonar-project.properties ./
 COPY *.json ./
+COPY node_modules node_modules
 
 # Generate the build of the application using npx to call local ng
 RUN npx ng build
