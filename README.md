@@ -398,22 +398,6 @@ The whole process of the project has been automated using Jenkins. The process c
    </pre>
 
 -  Configuration Steps:
-   -  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
-      1.  Create a ``daemon.json`` file under ``/etc/docker`` directory of build-server and deploy-server with the following content:
-         ```json
-         {
-            "insecure-registries": ["209.38.204.141:8083"]
-         }
-         ```
-      2.  Restart Docker on both build-server and deploy-server after the changes by the following command: ``sudo systemctl restart docker``
-      3.  Create a file called ``settings.xml`` under the ``~/.m2`` directory on the build-server, put ``nexusUser`` to ``<username>`` and a pre-defined password (for e.g. ``nexusPassword``) to ``<password>`` as follows:
-      <pre>
-
-      <img width="990" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
-      
-      </pre>
-      4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
-
    -  Configure Nexus Server:
       1.  Login to the installed Nexus server with credentials as ``admin/adminPassword`` (``adminPassword`` can be found at ``/nexus-data/admin.password`` within the nexus-container).
       2.  Follow on-screen instructions to change ``adminPassword`` to something really strong.
@@ -430,35 +414,66 @@ The whole process of the project has been automated using Jenkins. The process c
       <img width="1440" alt="Screenshot 2024-01-07 at 0 37 23" src="https://github.com/danglam88/buy-01/assets/100776787/d09d44bd-46d9-4f8e-8723-41287af72c7b">
       
       </pre>
-      5.  Transfer the ``Docker Bearer Token Realm`` to the ``Active Realms``. Realms define a Sonatype Nexus Repository user's authentication source (e.g., ``Local Authentication``, ``LDAP Realm``, etc.). This realm is required to access Docker repositories through a Docker client or other container image manager (e.g., ``Docker Desktop``, ``Docker Engine``, ``Podman``, etc.).
+      5.  Transfer the ``Docker Bearer Token Realm`` and ``npm Bearer Token Realm`` to the ``Active Realms``. Realms define a Sonatype Nexus Repository user's authentication source (e.g., ``Local Authentication``, ``LDAP Realm``, etc.). ``Docker Bearer Token Realm`` is required to access Docker repositories through a Docker client or other container image manager (e.g., ``Docker Desktop``, ``Docker Engine``, ``Podman``, etc.).
       <pre>
 
-      <img width="1440" alt="Screenshot 2024-01-07 at 0 38 06" src="https://github.com/danglam88/buy-01/assets/100776787/4593ab28-58c7-4311-bcc3-9992222bf66c">
+      <img width="1440" src="assets/instruction1.png">
       
       </pre>
-      6.  Create an ``active user`` with credentials as ``nexusUser/nexusPassword`` (``nexusPassword`` can be found from ``settings.xml`` file under ``~/.m2`` directory on the build-server at 139.59.159.95). By configuring Nexus to operate under a dedicated "nexus" user enhances security by following the principle of least privilege, mitigating security risks, and providing isolation in case of vulnerabilities or attacks. It aligns with best practices for securing applications and is particularly important in containerized environments.
+      6.  Create an ``active user`` with credentials as ``npmuser/npmpassword`` (``npmpassword`` will be set to the ``~/.npmrc`` file on the build-server at 139.59.159.95).
+      <pre>
+
+      <img width="1440" src="assets/instruction2.png">
+
+      </pre>
+      7.  Create an ``active user`` with credentials as ``nexusUser/nexusPassword`` (``nexusPassword`` will be set to the ``settings.xml`` file under ``~/.m2`` directory on the build-server at 139.59.159.95).
       <pre>
 
       <img width="1440" alt="Screenshot 2024-01-07 at 0 38 49" src="https://github.com/danglam88/buy-01/assets/100776787/8e83d155-cdc8-41a4-8e3d-e95b0c11b26a">
 
       </pre>
-      7.  Create a ``docker-hosted`` repository named ``nx-docker`` at port ``8083``.
+      8.  Create a ``docker-hosted`` repository named ``nx-docker`` at port ``8083``.
       <pre>
 
       <img width="1440" alt="Screenshot 2024-01-07 at 0 50 21" src="https://github.com/danglam88/buy-01/assets/100776787/ce2ab701-4795-4103-a28f-7648085b52a0">
       
       </pre>
-      8.  Create a ``maven2-proxy`` repository named ``maven-proxy`` with ``permissive layout-policy``.
+      9.  Create a ``maven2-proxy`` repository named ``maven-proxy`` with ``permissive layout-policy``.
       <pre>
 
       <img width="1440" alt="Screenshot 2024-01-07 at 0 55 08" src="https://github.com/danglam88/buy-01/assets/100776787/258f624c-b1a6-453e-a069-efffe9da0a30">
       </pre>
-      9.  Add ``maven-proxy`` repository to the list of ``member-repositories`` of ``maven-public`` group.
+      10.  Create a ``npm-proxy`` repository named ``npm-proxy`` with settings as in the image below:
+      <pre>
+
+      <img width="1440" src="assets/instruction3.png">
+
+      </pre>
+      11.  Add ``maven-proxy`` repository to the list of ``member-repositories`` of ``maven-public`` group.
       <pre>
 
       <img width="1440" alt="Screenshot 2024-01-07 at 0 57 17" src="https://github.com/danglam88/buy-01/assets/100776787/aa312427-80f2-428f-a511-f3214f730729">
 
       </pre>
+
+   -  Configure the build-server (at 139.59.159.95) and the deploy-server (at 164.92.252.125):
+      1.  Create a ``daemon.json`` file under ``/etc/docker`` directory of build-server and deploy-server with the following content:
+         ```json
+         {
+            "insecure-registries": ["209.38.204.141:8083"]
+         }
+         ```
+      2.  Restart Docker on both build-server and deploy-server after the changes by the following command: ``sudo systemctl restart docker``
+      3.  Create a file called ``settings.xml`` under the ``~/.m2`` directory on the build-server, put ``nexusUser`` to ``<username>`` and a pre-defined password (for e.g. ``nexusPassword``) to ``<password>`` as follows:
+      <pre>
+
+      <img width="990" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
+      
+      </pre>
+      4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
+      5.  Run ``npm config set registry http://209.38.204.141:8081/repository/npm-proxy`` on the build-server. This will add a ``registry`` to the ``~/.npmrc`` file.
+      6.  Run ``npm login`` then follow the instructions to set ``npmuser/npmpassword`` (nexus user created earlier) as credentials. This will add an ``authToken`` to the ``~/.npmrc`` file.
+      7.  Open ``~/.npmrc`` file then add ``audit=false`` to the last line of the file.
 
    -  Configure additional settings in the project:
       1.  Add to the ``pom.xml`` file of each and every microservice as well as of the parent project the following section (with ``${revision}`` resolved to the current pipeline build-number and ``${nexus.server.url}`` resolved to http://209.38.204.141:8081 in this case):
@@ -500,7 +515,13 @@ The whole process of the project has been automated using Jenkins. The process c
    git clone git@github.com:danglam88/buy-01.git
    ```
    2.  Navigate to the project root directory, switch to nexus branch, make some changes, commit the changes then push them to nexus branch of the remote repository. After that, make a pull request to main branch, review the changes then approve and merge them to main branch. The Jenkins pipeline will be triggered shortly (using Webhooks in Github) for main branch. Different artifacts can be found on the nexus-server at different stages of the pipeline as follows:
-   -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
+   -  Frontend dependencies can be found in ``npm-proxy`` repository after ``SonarQube Analysis for Frontend`` stage is done for the first execution of the Jenkins pipeline:
+   <pre>
+
+   <img width="440" src="assets/instruction4.png">
+
+   </pre>
+   -  Backend dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
    <img width="220" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/cafc8405-ef57-44d6-baa7-41a4ee3e160f">
