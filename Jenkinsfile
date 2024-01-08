@@ -12,8 +12,8 @@ pipeline {
     }
 
     environment {
-        NEXUS_DOCKER_REPOSITORY = '142.93.175.42:8083'
-        NEXUS_SERVER = 'http://142.93.175.42:8081'
+        NEXUS_DOCKER_REPOSITORY = '209.38.204.141:8083'
+        NEXUS_SERVER = 'http://209.38.204.141:8081'
     }
 
     stages {
