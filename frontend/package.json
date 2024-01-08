@@ -1,6 +1,6 @@
 {
   "name": "buy-01",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ssl true --ssl-key '/etc/nginx/164.92.252.125-key.pem' --ssl-cert '/etc/nginx/164.92.252.125.pem'",
@@ -24,7 +24,8 @@
     "ngx-toastr": "^17.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.13.0",
+    "commonjs" : "0.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.1",
