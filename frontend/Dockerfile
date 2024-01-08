@@ -8,6 +8,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
+COPY .npmrc /root/
 RUN npm install --ignore-scripts
 
 # Copy the codebase into the image
