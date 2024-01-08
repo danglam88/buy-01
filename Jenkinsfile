@@ -185,7 +185,7 @@ pipeline {
             }
         }
 
-        stage('Deploy JAR Artifacts to Nexus') {
+        stage('Deploy JAR and POM Artifacts to Nexus') {
             agent { label 'build-agent' }
             steps {
                 script {
