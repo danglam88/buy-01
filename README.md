@@ -381,7 +381,7 @@ The whole process of the project has been automated using Jenkins. The process c
 
 ## Artifact Management (using Nexus)
 -  Project Setup:
-   1.  Copy the following files from the ``nexus`` directory under the ``buy-01`` project root folder to the nexus-server (at 142.93.175.42):
+   1.  Copy the following files from the ``nexus`` directory under the ``buy-01`` project root folder to the nexus-server (at 209.38.204.141):
    - ``docker-compose.yml`` sets up a Nexus repository manager/ Nexus server using the specified image and provides essential configurations for its deployment.
    - ``Dockerfile`` is used to build a custom Docker image based on the official Sonatype Nexus 3 image (sonatype/nexus3). It switches to root user to create a directory at /nexus-blobs and sets the ownership to the user and group "nexus:nexus" This step is necessary for Nexus to have the appropriate permissions to manage and store artifacts in blobs store. After that, it switches back to the "nexus" user. This is the user that the Nexus service runs as for security reasons. Running the Nexus service as a non-root user enhances security by minimizing potential vulnerabilities.
    - ``setup.sh`` installs a Sonatype Nexus Repository server on the nexus-server at port 8081 by creating external volumes (if not already exist), building nexus-image using the above ``Dockerfile`` and running nexus-container using the above ``docker-compose.yml``.
@@ -390,7 +390,7 @@ The whole process of the project has been automated using Jenkins. The process c
    <img width="1440" alt="Screenshot 2024-01-07 at 0 19 12" src="https://github.com/danglam88/buy-01/assets/100776787/44b78d4d-9b15-4420-94de-b61c33ea6cfd">
 
    </pre>
-   2.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://142.93.175.42:8081
+   2.  Execute ``./setup.sh`` to install a Sonatype Nexus Repository server on the nexus-server at port 8081. Nexus is now accessible via http://209.38.204.141:8081
    <pre>
 
    <img width="1440" alt="Screenshot 2024-01-07 at 0 29 01" src="https://github.com/danglam88/buy-01/assets/100776787/6009b47e-0e52-4c2f-ba75-9002da68a16d">
@@ -460,7 +460,7 @@ The whole process of the project has been automated using Jenkins. The process c
       1.  Create a ``daemon.json`` file under ``/etc/docker`` directory of build-server and deploy-server with the following content:
          ```json
          {
-            "insecure-registries": ["142.93.175.42:8083"]
+            "insecure-registries": ["209.38.204.141:8083"]
          }
          ```
       2.  Restart Docker on both build-server and deploy-server after the changes by the following command: ``sudo systemctl restart docker``
@@ -470,13 +470,13 @@ The whole process of the project has been automated using Jenkins. The process c
       <img width="990" alt="Screenshot 2024-01-07 at 0 44 38" src="https://github.com/danglam88/buy-01/assets/100776787/9793c40c-7170-4687-a162-689887dc32d0">
       
       </pre>
-      4.  Run ``docker login 142.93.175.42:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
-      5.  Run ``npm config set registry http://142.93.175.42:8081/repository/npm-proxy`` on the build-server. This will add a ``registry`` to the ``~/.npmrc`` file.
+      4.  Run ``docker login 209.38.204.141:8083 -u nexusUser -p nexusPassword`` on both build-server and deploy-server.
+      5.  Run ``npm config set registry http://209.38.204.141:8081/repository/npm-proxy`` on the build-server. This will add a ``registry`` to the ``~/.npmrc`` file.
       6.  Run ``npm login`` then follow the instructions to set ``npmuser/npmpassword`` (nexus user created earlier) as credentials. This will add an ``authToken`` to the ``~/.npmrc`` file.
       7.  Open ``~/.npmrc`` file then add ``audit=false`` to the last line of the file.
 
    -  Configure additional settings in the project:
-      1.  Add to the ``pom.xml`` file of each and every microservice as well as of the parent project the following section (with ``${revision}`` resolved to the current pipeline build-number and ``${nexus.server.url}`` resolved to http://142.93.175.42:8081 in this case):
+      1.  Add to the ``pom.xml`` file of each and every microservice as well as of the parent project the following section (with ``${revision}`` resolved to the current pipeline build-number and ``${nexus.server.url}`` resolved to http://209.38.204.141:8081 in this case):
       ```xml
       ...
       <version>${revision}</version>
@@ -501,7 +501,7 @@ The whole process of the project has been automated using Jenkins. The process c
       ```
       The above settings in the ``pom.xml`` files will be used for versioning of the ``JAR`` artifacts and pointing to the locations of ``mven-snapshots`` and ``maven-releases`` repositories on the nexus-server.
 
-      2.  Create a file called ``settings.xml`` under the ``backend`` directory of the ``buy-01`` project root folder (with ``${NEXUS_USERNAME}`` resolved to ``nexusUser``, ``${NEXUS_PASSWORD}`` resolved to ``nexusPassword`` and ``${NEXUS_SERVER}`` resolved to http://142.93.175.42:8081 in this case) as follows:
+      2.  Create a file called ``settings.xml`` under the ``backend`` directory of the ``buy-01`` project root folder (with ``${NEXUS_USERNAME}`` resolved to ``nexusUser``, ``${NEXUS_PASSWORD}`` resolved to ``nexusPassword`` and ``${NEXUS_SERVER}`` resolved to http://209.38.204.141:8081 in this case) as follows:
       <pre>
 
       <img width="1440" alt="proxy" src="https://github.com/danglam88/buy-01/assets/119531235/a3ff75ca-19a1-4225-9164-eebe4ec526ad">
@@ -541,7 +541,7 @@ Jenkins: http://164.90.178.137:8080
 
 SonarQube: http://209.38.204.141:9000
 
-Nexus: http://142.93.175.42:8081
+Nexus: http://209.38.204.141:8081
 
 Application: https://164.92.252.125:4200
 
