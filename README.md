@@ -515,7 +515,13 @@ The whole process of the project has been automated using Jenkins. The process c
    git clone git@github.com:danglam88/buy-01.git
    ```
    2.  Navigate to the project root directory, switch to nexus branch, make some changes, commit the changes then push them to nexus branch of the remote repository. After that, make a pull request to main branch, review the changes then approve and merge them to main branch. The Jenkins pipeline will be triggered shortly (using Webhooks in Github) for main branch. Different artifacts can be found on the nexus-server at different stages of the pipeline as follows:
-   -  Dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
+   -  Frontend dependencies can be found in ``npm-proxy`` repository after ``SonarQube Analysis for Frontend`` stage is done for the first execution of the Jenkins pipeline:
+   <pre>
+
+   <img width="440" src="assets/instruction4.png">
+
+   </pre>
+   -  Backend dependencies can be found in ``maven-proxy`` repository after ``Build`` stage is done for the first execution of the Jenkins pipeline:
    <pre>
 
    <img width="220" alt="dependencies" src="https://github.com/danglam88/buy-01/assets/119531235/cafc8405-ef57-44d6-baa7-41a4ee3e160f">
